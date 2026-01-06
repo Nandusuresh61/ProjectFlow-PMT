@@ -1,0 +1,67 @@
+// src/enums/ErrorCode.ts
+var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
+  ErrorCode2["AUTH"] = "Authentication Error";
+  return ErrorCode2;
+})(ErrorCode || {});
+
+// src/enums/HttpStatusCodes.ts
+var HttpStatusCode = /* @__PURE__ */ ((HttpStatusCode2) => {
+  HttpStatusCode2[HttpStatusCode2["OK"] = 200] = "OK";
+  HttpStatusCode2[HttpStatusCode2["CREATED"] = 201] = "CREATED";
+  HttpStatusCode2[HttpStatusCode2["ACCEPTED"] = 202] = "ACCEPTED";
+  HttpStatusCode2[HttpStatusCode2["NO_CONTENT"] = 204] = "NO_CONTENT";
+  HttpStatusCode2[HttpStatusCode2["MOVED_PERMANENTLY"] = 301] = "MOVED_PERMANENTLY";
+  HttpStatusCode2[HttpStatusCode2["FOUND"] = 302] = "FOUND";
+  HttpStatusCode2[HttpStatusCode2["NOT_MODIFIED"] = 304] = "NOT_MODIFIED";
+  HttpStatusCode2[HttpStatusCode2["BAD_REQUEST"] = 400] = "BAD_REQUEST";
+  HttpStatusCode2[HttpStatusCode2["UNAUTHORIZED"] = 401] = "UNAUTHORIZED";
+  HttpStatusCode2[HttpStatusCode2["FORBIDDEN"] = 403] = "FORBIDDEN";
+  HttpStatusCode2[HttpStatusCode2["NOT_FOUND"] = 404] = "NOT_FOUND";
+  HttpStatusCode2[HttpStatusCode2["METHOD_NOT_ALLOWED"] = 405] = "METHOD_NOT_ALLOWED";
+  HttpStatusCode2[HttpStatusCode2["CONFLICT"] = 409] = "CONFLICT";
+  HttpStatusCode2[HttpStatusCode2["UNPROCESSABLE_ENTITY"] = 422] = "UNPROCESSABLE_ENTITY";
+  HttpStatusCode2[HttpStatusCode2["TOO_MANY_REQUESTS"] = 429] = "TOO_MANY_REQUESTS";
+  HttpStatusCode2[HttpStatusCode2["INTERNAL_SERVER_ERROR"] = 500] = "INTERNAL_SERVER_ERROR";
+  HttpStatusCode2[HttpStatusCode2["NOT_IMPLEMENTED"] = 501] = "NOT_IMPLEMENTED";
+  HttpStatusCode2[HttpStatusCode2["BAD_GATEWAY"] = 502] = "BAD_GATEWAY";
+  HttpStatusCode2[HttpStatusCode2["SERVICE_UNAVAILABLE"] = 503] = "SERVICE_UNAVAILABLE";
+  HttpStatusCode2[HttpStatusCode2["GATEWAY_TIMEOUT"] = 504] = "GATEWAY_TIMEOUT";
+  return HttpStatusCode2;
+})(HttpStatusCode || {});
+
+// src/enums/TokenEnums.ts
+var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
+  TokenEnums2["ACCESS_TOKEN"] = "Access Token";
+  TokenEnums2["REFRESH_TOKEN"] = "Refresh Token";
+  return TokenEnums2;
+})(TokenEnums || {});
+
+// src/errors/AppError.ts
+var AppError = class extends Error {
+  constructor(errorCode, message, statusCode) {
+    super(message);
+  }
+};
+
+// src/messages/AuthErrorMessages.ts
+var AuthErrorMessages = {
+  EMAIL_EXISTS: "The given email already exists! please try a different one"
+};
+
+// src/schema/TokenPayload.ts
+import z from "zod";
+var TokenPayloadSchema = z.object({
+  userId: z.string(),
+  fullName: z.string(),
+  email: z.string(),
+  isSuperAdmin: z.boolean(),
+  type: z.enum(TokenEnums)
+});
+export {
+  AppError,
+  AuthErrorMessages,
+  ErrorCode,
+  HttpStatusCode,
+  TokenEnums,
+  TokenPayloadSchema
+};
