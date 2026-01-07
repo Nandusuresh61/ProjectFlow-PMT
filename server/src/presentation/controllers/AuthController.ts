@@ -16,6 +16,12 @@ export class AuthController {
     const registerDto = AuthRequestMapper.toRegisterUserDto(validateData);
 
     const result = await this.registerUserUseCase.execute(registerDto);
+    console.log(result)
+
+    res.status(HttpStatusCode.CREATED).json({
+      success: true,
+      data: result,
+    });
 
   });
 }

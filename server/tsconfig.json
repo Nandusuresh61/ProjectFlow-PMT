@@ -1,26 +1,27 @@
 {
+  "ts-node": {
+    "transpileOnly": true
+  },
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "allowSyntheticDefaultImports": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "moduleDetection": "force",
     "esModuleInterop": true,
- 
+    "strict": false,
+    "skipLibCheck": true,
     "rootDir": "src",
-    "outDir": "dist",
-    "strict": true,
-    "allowJs": true,
-    "isolatedModules": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitAny": true,
-    "noEmit": true,
-    "lib": ["es2022"],
-    "forceConsistentCasingInFileNames": true,
     "baseUrl": "./src",
     "paths": {
-      "@/*":["*"]
+      "@/*": [
+        "*"
+      ]
     }
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

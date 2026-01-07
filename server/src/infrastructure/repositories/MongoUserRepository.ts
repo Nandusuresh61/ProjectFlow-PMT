@@ -11,8 +11,8 @@ export class MongoUserRepostory
     super(UserModel);
   }
 
-  async findByEmail(email: string): Promise<User> {
-    let user = await this.findOne(email);
+  async findByEmail(email: string): Promise<User | null> {
+    let user = await this.findOne({email});
     return user;
   }
   async createUser(user: User): Promise<User> {
