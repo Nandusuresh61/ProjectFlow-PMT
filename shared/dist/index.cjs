@@ -34,6 +34,7 @@ __export(index_exports, {
   AuthErrorMessages: () => AuthErrorMessages,
   ErrorCode: () => ErrorCode,
   HttpStatusCode: () => HttpStatusCode,
+  RegisterUserSchema: () => RegisterUserSchema,
   TokenEnums: () => TokenEnums,
   TokenPayloadSchema: () => TokenPayloadSchema
 });
@@ -98,12 +99,21 @@ var TokenPayloadSchema = import_zod.default.object({
   isSuperAdmin: import_zod.default.boolean(),
   type: import_zod.default.enum(TokenEnums)
 });
+
+// src/schema/auth/registerUserSchema.ts
+var import_zod2 = require("zod");
+var RegisterUserSchema = import_zod2.z.object({
+  fullName: import_zod2.z.string().min(3, "Fullname must be atleast 3 letters!"),
+  email: import_zod2.z.string().email("Invalid Email Address!"),
+  password: import_zod2.z.string().min(8, "Password must be atleast 8 characters!")
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
   AuthErrorMessages,
   ErrorCode,
   HttpStatusCode,
+  RegisterUserSchema,
   TokenEnums,
   TokenPayloadSchema
 });

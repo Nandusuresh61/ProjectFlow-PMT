@@ -1,4 +1,4 @@
-import z from 'zod';
+import z, { z as z$1 } from 'zod';
 
 declare enum ErrorCode {
     AUTH = "Authentication Error"
@@ -49,4 +49,11 @@ declare const TokenPayloadSchema: z.ZodObject<{
 }, z.core.$strip>;
 type TokenPayloadType = z.infer<typeof TokenPayloadSchema>;
 
-export { AppError, AuthErrorMessages, ErrorCode, HttpStatusCode, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+declare const RegisterUserSchema: z$1.ZodObject<{
+    fullName: z$1.ZodString;
+    email: z$1.ZodString;
+    password: z$1.ZodString;
+}, z$1.core.$strip>;
+type RegisterUserSchemaType = z$1.infer<typeof RegisterUserSchema>;
+
+export { AppError, AuthErrorMessages, ErrorCode, HttpStatusCode, RegisterUserSchema, type RegisterUserSchemaType, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
