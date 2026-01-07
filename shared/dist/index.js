@@ -57,11 +57,20 @@ var TokenPayloadSchema = z.object({
   isSuperAdmin: z.boolean(),
   type: z.enum(TokenEnums)
 });
+
+// src/schema/auth/registerUserSchema.ts
+import { z as z2 } from "zod";
+var RegisterUserSchema = z2.object({
+  fullName: z2.string().min(3, "Fullname must be atleast 3 letters!"),
+  email: z2.string().email("Invalid Email Address!"),
+  password: z2.string().min(8, "Password must be atleast 8 characters!")
+});
 export {
   AppError,
   AuthErrorMessages,
   ErrorCode,
   HttpStatusCode,
+  RegisterUserSchema,
   TokenEnums,
   TokenPayloadSchema
 };
