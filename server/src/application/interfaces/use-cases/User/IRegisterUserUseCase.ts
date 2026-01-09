@@ -1,6 +1,6 @@
-import { RegisterUserDto,UserAuthResponseDto } from "@/application/dtos/UserDtos"
+import { RegisterVerifiedUserDto,UserAuthResponseDto } from "@/application/dtos/UserDtos"
 
 export interface IRegisterUserUseCase{
-    execute(user: RegisterUserDto): Promise<UserAuthResponseDto>
+    execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto>
 }
 

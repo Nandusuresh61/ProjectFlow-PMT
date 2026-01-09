@@ -27,16 +27,6 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
    * @param user
    */
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
-    // check user is already exist or not
-
-    const existingUser = await this._userRepo.findByEmail(user.email);
-
-    if (existingUser)
-      throw new AppError(
-        ErrorCode.AUTH,
-        AuthErrorMessages.EMAIL_EXISTS,
-        HttpStatusCode.CONFLICT
-      );
 
     const now = new Date();
     const newUser = await this._userRepo.createUser({
