@@ -1,5 +1,5 @@
 import {
-  RegisterUserDto,
+  RegisterVerifiedUserDto,
   UserAuthResponseDto,
 } from "@/application/dtos/UserDtos";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
@@ -19,7 +19,6 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _uidGenerator: IUidGenerator,
-    private readonly _passwordHasher: IPasswordHasher,
     private readonly _tokenService: ITokenService
   ) {}
 
@@ -27,7 +26,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
    *
    * @param user
    */
-  async execute(user: RegisterUserDto): Promise<UserAuthResponseDto> {
+  async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
     // check user is already exist or not
 
     const existingUser = await this._userRepo.findByEmail(user.email);
@@ -44,7 +43,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       userId: this._uidGenerator.createId(),
       fullName: user.fullName,
       email: user.email,
-      passwordHash: await this._passwordHasher.createHashPassword(user.password),
+      passwordHash: user.passwordHash,
       isSuperAdmin: false,
       createdAt: now,
       updatedAt: now,

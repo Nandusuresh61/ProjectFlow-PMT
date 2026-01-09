@@ -1,27 +1,38 @@
 import { Request, Response } from "express";
-import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { RegisterUserSchema } from "shared";
-import { AuthRequestMapper } from "../mappers/AuthRequestMapper";
 import { HttpStatusCode } from "shared";
+import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
+import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 
 export class AuthController {
-  constructor(private readonly registerUserUseCase: IRegisterUserUseCase) {}
+  constructor(
+    private readonly startRegisterUseCase: IStartRegisterUseCase,
+    private readonly verifyOtpUseCase: IVerifyOtpUseCase,
+  ) {}
 
-  register = asyncHandler(async (req: Request, res: Response) => {
-    // validate data from req.body
-    const validateData = RegisterUserSchema.parse(req.body);
+  // Send OTP
+  startRegister = asyncHandler(async (req: Request, res: Response) => {
+    const validatedData = RegisterUserSchema.parse(req.body);
 
-    // Mapper to register dto
-    const registerDto = AuthRequestMapper.toRegisterUserDto(validateData);
+    await this.startRegisterUseCase.execute(validatedData);
 
-    const result = await this.registerUserUseCase.execute(registerDto);
-    console.log(result)
+    res.status(HttpStatusCode.OK).json({
+      success: true,
+      message: "OTP sent to email",
+    });
+  });
+
+  // Verify Otp
+
+  verifyOtp = asyncHandler(async (req: Request, res: Response) => {
+    const { email, otp } = req.body;
+
+    const result = await this.verifyOtpUseCase.execute({ email, otp } );
 
     res.status(HttpStatusCode.CREATED).json({
       success: true,
-      data: result,
-    });
-
+      data: result
+    })
   });
 }

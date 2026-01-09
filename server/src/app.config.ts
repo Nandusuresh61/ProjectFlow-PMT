@@ -10,5 +10,6 @@ export const config = {
   REFRESH_TOKEN_SECRET:
     process.env.REFRESH_TOKEN_SECRET || "super_secret_refresh_key",
   PORT: process.env.PORT || 8080,
-  NODE_ENV:process.env.NODE_ENV || "development"
+  NODE_ENV:process.env.NODE_ENV || "development",
+  RedisURL: process.env.REDIS_URL
 };

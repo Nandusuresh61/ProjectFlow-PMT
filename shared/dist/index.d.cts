@@ -38,6 +38,8 @@ declare class AppError extends Error {
 
 declare const AuthErrorMessages: {
     EMAIL_EXISTS: string;
+    OTP_ERROR: string;
+    OTP_ATTEMPT: string;
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
