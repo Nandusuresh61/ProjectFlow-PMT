@@ -1,4 +1,4 @@
-import { RegisterUserDto } from "@/application/dtos/UserDtos";
+import { RegisterVerifiedUserDto } from "@/application/dtos/UserDtos";
 import { RegisterUserSchemaType } from "shared";
 
 /**
@@ -7,11 +7,11 @@ import { RegisterUserSchemaType } from "shared";
 export class AuthRequestMapper {
     static toRegisterUserDto(
         data: RegisterUserSchemaType
-    ): RegisterUserDto {
+    ): RegisterVerifiedUserDto {
         return {
             fullName: data.fullName,
             email:data.email,
-            password: data.password
+            passwordHash: data.password
         }
     }
 }

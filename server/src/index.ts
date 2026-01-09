@@ -2,10 +2,12 @@ import express from 'express';
 import { config } from './app.config';
 import userRoutes from '@/presentation/routes/AuthRoutes'
 import { connectDB } from './infrastructure/database/connection';
+import { connectRedis } from './infrastructure/cache/redisClient';
 
 
 const app = express();
 connectDB();
+connectRedis();
 
 app.use(express.json());
 app.use('/api/auth', userRoutes)
