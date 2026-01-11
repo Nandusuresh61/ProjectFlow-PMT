@@ -6,8 +6,9 @@ import { UidService } from "@/infrastructure/services/UidService";
 import { AuthController } from "../controllers/AuthController";
 import { StartRegisterUseCase } from "@/application/use-cases/User/StartRegisterationUseCase";
 import { VerifyOtpUseCase } from "@/application/use-cases/User/VerifyOtpUseCase";
-import { RedisOtpStore } from "@/infrastructure/cache/redisOtpStore";
 import { OtpGenerator } from "@/infrastructure/services/OtpGenerator";
+import { RedisOtpStore } from "@/infrastructure/cache/RedisOtpStore";
+import { EmailService } from "@/infrastructure/services/EmailService";
 
 /**
  * Infrastructure layer use case
@@ -19,6 +20,7 @@ const tokenService = new TokenService();
 const uidService = new UidService();
 const otpStore = new RedisOtpStore();
 const otpGenerator = new OtpGenerator()
+const emailService = new EmailService();
 
 /**
  * Application layer useCase
@@ -27,7 +29,8 @@ const startRegisterUseCase = new StartRegisterUseCase(
   userRepository,
   passwordHasher,
   otpStore,
-  otpGenerator
+  otpGenerator,
+  emailService
 );
 
 const registerUserUseCase = new RegisterUserUseCase(
