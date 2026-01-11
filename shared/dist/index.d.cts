@@ -1,7 +1,9 @@
 import z, { z as z$1 } from 'zod';
 
 declare enum ErrorCode {
-    AUTH = "Authentication Error"
+    AUTH = "Authentication Error",
+    EMAIL_SEND_FAILED = "Email send failed!",
+    EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!"
 }
 
 declare enum HttpStatusCode {
@@ -32,6 +34,12 @@ declare enum TokenEnums {
     REFRESH_TOKEN = "Refresh Token"
 }
 
+declare enum EmailType {
+    OTP = "OTP",
+    RESET_PASSWORD = "RESET_PASSWORD",
+    INVITE_USER = "INVITE_USER"
+}
+
 declare class AppError extends Error {
     constructor(errorCode: ErrorCode, message: string, statusCode: HttpStatusCode);
 }
@@ -40,6 +48,13 @@ declare const AuthErrorMessages: {
     EMAIL_EXISTS: string;
     OTP_ERROR: string;
     OTP_ATTEMPT: string;
+};
+
+declare const EmailMessages: {
+    EMAIL_SENT_SUCESS: string;
+    EMAIL_SENT_FAILED: string;
+    OTP_EMAIL_SUBJECT: string;
+    RESET_PASSOWRD_SUBJECT: string;
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -58,4 +73,4 @@ declare const RegisterUserSchema: z$1.ZodObject<{
 }, z$1.core.$strip>;
 type RegisterUserSchemaType = z$1.infer<typeof RegisterUserSchema>;
 
-export { AppError, AuthErrorMessages, ErrorCode, HttpStatusCode, RegisterUserSchema, type RegisterUserSchemaType, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AuthErrorMessages, EmailMessages, EmailType, ErrorCode, HttpStatusCode, RegisterUserSchema, type RegisterUserSchemaType, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

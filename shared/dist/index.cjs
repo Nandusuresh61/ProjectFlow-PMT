@@ -32,6 +32,8 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AuthErrorMessages: () => AuthErrorMessages,
+  EmailMessages: () => EmailMessages,
+  EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   HttpStatusCode: () => HttpStatusCode,
   RegisterUserSchema: () => RegisterUserSchema,
@@ -43,6 +45,8 @@ module.exports = __toCommonJS(index_exports);
 // src/enums/ErrorCode.ts
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
+  ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
+  ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -78,6 +82,14 @@ var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
   return TokenEnums2;
 })(TokenEnums || {});
 
+// src/enums/EmailEnums.ts
+var EmailType = /* @__PURE__ */ ((EmailType2) => {
+  EmailType2["OTP"] = "OTP";
+  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
+  EmailType2["INVITE_USER"] = "INVITE_USER";
+  return EmailType2;
+})(EmailType || {});
+
 // src/errors/AppError.ts
 var AppError = class extends Error {
   constructor(errorCode, message, statusCode) {
@@ -90,6 +102,14 @@ var AuthErrorMessages = {
   EMAIL_EXISTS: "The given email already exists! please try a different one",
   OTP_ERROR: "Otp Invalid or Expired",
   OTP_ATTEMPT: "TOO many Invalid Attempt"
+};
+
+// src/messages/EmailMessages.ts
+var EmailMessages = {
+  EMAIL_SENT_SUCESS: "Email sent successfully",
+  EMAIL_SENT_FAILED: "Unable to sent Email!",
+  OTP_EMAIL_SUBJECT: "Your OTP Code",
+  RESET_PASSOWRD_SUBJECT: "Reset your password"
 };
 
 // src/schema/TokenPayload.ts
@@ -113,6 +133,8 @@ var RegisterUserSchema = import_zod2.z.object({
 0 && (module.exports = {
   AppError,
   AuthErrorMessages,
+  EmailMessages,
+  EmailType,
   ErrorCode,
   HttpStatusCode,
   RegisterUserSchema,
