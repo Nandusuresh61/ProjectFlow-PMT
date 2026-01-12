@@ -41,6 +41,7 @@ export class StartRegisterUseCase implements IStartRegisterUseCase {
         passwordHash,
         otpHash,
         attempt: 0,
+        lastOtpSentAt: Date.now()
       },
       300
     );

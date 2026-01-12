@@ -7,5 +7,6 @@ const router = Router();
 
 router.post('/register',authController.startRegister);
 router.post('/verify-otp',authController.verifyOtp);
+router.post('/resend-otp',authController.resendOtp)
 
 export default router;

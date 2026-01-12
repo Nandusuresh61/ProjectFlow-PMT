@@ -4,11 +4,13 @@ import { RegisterUserSchema } from "shared";
 import { HttpStatusCode } from "shared";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
+import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
 
 export class AuthController {
   constructor(
     private readonly startRegisterUseCase: IStartRegisterUseCase,
     private readonly verifyOtpUseCase: IVerifyOtpUseCase,
+    private readonly resendOtpUseCase: IResendOtpUseCase
   ) {}
 
   // Send OTP
@@ -28,11 +30,19 @@ export class AuthController {
   verifyOtp = asyncHandler(async (req: Request, res: Response) => {
     const { email, otp } = req.body;
 
-    const result = await this.verifyOtpUseCase.execute({ email, otp } );
+    const result = await this.verifyOtpUseCase.execute({ email, otp });
 
     res.status(HttpStatusCode.CREATED).json({
       success: true,
-      data: result
-    })
+      data: result,
+    });
+  });
+
+  // Resend Otp
+
+  resendOtp = asyncHandler(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    await this.resendOtpUseCase.execute(email);
+    res.status(HttpStatusCode.CREATED).json({success:true,message: "OTP resend successfully."})
   });
 }
