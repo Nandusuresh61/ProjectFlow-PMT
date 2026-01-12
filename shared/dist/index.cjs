@@ -47,6 +47,7 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
+  ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -101,7 +102,8 @@ var AppError = class extends Error {
 var AuthErrorMessages = {
   EMAIL_EXISTS: "The given email already exists! please try a different one",
   OTP_ERROR: "Otp Invalid or Expired",
-  OTP_ATTEMPT: "TOO many Invalid Attempt"
+  OTP_ATTEMPT: "TOO many Invalid Attempt",
+  OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP"
 };
 
 // src/messages/EmailMessages.ts

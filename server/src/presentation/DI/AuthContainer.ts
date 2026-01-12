@@ -9,6 +9,7 @@ import { VerifyOtpUseCase } from "@/application/use-cases/User/VerifyOtpUseCase"
 import { OtpGenerator } from "@/infrastructure/services/OtpGenerator";
 import { RedisOtpStore } from "@/infrastructure/cache/RedisOtpStore";
 import { EmailService } from "@/infrastructure/services/EmailService";
+import { ResendOtpUseCase } from "@/application/use-cases/User/ResendOtpUseCase";
 
 /**
  * Infrastructure layer use case
@@ -45,7 +46,16 @@ const verifyOtpUseCase = new VerifyOtpUseCase(
   registerUserUseCase
 );
 
+const resendOtpUseCase = new ResendOtpUseCase(
+  userRepository,
+  otpStore,
+  otpGenerator,
+  passwordHasher,
+  emailService
+)
+
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
+  resendOtpUseCase
 );

@@ -3,7 +3,8 @@ import z, { z as z$1 } from 'zod';
 declare enum ErrorCode {
     AUTH = "Authentication Error",
     EMAIL_SEND_FAILED = "Email send failed!",
-    EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!"
+    EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
+    OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN"
 }
 
 declare enum HttpStatusCode {
@@ -48,6 +49,7 @@ declare const AuthErrorMessages: {
     EMAIL_EXISTS: string;
     OTP_ERROR: string;
     OTP_ATTEMPT: string;
+    OTP_RESEND_COOLDOWN: string;
 };
 
 declare const EmailMessages: {

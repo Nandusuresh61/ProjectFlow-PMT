@@ -4,6 +4,7 @@ export type PendingRegistration = {
   passwordHash: string;
   otpHash: string;
   attempt: number;
+  lastOtpSentAt: number
 };
 
 export interface IOtpStore {
