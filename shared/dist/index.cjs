@@ -124,7 +124,7 @@ var TokenPayloadSchema = import_zod.default.object({
   type: import_zod.default.enum(TokenEnums)
 });
 
-// src/schema/auth/registerUserSchema.ts
+// src/schema/auth/RegisterUserSchema.ts
 var import_zod2 = require("zod");
 var RegisterUserSchema = import_zod2.z.object({
   fullName: import_zod2.z.string().min(3, "Fullname must be atleast 3 letters!"),

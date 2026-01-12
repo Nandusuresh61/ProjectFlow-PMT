@@ -80,7 +80,7 @@ var TokenPayloadSchema = z.object({
   type: z.enum(TokenEnums)
 });
 
-// src/schema/auth/registerUserSchema.ts
+// src/schema/auth/RegisterUserSchema.ts
 import { z as z2 } from "zod";
 var RegisterUserSchema = z2.object({
   fullName: z2.string().min(3, "Fullname must be atleast 3 letters!"),
