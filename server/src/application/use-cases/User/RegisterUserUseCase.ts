@@ -22,10 +22,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     private readonly _tokenService: ITokenService
   ) {}
 
-  /**
-   *
-   * @param user
-   */
+  
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
 
     const now = new Date();
