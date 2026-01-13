@@ -86,7 +86,7 @@ const Navbar = () => {
             </a>
           ))}
           <div className="h-4 w-[1px] bg-white/10 mx-2"></div>
-          <a href="#" className="hover:text-white transition-colors">
+          <a href="/login" className="hover:text-white transition-colors">
             Login
           </a>
           <motion.button
