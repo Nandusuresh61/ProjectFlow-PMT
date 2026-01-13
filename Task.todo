@@ -1,0 +1,61 @@
+Modules
+-------
+
+Week 1 - Core Foundation
+------------------------
+• Backend project setup
+• Database schema implementation
+• Authentication system
+• User onboarding flow
+• Workspace (organization) creation
+• Workspace slug & uniqueness handling
+• Workspace switching mechanism
+• Role & permission system
+• Super Admin access separation
+
+
+
+
+
+
+Week 2 - Project Management System
+• Workspace dashboard
+• Project management
+• Sprint management
+• Backlog management
+• Issue / task management
+• Issue workflow (Kanban board)
+• Comments on issues
+• File attachments on issues
+• Activity tracking across workspace
+
+
+
+
+
+Week 3 - Collaboration & Intelligence
+• User profile management
+• Skill & proficiency management
+• AI-assisted task recommendation
+• Skill matching & scoring logic
+• Workspace chat system
+• Project-level chat
+• Direct messaging
+• Meeting scheduling
+• Instant meetings
+• Meeting participation flow
+
+
+
+
+
+Week 4 - SaaS & Platform Features
+• Subscription plans
+• Workspace billing
+• Invoice generation
+• Invoice download
+• Support ticket system
+• Super Admin dashboard
+• Organization monitoring (Super Admin)
+• Plan management (Super Admin)
+• Ticket handling (Super Admin)
