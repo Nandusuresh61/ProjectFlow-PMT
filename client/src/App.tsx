@@ -12,11 +12,11 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/verfiy-otp" element={<Otp/>} />
+        <Route path="/verify-otp" element={<Otp/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />
       </Routes>
     </>
   );
-}
+}  
 
 export default App;

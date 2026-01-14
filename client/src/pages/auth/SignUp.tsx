@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-/* --- SHARED COMPONENTS (Mimicking shadcn/ui) --- */
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
