@@ -1,4 +1,4 @@
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { IUserRepository } from "@/domain/repositories/IUserRepository";
 import { IEmailService } from "@/application/interfaces/services/IEmailService";
 import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
