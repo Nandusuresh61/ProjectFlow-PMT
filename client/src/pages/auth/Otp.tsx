@@ -1,67 +1,10 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { GridBackground } from '@/components/ui/gridBackground';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label: string;
-}
-
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, label, ...props }, ref) => {
-        return (
-            <div className="space-y-2">
-                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-400">
-                    {label}
-                </label>
-                <input
-                    className={`flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 ${className}`}
-                    ref={ref}
-                    {...props}
-                />
-            </div>
-        );
-    }
-);
-Input.displayName = "Input";
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'outline' | 'ghost';
-    isLoading?: boolean;
-}
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant = 'primary', isLoading, children, ...props }, ref) => {
-        const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2";
-
-        const variants = {
-            primary: "bg-white text-black hover:bg-slate-200",
-            outline: "border border-white/10 bg-transparent hover:bg-white/5 text-white",
-            ghost: "hover:bg-white/5 text-white"
-        };
-
-        return (
-            <button
-                ref={ref}
-                className={`${baseStyles} ${variants[variant]} ${className}`}
-                disabled={isLoading || props.disabled}
-                {...props}
-            >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {children}
-            </button>
-        );
-    }
-);
-Button.displayName = "Button";
-
-const GridBackground = () => (
-    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-    </div>
-);
-
-/* --- OTP PAGE --- */
 
 export default function Otp() {
     return (
@@ -75,11 +18,11 @@ export default function Otp() {
                     <span className="text-white">ProjectFlow</span>
                 </Link>
                 <Link to="/login">
-                    <Button variant="ghost" className="text-slate-400 hover:text-white">Log in</Button>
+                    <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5">Log in</Button>
                 </Link>
             </nav>
 
-            <main className="flex-grow flex items-center justify-center p-6 relative z-10">
+            <main className="flex-grow flex items-center justify-center p-4 md:p-6 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -95,16 +38,19 @@ export default function Otp() {
 
                     <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 space-y-6 shadow-2xl backdrop-blur-sm">
                         <div className="space-y-4">
-                            <Input
-                                label="One-Time Password"
-                                placeholder="123456"
-                                type="text"
-                                maxLength={6}
-                                className="text-center text-2xl tracking-[0.5em] font-mono h-14"
-                            />
+                            <div className="space-y-2">
+                                <Label htmlFor="otp" className="text-slate-400">One-Time Password</Label>
+                                <Input
+                                    id="otp"
+                                    placeholder="123456"
+                                    type="text"
+                                    maxLength={6}
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20 text-center text-2xl tracking-[0.5em] font-mono h-14"
+                                />
+                            </div>
                         </div>
 
-                        <Button className="w-full font-bold h-12">
+                        <Button className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200">
                             Verify Email
                         </Button>
 
