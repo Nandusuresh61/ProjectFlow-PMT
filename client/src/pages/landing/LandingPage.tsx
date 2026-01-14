@@ -1,0 +1,424 @@
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  LayoutGrid,
+  Zap,
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  Menu,
+  X,
+} from "lucide-react";
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+};
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.1 } },
+};
+
+const scaleHover = {
+  whileHover: { scale: 1.02, transition: { duration: 0.2 } },
+  whileTap: { scale: 0.98 },
+};
+
+interface FeatureCardProps {
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+}
+
+interface PricingCardProps {
+  tier: string;
+  price: string;
+  features: string[];
+  featured?: boolean;
+}
+
+interface FooterListProps {
+  title: string;
+  links: string[];
+}
+
+const GridBackground = () => (
+  <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+  </div>
+);
+
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled
+          ? "bg-black/60 backdrop-blur-xl border-b border-white/5 py-3"
+          : "bg-transparent border-b border-transparent py-5"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter cursor-pointer group">
+          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
+            PF
+          </div>
+          <span className="text-white">ProjectFlow</span>
+        </div>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+          {["Features", "Solutions", "Pricing"].map((item) => (
+            <a
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="hover:text-white transition-colors relative group"
+            >
+              {item}
+            </a>
+          ))}
+          <div className="h-4 w-[1px] bg-white/10 mx-2"></div>
+          <a href="/login" className="hover:text-white transition-colors">
+            Login
+          </a>
+          <motion.button
+            {...scaleHover}
+            className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold"
+          >
+            Get Started
+          </motion.button>
+        </div>
+
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden p-2 text-white"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden bg-black border-b border-white/10 absolute top-full left-0 w-full"
+          >
+            <div className="flex flex-col p-6 gap-6">
+              {["Features", "Solutions", "Pricing", "Login"].map((item) => (
+                <a
+                  key={item}
+                  href="#"
+                  className="text-xl font-medium text-slate-300"
+                >
+                  {item}
+                </a>
+              ))}
+              <button className="bg-white text-black py-4 rounded-xl font-bold">
+                Get Started
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
+
+const FeatureCard = ({ icon: Icon, title, desc }: FeatureCardProps) => (
+  <motion.div
+    variants={fadeInUp}
+    className="bg-[#0A0A0A] p-8 rounded-3xl border border-white/5 hover:border-white/10 transition-all duration-500 flex flex-col items-start gap-4 group"
+  >
+    <div className="w-12 h-12 bg-white/5 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all duration-300">
+      <Icon size={24} />
+    </div>
+    <h3 className="text-xl font-bold text-white tracking-tight">{title}</h3>
+    <p className="text-slate-500 leading-relaxed text-sm">{desc}</p>
+    <button className="flex items-center gap-2 text-sm font-bold mt-4 text-white/50 hover:text-white transition-all">
+      View integration <ArrowRight size={14} />
+    </button>
+  </motion.div>
+);
+
+const PricingCard = ({
+  tier,
+  price,
+  features,
+  featured = false,
+}: PricingCardProps) => (
+  <motion.div
+    variants={fadeInUp}
+    className={`relative flex flex-col p-10 rounded-[2.5rem] transition-all duration-500 h-full ${
+      featured
+        ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+        : "bg-[#0A0A0A] text-white border border-white/5 hover:border-white/20"
+    }`}
+  >
+    <div className="mb-10">
+      <h4
+        className={`text-xs font-black uppercase tracking-[0.2em] mb-4 ${
+          featured ? "text-black/50" : "text-slate-500"
+        }`}
+      >
+        {tier}
+      </h4>
+      <div className="flex items-baseline gap-1">
+        <span className="text-6xl font-black tracking-tighter">${price}</span>
+        <span
+          className={
+            featured ? "text-black/40 text-sm" : "text-slate-500 text-sm"
+          }
+        >
+          /mo
+        </span>
+      </div>
+    </div>
+
+    <ul className="space-y-4 mb-10 flex-grow">
+      {features.map((feature, i) => (
+        <li key={i} className="flex items-start gap-3 text-sm font-medium">
+          <CheckCircle2
+            size={18}
+            className={featured ? "text-black/20" : "text-white/10"}
+          />
+          <span className={featured ? "text-black/70" : "text-slate-400"}>
+            {feature}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <motion.button
+      {...scaleHover}
+      className={`w-full py-4 rounded-2xl font-bold transition-all ${
+        featured ? "bg-black text-white" : "bg-white text-black"
+      }`}
+    >
+      Get Started
+    </motion.button>
+  </motion.div>
+);
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black font-sans">
+      <Navbar />
+
+      <main className="relative">
+        <GridBackground />
+
+        {/* --- HERO --- */}
+        <section className="relative pt-48 pb-32 px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full mb-12 hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                Join the waitlist for ProjectFlow v1.0
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-6xl md:text-[9rem] font-black tracking-tighter leading-[0.85] mb-12 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40"
+            >
+              SHIP FASTER <br />
+              TOGETHER.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed mb-16"
+            >
+              The most powerful project management tool for high-performance
+              teams. Minimal setup, maximum output.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <motion.button
+                {...scaleHover}
+                className="w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl text-lg font-bold shadow-[0_0_30px_rgba(255,255,255,0.15)]"
+              >
+                Get Started
+              </motion.button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* --- FEATURES --- */}
+        <section id="features" className="py-32 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8">
+              <div className="max-w-2xl">
+                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-4">
+                  Core Principles
+                </h2>
+                <h3 className="text-4xl md:text-6xl font-bold tracking-tight">
+                  Everything you need to{" "}
+                  <span className="text-white/40 italic">
+                    master the sprint.
+                  </span>
+                </h3>
+              </div>
+            </div>
+
+            <motion.div
+              variants={staggerContainer}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              <FeatureCard
+                icon={LayoutGrid}
+                title="Bento Boards"
+                desc="Beautiful, high-performance kanban boards that work as fast as you do."
+              />
+              <FeatureCard
+                icon={Zap}
+                title="Instant Sync"
+                desc="Changes are reflected globally in 40ms. No loading spinners, ever."
+              />
+              <FeatureCard
+                icon={Users}
+                title="Live Sprints"
+                desc="Collaborative sprint planning with real-time capacity management."
+              />
+            </motion.div>
+          </div>
+        </section>
+
+        {/* --- PRICING --- */}
+        <section
+          id="pricing"
+          className="py-32 px-6 bg-white/[0.02] border-y border-white/5"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center max-w-2xl mx-auto mb-24">
+              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-4">
+                Pricing
+              </h2>
+              <h3 className="text-4xl md:text-6xl font-bold tracking-tight mb-8">
+                Ready to evolve?
+              </h3>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <PricingCard
+                tier="Developer"
+                price="0"
+                features={[
+                  "Up to 3 seats",
+                  "10 projects",
+                  "Real-time sync",
+                  "Community Support",
+                ]}
+              />
+              <PricingCard
+                tier="Enterprise"
+                price="19"
+                featured
+                features={[
+                  "Unlimited everything",
+                  "Priority Support",
+                  "SAML/SSO",
+                  "Dedicated Manager",
+                  "Custom SLAs",
+                ]}
+              />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="py-24 px-6 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
+            <div>
+              <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter mb-6">
+                <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg">
+                  PF
+                </div>
+                ProjectFlow
+              </div>
+              <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
+                The standard for modern agile software development.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
+              <FooterList
+                title="Product"
+                links={["Features", "Security", "Roadmap"]}
+              />
+              <FooterList title="Resource" links={["Guides", "API", "Docs"]} />
+              <FooterList
+                title="Connect"
+                links={["Twitter", "Github", "Discord"]}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-white/5 gap-4">
+            <p className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">
+              © 2025 ProjectFlow. Built for the future.
+            </p>
+            <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                Terms
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function FooterList({ title, links }: FooterListProps) {
+  return (
+    <div className="flex flex-col gap-4">
+      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+        {title}
+      </h4>
+      <div className="flex flex-col gap-3">
+        {links.map((l) => (
+          <a
+            key={l}
+            href="#"
+            className="text-xs font-bold text-slate-500 hover:text-white transition-colors"
+          >
+            {l}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,1 +1,1 @@
-export * from './registerUserSchema'
+export * from './RegisterUserSchema'
