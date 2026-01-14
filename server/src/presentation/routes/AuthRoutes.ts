@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { authController } from "../DI/AuthContainer";
-
+import { authController } from "@/infrastructure/DI/AuthContainer";
 
 const router = Router();
 

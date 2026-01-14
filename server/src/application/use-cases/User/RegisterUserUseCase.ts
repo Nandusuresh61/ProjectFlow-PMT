@@ -2,16 +2,11 @@ import {
   RegisterVerifiedUserDto,
   UserAuthResponseDto,
 } from "@/application/dtos/UserDtos";
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
-import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
+import { IUserRepository } from "@/domain/repositories/IUserRepository";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 import {
-  AppError,
-  AuthErrorMessages,
-  ErrorCode,
-  HttpStatusCode,
   TokenEnums,
 } from "shared";
 

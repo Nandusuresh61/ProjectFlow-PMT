@@ -1,5 +1,5 @@
 import { StartRegisterDto } from "@/application/dtos/UserDtos";
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { IUserRepository } from "@/domain/repositories/IUserRepository";
 import { IEmailService } from "@/application/interfaces/services/IEmailService";
 import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
@@ -7,7 +7,7 @@ import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 import { AppError, AuthErrorMessages, EmailMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
 
-export class StartRegisterUseCase implements IStartRegisterUseCase {
+export class StartRegistrationUseCase implements IStartRegisterUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _passwordHasher: IPasswordHasher,

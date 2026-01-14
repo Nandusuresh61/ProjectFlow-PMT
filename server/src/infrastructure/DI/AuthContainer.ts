@@ -1,10 +1,10 @@
 import { RegisterUserUseCase } from "@/application/use-cases/User/RegisterUserUseCase";
 import { PasswordHash } from "@/infrastructure/services/PasswordHash";
-import { MongoUserRepostory } from "@/infrastructure/repositories/MongoUserRepository";
+import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
 import { TokenService } from "@/infrastructure/services/TokenService";
 import { UidService } from "@/infrastructure/services/UidService";
-import { AuthController } from "../controllers/AuthController";
-import { StartRegisterUseCase } from "@/application/use-cases/User/StartRegisterationUseCase";
+import { AuthController } from "@/presentation/controllers/AuthController";
+import { StartRegistrationUseCase } from "@/application/use-cases/User/StartRegistrationUseCase";
 import { VerifyOtpUseCase } from "@/application/use-cases/User/VerifyOtpUseCase";
 import { OtpGenerator } from "@/infrastructure/services/OtpGenerator";
 import { RedisOtpStore } from "@/infrastructure/cache/RedisOtpStore";
@@ -15,7 +15,7 @@ import { ResendOtpUseCase } from "@/application/use-cases/User/ResendOtpUseCase"
  * Infrastructure layer use case
  */
 
-const userRepository = new MongoUserRepostory();
+const userRepository = new MongoUserRepository();
 const passwordHasher = new PasswordHash();
 const tokenService = new TokenService();
 const uidService = new UidService();
@@ -26,7 +26,7 @@ const emailService = new EmailService();
 /**
  * Application layer useCase
  */
-const startRegisterUseCase = new StartRegisterUseCase(
+const startRegisterUseCase = new StartRegistrationUseCase(
   userRepository,
   passwordHasher,
   otpStore,
