@@ -1,5 +1,5 @@
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { UserModel, UserDoc } from "../database/models/MongoUserModel";
+import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { MongoBaseRepository } from "./MongoBaseRepository";
 import { User } from "@/domain/entities/User";
 

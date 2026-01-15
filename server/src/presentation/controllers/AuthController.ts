@@ -15,36 +15,43 @@ export class AuthController implements IAuthController {
     private readonly resendOtpUseCase: IResendOtpUseCase
   ) {}
 
-  startRegister = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const validatedData = RegisterUserSchema.parse(req.body);
+  startRegister = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const validatedData = RegisterUserSchema.parse(req.body);
+      // add mapper
 
-    await this.startRegisterUseCase.execute(validatedData);
+      await this.startRegisterUseCase.execute(validatedData);
 
-    res.status(HttpStatusCode.OK).json({
-      success: true,
-      message: "OTP sent to email",
-    });
-  });
+      res.status(HttpStatusCode.OK).json({
+        success: true,
+        message: "OTP sent to email",
+      });
+    }
+  );
 
-  verifyOtp = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { email, otp } = req.body;
+  verifyOtp = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email, otp } = req.body;
 
-    const result = await this.verifyOtpUseCase.execute({ email, otp });
+      const result = await this.verifyOtpUseCase.execute({ email, otp });
 
-    res.status(HttpStatusCode.CREATED).json({
-      success: true,
-      data: result,
-    });
-  });
+      res.status(HttpStatusCode.CREATED).json({
+        success: true,
+        data: result,
+      });
+    }
+  );
 
-  resendOtp = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { email } = req.body;
+  resendOtp = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { email } = req.body;
 
-    await this.resendOtpUseCase.execute(email);
+      await this.resendOtpUseCase.execute(email);
 
-    res.status(HttpStatusCode.CREATED).json({
-      success: true,
-      message: "OTP resend successfully.",
-    });
-  });
+      res.status(HttpStatusCode.CREATED).json({
+        success: true,
+        message: "OTP resend successfully.",
+      });
+    }
+  );
 }

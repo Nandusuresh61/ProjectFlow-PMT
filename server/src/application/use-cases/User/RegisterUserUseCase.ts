@@ -2,7 +2,7 @@ import {
   RegisterVerifiedUserDto,
   UserAuthResponseDto,
 } from "@/application/dtos/UserDtos";
-import { IUserRepository } from "@/domain/repositories/IUserRepository";
+import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
