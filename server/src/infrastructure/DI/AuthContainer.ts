@@ -32,6 +32,7 @@ const startRegisterUseCase = new StartRegistrationUseCase(
   otpStore,
   otpGenerator,
   emailService
+  
 );
 
 const registerUserUseCase = new RegisterUserUseCase(

@@ -6,12 +6,12 @@ import type {
   RegisterPayload,
 } from "@/types/auth.types";
 
-export const registerUser = async (payload: RegisterPayload): Promise<void> => {
+export const registerUser = async (payload: RegisterPayload): Promise<{message:string}> => {
   const { data } = await API.post("/auth/register", payload);
   return data;
 };
 
-export const verifyUserOtp = async (payload: OtpPayload): Promise<void> => {
+export const verifyUserOtp = async (payload: OtpPayload): Promise<AuthResponse> => {
   const {data } =await API.post("/auth/verify-otp",payload);
   return data
 }

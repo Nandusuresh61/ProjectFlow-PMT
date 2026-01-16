@@ -1,18 +1,68 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { GridBackground } from "@/components/ui/gridBackground";
+import React, { useState } from "react";
+import { registerUser } from "@/services/auth/auth.api";
+import { toast } from "sonner";
+import { AuthUserState } from "@/store/auth.store";
 
 export default function SignUp() {
+  const isLoading = AuthUserState((state) => state.isLoading);
+  const setLoading = AuthUserState((state) => state.setLoading);
+  const setPendingEmail = AuthUserState((state) => state.setPendingEmail);
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  console.log("form data :", form);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!form.fullName || !form.email || !form.password) {
+      toast.error("please input all the field");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      toast.error("Password not matching");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await registerUser({
+        fullName: form.fullName,
+        email: form.email,
+        password: form.password,
+      });
+      toast.success(response.message);
+      setPendingEmail(form.email);
+      setTimeout(() => {
+        navigate("/verify-otp");
+      }, 800);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || "Registration Failed";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <GridBackground />
 
-      {/* Navbar Minimal */}
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link
           to="/"
@@ -52,11 +102,13 @@ export default function SignUp() {
           <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 space-y-6 shadow-2xl backdrop-blur-sm">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-slate-400">
+                <Label htmlFor="fullName" className="text-slate-400">
                   Full Name
                 </Label>
                 <Input
-                  id="name"
+                  id="fullName"
+                  value={form.fullName}
+                  onChange={handleChange}
                   placeholder="John Doe"
                   type="text"
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
@@ -68,6 +120,8 @@ export default function SignUp() {
                 </Label>
                 <Input
                   id="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="m@example.com"
                   type="email"
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
@@ -79,6 +133,8 @@ export default function SignUp() {
                 </Label>
                 <PasswordInput
                   id="password"
+                  value={form.password}
+                  onChange={handleChange}
                   placeholder="••••••••"
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
                 />
@@ -89,14 +145,20 @@ export default function SignUp() {
                 </Label>
                 <PasswordInput
                   id="confirmPassword"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
                   placeholder="••••••••"
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
                 />
               </div>
             </div>
 
-            <Button className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200">
-              Create Account
+            <Button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200"
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <div className="relative">
