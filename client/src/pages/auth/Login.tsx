@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { GridBackground } from '@/components/ui/gridBackground';
+import { GridBackground } from '@/components/ui/gridBackground'; 
 
 export default function Login() {
     return (
