@@ -1,7 +1,7 @@
 import { API } from "@/services/api";
 import type {
   AuthResponse,
-  LoginPayload,
+  LoginPayload, 
   OtpPayload,
   RegisterPayload,
 } from "@/types/auth.types";

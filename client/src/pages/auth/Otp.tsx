@@ -1,11 +1,50 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GridBackground } from "@/components/ui/gridBackground";
+import { AuthUserState } from "@/store/auth.store";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { verifyUserOtp } from "@/services/auth/auth.api";
 
 export default function Otp() {
+  const pendingEmail = AuthUserState((state) => state.pendingEmail);
+  const setUser = AuthUserState((state) => state.setUser);
+  const navigate = useNavigate();
+  const [otpInput, setOtpinput] = useState("");
+
+  useEffect(() => {
+    if (!pendingEmail) {
+      navigate("/signup");
+    }
+  }, [pendingEmail, navigate]);
+
+  const handleSubmit = async () => {
+    if (otpInput.length !== 6) {
+      toast.error("Otp must be 6 digits!");
+      return;
+    }
+    if (!pendingEmail) {
+      toast.error("Email not found");
+      navigate("/signup");
+      return;
+    }
+
+    try {
+      const response = await verifyUserOtp({
+        email: pendingEmail,
+        otp: otpInput,
+      });
+      setUser(response.user)
+      toast.success(response.message);
+      navigate('/home')
+    } catch(error: any) {
+    toast.error(error?.response?.data?.message || "OTP verification failed");
+  }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <GridBackground />
@@ -44,7 +83,7 @@ export default function Otp() {
             </h1>
             <p className="text-slate-500">
               We've sent a code to{" "}
-              <span className="text-white font-medium">m@example.com</span>
+              <span className="text-white font-medium">{pendingEmail}</span>
             </p>
           </div>
 
@@ -57,6 +96,8 @@ export default function Otp() {
                 <Input
                   id="otp"
                   placeholder="123456"
+                  value={otpInput}
+                  onChange={(e) => setOtpinput(e.target.value)}
                   type="text"
                   maxLength={6}
                   className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20 text-center text-2xl tracking-[0.5em] font-mono h-14"
@@ -64,7 +105,10 @@ export default function Otp() {
               </div>
             </div>
 
-            <Button className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200">
+            <Button
+              onClick={handleSubmit}
+              className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200"
+            >
               Verify Email
             </Button>
 

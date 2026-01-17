@@ -6,9 +6,7 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
-import {
-  TokenEnums,
-} from "shared";
+import { TokenEnums } from "shared";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
@@ -17,9 +15,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     private readonly _tokenService: ITokenService
   ) {}
 
-  
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
-
     const now = new Date();
     const newUser = await this._userRepo.createUser({
       userId: this._uidGenerator.createId(),
@@ -46,6 +42,12 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {
+      user: {
+        userId: newUser.userId,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        isSuperAdmin: newUser.isSuperAdmin,
+      },
       accessToken,
       refreshToken,
     };

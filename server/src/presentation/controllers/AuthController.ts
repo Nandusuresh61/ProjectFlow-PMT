@@ -35,9 +35,23 @@ export class AuthController implements IAuthController {
 
       const result = await this.verifyOtpUseCase.execute({ email, otp });
 
-      res.status(HttpStatusCode.CREATED).json({
-        success: true,
-        data: result,
+      res.cookie("access_token", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.cookie("refresh_token", result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json({
+        user: result.user,
+        message: "Email verified successfully",
       });
     }
   );
