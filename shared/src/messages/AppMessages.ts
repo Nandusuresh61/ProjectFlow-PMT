@@ -1,7 +1,5 @@
 export const AppMessages = {
-  // =========================
-  // AUTH – ERRORS
-  // =========================
+
   EMAIL_ALREADY_EXISTS:
     "The given email already exists. Please try a different one.",
 
@@ -30,9 +28,6 @@ export const AppMessages = {
     "Invalid authentication token.",
 
 
-  // =========================
-  // AUTH – SUCCESS
-  // =========================
   OTP_SENT:
     "OTP has been sent to your email.",
 
@@ -52,9 +47,6 @@ export const AppMessages = {
     "Password reset successful.",
 
 
-  // =========================
-  // EMAIL
-  // =========================
   EMAIL_SENT_SUCCESS:
     "Email sent successfully.",
 
@@ -71,9 +63,6 @@ export const AppMessages = {
     "You have been invited",
 
 
-  // =========================
-  // COMMON / GLOBAL (FUTURE)
-  // =========================
   INTERNAL_SERVER_ERROR:
     "Something went wrong. Please try again later.",
 
