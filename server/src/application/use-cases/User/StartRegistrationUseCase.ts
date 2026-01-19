@@ -5,7 +5,7 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
-import { AppError, AuthErrorMessages, EmailMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
+import { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
 
 export class StartRegistrationUseCase implements IStartRegisterUseCase {
   constructor(
@@ -21,7 +21,7 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
     if (existingUser)
       throw new AppError(
         ErrorCode.AUTH,
-        AuthErrorMessages.EMAIL_EXISTS,
+        AppMessages.EMAIL_ALREADY_EXISTS,
         HttpStatusCode.CONFLICT
       );
 
@@ -48,7 +48,7 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
     console.log(`OTP for ${data.email} => `, otp);
     await this._emailService.sendMail({
       to: data.email,
-      subject: EmailMessages.OTP_EMAIL_SUBJECT,
+      subject: AppMessages.EMAIL_SUBJECT_OTP,
       body: `
     <h3>OTP Verification</h3>
     <p>Hello ${data.fullName},</p>

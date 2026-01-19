@@ -6,8 +6,7 @@ import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
 import {
   AppError,
-  AuthErrorMessages,
-  EmailMessages,
+  AppMessages,
   EmailType,
   ErrorCode,
   HttpStatusCode,
@@ -23,13 +22,13 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
   ) {}
 
   async execute(email: string): Promise<void> {
-    const RESEND_COOLDOWN_MS = 60 * 1000; // 60 Seconds coolDown
+    const RESEND_COOLDOWN_MS = 60 * 1000; 
     const pending = await this._otpStore.get(email);
 
     if (!pending) {
       throw new AppError(
         ErrorCode.AUTH,
-        AuthErrorMessages.OTP_ERROR,
+        AppMessages.OTP_INVALID_OR_EXPIRED,
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -42,7 +41,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     ) {
       throw new AppError(
         ErrorCode.OTP_RESEND_COOLDOWN,
-        AuthErrorMessages.OTP_RESEND_COOLDOWN,
+        AppMessages.OTP_RESEND_COOLDOWN,
         HttpStatusCode.TOO_MANY_REQUESTS
       );
     } 
@@ -73,7 +72,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
 
     await this._emailService.sendMail({
       to: email,
-      subject: EmailMessages.OTP_EMAIL_SUBJECT,
+      subject: AppMessages.EMAIL_SUBJECT_RESET_PASSWORD,
       body: `
         <h3>OTP Verification</h3>
         <p>Your new OTP is:</p>

@@ -1,3 +1,5 @@
+import { LoginUserSchemaType, RegisterUserSchemaType } from "shared";
+
 export type RegisterVerifiedUserDto = {
   fullName: string;
   email: string;
@@ -15,8 +17,6 @@ export type UserAuthResponseDto = {
   refreshToken: string;
 };
 
-export type StartRegisterDto = {
-  fullName: string;
-  email: string;
-  password: string;
-};
+export type StartRegisterDto = RegisterUserSchemaType;
+
+export type LoginRequestDto = LoginUserSchemaType;

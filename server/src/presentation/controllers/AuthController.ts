@@ -1,18 +1,25 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
-import { RegisterUserSchema } from "shared";
+import {
+  AppMessages,
+  LoginUserSchema,
+  RegisterUserSchema,
+  ResponseHandler,
+} from "shared";
 import { HttpStatusCode } from "shared";
 
 import { IAuthController } from "../interfaces/IAuthController";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
+import { ILoginUserUseCase } from "@/application/interfaces/use-cases/User/ILoginUserUserCase";
 
 export class AuthController implements IAuthController {
   constructor(
     private readonly startRegisterUseCase: IStartRegisterUseCase,
     private readonly verifyOtpUseCase: IVerifyOtpUseCase,
-    private readonly resendOtpUseCase: IResendOtpUseCase
+    private readonly resendOtpUseCase: IResendOtpUseCase,
+    private readonly loginUserUseCase: ILoginUserUseCase,
   ) {}
 
   startRegister = asyncHandler(
@@ -22,11 +29,10 @@ export class AuthController implements IAuthController {
 
       await this.startRegisterUseCase.execute(validatedData);
 
-      res.status(HttpStatusCode.OK).json({
-        success: true,
-        message: "OTP sent to email",
-      });
-    }
+      res
+        .status(HttpStatusCode.OK)
+        .json(ResponseHandler.success(AppMessages.OTP_SENT));
+    },
   );
 
   verifyOtp = asyncHandler(
@@ -49,11 +55,12 @@ export class AuthController implements IAuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(200).json({
-        user: result.user,
-        message: "Email verified successfully",
-      });
-    }
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(AppMessages.EMAIL_VERIFIED, {
+          user: result.user,
+        }),
+      );
+    },
   );
 
   resendOtp = asyncHandler(
@@ -62,10 +69,36 @@ export class AuthController implements IAuthController {
 
       await this.resendOtpUseCase.execute(email);
 
-      res.status(HttpStatusCode.CREATED).json({
-        success: true,
-        message: "OTP resend successfully.",
+      res
+        .status(HttpStatusCode.CREATED)
+        .json(ResponseHandler.success(AppMessages.OTP_RESENT));
+    },
+  );
+
+  loginUser = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const validatedData = LoginUserSchema.parse(req.body);
+      const result = await this.loginUserUseCase.execute(validatedData);
+
+      res.cookie("access_token", result.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
       });
-    }
+
+      res.cookie("refresh_token", result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(AppMessages.LOGIN_SUCCESS, {
+          user: result.user,
+        }),
+      );
+    },
   );
 }

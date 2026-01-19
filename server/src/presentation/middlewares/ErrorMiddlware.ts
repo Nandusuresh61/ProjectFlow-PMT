@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { HttpStatusCode } from "shared";
+import { AppError, HttpStatusCode } from "shared";
 import { ZodError } from "zod";
+import { Request, Response, NextFunction } from "express";
 
 export const errorMiddleware = (
   err: any,
@@ -16,12 +16,14 @@ export const errorMiddleware = (
     });
   }
 
-  if (err.statusCode) {
+  if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
+      errorCode: err.errorCode,
       message: err.message,
     });
   }
+  console.error("Unhandled Error:", err);
 
   return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
     success: false,

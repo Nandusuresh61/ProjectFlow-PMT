@@ -42,21 +42,37 @@ declare enum EmailType {
 }
 
 declare class AppError extends Error {
+    readonly statusCode: HttpStatusCode;
+    readonly errorCode: ErrorCode;
+    readonly isOperational: boolean;
     constructor(errorCode: ErrorCode, message: string, statusCode: HttpStatusCode);
 }
 
-declare const AuthErrorMessages: {
-    EMAIL_EXISTS: string;
-    OTP_ERROR: string;
-    OTP_ATTEMPT: string;
-    OTP_RESEND_COOLDOWN: string;
-};
-
-declare const EmailMessages: {
-    EMAIL_SENT_SUCESS: string;
-    EMAIL_SENT_FAILED: string;
-    OTP_EMAIL_SUBJECT: string;
-    RESET_PASSOWRD_SUBJECT: string;
+declare const AppMessages: {
+    readonly EMAIL_ALREADY_EXISTS: "The given email already exists. Please try a different one.";
+    readonly INVALID_EMAIL: "Invalid email address.";
+    readonly INVALID_CREDENTIALS: "Invalid email or password.";
+    readonly OTP_INVALID_OR_EXPIRED: "OTP is invalid or has expired.";
+    readonly OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.";
+    readonly OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.";
+    readonly UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.";
+    readonly TOKEN_EXPIRED: "Session expired. Please login again.";
+    readonly TOKEN_INVALID: "Invalid authentication token.";
+    readonly OTP_SENT: "OTP has been sent to your email.";
+    readonly OTP_RESENT: "OTP has been resent successfully.";
+    readonly EMAIL_VERIFIED: "Email verified successfully.";
+    readonly LOGIN_SUCCESS: "Login successful.";
+    readonly LOGOUT_SUCCESS: "Logout successful.";
+    readonly PASSWORD_RESET_SUCCESS: "Password reset successful.";
+    readonly EMAIL_SENT_SUCCESS: "Email sent successfully.";
+    readonly EMAIL_SENT_FAILED: "Unable to send email at the moment.";
+    readonly EMAIL_SUBJECT_OTP: "Your OTP Code";
+    readonly EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password";
+    readonly EMAIL_SUBJECT_INVITE_USER: "You have been invited";
+    readonly INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.";
+    readonly VALIDATION_FAILED: "Invalid input data.";
+    readonly RESOURCE_NOT_FOUND: "Requested resource not found.";
+    readonly OPERATION_SUCCESS: "Operation completed successfully.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -70,9 +86,29 @@ type TokenPayloadType = z.infer<typeof TokenPayloadSchema>;
 
 declare const RegisterUserSchema: z$1.ZodObject<{
     fullName: z$1.ZodString;
-    email: z$1.ZodString;
+    email: z$1.ZodPipe<z$1.ZodString, z$1.ZodTransform<string, string>>;
     password: z$1.ZodString;
 }, z$1.core.$strip>;
 type RegisterUserSchemaType = z$1.infer<typeof RegisterUserSchema>;
 
-export { AppError, AuthErrorMessages, EmailMessages, EmailType, ErrorCode, HttpStatusCode, RegisterUserSchema, type RegisterUserSchemaType, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+declare const LoginUserSchema: z$1.ZodObject<{
+    email: z$1.ZodPipe<z$1.ZodString, z$1.ZodTransform<string, string>>;
+    password: z$1.ZodString;
+}, z$1.core.$strip>;
+type LoginUserSchemaType = z$1.infer<typeof LoginUserSchema>;
+
+type SuccessResponse<T> = {
+    success: true;
+    message: string;
+    data?: T;
+};
+type ErrorResponse = {
+    success: false;
+    message: string;
+};
+declare const ResponseHandler: {
+    success<T>(message: string, data?: T): SuccessResponse<T>;
+    error(message: string): ErrorResponse;
+};
+
+export { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
