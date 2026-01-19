@@ -37,12 +37,14 @@ export default function Otp() {
         email: pendingEmail,
         otp: otpInput,
       });
-      setUser(response.user)
+      setUser(response.data!.user);
       toast.success(response.message);
-      navigate('/home')
-    } catch(error: any) {
-    toast.error(error?.response?.data?.message || "OTP verification failed");
-  }
+      setTimeout(() =>{
+        navigate("/home");
+      },300)
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (

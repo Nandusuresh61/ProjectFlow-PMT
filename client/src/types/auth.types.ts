@@ -1,7 +1,18 @@
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
 export interface User {
   id: string;
   fullName: string;
   email: string;
+  isSuperAdmin:boolean;
+}
+
+export interface AuthData {
+  user: User
 }
 
 export interface RegisterPayload {
@@ -20,7 +31,4 @@ export interface LoginPayload {
   password: string;
 }
 
-export interface AuthResponse {
-  user: User;
-  message: string
-}
+

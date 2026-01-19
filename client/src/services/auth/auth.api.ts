@@ -1,33 +1,48 @@
 import { API } from "@/services/api";
+import type { ApiResponse } from "@/types/auth.types";
 import type {
-  AuthResponse,
-  LoginPayload, 
+  AuthData,
+  LoginPayload,
   OtpPayload,
   RegisterPayload,
 } from "@/types/auth.types";
 
-export const registerUser = async (payload: RegisterPayload): Promise<{message:string}> => {
-  const { data } = await API.post("/auth/register", payload);
+export const registerUser = async (
+  payload: RegisterPayload
+): Promise<ApiResponse<null>> => {
+  const { data } = await API.post<ApiResponse<null>>(
+    "/auth/register",
+    payload
+  );
   return data;
 };
 
-export const verifyUserOtp = async (payload: OtpPayload): Promise<AuthResponse> => {
-  const {data } =await API.post("/auth/verify-otp",payload);
-  return data
-}
+export const verifyUserOtp = async (
+  payload: OtpPayload
+): Promise<ApiResponse<AuthData>> => {
+  const { data } = await API.post<ApiResponse<AuthData>>(
+    "/auth/verify-otp",
+    payload
+  );
+  return data;
+};
 
 export const loginUser = async (
   payload: LoginPayload
-): Promise<AuthResponse> => {
-  const { data } = await API.post("/auth/login", payload);
+): Promise<ApiResponse<AuthData>> => {
+  const { data } = await API.post<ApiResponse<AuthData>>(
+    "/auth/login",
+    payload
+  );
   return data;
 };
 
-export const getMe = async (): Promise<AuthResponse> => {
-  const { data } = await API.post("/auth/getme");
+export const getMe = async (): Promise<ApiResponse<AuthData>> => {
+  const { data } = await API.get<ApiResponse<AuthData>>("/auth/getme");
   return data;
 };
 
-export const logoutUser = async () => {
-  await API.post("/auth/logout");
+export const logoutUser = async (): Promise<ApiResponse<null>> => {
+  const { data } = await API.post<ApiResponse<null>>("/auth/logout");
+  return data;
 };

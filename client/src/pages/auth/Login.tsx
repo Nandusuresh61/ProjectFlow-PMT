@@ -33,16 +33,17 @@ export default function Login() {
     }
     try {
       const response = await loginUser(form);
+      console.log(response)
 
-      setUser(response.user);
+      setUser(response.data!.user);
 
-      toast.success("Login Successful...");
+      toast.success(response.message);
       setTimeout(() => {
         navigate("/home");
       }, 800);
       setLoading(false);
-    } catch (error) {
-      toast.error("Login error");
+    } catch (error: any) {
+      toast.error(error.message);
     }finally{
         setLoading(false)
     }

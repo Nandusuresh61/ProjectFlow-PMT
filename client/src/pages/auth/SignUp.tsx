@@ -50,10 +50,9 @@ export default function SignUp() {
       setPendingEmail(form.email);
       setTimeout(() => {
         navigate("/verify-otp");
-      }, 800);
+      }, 300);
     } catch (error: any) {
-      const message = error?.response?.data?.message || "Registration Failed";
-      toast.error(message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

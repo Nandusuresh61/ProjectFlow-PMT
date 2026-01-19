@@ -8,17 +8,13 @@ export const API = axios.create({
   },
 });
 
-/***
- *  Res Interceptor for New AccessToken By passing RefreshToken.
- */
 API.interceptors.response.use(
   (response) => response,
 
   async (error) => {
     const originalRequest = error.config;
-
     if (
-      error.response?.status == HttpStatusCode.Unauthorized &&
+      error.response?.status === HttpStatusCode.Unauthorized &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
@@ -26,10 +22,22 @@ API.interceptors.response.use(
       try {
         await API.post("/auth/refresh");
         return API(originalRequest);
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
+      } catch (refreshError: any) {
+        return Promise.reject({
+          message:
+            refreshError?.response?.data?.message ||
+            "Session expired. Please login again.",
+          status: refreshError?.response?.status,
+        });
       }
     }
-    return Promise.reject(error);
-  }
+
+    return Promise.reject({
+      message:
+        error?.response?.data?.message ||
+        error?.message ||
+        "Something went wrong",
+      status: error?.response?.status,
+    });
+  },
 );
