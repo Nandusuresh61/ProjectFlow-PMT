@@ -17,7 +17,7 @@ export const AuthProvider = ({
 
       try {
         const response = await getMe();
-        setUser(response.user);
+        setUser(response.data!.user);
       } catch {
         clearUser();
       } finally {

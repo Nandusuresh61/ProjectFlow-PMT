@@ -29,7 +29,7 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     if (!form.email && !form.password) {
-      toast.error("Please input all the fields!");
+      toast.error("Please fill in all required fields.");
     }
     try {
       const response = await loginUser(form);

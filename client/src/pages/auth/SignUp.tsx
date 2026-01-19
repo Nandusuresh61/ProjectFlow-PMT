@@ -31,11 +31,11 @@ export default function SignUp() {
 
   const handleSubmit = async () => {
     if (!form.fullName || !form.email || !form.password) {
-      toast.error("please input all the field");
+      toast.error("Please fill in all required fields.");
       return;
     }
     if (form.password !== form.confirmPassword) {
-      toast.error("Password not matching");
+      toast.error("Passwords do not match.");
       return;
     }
 
