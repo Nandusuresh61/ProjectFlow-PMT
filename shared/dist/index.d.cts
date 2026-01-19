@@ -58,6 +58,7 @@ declare const AppMessages: {
     readonly UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.";
     readonly TOKEN_EXPIRED: "Session expired. Please login again.";
     readonly TOKEN_INVALID: "Invalid authentication token.";
+    readonly TOKEN_REFRESH_INVALID: "Invalid Refresh Token.";
     readonly OTP_SENT: "OTP has been sent to your email.";
     readonly OTP_RESENT: "OTP has been resent successfully.";
     readonly EMAIL_VERIFIED: "Email verified successfully.";

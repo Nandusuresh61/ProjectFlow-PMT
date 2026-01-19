@@ -26,8 +26,11 @@ export const AppMessages = {
 
   TOKEN_INVALID:
     "Invalid authentication token.",
+    
+  TOKEN_REFRESH_INVALID:
+    "Invalid Refresh Token.",
 
-
+  
   OTP_SENT:
     "OTP has been sent to your email.",
 

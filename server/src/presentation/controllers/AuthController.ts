@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
 import {
   AppMessages,
+  AppError,
   LoginUserSchema,
   RegisterUserSchema,
   ResponseHandler,
+  ErrorCode,
 } from "shared";
 import { HttpStatusCode } from "shared";
 
@@ -13,6 +15,7 @@ import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVeri
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
 import { ILoginUserUseCase } from "@/application/interfaces/use-cases/User/ILoginUserUserCase";
+import { IRefreshTokenUseCase } from "@/application/interfaces/use-cases/User/IRefreshTokenUseCase";
 import { AuthRequestMapper } from "@/application/mappers/AuthRequestMapper";
 import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
 
@@ -22,7 +25,8 @@ export class AuthController implements IAuthController {
     private readonly verifyOtpUseCase: IVerifyOtpUseCase,
     private readonly resendOtpUseCase: IResendOtpUseCase,
     private readonly loginUserUseCase: ILoginUserUseCase,
-  ) {}
+    private readonly refreshTokenUseCase: IRefreshTokenUseCase,
+  ) { }
 
   startRegister = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -112,7 +116,42 @@ export class AuthController implements IAuthController {
         );
     },
   );
-  
+
+  refreshToken = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const refreshToken = req.cookies.refresh_token;
+
+      if (!refreshToken) {
+        throw new AppError(
+          ErrorCode.AUTH,
+          AppMessages.TOKEN_INVALID,
+          HttpStatusCode.UNAUTHORIZED
+        );
+      }
+
+      const { accessToken, refreshToken: newRefreshToken } =
+        await this.refreshTokenUseCase.execute(refreshToken);
+
+      res.cookie("access_token", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.cookie("refresh_token", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res
+        .status(HttpStatusCode.OK)
+        .json(ResponseHandler.success(AppMessages.LOGIN_SUCCESS));
+    },
+  );
+
   LogoutUser = asyncHandler(async (req: Request, res: Response) => {
     res.clearCookie("access_token", {
       httpOnly: true,
@@ -128,5 +167,18 @@ export class AuthController implements IAuthController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.LOGOUT_SUCCESS));
+  });
+
+  getMe = asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(
+        AppMessages.OPERATION_SUCCESS,
+        {
+          user: user
+        }
+      )
+    );
   });
 }

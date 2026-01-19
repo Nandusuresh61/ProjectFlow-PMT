@@ -117,6 +117,7 @@ var AppMessages = {
   UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
   TOKEN_EXPIRED: "Session expired. Please login again.",
   TOKEN_INVALID: "Invalid authentication token.",
+  TOKEN_REFRESH_INVALID: "Invalid Refresh Token.",
   OTP_SENT: "OTP has been sent to your email.",
   OTP_RESENT: "OTP has been resent successfully.",
   EMAIL_VERIFIED: "Email verified successfully.",

@@ -11,4 +11,20 @@ export class TokenService implements ITokenService {
   createRefreshToken(payload: TokenPayloadType): string {
     return jwt.sign(payload, config.REFRESH_TOKEN_SECRET);
   }
+
+  verifyAccessToken(token: string): TokenPayloadType | null {
+    try {
+      return jwt.verify(token, config.ACCESS_TOKEN_SECRET) as TokenPayloadType;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  verifyRefreshToken(token: string): TokenPayloadType | null {
+    try {
+      return jwt.verify(token, config.REFRESH_TOKEN_SECRET) as TokenPayloadType;
+    } catch (error) {
+      return null;
+    }
+  }
 }
