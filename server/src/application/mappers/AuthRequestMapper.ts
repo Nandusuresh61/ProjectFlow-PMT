@@ -1,17 +1,23 @@
-import { RegisterVerifiedUserDto } from "@/application/dtos/UserDtos";
-import { RegisterUserSchemaType } from "shared";
+import { RegisterUserSchemaType, LoginUserSchemaType } from "shared";
+import { StartRegisterDto, LoginRequestDto } from "@/application/dtos/UserDtos";
 
-/**
- * Express Request  → Mapper → DTO → Use Case
- */
 export class AuthRequestMapper {
-    static toRegisterUserDto(
-        data: RegisterUserSchemaType
-    ): RegisterVerifiedUserDto {
-        return {
-            fullName: data.fullName,
-            email:data.email,
-            passwordHash: data.password
-        }
-    }
+  static toStartRegisterDto(
+    data: RegisterUserSchemaType
+  ): StartRegisterDto {
+    return {
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+    };
+  }
+
+  static toLoginDto(
+    data: LoginUserSchemaType
+  ): LoginRequestDto {
+    return {
+      email: data.email,
+      password: data.password,
+    };
+  }
 }

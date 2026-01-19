@@ -13,6 +13,8 @@ import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVeri
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
 import { ILoginUserUseCase } from "@/application/interfaces/use-cases/User/ILoginUserUserCase";
+import { AuthRequestMapper } from "@/application/mappers/AuthRequestMapper";
+import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -25,9 +27,10 @@ export class AuthController implements IAuthController {
   startRegister = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       const validatedData = RegisterUserSchema.parse(req.body);
-      // add mapper
 
-      await this.startRegisterUseCase.execute(validatedData);
+      const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
+
+      await this.startRegisterUseCase.execute(dto);
 
       res
         .status(HttpStatusCode.OK)
@@ -55,11 +58,14 @@ export class AuthController implements IAuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(AppMessages.EMAIL_VERIFIED, {
-          user: result.user,
-        }),
-      );
+      res
+        .status(HttpStatusCode.OK)
+        .json(
+          ResponseHandler.success(
+            AppMessages.EMAIL_VERIFIED,
+            AuthResponseMapper.toUserResponse(result),
+          ),
+        );
     },
   );
 
@@ -78,7 +84,9 @@ export class AuthController implements IAuthController {
   loginUser = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       const validatedData = LoginUserSchema.parse(req.body);
-      const result = await this.loginUserUseCase.execute(validatedData);
+
+      const dto = AuthRequestMapper.toLoginDto(validatedData);
+      const result = await this.loginUserUseCase.execute(dto);
 
       res.cookie("access_token", result.accessToken, {
         httpOnly: true,
@@ -94,11 +102,14 @@ export class AuthController implements IAuthController {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.status(HttpStatusCode.OK).json(
-        ResponseHandler.success(AppMessages.LOGIN_SUCCESS, {
-          user: result.user,
-        }),
-      );
+      res
+        .status(HttpStatusCode.OK)
+        .json(
+          ResponseHandler.success(
+            AppMessages.LOGIN_SUCCESS,
+            AuthResponseMapper.toUserResponse(result),
+          ),
+        );
     },
   );
 }
