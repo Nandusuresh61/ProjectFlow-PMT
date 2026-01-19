@@ -50,7 +50,7 @@ export default function SignUp() {
       setPendingEmail(form.email);
       setTimeout(() => {
         navigate("/verify-otp");
-      }, 300);
+      }, 500);
     } catch (error: any) {
       toast.error(error.message);
     } finally {

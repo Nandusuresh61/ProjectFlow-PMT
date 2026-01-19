@@ -108,9 +108,6 @@ var AppError = class extends Error {
 
 // src/messages/AppMessages.ts
 var AppMessages = {
-  // =========================
-  // AUTH – ERRORS
-  // =========================
   EMAIL_ALREADY_EXISTS: "The given email already exists. Please try a different one.",
   INVALID_EMAIL: "Invalid email address.",
   INVALID_CREDENTIALS: "Invalid email or password.",
@@ -120,26 +117,17 @@ var AppMessages = {
   UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
   TOKEN_EXPIRED: "Session expired. Please login again.",
   TOKEN_INVALID: "Invalid authentication token.",
-  // =========================
-  // AUTH – SUCCESS
-  // =========================
   OTP_SENT: "OTP has been sent to your email.",
   OTP_RESENT: "OTP has been resent successfully.",
   EMAIL_VERIFIED: "Email verified successfully.",
   LOGIN_SUCCESS: "Login successful.",
   LOGOUT_SUCCESS: "Logout successful.",
   PASSWORD_RESET_SUCCESS: "Password reset successful.",
-  // =========================
-  // EMAIL
-  // =========================
   EMAIL_SENT_SUCCESS: "Email sent successfully.",
   EMAIL_SENT_FAILED: "Unable to send email at the moment.",
   EMAIL_SUBJECT_OTP: "Your OTP Code",
   EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password",
   EMAIL_SUBJECT_INVITE_USER: "You have been invited",
-  // =========================
-  // COMMON / GLOBAL (FUTURE)
-  // =========================
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",

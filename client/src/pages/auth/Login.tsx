@@ -30,6 +30,8 @@ export default function Login() {
     setLoading(true);
     if (!form.email && !form.password) {
       toast.error("Please fill in all required fields.");
+      setLoading(false)
+      return;
     }
     try {
       const response = await loginUser(form);
@@ -40,7 +42,7 @@ export default function Login() {
       toast.success(response.message);
       setTimeout(() => {
         navigate("/home");
-      }, 800);
+      }, 500);
       setLoading(false);
     } catch (error: any) {
       toast.error(error.message);

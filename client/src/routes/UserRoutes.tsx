@@ -6,16 +6,23 @@ import Home from "@/pages/Home";
 import LandingPage from "@/pages/landing/LandingPage";
 
 import { Routes, Route } from "react-router-dom";
+import PublicRoutes from "./PublicRoutes";
+import ProtectedRoutes from "./ProtectedRoutes";
 
 export default function UserRoutes() {
   return (
-      <Routes>
+    <Routes>
+      <Route element={<PublicRoutes />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+      </Route>  
+
+      <Route element={<ProtectedRoutes />}>
         <Route path="/home" element={<Home />} />
-      </Routes>
+      </Route>
+    </Routes>
   );
 }

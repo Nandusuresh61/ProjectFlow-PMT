@@ -112,4 +112,21 @@ export class AuthController implements IAuthController {
         );
     },
   );
+  
+  LogoutUser = asyncHandler(async (req: Request, res: Response) => {
+    res.clearCookie("access_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.LOGOUT_SUCCESS));
+  });
 }
