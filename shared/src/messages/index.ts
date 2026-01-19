@@ -1,2 +1,1 @@
-export * from "./AuthErrorMessages";
-export * from "./EmailMessages";
+export * from "./AppMessages";

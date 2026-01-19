@@ -1,6 +1,6 @@
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { VerifyAuthDto } from "@/application/dtos/AuthDto";
-import { AppError, AuthErrorMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
@@ -18,7 +18,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     if (!stored) {
       throw new AppError(
         ErrorCode.AUTH,
-        AuthErrorMessages.OTP_ERROR,
+        AppMessages.OTP_INVALID_OR_EXPIRED,
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -27,7 +27,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
       await this._otpStore.delete(data.email);
       throw new AppError(
         ErrorCode.AUTH,
-        AuthErrorMessages.OTP_ATTEMPT,
+        AppMessages.OTP_MAX_ATTEMPTS_REACHED,
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -42,7 +42,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
       await this._otpStore.update(data.email, stored, 300);
       throw new AppError(
         ErrorCode.AUTH,
-        AuthErrorMessages.OTP_ERROR,
+        AppMessages.OTP_INVALID_OR_EXPIRED,
         HttpStatusCode.BAD_REQUEST
       );
     }

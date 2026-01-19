@@ -31,12 +31,13 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
-  AuthErrorMessages: () => AuthErrorMessages,
-  EmailMessages: () => EmailMessages,
+  AppMessages: () => AppMessages,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   HttpStatusCode: () => HttpStatusCode,
+  LoginUserSchema: () => LoginUserSchema,
   RegisterUserSchema: () => RegisterUserSchema,
+  ResponseHandler: () => ResponseHandler,
   TokenEnums: () => TokenEnums,
   TokenPayloadSchema: () => TokenPayloadSchema
 });
@@ -93,25 +94,45 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
+  statusCode;
+  errorCode;
+  isOperational;
   constructor(errorCode, message, statusCode) {
     super(message);
+    this.errorCode = errorCode;
+    this.statusCode = statusCode;
+    this.isOperational = true;
+    Error.captureStackTrace(this, this.constructor);
   }
 };
 
-// src/messages/AuthErrorMessages.ts
-var AuthErrorMessages = {
-  EMAIL_EXISTS: "The given email already exists! please try a different one",
-  OTP_ERROR: "Otp Invalid or Expired",
-  OTP_ATTEMPT: "TOO many Invalid Attempt",
-  OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP"
-};
-
-// src/messages/EmailMessages.ts
-var EmailMessages = {
-  EMAIL_SENT_SUCESS: "Email sent successfully",
-  EMAIL_SENT_FAILED: "Unable to sent Email!",
-  OTP_EMAIL_SUBJECT: "Your OTP Code",
-  RESET_PASSOWRD_SUBJECT: "Reset your password"
+// src/messages/AppMessages.ts
+var AppMessages = {
+  EMAIL_ALREADY_EXISTS: "The given email already exists. Please try a different one.",
+  INVALID_EMAIL: "Invalid email address.",
+  INVALID_CREDENTIALS: "Invalid email or password.",
+  OTP_INVALID_OR_EXPIRED: "OTP is invalid or has expired.",
+  OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.",
+  OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.",
+  UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
+  TOKEN_EXPIRED: "Session expired. Please login again.",
+  TOKEN_INVALID: "Invalid authentication token.",
+  TOKEN_REFRESH_INVALID: "Invalid Refresh Token.",
+  OTP_SENT: "OTP has been sent to your email.",
+  OTP_RESENT: "OTP has been resent successfully.",
+  EMAIL_VERIFIED: "Email verified successfully.",
+  LOGIN_SUCCESS: "Login successful.",
+  LOGOUT_SUCCESS: "Logout successful.",
+  PASSWORD_RESET_SUCCESS: "Password reset successful.",
+  EMAIL_SENT_SUCCESS: "Email sent successfully.",
+  EMAIL_SENT_FAILED: "Unable to send email at the moment.",
+  EMAIL_SUBJECT_OTP: "Your OTP Code",
+  EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password",
+  EMAIL_SUBJECT_INVITE_USER: "You have been invited",
+  INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
+  VALIDATION_FAILED: "Invalid input data.",
+  RESOURCE_NOT_FOUND: "Requested resource not found.",
+  OPERATION_SUCCESS: "Operation completed successfully."
 };
 
 // src/schema/TokenPayload.ts
@@ -127,19 +148,50 @@ var TokenPayloadSchema = import_zod.default.object({
 // src/schema/auth/RegisterUserSchema.ts
 var import_zod2 = require("zod");
 var RegisterUserSchema = import_zod2.z.object({
-  fullName: import_zod2.z.string().min(3, "Fullname must be atleast 3 letters!"),
-  email: import_zod2.z.string().email("Invalid Email Address!"),
-  password: import_zod2.z.string().min(8, "Password must be atleast 8 characters!")
+  fullName: import_zod2.z.string().trim().min(3, "Full name must be at least 3 characters").max(50, "Full name must not exceed 50 characters").regex(
+    /^[A-Za-z ]+$/,
+    "Full name can contain only letters and spaces"
+  ),
+  email: import_zod2.z.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  password: import_zod2.z.string().min(8, "Password must be at least 8 characters").max(64, "Password must not exceed 64 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number").regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  ).regex(/^\S*$/, "Password must not contain spaces")
 });
+
+// src/schema/auth/LoginUserSchema.ts
+var import_zod3 = require("zod");
+var LoginUserSchema = import_zod3.z.object({
+  email: import_zod3.z.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  password: import_zod3.z.string().min(1, "Password is required").max(64, "Password is too long")
+});
+
+// src/response/responseHandler.ts
+var ResponseHandler = {
+  success(message, data) {
+    return {
+      success: true,
+      message,
+      ...data && { data }
+    };
+  },
+  error(message) {
+    return {
+      success: false,
+      message
+    };
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   AppError,
-  AuthErrorMessages,
-  EmailMessages,
+  AppMessages,
   EmailType,
   ErrorCode,
   HttpStatusCode,
+  LoginUserSchema,
   RegisterUserSchema,
+  ResponseHandler,
   TokenEnums,
   TokenPayloadSchema
 });
