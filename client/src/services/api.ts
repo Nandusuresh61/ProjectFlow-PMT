@@ -8,11 +8,31 @@ export const API = axios.create({
   },
 });
 
+const AUTH_ROUTES = [
+  "/auth/login",
+  "/auth/signup",
+  "/auth/refresh",
+];
+
 API.interceptors.response.use(
   (response) => response,
 
   async (error) => {
     const originalRequest = error.config;
+
+    const isAuthRoute = AUTH_ROUTES.some((route) =>
+      originalRequest.url?.includes(route)
+    );
+
+    if (isAuthRoute) {
+      return Promise.reject({
+        message:
+          error?.response?.data?.message ||
+          "Authentication failed",
+        status: error?.response?.status,
+      });
+    }
+
     if (
       error.response?.status === HttpStatusCode.Unauthorized &&
       !originalRequest._retry
@@ -39,6 +59,5 @@ API.interceptors.response.use(
         "Something went wrong",
       status: error?.response?.status,
     });
-  },
+  }
 );
-  
