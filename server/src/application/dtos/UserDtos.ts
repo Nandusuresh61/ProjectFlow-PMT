@@ -17,6 +17,13 @@ export type UserAuthResponseDto = {
   refreshToken: string;
 };
 
-export type StartRegisterDto = RegisterUserSchemaType;
+export type StartRegisterDto = {
+  fullName: string;
+  email: string;
+  password: string;
+};
 
-export type LoginRequestDto = LoginUserSchemaType;
+export type LoginRequestDto = {
+  email: string;
+  password: string;
+};
