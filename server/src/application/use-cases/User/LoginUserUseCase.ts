@@ -27,7 +27,7 @@ export class LoginUserUseCase {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.INVALID_EMAIL,
-        HttpStatusCode.UNAUTHORIZED,
+        HttpStatusCode.BAD_REQUEST,
       );
 
     const isMatch = await this._passwordHash.comparePassword(
@@ -38,7 +38,7 @@ export class LoginUserUseCase {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.INVALID_CREDENTIALS,
-        HttpStatusCode.UNAUTHORIZED,
+        HttpStatusCode.CONFLICT,
       );
 
     const accessToken = this._tokenService.createAccessToken({
