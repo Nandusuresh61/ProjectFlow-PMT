@@ -9,6 +9,7 @@ import {
   ErrorCode,
 } from "shared";
 import { HttpStatusCode } from "shared";
+import { config } from "@/app.config";
 
 import { IAuthController } from "../interfaces/IAuthController";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
@@ -21,11 +22,11 @@ import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
 
 export class AuthController implements IAuthController {
   constructor(
-    private readonly startRegisterUseCase: IStartRegisterUseCase,
-    private readonly verifyOtpUseCase: IVerifyOtpUseCase,
-    private readonly resendOtpUseCase: IResendOtpUseCase,
-    private readonly loginUserUseCase: ILoginUserUseCase,
-    private readonly refreshTokenUseCase: IRefreshTokenUseCase,
+    private readonly _startRegisterUseCase: IStartRegisterUseCase,
+    private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
+    private readonly _resendOtpUseCase: IResendOtpUseCase,
+    private readonly _loginUserUseCase: ILoginUserUseCase,
+    private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
   ) { }
 
   startRegister = asyncHandler(
@@ -34,7 +35,7 @@ export class AuthController implements IAuthController {
 
       const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
 
-      await this.startRegisterUseCase.execute(dto);
+      await this._startRegisterUseCase.execute(dto);
 
       res
         .status(HttpStatusCode.OK)
@@ -46,7 +47,7 @@ export class AuthController implements IAuthController {
     async (req: Request, res: Response): Promise<void> => {
       const { email, otp } = req.body;
 
-      const result = await this.verifyOtpUseCase.execute({ email, otp });
+      const result = await this._verifyOtpUseCase.execute({ email, otp });
 
       res.cookie("access_token", result.accessToken, {
         httpOnly: true,
@@ -60,6 +61,7 @@ export class AuthController implements IAuthController {
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
 
       res
@@ -77,7 +79,7 @@ export class AuthController implements IAuthController {
     async (req: Request, res: Response): Promise<void> => {
       const { email } = req.body;
 
-      await this.resendOtpUseCase.execute(email);
+      await this._resendOtpUseCase.execute(email);
 
       res
         .status(HttpStatusCode.CREATED)
@@ -90,7 +92,7 @@ export class AuthController implements IAuthController {
       const validatedData = LoginUserSchema.parse(req.body);
 
       const dto = AuthRequestMapper.toLoginDto(validatedData);
-      const result = await this.loginUserUseCase.execute(dto);
+      const result = await this._loginUserUseCase.execute(dto);
 
       res.cookie("access_token", result.accessToken, {
         httpOnly: true,
@@ -104,6 +106,7 @@ export class AuthController implements IAuthController {
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
 
       res
@@ -130,7 +133,7 @@ export class AuthController implements IAuthController {
       }
 
       const { accessToken, refreshToken: newRefreshToken } =
-        await this.refreshTokenUseCase.execute(refreshToken);
+        await this._refreshTokenUseCase.execute(refreshToken);
 
       res.cookie("access_token", accessToken, {
         httpOnly: true,
@@ -144,6 +147,7 @@ export class AuthController implements IAuthController {
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
 
       res
@@ -162,6 +166,7 @@ export class AuthController implements IAuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      path: "/api/auth" + config.REFRESH_TOKEN_PATH,
     });
 
     res

@@ -40,7 +40,7 @@ API.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await API.post("/auth/refresh");
+        await API.post(import.meta.env.VITE_REFRESH_TOKEN_PATH);
         return API(originalRequest);
       } catch (refreshError: any) {
         return Promise.reject({

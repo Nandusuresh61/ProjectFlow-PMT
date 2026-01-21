@@ -14,6 +14,23 @@ export default function Otp() {
   const setUser = AuthUserState((state) => state.setUser);
   const navigate = useNavigate();
   const [otpInput, setOtpinput] = useState("");
+  const [timer, setTimer] = useState(60);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleResend = () => {
+    setTimer(60);
+    
+    toast.success("Verification code resent");
+  };
 
   useEffect(() => {
     if (!pendingEmail) {
@@ -39,9 +56,9 @@ export default function Otp() {
       });
       setUser(response.data!.user);
       toast.success(response.message);
-      setTimeout(() =>{
+      setTimeout(() => {
         navigate("/home");
-      },300)
+      }, 300)
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -116,9 +133,18 @@ export default function Otp() {
 
             <div className="text-center text-sm">
               <span className="text-slate-500">Didn't receive the code? </span>
-              <button className="text-white underline hover:text-slate-200">
-                Click to resend
-              </button>
+              {timer > 0 ? (
+                <span className="text-slate-500">
+                  Resend in {timer}s
+                </span>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  className="text-white underline hover:text-slate-200"
+                >
+                  Click to resend
+                </button>
+              )}
             </div>
           </div>
         </motion.div>

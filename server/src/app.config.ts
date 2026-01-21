@@ -14,6 +14,7 @@ export const config = {
   PORT: process.env.PORT || 8080,
   ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
   REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
+  REFRESH_TOKEN_PATH: process.env.REFRESH_TOKEN_PATH,
   NODE_ENV: process.env.NODE_ENV || "development",
   RedisURL: process.env.REDIS_URL,
 };
