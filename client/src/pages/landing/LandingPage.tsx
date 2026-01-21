@@ -263,7 +263,7 @@ export default function LandingPage() {
                 {...scaleHover}
                 className="w-full sm:w-auto bg-white text-black px-12 py-6 rounded-2xl text-lg font-bold shadow-[0_0_30px_rgba(255,255,255,0.15)] h-auto hover:bg-slate-200"
               >
-                Get Started
+                <Link to="/signup">Get Started</Link>
               </MotionButton>
             </motion.div>
           </div>
