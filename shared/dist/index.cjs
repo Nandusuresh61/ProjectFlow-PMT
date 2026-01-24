@@ -34,6 +34,7 @@ __export(index_exports, {
   AppMessages: () => AppMessages,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
+  ForgotEmailSchema: () => ForgotEmailSchema,
   HttpStatusCode: () => HttpStatusCode,
   LoginUserSchema: () => LoginUserSchema,
   RegisterUserSchema: () => RegisterUserSchema,
@@ -166,6 +167,12 @@ var LoginUserSchema = import_zod3.z.object({
   password: import_zod3.z.string().min(1, "Password is required").max(64, "Password is too long")
 });
 
+// src/schema/auth/ForgotEmailSchema.ts
+var import_zod4 = __toESM(require("zod"), 1);
+var ForgotEmailSchema = import_zod4.default.object({
+  email: import_zod4.default.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase())
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -188,6 +195,7 @@ var ResponseHandler = {
   AppMessages,
   EmailType,
   ErrorCode,
+  ForgotEmailSchema,
   HttpStatusCode,
   LoginUserSchema,
   RegisterUserSchema,

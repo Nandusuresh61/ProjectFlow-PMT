@@ -98,6 +98,11 @@ declare const LoginUserSchema: z$1.ZodObject<{
 }, z$1.core.$strip>;
 type LoginUserSchemaType = z$1.infer<typeof LoginUserSchema>;
 
+declare const ForgotEmailSchema: z.ZodObject<{
+    email: z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>;
+}, z.core.$strip>;
+type ForgotEmailSchemaType = z.infer<typeof ForgotEmailSchema>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -112,4 +117,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

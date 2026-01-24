@@ -7,6 +7,7 @@ import {
   RegisterUserSchema,
   ResponseHandler,
   ErrorCode,
+  ForgotEmailSchema,
 } from "shared";
 import { HttpStatusCode } from "shared";
 import { config } from "@/app.config";
@@ -19,6 +20,7 @@ import { ILoginUserUseCase } from "@/application/interfaces/use-cases/User/ILogi
 import { IRefreshTokenUseCase } from "@/application/interfaces/use-cases/User/IRefreshTokenUseCase";
 import { AuthRequestMapper } from "@/application/mappers/AuthRequestMapper";
 import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
+import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/User/IForgotPasswordOtpUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -27,7 +29,8 @@ export class AuthController implements IAuthController {
     private readonly _resendOtpUseCase: IResendOtpUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
-  ) { }
+    private readonly _resetPasswordOtpUseCase: IForgotPasswordOtpUseCase,
+  ) {}
 
   startRegister = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -128,7 +131,7 @@ export class AuthController implements IAuthController {
         throw new AppError(
           ErrorCode.AUTH,
           AppMessages.TOKEN_INVALID,
-          HttpStatusCode.UNAUTHORIZED
+          HttpStatusCode.UNAUTHORIZED,
         );
       }
 
@@ -178,12 +181,20 @@ export class AuthController implements IAuthController {
     const user = (req as any).user;
 
     res.status(HttpStatusCode.OK).json(
-      ResponseHandler.success(
-        AppMessages.OPERATION_SUCCESS,
-        {
-          user: user
-        }
-      )
+      ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
+        user: user,
+      }),
     );
+  });
+
+  forgotOtp = asyncHandler(async (req: Request, res: Response) => {
+    const validatedData = ForgotEmailSchema.parse(req.body);
+    const dto = AuthRequestMapper.toForgotDto(validatedData);
+
+    await this._resetPasswordOtpUseCase.execute(dto);
+
+    res
+      .status(HttpStatusCode.CREATED)
+      .json(ResponseHandler.success(AppMessages.EMAIL_SENT_SUCCESS));
   });
 }

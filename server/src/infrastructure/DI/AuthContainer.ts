@@ -12,6 +12,8 @@ import { EmailService } from "@/infrastructure/services/EmailService";
 import { ResendOtpUseCase } from "@/application/use-cases/User/ResendOtpUseCase";
 import { LoginUserUseCase } from "@/application/use-cases/User/LoginUserUseCase";
 import { RefreshTokenUseCase } from "@/application/use-cases/User/RefreshTokenUseCase";
+import { ForgotPasswordOtpUseCase } from "@/application/use-cases/User/ForgotPasswordOtpUseCase";
+import { RedisResetPasswordOtpStore } from "../cache/RedisResetPasswordOtpStore";
 
 /**
  * Infrastructure layer use case
@@ -22,8 +24,9 @@ const passwordHasher = new PasswordHash();
 const tokenService = new TokenService();
 const uidService = new UidService();
 const otpStore = new RedisOtpStore();
-const otpGenerator = new OtpGenerator()
+const otpGenerator = new OtpGenerator();
 const emailService = new EmailService();
+const resetOtpStore = new RedisResetPasswordOtpStore();
 
 /**
  * Application layer useCase
@@ -33,20 +36,19 @@ const startRegisterUseCase = new StartRegistrationUseCase(
   passwordHasher,
   otpStore,
   otpGenerator,
-  emailService
-
+  emailService,
 );
 
 const registerUserUseCase = new RegisterUserUseCase(
   userRepository,
   uidService,
-  tokenService
+  tokenService,
 );
 
 const verifyOtpUseCase = new VerifyOtpUseCase(
   otpStore,
   passwordHasher,
-  registerUserUseCase
+  registerUserUseCase,
 );
 
 const resendOtpUseCase = new ResendOtpUseCase(
@@ -54,21 +56,30 @@ const resendOtpUseCase = new ResendOtpUseCase(
   otpStore,
   otpGenerator,
   passwordHasher,
-  emailService
-)
+  emailService,
+);
 
 const loginUserUseCase = new LoginUserUseCase(
   userRepository,
   tokenService,
-  passwordHasher
-)
+  passwordHasher,
+);
 
 const refreshTokenUseCase = new RefreshTokenUseCase(tokenService);
+
+const resetPasswordOtpUseCase = new ForgotPasswordOtpUseCase(
+  userRepository,
+  resetOtpStore,
+  emailService,
+  otpGenerator,
+  passwordHasher,
+);
 
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
   resendOtpUseCase,
   loginUserUseCase,
-  refreshTokenUseCase
+  refreshTokenUseCase,
+  resetPasswordOtpUseCase,
 );
