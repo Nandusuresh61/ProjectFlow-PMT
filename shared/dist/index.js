@@ -127,6 +127,17 @@ var ForgotEmailSchema = z4.object({
   email: z4.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase())
 });
 
+// src/schema/auth/ResetPasswordSchema.ts
+import z5 from "zod";
+var ResetPasswordSchema = z5.object({
+  email: z5.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  otp: z5.string().length(6, "OTP must be 6 digits"),
+  password: z5.string().min(8, "Password must be at least 8 characters").max(64, "Password must not exceed 64 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number").regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  ).regex(/^\S*$/, "Password must not contain spaces")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -152,6 +163,7 @@ export {
   HttpStatusCode,
   LoginUserSchema,
   RegisterUserSchema,
+  ResetPasswordSchema,
   ResponseHandler,
   TokenEnums,
   TokenPayloadSchema

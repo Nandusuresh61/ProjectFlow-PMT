@@ -14,6 +14,7 @@ import { LoginUserUseCase } from "@/application/use-cases/User/LoginUserUseCase"
 import { RefreshTokenUseCase } from "@/application/use-cases/User/RefreshTokenUseCase";
 import { ForgotPasswordOtpUseCase } from "@/application/use-cases/User/ForgotPasswordOtpUseCase";
 import { RedisResetPasswordOtpStore } from "../cache/RedisResetPasswordOtpStore";
+import { ResetPasswordUseCase } from "@/application/use-cases/User/ResetPasswordUseCase";
 
 /**
  * Infrastructure layer use case
@@ -27,6 +28,7 @@ const otpStore = new RedisOtpStore();
 const otpGenerator = new OtpGenerator();
 const emailService = new EmailService();
 const resetOtpStore = new RedisResetPasswordOtpStore();
+
 
 /**
  * Application layer useCase
@@ -75,6 +77,12 @@ const resetPasswordOtpUseCase = new ForgotPasswordOtpUseCase(
   passwordHasher,
 );
 
+const resetPasswordUseCase = new ResetPasswordUseCase(
+  userRepository,
+  resetOtpStore,
+  passwordHasher
+);
+
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
@@ -82,4 +90,5 @@ export const authController = new AuthController(
   loginUserUseCase,
   refreshTokenUseCase,
   resetPasswordOtpUseCase,
+  resetPasswordUseCase
 );

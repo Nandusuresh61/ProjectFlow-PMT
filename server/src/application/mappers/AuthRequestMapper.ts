@@ -2,11 +2,13 @@ import {
   RegisterUserSchemaType,
   LoginUserSchemaType,
   ForgotEmailSchemaType,
+  ResetPasswordSchemaType,
 } from "shared";
 import {
   StartRegisterDto,
   LoginRequestDto,
   ForgotRequestDto,
+  ResetPasswordRequestDto,
 } from "@/application/dtos/UserDtos";
 
 export class AuthRequestMapper {
@@ -29,5 +31,13 @@ export class AuthRequestMapper {
     return {
       email: data.email,
     };
+  }
+
+  static toResetPasswordDto(data: ResetPasswordSchemaType): ResetPasswordRequestDto {
+    return {
+      email: data.email,
+      otp: data.otp,
+      newPassword: data.password
+    }
   }
 }

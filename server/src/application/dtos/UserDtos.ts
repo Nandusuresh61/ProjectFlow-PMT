@@ -29,5 +29,11 @@ export type LoginRequestDto = {
 };
 
 export type ForgotRequestDto = {
-  email: string
-}
+  email: string;
+};
+
+export type ResetPasswordRequestDto = {
+  email: string;
+  otp: string;
+  newPassword: string;
+};

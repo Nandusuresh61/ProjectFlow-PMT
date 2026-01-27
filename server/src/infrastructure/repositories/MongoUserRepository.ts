@@ -5,7 +5,8 @@ import { User } from "@/domain/entities/User";
 
 export class MongoUserRepository
   extends MongoBaseRepository<UserDoc>
-  implements IUserRepository {
+  implements IUserRepository
+{
   constructor() {
     super(UserModel);
   }
@@ -16,10 +17,20 @@ export class MongoUserRepository
   }
   async createUser(user: User): Promise<User> {
     let newUser = await this.create(user);
-    return newUser
-
+    return newUser;
+  }
+  async updatePasswordByEmail(
+    email: string,
+    passwordHash: string,
+  ): Promise<void> {
+    await this.model.updateOne(
+      { email },
+      {
+        $set: {
+          passwordHash: passwordHash,
+          updatedAt: new Date(),
+        },
+      },
+    );
   }
 }
-
-
-

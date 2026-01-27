@@ -8,6 +8,7 @@ import {
   ResponseHandler,
   ErrorCode,
   ForgotEmailSchema,
+  ResetPasswordSchema,
 } from "shared";
 import { HttpStatusCode } from "shared";
 import { config } from "@/app.config";
@@ -21,6 +22,7 @@ import { IRefreshTokenUseCase } from "@/application/interfaces/use-cases/User/IR
 import { AuthRequestMapper } from "@/application/mappers/AuthRequestMapper";
 import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
 import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/User/IForgotPasswordOtpUseCase";
+import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/IResetPasswordUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -30,6 +32,7 @@ export class AuthController implements IAuthController {
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
     private readonly _resetPasswordOtpUseCase: IForgotPasswordOtpUseCase,
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase
   ) {}
 
   startRegister = asyncHandler(
@@ -197,4 +200,16 @@ export class AuthController implements IAuthController {
       .status(HttpStatusCode.CREATED)
       .json(ResponseHandler.success(AppMessages.EMAIL_SENT_SUCCESS));
   });
+
+  resetPassword = asyncHandler(async(req:Request,res: Response) => {
+    const validatedData = ResetPasswordSchema.parse(req.body);
+
+    const dto = AuthRequestMapper.toResetPasswordDto(validatedData);
+
+    await this._resetPasswordUseCase.execute(dto);
+
+    res
+    .status(HttpStatusCode.OK)
+    .json(ResponseHandler.success(AppMessages.PASSWORD_RESET_SUCCESS));
+  })
 }
