@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ export default function Login() {
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
+
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({
       ...prev,
@@ -30,24 +30,21 @@ export default function Login() {
     setLoading(true);
     if (!form.email && !form.password) {
       toast.error("Please fill in all required fields.");
-      setLoading(false)
+      setLoading(false);
       return;
     }
     try {
       const response = await loginUser(form);
-      console.log(response)
-
-      setUser(response.data!.user);
-
+      console.log(response);
+      const user = response.data!.user;
+      setUser(user);
       toast.success(response.message);
-      setTimeout(() => {
-        navigate("/home");
-      }, 500);
+
       setLoading(false);
     } catch (error: any) {
       toast.error(error.message);
-    }finally{
-        setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -109,8 +106,8 @@ export default function Login() {
                   <Label htmlFor="password" className="text-slate-400">
                     Password
                   </Label>
-                  <Link 
-                    to="/forgot-password" 
+                  <Link
+                    to="/forgot-password"
                     className="text-xs text-slate-500 hover:text-white transition-colors underline-offset-4 hover:underline"
                   >
                     Forgot password?
@@ -130,7 +127,7 @@ export default function Login() {
               className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200"
               onClick={handleLogin}
             >
-              {isLoading ? "Loading...":"Sign In"}
+              {isLoading ? "Loading..." : "Sign In"}
             </Button>
 
             <div className="relative">

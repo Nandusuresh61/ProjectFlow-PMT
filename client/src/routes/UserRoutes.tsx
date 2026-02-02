@@ -9,7 +9,6 @@ import { Routes, Route } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
-
 export default function UserRoutes() {
   return (
     <Routes>

@@ -33,7 +33,7 @@ export class AuthController implements IAuthController {
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
     private readonly _resetPasswordOtpUseCase: IForgotPasswordOtpUseCase,
     private readonly _resetPasswordUseCase: IResetPasswordUseCase
-  ) {}
+  ) { }
 
   startRegister = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -201,7 +201,7 @@ export class AuthController implements IAuthController {
       .json(ResponseHandler.success(AppMessages.EMAIL_SENT_SUCCESS));
   });
 
-  resetPassword = asyncHandler(async(req:Request,res: Response) => {
+  resetPassword = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = ResetPasswordSchema.parse(req.body);
 
     const dto = AuthRequestMapper.toResetPasswordDto(validatedData);
@@ -209,7 +209,7 @@ export class AuthController implements IAuthController {
     await this._resetPasswordUseCase.execute(dto);
 
     res
-    .status(HttpStatusCode.OK)
-    .json(ResponseHandler.success(AppMessages.PASSWORD_RESET_SUCCESS));
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.PASSWORD_RESET_SUCCESS));
   })
 }
