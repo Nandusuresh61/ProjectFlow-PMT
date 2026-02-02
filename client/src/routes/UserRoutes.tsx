@@ -8,6 +8,7 @@ import LandingPage from "@/pages/landing/LandingPage";
 import { Routes, Route } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
 
 export default function UserRoutes() {
   return (
@@ -18,6 +19,7 @@ export default function UserRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword/> } />  
       </Route>  
 
       <Route element={<ProtectedRoutes />}>

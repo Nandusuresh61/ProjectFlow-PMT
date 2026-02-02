@@ -1,5 +1,5 @@
 import { API } from "@/services/api";
-import type { ApiResponse } from "@/types/auth.types";
+import type { ApiResponse, ResetPasswordOtpPayload } from "@/types/auth.types";
 import type {
   AuthData,
   LoginPayload,
@@ -8,31 +8,28 @@ import type {
 } from "@/types/auth.types";
 
 export const registerUser = async (
-  payload: RegisterPayload
+  payload: RegisterPayload,
 ): Promise<ApiResponse<null>> => {
-  const { data } = await API.post<ApiResponse<null>>(
-    "/auth/register",
-    payload
-  );
+  const { data } = await API.post<ApiResponse<null>>("/auth/register", payload);
   return data;
 };
 
 export const verifyUserOtp = async (
-  payload: OtpPayload
+  payload: OtpPayload,
 ): Promise<ApiResponse<AuthData>> => {
   const { data } = await API.post<ApiResponse<AuthData>>(
     "/auth/verify-otp",
-    payload
+    payload,
   );
   return data;
 };
 
 export const loginUser = async (
-  payload: LoginPayload
+  payload: LoginPayload,
 ): Promise<ApiResponse<AuthData>> => {
   const { data } = await API.post<ApiResponse<AuthData>>(
     "/auth/login",
-    payload
+    payload,
   );
   return data;
 };
@@ -44,5 +41,19 @@ export const getMe = async (): Promise<ApiResponse<AuthData>> => {
 
 export const logoutUser = async (): Promise<ApiResponse<null>> => {
   const { data } = await API.post<ApiResponse<null>>("/auth/logout");
+  return data;
+};
+
+export const forgotPassoword = async (
+  email: string,
+): Promise<ApiResponse<null>> => {
+  const { data } = await API.post<ApiResponse<null>>("auth/forgot", { email });
+  return data;
+};
+
+export const resetPassword = async (
+  payload: ResetPasswordOtpPayload,
+): Promise<ApiResponse<null>> => {
+  const { data } = await API.post<ApiResponse<null>>("auth/reset-password", payload);
   return data;
 };

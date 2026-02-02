@@ -34,9 +34,11 @@ __export(index_exports, {
   AppMessages: () => AppMessages,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
+  ForgotEmailSchema: () => ForgotEmailSchema,
   HttpStatusCode: () => HttpStatusCode,
   LoginUserSchema: () => LoginUserSchema,
   RegisterUserSchema: () => RegisterUserSchema,
+  ResetPasswordSchema: () => ResetPasswordSchema,
   ResponseHandler: () => ResponseHandler,
   TokenEnums: () => TokenEnums,
   TokenPayloadSchema: () => TokenPayloadSchema
@@ -166,6 +168,23 @@ var LoginUserSchema = import_zod3.z.object({
   password: import_zod3.z.string().min(1, "Password is required").max(64, "Password is too long")
 });
 
+// src/schema/auth/ForgotEmailSchema.ts
+var import_zod4 = __toESM(require("zod"), 1);
+var ForgotEmailSchema = import_zod4.default.object({
+  email: import_zod4.default.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase())
+});
+
+// src/schema/auth/ResetPasswordSchema.ts
+var import_zod5 = __toESM(require("zod"), 1);
+var ResetPasswordSchema = import_zod5.default.object({
+  email: import_zod5.default.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  otp: import_zod5.default.string().length(6, "OTP must be 6 digits"),
+  password: import_zod5.default.string().min(8, "Password must be at least 8 characters").max(64, "Password must not exceed 64 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number").regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  ).regex(/^\S*$/, "Password must not contain spaces")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -188,9 +207,11 @@ var ResponseHandler = {
   AppMessages,
   EmailType,
   ErrorCode,
+  ForgotEmailSchema,
   HttpStatusCode,
   LoginUserSchema,
   RegisterUserSchema,
+  ResetPasswordSchema,
   ResponseHandler,
   TokenEnums,
   TokenPayloadSchema

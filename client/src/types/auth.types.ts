@@ -8,11 +8,11 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
-  isSuperAdmin:boolean;
+  isSuperAdmin: boolean;
 }
 
 export interface AuthData {
-  user: User
+  user: User;
 }
 
 export interface RegisterPayload {
@@ -31,4 +31,8 @@ export interface LoginPayload {
   password: string;
 }
 
-
+export interface ResetPasswordOtpPayload {
+  email: string;
+  otp: string;
+  password: string;
+}
