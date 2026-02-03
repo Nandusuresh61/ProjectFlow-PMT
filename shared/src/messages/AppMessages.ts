@@ -58,6 +58,8 @@ export const AppMessages = {
 
   EMAIL_SUBJECT_OTP:
     "Your OTP Code",
+  EMAIL_SUBJECT_RESEND_OTP:
+    "Your Resend OTP Code",
 
   EMAIL_SUBJECT_RESET_PASSWORD:
     "Reset your password",

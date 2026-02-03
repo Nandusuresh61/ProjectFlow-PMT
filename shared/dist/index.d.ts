@@ -68,6 +68,7 @@ declare const AppMessages: {
     readonly EMAIL_SENT_SUCCESS: "Email sent successfully.";
     readonly EMAIL_SENT_FAILED: "Unable to send email at the moment.";
     readonly EMAIL_SUBJECT_OTP: "Your OTP Code";
+    readonly EMAIL_SUBJECT_RESEND_OTP: "Your ResOTP Code";
     readonly EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password";
     readonly EMAIL_SUBJECT_INVITE_USER: "You have been invited";
     readonly INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.";
