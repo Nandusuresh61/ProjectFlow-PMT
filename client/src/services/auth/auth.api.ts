@@ -1,5 +1,9 @@
 import { API } from "@/services/api";
-import type { ApiResponse, ResetPasswordOtpPayload } from "@/types/auth.types";
+import type {
+  ApiResponse,
+  ResendOtpPayload,
+  ResetPasswordOtpPayload,
+} from "@/types/auth.types";
 import type {
   AuthData,
   LoginPayload,
@@ -54,6 +58,19 @@ export const forgotPassoword = async (
 export const resetPassword = async (
   payload: ResetPasswordOtpPayload,
 ): Promise<ApiResponse<null>> => {
-  const { data } = await API.post<ApiResponse<null>>("auth/reset-password", payload);
+  const { data } = await API.post<ApiResponse<null>>(
+    "auth/reset-password",
+    payload,
+  );
+  return data;
+};
+
+export const resendOtp = async (
+  payload: ResendOtpPayload,
+): Promise<ApiResponse<null>> => {
+  const { data } = await API.post<ApiResponse<null>>(
+    "auth/resend-otp",
+    payload,
+  );
   return data;
 };

@@ -69,6 +69,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     );
 
     // Otp to mail
+    console.log("Resend otp: ",otp)
 
     await this._emailService.sendMail({
       to: email,
