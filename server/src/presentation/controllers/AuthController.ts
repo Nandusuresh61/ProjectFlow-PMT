@@ -26,7 +26,7 @@ import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/I
 
 export class AuthController implements IAuthController {
   constructor(
-    private readonly _startRegisterUseCase: IStartRegisterUseCase,
+    private readonly _startRegisterUseCase: IStartRegisterUseCase,  
     private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
     private readonly _resendOtpUseCase: IResendOtpUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
