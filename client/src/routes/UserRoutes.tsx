@@ -9,6 +9,7 @@ import { Routes, Route } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
+import GoogleCallback from "@/pages/auth/GoogleCallback";
 export default function UserRoutes() {
   return (
     <Routes>
@@ -16,10 +17,11 @@ export default function UserRoutes() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/google/callback" element={<GoogleCallback />} />
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword/> } />  
-      </Route>  
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Route>
 
       <Route element={<ProtectedRoutes />}>
         <Route path="/home" element={<Home />} />

@@ -4,7 +4,7 @@ export interface UserDoc extends Document {
   userId: string;
   fullName: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   isSuperAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,7 +26,7 @@ const UserSchema = new Schema<UserDoc>({
   },
   passwordHash: {
     type: String,
-    required: true,
+    required: false,
   },
   isSuperAdmin: {
     type: Boolean,

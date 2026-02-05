@@ -6,6 +6,7 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
+import { AuthProvider } from "@/domain/entities/auth/authProvider";
 import { TokenEnums } from "shared";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
@@ -22,6 +23,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       fullName: user.fullName,
       email: user.email,
       passwordHash: user.passwordHash,
+      authProvider: AuthProvider.LOCAL,
       isSuperAdmin: false,
       createdAt: now,
       updatedAt: now,
