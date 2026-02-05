@@ -129,6 +129,7 @@ var AppMessages = {
   EMAIL_SENT_SUCCESS: "Email sent successfully.",
   EMAIL_SENT_FAILED: "Unable to send email at the moment.",
   EMAIL_SUBJECT_OTP: "Your OTP Code",
+  EMAIL_SUBJECT_RESEND_OTP: "Your Resend OTP Code",
   EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password",
   EMAIL_SUBJECT_INVITE_USER: "You have been invited",
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",

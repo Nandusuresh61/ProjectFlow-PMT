@@ -69,10 +69,11 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     );
 
     // Otp to mail
+    console.log("Resend otp: ",otp)
 
     await this._emailService.sendMail({
       to: email,
-      subject: AppMessages.EMAIL_SUBJECT_RESET_PASSWORD,
+      subject: AppMessages.EMAIL_SUBJECT_RESEND_OTP,
       body: `
         <h3>OTP Verification</h3>
         <p>Your new OTP is:</p>

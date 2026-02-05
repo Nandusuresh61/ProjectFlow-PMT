@@ -7,7 +7,7 @@ import { GridBackground } from "@/components/ui/gridBackground";
 import { AuthUserState } from "@/store/auth.store";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { verifyUserOtp } from "@/services/auth/auth.api";
+import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
 
 export default function Otp() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
@@ -26,10 +26,19 @@ export default function Otp() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleResend = () => {
-    setTimer(60);
-    
-    toast.success("Verification code resent");
+  const handleResend = async () => {
+    if (!pendingEmail) {
+      toast.error("Email not found.");
+      return;
+    }
+    try {
+      const response = await resendOtp({ email: pendingEmail });
+
+      toast.success(response.message);
+      setTimer(60);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send otp!");
+    }
   };
 
   useEffect(() => {
@@ -58,7 +67,7 @@ export default function Otp() {
       toast.success(response.message);
       setTimeout(() => {
         navigate("/home");
-      }, 300)
+      }, 300);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -134,9 +143,7 @@ export default function Otp() {
             <div className="text-center text-sm">
               <span className="text-slate-500">Didn't receive the code? </span>
               {timer > 0 ? (
-                <span className="text-slate-500">
-                  Resend in {timer}s
-                </span>
+                <span className="text-slate-500">Resend in {timer}s</span>
               ) : (
                 <button
                   onClick={handleResend}
