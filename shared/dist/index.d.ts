@@ -52,6 +52,11 @@ declare const AppMessages: {
     readonly EMAIL_ALREADY_EXISTS: "The given email already exists. Please try a different one.";
     readonly INVALID_EMAIL: "Invalid email address.";
     readonly INVALID_CREDENTIALS: "Invalid email or password.";
+    readonly INVALID_AUTH_PROVIDER: "Invalid Auth Provider.";
+    readonly INVALID_GOOGLE_TOKEN: "Invalid Google Token.";
+    readonly INVALID_GOOGLE_PAYLOAD: "Invalid Google Payload";
+    readonly INVALID_GOOGLE_CODE: "Invalid Google Auth Code.";
+    readonly GOOGLE_AUTH_FAILED: "Google authentication failed.";
     readonly OTP_INVALID_OR_EXPIRED: "OTP is invalid or has expired.";
     readonly OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.";
     readonly OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.";

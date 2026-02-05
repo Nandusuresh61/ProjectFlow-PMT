@@ -23,16 +23,20 @@ import { AuthRequestMapper } from "@/application/mappers/AuthRequestMapper";
 import { AuthResponseMapper } from "@/application/mappers/AuthResponseMapper";
 import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/User/IForgotPasswordOtpUseCase";
 import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/IResetPasswordUseCase";
+import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
+import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
 
 export class AuthController implements IAuthController {
   constructor(
-    private readonly _startRegisterUseCase: IStartRegisterUseCase,  
+    private readonly _startRegisterUseCase: IStartRegisterUseCase,
     private readonly _verifyOtpUseCase: IVerifyOtpUseCase,
     private readonly _resendOtpUseCase: IResendOtpUseCase,
     private readonly _loginUserUseCase: ILoginUserUseCase,
     private readonly _refreshTokenUseCase: IRefreshTokenUseCase,
     private readonly _resetPasswordOtpUseCase: IForgotPasswordOtpUseCase,
-    private readonly _resetPasswordUseCase: IResetPasswordUseCase
+    private readonly _resetPasswordUseCase: IResetPasswordUseCase,
+    private readonly _googleOAuthService: IOAuthProviderService,
+    private readonly _googleAuthUseCase: IGoogleAuthUseCase,
   ) { }
 
   startRegister = asyncHandler(
@@ -58,14 +62,15 @@ export class AuthController implements IAuthController {
       res.cookie("access_token", result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 15 * 60 * 1000,
+        path: "/",
       });
 
       res.cookie("refresh_token", result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
@@ -103,14 +108,15 @@ export class AuthController implements IAuthController {
       res.cookie("access_token", result.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 15 * 60 * 1000,
+        path: "/",
       });
 
       res.cookie("refresh_token", result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
@@ -144,14 +150,15 @@ export class AuthController implements IAuthController {
       res.cookie("access_token", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 15 * 60 * 1000,
+        path: "/",
       });
 
       res.cookie("refresh_token", newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/api/auth" + config.REFRESH_TOKEN_PATH,
       });
@@ -211,5 +218,45 @@ export class AuthController implements IAuthController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.PASSWORD_RESET_SUCCESS));
-  })
+  });
+
+  googleAuth = asyncHandler(async (req: Request, res: Response) => {
+    const { code } = req.body;
+
+    if (!code) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.INVALID_GOOGLE_CODE,
+        HttpStatusCode.BAD_REQUEST,
+      );
+    }
+
+    const oauthPayload = await this._googleOAuthService.verifyAndGetUser(code);
+
+    const result = await this._googleAuthUseCase.execute(oauthPayload);
+
+    res.cookie("access_token", result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
+      path: "/",
+    });
+
+    res.cookie("refresh_token", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/api/auth" + config.REFRESH_TOKEN_PATH,
+    });
+
+    res
+      .json(
+        ResponseHandler.success(
+          AppMessages.LOGIN_SUCCESS,
+          AuthResponseMapper.toUserResponse(result),
+        ),
+      );
+  });
 }

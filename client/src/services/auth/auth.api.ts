@@ -74,3 +74,12 @@ export const resendOtp = async (
   );
   return data;
 };
+
+export const googleAuth = async (
+  code: string,
+): Promise<ApiResponse<AuthData>> => {
+  const { data } = await API.post<ApiResponse<AuthData>>("/auth/google", {
+    code,
+  });
+  return data;
+};

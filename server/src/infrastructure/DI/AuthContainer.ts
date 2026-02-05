@@ -15,6 +15,8 @@ import { RefreshTokenUseCase } from "@/application/use-cases/User/RefreshTokenUs
 import { ForgotPasswordOtpUseCase } from "@/application/use-cases/User/ForgotPasswordOtpUseCase";
 import { RedisResetPasswordOtpStore } from "../cache/RedisResetPasswordOtpStore";
 import { ResetPasswordUseCase } from "@/application/use-cases/User/ResetPasswordUseCase";
+import { GoogleOAuthService } from "../services/GoogleOAuthService";
+import { GoogleAuthUseCase } from "@/application/use-cases/User/GoogleAuthUseCase";
 
 /**
  * Infrastructure layer use case
@@ -28,6 +30,7 @@ const otpStore = new RedisOtpStore();
 const otpGenerator = new OtpGenerator();
 const emailService = new EmailService();
 const resetOtpStore = new RedisResetPasswordOtpStore();
+const googleOAuthService = new GoogleOAuthService();
 
 
 /**
@@ -83,6 +86,13 @@ const resetPasswordUseCase = new ResetPasswordUseCase(
   passwordHasher
 );
 
+
+const googleAuthUseCase = new GoogleAuthUseCase(
+  userRepository,
+  tokenService,
+  uidService
+);
+
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
@@ -90,5 +100,7 @@ export const authController = new AuthController(
   loginUserUseCase,
   refreshTokenUseCase,
   resetPasswordOtpUseCase,
-  resetPasswordUseCase
+  resetPasswordUseCase,
+  googleOAuthService,
+  googleAuthUseCase
 );
