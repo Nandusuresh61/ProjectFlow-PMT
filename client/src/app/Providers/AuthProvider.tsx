@@ -13,6 +13,13 @@ export const AuthProvider = ({
 
   useEffect(() => {
     const initAuth = async () => {
+      const isAuthenticated = AuthUserState.getState().isAuthenticated;
+
+      if (!isAuthenticated) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
 
       try {
