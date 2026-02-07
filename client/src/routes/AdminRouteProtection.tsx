@@ -6,14 +6,10 @@ export default function AdminRouteProtection() {
   const isLoading = AuthUserState((state) => state.isLoading);
 
   if (isLoading) {
-    return null; 
+    return <div>Loading...</div>; // Or a proper loading spinner
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (!user.isSuperAdmin) {
+  if (!user || !user.isSuperAdmin) {
     return <Navigate to="/home" replace />;
   }
 

@@ -1,15 +1,13 @@
-import UserRoutes from "@/routes/UserRoutes";
+import AppRoutes from "@/routes/AppRoutes";
 import { Toaster } from "@/components/ui/sonner";
-import AdminRoutes from "@/routes/AdminRoutes";
 
 function App() {
   return (
     <>
-    <Toaster />
-      <UserRoutes />
-      <AdminRoutes />
+      <Toaster />
+      <AppRoutes />
     </>
   );
-}  
+}
 
 export default App;

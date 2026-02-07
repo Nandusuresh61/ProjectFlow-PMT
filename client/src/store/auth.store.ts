@@ -21,7 +21,7 @@ export const AuthUserState = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true,
       pendingEmail: null,
 
       setUser: (user) =>
