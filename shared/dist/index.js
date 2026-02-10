@@ -4,6 +4,8 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
+  ErrorCode2["ONBOARDING"] = "ONBOARDING_ERROR";
+  ErrorCode2["WORKSPACE"] = "WORKSPACE_ERROR";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -93,7 +95,10 @@ var AppMessages = {
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",
-  OPERATION_SUCCESS: "Operation completed successfully."
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  ONBOARDING_COMPLETE: "Onboarding completed successfully",
+  WORKSPACE_CREATED: "Workspace created successfully",
+  ONBOARDING_ALREADY_DONE: "Onboarding already completed"
 };
 
 // src/schema/TokenPayload.ts
@@ -144,6 +149,18 @@ var ResetPasswordSchema = z5.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/onboarding/OnboardingSchema.ts
+import { z as z6 } from "zod";
+var TeamInviteSchema = z6.object({
+  email: z6.string().email(),
+  role: z6.enum(["Admin", "Member"])
+});
+var CompleteOnboardingSchema = z6.object({
+  workspaceName: z6.string().min(3).max(50),
+  plan: z6.enum(["free", "pro", "enterprise"]),
+  teamInvites: z6.array(TeamInviteSchema).optional().default([])
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -163,6 +180,7 @@ var ResponseHandler = {
 export {
   AppError,
   AppMessages,
+  CompleteOnboardingSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
@@ -171,6 +189,7 @@ export {
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,
+  TeamInviteSchema,
   TokenEnums,
   TokenPayloadSchema
 };

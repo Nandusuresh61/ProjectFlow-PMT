@@ -15,10 +15,15 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 
 
 
+import { onboardingApi } from "@/services/onboarding/onboaring.api";
+import { useNavigate } from "react-router-dom";
+
 export default function Login() {
   const setUser = AuthUserState((state) => state.setUser);
+  const setIsOnboarded = AuthUserState((state) => state.setIsOnboarded);
   const isLoading = AuthUserState((state) => state.isLoading);
   const setLoading = AuthUserState((state) => state.setLoading);
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -43,10 +48,25 @@ export default function Login() {
       const response = await loginUser(form);
       console.log(response);
       const user = response.data!.user;
-      setUser(user);
-      toast.success(response.message);
 
-      setLoading(false);
+      try {
+        const onboardingStatus = await onboardingApi.getStatus();
+        setIsOnboarded(onboardingStatus.isCompleted);
+
+        setUser(user);
+        toast.success(response.message);
+
+        if (onboardingStatus.isCompleted) {
+          navigate("/home");
+        } else {
+          navigate("/onboarding");
+        }
+      } catch (statusError) {
+        console.error("Failed to fetch onboarding status", statusError);
+        setUser(user);
+        navigate("/home"); // Fallback
+      }
+
     } catch (error: any) {
       toast.error(error.message);
     } finally {

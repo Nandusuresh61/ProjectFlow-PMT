@@ -4,7 +4,9 @@ declare enum ErrorCode {
     AUTH = "Authentication Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
-    OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN"
+    OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN",
+    ONBOARDING = "ONBOARDING_ERROR",
+    WORKSPACE = "WORKSPACE_ERROR"
 }
 
 declare enum HttpStatusCode {
@@ -80,6 +82,9 @@ declare const AppMessages: {
     readonly VALIDATION_FAILED: "Invalid input data.";
     readonly RESOURCE_NOT_FOUND: "Requested resource not found.";
     readonly OPERATION_SUCCESS: "Operation completed successfully.";
+    readonly ONBOARDING_COMPLETE: "Onboarding completed successfully";
+    readonly WORKSPACE_CREATED: "Workspace created successfully";
+    readonly ONBOARDING_ALREADY_DONE: "Onboarding already completed";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -116,6 +121,31 @@ declare const ResetPasswordSchema: z.ZodObject<{
 }, z.core.$strip>;
 type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;
 
+declare const TeamInviteSchema: z$1.ZodObject<{
+    email: z$1.ZodString;
+    role: z$1.ZodEnum<{
+        Admin: "Admin";
+        Member: "Member";
+    }>;
+}, z$1.core.$strip>;
+declare const CompleteOnboardingSchema: z$1.ZodObject<{
+    workspaceName: z$1.ZodString;
+    plan: z$1.ZodEnum<{
+        free: "free";
+        pro: "pro";
+        enterprise: "enterprise";
+    }>;
+    teamInvites: z$1.ZodDefault<z$1.ZodOptional<z$1.ZodArray<z$1.ZodObject<{
+        email: z$1.ZodString;
+        role: z$1.ZodEnum<{
+            Admin: "Admin";
+            Member: "Member";
+        }>;
+    }, z$1.core.$strip>>>>;
+}, z$1.core.$strip>;
+type CompletedOnboardingInput = z$1.infer<typeof CompleteOnboardingSchema>;
+type TeamInviteInput = z$1.infer<typeof TeamInviteSchema>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -130,4 +160,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, CompleteOnboardingSchema, type CompletedOnboardingInput, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, type TeamInviteInput, TeamInviteSchema, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AppMessages: () => AppMessages,
+  CompleteOnboardingSchema: () => CompleteOnboardingSchema,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   ForgotEmailSchema: () => ForgotEmailSchema,
@@ -40,6 +41,7 @@ __export(index_exports, {
   RegisterUserSchema: () => RegisterUserSchema,
   ResetPasswordSchema: () => ResetPasswordSchema,
   ResponseHandler: () => ResponseHandler,
+  TeamInviteSchema: () => TeamInviteSchema,
   TokenEnums: () => TokenEnums,
   TokenPayloadSchema: () => TokenPayloadSchema
 });
@@ -51,6 +53,8 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
+  ErrorCode2["ONBOARDING"] = "ONBOARDING_ERROR";
+  ErrorCode2["WORKSPACE"] = "WORKSPACE_ERROR";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -140,7 +144,10 @@ var AppMessages = {
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",
-  OPERATION_SUCCESS: "Operation completed successfully."
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  ONBOARDING_COMPLETE: "Onboarding completed successfully",
+  WORKSPACE_CREATED: "Workspace created successfully",
+  ONBOARDING_ALREADY_DONE: "Onboarding already completed"
 };
 
 // src/schema/TokenPayload.ts
@@ -191,6 +198,18 @@ var ResetPasswordSchema = import_zod5.default.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/onboarding/OnboardingSchema.ts
+var import_zod6 = require("zod");
+var TeamInviteSchema = import_zod6.z.object({
+  email: import_zod6.z.string().email(),
+  role: import_zod6.z.enum(["Admin", "Member"])
+});
+var CompleteOnboardingSchema = import_zod6.z.object({
+  workspaceName: import_zod6.z.string().min(3).max(50),
+  plan: import_zod6.z.enum(["free", "pro", "enterprise"]),
+  teamInvites: import_zod6.z.array(TeamInviteSchema).optional().default([])
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -211,6 +230,7 @@ var ResponseHandler = {
 0 && (module.exports = {
   AppError,
   AppMessages,
+  CompleteOnboardingSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
@@ -219,6 +239,7 @@ var ResponseHandler = {
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,
+  TeamInviteSchema,
   TokenEnums,
   TokenPayloadSchema
 });

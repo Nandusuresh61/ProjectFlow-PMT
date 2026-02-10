@@ -8,11 +8,13 @@ interface AuthState {
   isLoading: boolean;
 
   pendingEmail: string | null;
+  isOnboarded: boolean;
 
   setUser: (user: User) => void;
   clearUser: () => void;
   setLoading: (value: boolean) => void;
   setPendingEmail: (email: string | null) => void;
+  setIsOnboarded: (status: boolean) => void;
 }
 
 
@@ -23,6 +25,7 @@ export const AuthUserState = create<AuthState>()(
       isAuthenticated: false,
       isLoading: true,
       pendingEmail: null,
+      isOnboarded: false,
 
       setUser: (user) =>
         set({
@@ -30,13 +33,18 @@ export const AuthUserState = create<AuthState>()(
           isAuthenticated: true,
           isLoading: false,
           pendingEmail: null,
+          // We'll optimistically assume true if not provided, or handle it via a separate action
+          // For now, let's just initialize it. The components will update it.
         }),
+
+      setIsOnboarded: (status: boolean) => set({ isOnboarded: status }),
 
       clearUser: () =>
         set({
           user: null,
           isAuthenticated: false,
           isLoading: false,
+          isOnboarded: false,
         }),
 
       setLoading: (value) => set({ isLoading: value }),
@@ -48,6 +56,7 @@ export const AuthUserState = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        isOnboarded: state.isOnboarded,
       }),
     }
   )

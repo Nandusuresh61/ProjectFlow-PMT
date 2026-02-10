@@ -8,10 +8,12 @@ import { AuthUserState } from "@/store/auth.store";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
+import { onboardingApi } from "@/services/onboarding/onboaring.api"; // Fix import path if needed based on file structure
 
 export default function Otp() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
   const setUser = AuthUserState((state) => state.setUser);
+  const setIsOnboarded = AuthUserState((state) => state.setIsOnboarded);
   const navigate = useNavigate();
   const [otpInput, setOtpinput] = useState("");
   const [timer, setTimer] = useState(60);
@@ -63,11 +65,33 @@ export default function Otp() {
         email: pendingEmail,
         otp: otpInput,
       });
-      setUser(response.data!.user);
-      toast.success(response.message);
-      setTimeout(() => {
-        navigate("/home");
-      }, 300);
+      console.log("otp response", response);
+
+      // Check onboarding status
+      try {
+        const onboardingStatus = await onboardingApi.getStatus();
+        setIsOnboarded(onboardingStatus.isCompleted);
+
+        setUser(response.data!.user);
+        toast.success(response.message);
+
+        setTimeout(() => {
+          if (onboardingStatus.isCompleted) {
+            navigate("/home");
+          } else {
+            navigate("/onboarding");
+          }
+        }, 300);
+      } catch (statusError) {
+        console.error("Failed to fetch onboarding status", statusError);
+        // Fallback or handle error - maybe default to onboarding if uncertain, or home?
+        // Let's assume if we can't get status, we might want to go to home or stay here.
+        // For now, let's set user and go to onboarding to be safe, or just home.
+        // Better to be safe and set user then guide to onboarding if we can't verify.
+        setUser(response.data!.user);
+        navigate("/onboarding");
+      }
+
     } catch (error: any) {
       toast.error(error.message);
     }

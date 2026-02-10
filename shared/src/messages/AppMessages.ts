@@ -61,4 +61,10 @@ export const AppMessages = {
   RESOURCE_NOT_FOUND: "Requested resource not found.",
 
   OPERATION_SUCCESS: "Operation completed successfully.",
+
+  ONBOARDING_COMPLETE: "Onboarding completed successfully",
+
+  WORKSPACE_CREATED: "Workspace created successfully",
+
+  ONBOARDING_ALREADY_DONE: "Onboarding already completed",
 } as const;
