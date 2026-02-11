@@ -2,7 +2,7 @@ import { onboardingApi } from "@/services/onboarding/onboaring.api";
 import type { CompleteOnboardingPayload, TeamInvite } from "@/types/onboarding.types";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner"; // or your toast lib
+import { toast } from "sonner";
 
 export interface OnboardingFormData {
   workspaceName: string;

@@ -33,8 +33,6 @@ export const AuthUserState = create<AuthState>()(
           isAuthenticated: true,
           isLoading: false,
           pendingEmail: null,
-          // We'll optimistically assume true if not provided, or handle it via a separate action
-          // For now, let's just initialize it. The components will update it.
         }),
 
       setIsOnboarded: (status: boolean) => set({ isOnboarded: status }),

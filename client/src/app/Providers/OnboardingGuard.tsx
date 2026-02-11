@@ -16,7 +16,7 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
       .catch(() => setStatus("complete"));
   }, []);
 
-  if (status === "loading") return null; // or a spinner
+  if (status === "loading") return null; 
   if (status === "incomplete") return <Navigate to="/onboarding" replace />;
   return <>{children}</>;
 }
