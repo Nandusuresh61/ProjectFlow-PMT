@@ -2,6 +2,7 @@ import z, { z as z$1 } from 'zod';
 
 declare enum ErrorCode {
     AUTH = "Authentication Error",
+    PLAN = "Plan Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN"
@@ -80,6 +81,8 @@ declare const AppMessages: {
     readonly VALIDATION_FAILED: "Invalid input data.";
     readonly RESOURCE_NOT_FOUND: "Requested resource not found.";
     readonly OPERATION_SUCCESS: "Operation completed successfully.";
+    readonly PLAN_NAME_ALREADY_EXISTS: "Plan name already exists";
+    readonly PLAN_CREATED: "Plan Created Successful.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{

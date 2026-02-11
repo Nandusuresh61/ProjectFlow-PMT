@@ -61,4 +61,8 @@ export const AppMessages = {
   RESOURCE_NOT_FOUND: "Requested resource not found.",
 
   OPERATION_SUCCESS: "Operation completed successfully.",
+
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+
+  PLAN_CREATED: "Plan Created Successful."
 } as const;

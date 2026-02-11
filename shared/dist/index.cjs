@@ -48,6 +48,7 @@ module.exports = __toCommonJS(index_exports);
 // src/enums/ErrorCode.ts
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
+  ErrorCode2["PLAN"] = "Plan Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
@@ -140,7 +141,9 @@ var AppMessages = {
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",
-  OPERATION_SUCCESS: "Operation completed successfully."
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+  PLAN_CREATED: "Plan Created Successful."
 };
 
 // src/schema/TokenPayload.ts
