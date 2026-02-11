@@ -6,7 +6,7 @@ export default function AdminRoutes() {
   return (
     <Routes>
       <Route element={<AdminRouteProtection />}>
-        <Route path="/super-admin" element={<SuperAdmin />} />
+        <Route path="/" element={<SuperAdmin />} />
       </Route>
     </Routes>
   );
