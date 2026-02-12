@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AppMessages: () => AppMessages,
+  CreatePlanSchema: () => CreatePlanSchema,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   ForgotEmailSchema: () => ForgotEmailSchema,
@@ -194,6 +195,17 @@ var ResetPasswordSchema = import_zod5.default.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/plan/PlanSchema.ts
+var import_zod6 = require("zod");
+var CreatePlanSchema = import_zod6.z.object({
+  name: import_zod6.z.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  priceMonthly: import_zod6.z.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
+  description: import_zod6.z.string({ message: "Description is required" }).min(1, "Description is required"),
+  maxProjects: import_zod6.z.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxMembers: import_zod6.z.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  features: import_zod6.z.array(import_zod6.z.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -214,6 +226,7 @@ var ResponseHandler = {
 0 && (module.exports = {
   AppError,
   AppMessages,
+  CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,

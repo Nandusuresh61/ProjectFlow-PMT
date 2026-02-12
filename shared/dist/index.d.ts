@@ -119,6 +119,16 @@ declare const ResetPasswordSchema: z.ZodObject<{
 }, z.core.$strip>;
 type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;
 
+declare const CreatePlanSchema: z$1.ZodObject<{
+    name: z$1.ZodString;
+    priceMonthly: z$1.ZodNumber;
+    description: z$1.ZodString;
+    maxProjects: z$1.ZodNumber;
+    maxMembers: z$1.ZodNumber;
+    features: z$1.ZodArray<z$1.ZodString>;
+}, z$1.core.$strip>;
+type CreatePlanSchemaType = z$1.infer<typeof CreatePlanSchema>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -133,4 +143,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

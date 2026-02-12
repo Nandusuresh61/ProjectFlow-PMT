@@ -147,6 +147,17 @@ var ResetPasswordSchema = z5.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/plan/PlanSchema.ts
+import { z as z6 } from "zod";
+var CreatePlanSchema = z6.object({
+  name: z6.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  priceMonthly: z6.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
+  description: z6.string({ message: "Description is required" }).min(1, "Description is required"),
+  maxProjects: z6.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxMembers: z6.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  features: z6.array(z6.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -166,6 +177,7 @@ var ResponseHandler = {
 export {
   AppError,
   AppMessages,
+  CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
