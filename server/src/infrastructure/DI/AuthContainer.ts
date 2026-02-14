@@ -93,6 +93,7 @@ const googleAuthUseCase = new GoogleAuthUseCase(
   uidService
 );
 
+
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
@@ -102,5 +103,6 @@ export const authController = new AuthController(
   resetPasswordOtpUseCase,
   resetPasswordUseCase,
   googleOAuthService,
-  googleAuthUseCase
+  googleAuthUseCase,
+  userRepository
 );

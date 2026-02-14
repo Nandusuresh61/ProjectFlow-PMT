@@ -13,8 +13,8 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _uidGenerator: IUidGenerator,
-    private readonly _tokenService: ITokenService
-  ) { }
+    private readonly _tokenService: ITokenService,
+  ) {}
 
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
     const now = new Date();
@@ -50,6 +50,8 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         fullName: newUser.fullName,
         email: newUser.email,
         isSuperAdmin: newUser.isSuperAdmin,
+        isOnboarded: newUser.isOnboarded,
+        currentOrganizationId: newUser.currentOrganizationId,
       },
       accessToken,
       refreshToken,

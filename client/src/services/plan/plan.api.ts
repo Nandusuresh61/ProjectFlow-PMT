@@ -4,7 +4,7 @@ import { API } from "../api";
 export const createPlan = async (data: CreatePlanPayload) => {
   const response = await API.post("/plan", data);
   return response.data;
-};
+};  
 
 export const getPlans = async () => {
   const response = await API.get("/plan");

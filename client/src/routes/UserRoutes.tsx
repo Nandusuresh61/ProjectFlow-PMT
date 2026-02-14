@@ -25,11 +25,11 @@ export default function UserRoutes() {
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/onboarding" element={<Onboarding />} />
       </Route>
 
       {/* User Protected Routes */}
       <Route element={<ProtectedRoutes />}>
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/home" element={<Home />} />
       </Route>
 

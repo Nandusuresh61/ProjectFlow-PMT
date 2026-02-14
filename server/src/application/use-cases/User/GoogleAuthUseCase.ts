@@ -4,14 +4,20 @@ import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
 import { AuthProvider } from "@/domain/entities/auth/authProvider";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode, TokenEnums } from "shared";
+import {
+  AppError,
+  AppMessages,
+  ErrorCode,
+  HttpStatusCode,
+  TokenEnums,
+} from "shared";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
-    private readonly _uidGenerator: IUidGenerator
-  ) { }
+    private readonly _uidGenerator: IUidGenerator,
+  ) {}
 
   async execute(payload: OAuthUserPayload) {
     if (payload.provider !== AuthProvider.GOOGLE) {
@@ -55,13 +61,14 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       type: TokenEnums.REFRESH_TOKEN,
     });
 
-
     return {
       user: {
         userId: user.userId,
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isOnboarded: user.isOnboarded,
+        currentOrganizationId: user.currentOrganizationId,
       },
       accessToken,
       refreshToken,

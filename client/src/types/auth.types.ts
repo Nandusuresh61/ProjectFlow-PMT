@@ -5,10 +5,12 @@ export interface ApiResponse<T> {
 }
 
 export interface User {
-  id: string;
+  userId: string;
   fullName: string;
   email: string;
   isSuperAdmin: boolean;
+  isOnboarded: boolean;
+  currentOrganizationId?: string;
 }
 
 export interface AuthData {
