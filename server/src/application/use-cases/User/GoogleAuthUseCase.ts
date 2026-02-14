@@ -6,12 +6,12 @@ import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoo
 import { AuthProvider } from "@/domain/entities/auth/authProvider";
 import { AppError, AppMessages, ErrorCode, HttpStatusCode, TokenEnums } from "shared";
 
-export class GoogleAuthUseCase implements IGoogleAuthUseCase{
+export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _uidGenerator: IUidGenerator
-  ) {}
+  ) { }
 
   async execute(payload: OAuthUserPayload) {
     if (payload.provider !== AuthProvider.GOOGLE) {
@@ -23,14 +23,15 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase{
     }
     let user = await this._userRepo.findByEmail(payload.email);
 
-     if (!user) {
-        const now = new Date();
+    if (!user) {
+      const now = new Date();
       user = {
         userId: this._uidGenerator.createId(),
         fullName: payload.fullName,
         email: payload.email,
         authProvider: AuthProvider.GOOGLE,
         providerId: payload.providerId,
+        isOnboarded: false,
         isSuperAdmin: false,
         createdAt: now,
         updatedAt: now,

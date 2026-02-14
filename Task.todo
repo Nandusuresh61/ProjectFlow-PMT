@@ -8,8 +8,7 @@ Week 1 - Core Foundation
 • Authentication system
 • User onboarding flow
 • Workspace (organization) creation
-• Workspace slug & uniqueness handling
-• Workspace switching mechanism
+• Plan Creation
 • Role & permission system
 • Super Admin access separation
 - 404 page
@@ -18,7 +17,9 @@ Week 1 - Core Foundation
 
 
 Week 2 - Project Management System
+
 • Workspace dashboard
+• Invite User
 • Project management
 • Sprint management
 • Backlog management

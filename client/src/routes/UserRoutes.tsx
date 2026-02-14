@@ -2,6 +2,7 @@ import Login from "@/pages/auth/Login";
 import Otp from "@/pages/auth/Otp";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import SignUp from "@/pages/auth/SignUp";
+import Onboarding from "@/pages/auth/Onboarding";
 import Home from "@/pages/Home";
 import LandingPage from "@/pages/landing/LandingPage";
 import NotFound from "@/pages/NotFound";
@@ -24,6 +25,7 @@ export default function UserRoutes() {
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/onboarding" element={<Onboarding />} />
       </Route>
 
       {/* User Protected Routes */}

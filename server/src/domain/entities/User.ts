@@ -7,6 +7,8 @@ export interface User {
     passwordHash?: string;
     authProvider: AuthProvider;
     providerId?: string;
+    isOnboarded: boolean;
+    currentOrganizationId?: string;
     isSuperAdmin: boolean;
     createdAt: Date
     updatedAt: Date

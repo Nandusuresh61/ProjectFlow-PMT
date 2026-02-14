@@ -3,6 +3,7 @@ import z, { z as z$1 } from 'zod';
 declare enum ErrorCode {
     AUTH = "Authentication Error",
     PLAN = "Plan Error",
+    ONBOARDING = "Onboarding Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN"
@@ -42,6 +43,11 @@ declare enum EmailType {
     INVITE_USER = "INVITE_USER"
 }
 
+declare enum OrganizationRoleEnum {
+    ORG_ADMIN = "ORG_ADMIN",
+    MEMBER = "MEMBER"
+}
+
 declare class AppError extends Error {
     readonly statusCode: HttpStatusCode;
     readonly errorCode: ErrorCode;
@@ -62,6 +68,7 @@ declare const AppMessages: {
     readonly OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.";
     readonly OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.";
     readonly UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.";
+    readonly USER_NOT_FOUND: "User not found.";
     readonly TOKEN_EXPIRED: "Session expired. Please login again.";
     readonly TOKEN_INVALID: "Invalid authentication token.";
     readonly TOKEN_REFRESH_INVALID: "Invalid Refresh Token.";
@@ -85,6 +92,8 @@ declare const AppMessages: {
     readonly PLAN_CREATED: "Plan Created Successful.";
     readonly PLAN_NOT_FOUND: "Plan not found.";
     readonly PLAN_STATUS_UPDATED: "Plan Status updated.";
+    readonly ONBOARDING_COMPLETED: "Onboarding completed successfully";
+    readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -131,6 +140,11 @@ declare const CreatePlanSchema: z$1.ZodObject<{
 }, z$1.core.$strip>;
 type CreatePlanSchemaType = z$1.infer<typeof CreatePlanSchema>;
 
+declare const CompleteOnboardingSchema: z$1.ZodObject<{
+    workspaceName: z$1.ZodString;
+    planId: z$1.ZodString;
+}, z$1.core.$strip>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -145,4 +159,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, OrganizationRoleEnum, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

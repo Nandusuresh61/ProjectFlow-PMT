@@ -25,6 +25,8 @@ export const AppMessages = {
 
   UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
 
+  USER_NOT_FOUND: "User not found.",
+
   TOKEN_EXPIRED: "Session expired. Please login again.",
 
   TOKEN_INVALID: "Invalid authentication token.",
@@ -65,6 +67,12 @@ export const AppMessages = {
   PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
 
   PLAN_CREATED: "Plan Created Successful.",
+
   PLAN_NOT_FOUND: "Plan not found.",
-  PLAN_STATUS_UPDATED: "Plan Status updated."
+
+  PLAN_STATUS_UPDATED: "Plan Status updated.",
+
+  ONBOARDING_COMPLETED: "Onboarding completed successfully",
+
+  USER_ALREADY_ONBOARDED: "User already completed onboarding",
 } as const;

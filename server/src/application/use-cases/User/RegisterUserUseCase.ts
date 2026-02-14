@@ -14,7 +14,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
     private readonly _userRepo: IUserRepository,
     private readonly _uidGenerator: IUidGenerator,
     private readonly _tokenService: ITokenService
-  ) {}
+  ) { }
 
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
     const now = new Date();
@@ -24,6 +24,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       email: user.email,
       passwordHash: user.passwordHash,
       authProvider: AuthProvider.LOCAL,
+      isOnboarded: false,
       isSuperAdmin: false,
       createdAt: now,
       updatedAt: now,
