@@ -8,6 +8,8 @@ export class AuthResponseMapper {
         fullName: data.user.fullName,
         email: data.user.email,
         isSuperAdmin: data.user.isSuperAdmin,
+        isOnboarded: data.user.isOnboarded,
+        currentOrganizationId: data.user.currentOrganizationId,
       },
     };
   }
