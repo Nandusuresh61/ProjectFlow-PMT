@@ -16,7 +16,7 @@ export class OrganizationRepository implements IOrganizationRepository {
       created.name,
       created.ownerId,
       created.planId,
-      created.createdAt,
+      created.createdAt,  
       created.updatedAt,
     );
   }
