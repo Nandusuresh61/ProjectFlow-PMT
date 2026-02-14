@@ -144,7 +144,9 @@ var AppMessages = {
   RESOURCE_NOT_FOUND: "Requested resource not found.",
   OPERATION_SUCCESS: "Operation completed successfully.",
   PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
-  PLAN_CREATED: "Plan Created Successful."
+  PLAN_CREATED: "Plan Created Successful.",
+  PLAN_NOT_FOUND: "Plan not found.",
+  PLAN_STATUS_UPDATED: "Plan Status updated."
 };
 
 // src/schema/TokenPayload.ts

@@ -64,5 +64,7 @@ export const AppMessages = {
 
   PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
 
-  PLAN_CREATED: "Plan Created Successful."
+  PLAN_CREATED: "Plan Created Successful.",
+  PLAN_NOT_FOUND: "Plan not found.",
+  PLAN_STATUS_UPDATED: "Plan Status updated."
 } as const;

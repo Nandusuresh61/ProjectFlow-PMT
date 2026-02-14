@@ -83,6 +83,8 @@ declare const AppMessages: {
     readonly OPERATION_SUCCESS: "Operation completed successfully.";
     readonly PLAN_NAME_ALREADY_EXISTS: "Plan name already exists";
     readonly PLAN_CREATED: "Plan Created Successful.";
+    readonly PLAN_NOT_FOUND: "Plan not found.";
+    readonly PLAN_STATUS_UPDATED: "Plan Status updated.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
