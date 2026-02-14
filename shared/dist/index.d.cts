@@ -2,6 +2,7 @@ import z, { z as z$1 } from 'zod';
 
 declare enum ErrorCode {
     AUTH = "Authentication Error",
+    PLAN = "Plan Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN"
@@ -80,6 +81,10 @@ declare const AppMessages: {
     readonly VALIDATION_FAILED: "Invalid input data.";
     readonly RESOURCE_NOT_FOUND: "Requested resource not found.";
     readonly OPERATION_SUCCESS: "Operation completed successfully.";
+    readonly PLAN_NAME_ALREADY_EXISTS: "Plan name already exists";
+    readonly PLAN_CREATED: "Plan Created Successful.";
+    readonly PLAN_NOT_FOUND: "Plan not found.";
+    readonly PLAN_STATUS_UPDATED: "Plan Status updated.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -116,6 +121,16 @@ declare const ResetPasswordSchema: z.ZodObject<{
 }, z.core.$strip>;
 type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;
 
+declare const CreatePlanSchema: z$1.ZodObject<{
+    name: z$1.ZodString;
+    priceMonthly: z$1.ZodNumber;
+    description: z$1.ZodString;
+    maxProjects: z$1.ZodNumber;
+    maxMembers: z$1.ZodNumber;
+    features: z$1.ZodArray<z$1.ZodString>;
+}, z$1.core.$strip>;
+type CreatePlanSchemaType = z$1.infer<typeof CreatePlanSchema>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -130,4 +145,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };

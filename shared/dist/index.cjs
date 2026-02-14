@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AppMessages: () => AppMessages,
+  CreatePlanSchema: () => CreatePlanSchema,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   ForgotEmailSchema: () => ForgotEmailSchema,
@@ -48,6 +49,7 @@ module.exports = __toCommonJS(index_exports);
 // src/enums/ErrorCode.ts
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
+  ErrorCode2["PLAN"] = "Plan Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
@@ -140,7 +142,11 @@ var AppMessages = {
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",
-  OPERATION_SUCCESS: "Operation completed successfully."
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+  PLAN_CREATED: "Plan Created Successful.",
+  PLAN_NOT_FOUND: "Plan not found.",
+  PLAN_STATUS_UPDATED: "Plan Status updated."
 };
 
 // src/schema/TokenPayload.ts
@@ -191,6 +197,17 @@ var ResetPasswordSchema = import_zod5.default.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/plan/PlanSchema.ts
+var import_zod6 = require("zod");
+var CreatePlanSchema = import_zod6.z.object({
+  name: import_zod6.z.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  priceMonthly: import_zod6.z.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
+  description: import_zod6.z.string({ message: "Description is required" }).min(1, "Description is required"),
+  maxProjects: import_zod6.z.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxMembers: import_zod6.z.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  features: import_zod6.z.array(import_zod6.z.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -211,6 +228,7 @@ var ResponseHandler = {
 0 && (module.exports = {
   AppError,
   AppMessages,
+  CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,

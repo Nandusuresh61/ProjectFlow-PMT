@@ -1,6 +1,7 @@
 // src/enums/ErrorCode.ts
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
+  ErrorCode2["PLAN"] = "Plan Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
@@ -93,7 +94,11 @@ var AppMessages = {
   INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
   VALIDATION_FAILED: "Invalid input data.",
   RESOURCE_NOT_FOUND: "Requested resource not found.",
-  OPERATION_SUCCESS: "Operation completed successfully."
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+  PLAN_CREATED: "Plan Created Successful.",
+  PLAN_NOT_FOUND: "Plan not found.",
+  PLAN_STATUS_UPDATED: "Plan Status updated."
 };
 
 // src/schema/TokenPayload.ts
@@ -144,6 +149,17 @@ var ResetPasswordSchema = z5.object({
   ).regex(/^\S*$/, "Password must not contain spaces")
 });
 
+// src/schema/plan/PlanSchema.ts
+import { z as z6 } from "zod";
+var CreatePlanSchema = z6.object({
+  name: z6.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  priceMonthly: z6.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
+  description: z6.string({ message: "Description is required" }).min(1, "Description is required"),
+  maxProjects: z6.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxMembers: z6.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  features: z6.array(z6.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -163,6 +179,7 @@ var ResponseHandler = {
 export {
   AppError,
   AppMessages,
+  CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
