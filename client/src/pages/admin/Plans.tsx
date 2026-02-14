@@ -120,7 +120,7 @@ export default function Plans() {
       });
       setFeaturesList([""]);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to create plan");
+      toast.error(error.message || "Failed to create plan");
     } finally {
       setLoading(false);
     }
