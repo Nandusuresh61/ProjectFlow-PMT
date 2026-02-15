@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { loginUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-
+import { LoginUserSchema } from "shared";
 
 
 
@@ -33,26 +33,29 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-    setLoading(true);
-    if (!form.email && !form.password) {
-      toast.error("Please fill in all required fields.");
-      setLoading(false);
-      return;
-    }
-    try {
-      const response = await loginUser(form);
-      console.log(response);
-      const user = response.data!.user;
-      setUser(user);
-      toast.success(response.message);
+  setLoading(true);
 
-      setLoading(false);
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const result = LoginUserSchema.safeParse(form);
+
+  if (!result.success) {
+    toast.error(result.error.issues[0].message);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const response = await loginUser(result.data);
+
+    const user = response.data!.user;
+    setUser(user);
+
+    toast.success(response.message);
+  } catch (error: any) {
+    toast.error(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <GridBackground />
