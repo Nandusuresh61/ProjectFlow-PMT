@@ -47,6 +47,10 @@ export default function Onboarding() {
   }, [user]);
 
   const handleNext = () => {
+    const isValid = validateStep();
+
+    if (!isValid) return;
+
     if (currentStep < 3) {
       setDirection(1);
       setCurrentStep(currentStep + 1);
@@ -67,6 +71,35 @@ export default function Onboarding() {
 
     fetchPlans();
   }, []);
+
+  const workspaceRegex = /^[a-zA-Z0-9][a-zA-Z0-9 _-]{1,48}[a-zA-Z0-9]$/;
+
+  const validateStep = () => {
+    if (currentStep === 1) {
+      const name = formData.workspaceName.trim();
+
+      if (!name) {
+        toast.error("Workspace name is required");
+        return false;
+      }
+
+      if (!workspaceRegex.test(name)) {
+        toast.error(
+          "Workspace must be 3–50 characters and contain only letters, numbers, spaces, - or _",
+        );
+        return false;
+      }
+    }
+
+    if (currentStep === 2) {
+      if (!formData.planId) {
+        toast.error("Please select a plan");
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   const handleFinish = async () => {
     try {
@@ -210,9 +243,7 @@ export default function Onboarding() {
               {currentStep === 1 && (
                 <StepWorkspace
                   data={formData}
-                  updateData={(data) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  updateData={(data) => setFormData({ ...formData, ...data })}
                   onNext={handleNext}
                 />
               )}
@@ -221,9 +252,7 @@ export default function Onboarding() {
                   data={formData}
                   plans={plans}
                   loading={plansLoading}
-                  updateData={(data) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  updateData={(data) => setFormData({ ...formData, ...data })}
                   onNext={handleNext}
                   onBack={handleBack}
                 />
@@ -231,9 +260,7 @@ export default function Onboarding() {
               {currentStep === 3 && (
                 <StepTeam
                   data={formData}
-                  updateData={(data) =>
-                    setFormData({ ...formData, ...data })
-                  }
+                  updateData={(data) => setFormData({ ...formData, ...data })}
                   onBack={handleBack}
                   onFinish={handleFinish}
                 />
@@ -284,7 +311,8 @@ function StepWorkspace({ data, updateData, onNext }: StepWorkspaceProps) {
       <div className="mt-8 flex justify-end">
         <Button
           onClick={onNext}
-          className="bg-white text-black hover:bg-slate-200 font-bold px-8 h-12 flex items-center gap-2 group"
+          disabled={!data.workspaceName.trim()}
+          className="bg-white text-black hover:bg-slate-200 font-bold px-8 h-12"
         >
           Continue
           <ChevronRight
@@ -306,7 +334,14 @@ interface StepPlanProps {
   onBack: () => void;
 }
 
-function StepPlan({ data, plans, loading, updateData, onNext, onBack }: StepPlanProps) {
+function StepPlan({
+  data,
+  plans,
+  loading,
+  updateData,
+  onNext,
+  onBack,
+}: StepPlanProps) {
   return (
     <div className="space-y-6">
       <div className="text-center mb-8">
@@ -336,21 +371,27 @@ function StepPlan({ data, plans, loading, updateData, onNext, onBack }: StepPlan
                 <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
 
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-2xl font-bold">₹{plan.priceMonthly}</span>
+                  <span className="text-2xl font-bold">
+                    ₹{plan.priceMonthly}
+                  </span>
                   <span className="text-sm text-slate-500">/month</span>
                 </div>
 
-                <p className="text-xs text-slate-400 mb-4">{plan.description}</p>
+                <p className="text-xs text-slate-400 mb-4">
+                  {plan.description}
+                </p>
 
                 <div className="space-y-2">
                   {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-sm text-slate-300">
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 text-sm text-slate-300"
+                    >
                       <Check size={14} className="text-green-500" />
                       <span>{feature}</span>
                     </div>
                   ))}
                 </div>
-
               </div>
             ))}
         </div>
@@ -368,6 +409,7 @@ function StepPlan({ data, plans, loading, updateData, onNext, onBack }: StepPlan
 
         <Button
           onClick={onNext}
+          disabled={!data.planId}
           className="bg-white text-black hover:bg-slate-200 font-bold px-8 h-12"
         >
           Continue
