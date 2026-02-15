@@ -9,7 +9,8 @@ import {
 } from "shared";
 import { IGetAllPlansUsecase } from "@/application/interfaces/use-cases/Plan/IGetAllPlansUseCase";
 import { ITogglePlanStatusUseCase } from "@/application/interfaces/use-cases/Plan/ITogglePlanStatusUseCase";
-import { PlanMapper } from "../mappers/PlanMapper";
+import { PlanMapper } from "@/application/mappers/PlanMapper";
+
 
 export class PlanController {
   constructor(

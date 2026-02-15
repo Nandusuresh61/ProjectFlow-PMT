@@ -2,6 +2,7 @@
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
   ErrorCode2["PLAN"] = "Plan Error";
+  ErrorCode2["ONBOARDING"] = "Onboarding Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
@@ -48,6 +49,13 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
   return EmailType2;
 })(EmailType || {});
 
+// src/enums/OrganizationRolesEnum.ts
+var OrganizationRoleEnum = /* @__PURE__ */ ((OrganizationRoleEnum2) => {
+  OrganizationRoleEnum2["ORG_ADMIN"] = "ORG_ADMIN";
+  OrganizationRoleEnum2["MEMBER"] = "MEMBER";
+  return OrganizationRoleEnum2;
+})(OrganizationRoleEnum || {});
+
 // src/errors/AppError.ts
 var AppError = class extends Error {
   statusCode;
@@ -76,6 +84,7 @@ var AppMessages = {
   OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.",
   OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.",
   UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
+  USER_NOT_FOUND: "User not found.",
   TOKEN_EXPIRED: "Session expired. Please login again.",
   TOKEN_INVALID: "Invalid authentication token.",
   TOKEN_REFRESH_INVALID: "Invalid Refresh Token.",
@@ -98,7 +107,9 @@ var AppMessages = {
   PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
   PLAN_CREATED: "Plan Created Successful.",
   PLAN_NOT_FOUND: "Plan not found.",
-  PLAN_STATUS_UPDATED: "Plan Status updated."
+  PLAN_STATUS_UPDATED: "Plan Status updated.",
+  ONBOARDING_COMPLETED: "Onboarding completed successfully",
+  USER_ALREADY_ONBOARDED: "User already completed onboarding"
 };
 
 // src/schema/TokenPayload.ts
@@ -160,6 +171,13 @@ var CreatePlanSchema = z6.object({
   features: z6.array(z6.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
 });
 
+// src/schema/onboarding/CompleteOnboardingSchema.ts
+import { z as z7 } from "zod";
+var CompleteOnboardingSchema = z7.object({
+  workspaceName: z7.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
+  planId: z7.string().trim().min(1, "Plan ID is required")
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -179,12 +197,14 @@ var ResponseHandler = {
 export {
   AppError,
   AppMessages,
+  CompleteOnboardingSchema,
   CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
   HttpStatusCode,
   LoginUserSchema,
+  OrganizationRoleEnum,
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,

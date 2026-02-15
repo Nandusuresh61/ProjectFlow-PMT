@@ -61,9 +61,11 @@ export class LoginUserUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isOnboarded: user.isOnboarded,
+        currentOrganizationId: user.currentOrganizationId,
       },
       accessToken,
       refreshToken,
     };
   }
-};
+}

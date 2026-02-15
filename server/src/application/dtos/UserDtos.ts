@@ -12,6 +12,8 @@ export type UserAuthResponseDto = {
     fullName: string;
     email: string;
     isSuperAdmin: boolean;
+    isOnboarded: boolean,
+    currentOrganizationId: string,
   };
   accessToken: string;
   refreshToken: string;

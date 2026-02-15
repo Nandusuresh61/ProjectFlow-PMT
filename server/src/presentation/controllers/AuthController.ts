@@ -25,6 +25,7 @@ import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/Us
 import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/IResetPasswordUseCase";
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
+import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -37,6 +38,7 @@ export class AuthController implements IAuthController {
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
     private readonly _googleOAuthService: IOAuthProviderService,
     private readonly _googleAuthUseCase: IGoogleAuthUseCase,
+    private readonly _userRepo: IUserRepository
   ) { }
 
   startRegister = asyncHandler(
@@ -188,14 +190,23 @@ export class AuthController implements IAuthController {
   });
 
   getMe = asyncHandler(async (req: Request, res: Response) => {
-    const user = (req as any).user;
+  const tokenPayload = (req as any).user;
 
-    res.status(HttpStatusCode.OK).json(
-      ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-        user: user,
-      }),
-    );
-  });
+  const user = await this._userRepo.findById(tokenPayload.userId);
+
+  res.status(200).json(
+    ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
+      user: {
+        userId: user.userId,
+        fullName: user.fullName,
+        email: user.email,
+        isSuperAdmin: user.isSuperAdmin,
+        isOnboarded: user.isOnboarded,
+        currentOrganizationId: user.currentOrganizationId,
+      },
+    })
+  );
+});
 
   forgotOtp = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = ForgotEmailSchema.parse(req.body);

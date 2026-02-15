@@ -7,6 +7,7 @@ import { connectRedis } from './infrastructure/cache/redisClient';
 import { errorMiddleware } from './presentation/middlewares/ErrorMiddlware';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'
+import onboardingRoutes from "@/presentation/routes/OnboardingRoutes"
 
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', userRoutes)
 app.use('/api/plan', planRoutes)
+app.use('/api/onboarding', onboardingRoutes)
 
 app.use(errorMiddleware);
 

@@ -2,6 +2,7 @@ import Login from "@/pages/auth/Login";
 import Otp from "@/pages/auth/Otp";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import SignUp from "@/pages/auth/SignUp";
+import Onboarding from "@/pages/auth/Onboarding";
 import Home from "@/pages/Home";
 import LandingPage from "@/pages/landing/LandingPage";
 import NotFound from "@/pages/NotFound";
@@ -28,6 +29,7 @@ export default function UserRoutes() {
 
       {/* User Protected Routes */}
       <Route element={<ProtectedRoutes />}>
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/home" element={<Home />} />
       </Route>
 
