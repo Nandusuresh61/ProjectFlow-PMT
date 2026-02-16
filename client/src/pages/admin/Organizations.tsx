@@ -30,7 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { API } from "@/services/api";
+
 import { getAllUsers } from "@/services/superAdmin/superadmin.api";
 
 interface Organization {
@@ -47,13 +47,6 @@ interface User {
   organizations: Organization[];
 }
 
-interface PaginatedResponse {
-  users: User[];
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
-}
 
 export default function Organizations() {
   const [searchTerm, setSearchTerm] = useState("");

@@ -17,7 +17,7 @@ export default function AdminSidebar({ collapsed, setCollapsed }: SidebarProps) 
     const location = useLocation();
     const navigate = useNavigate();
     const clearUser = AuthUserState((state) => state.clearUser);
-    const [isLoading, setIsLoading] = useState(false);
+    const [, setIsLoading] = useState(false);
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin/dashboard" },

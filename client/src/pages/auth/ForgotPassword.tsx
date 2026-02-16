@@ -16,7 +16,7 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async () => {
-    const result = ForgotEmailSchema.safeParse(email);
+    const result = ForgotEmailSchema.safeParse({ email });
 
     if (!result.success) {
       toast.error(result.error.issues[0].message);
