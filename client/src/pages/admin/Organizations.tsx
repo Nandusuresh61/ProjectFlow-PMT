@@ -1,262 +1,302 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-    Search,
-    MoreHorizontal,
-    ChevronLeft,
-    ChevronRight,
-    Building2,
-    Mail,
-    Calendar,
-    Loader2
+  Search,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  Building2,
+  Mail,
+  Calendar,
+  Loader2,
 } from "lucide-react";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { API } from "@/services/api";
+import { getAllUsers } from "@/services/superAdmin/superadmin.api";
 
 interface Organization {
-    organizationId: string;
-    name: string;
-    role: string;
+  organizationId: string;
+  name: string;
+  role: string;
 }
 
 interface User {
-    userId: string;
-    fullName: string;
-    email: string;
-    createdAt: string;
-    organizations: Organization[];
+  userId: string;
+  fullName: string;
+  email: string;
+  createdAt: string;
+  organizations: Organization[];
 }
 
 interface PaginatedResponse {
-    users: User[];
-    total: number;
-    page: number;
-    limit: number;
-    pages: number;
+  users: User[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 export default function Organizations() {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [totalUsers, setTotalUsers] = useState(0);
-    const itemsPerPage = 7;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const itemsPerPage = 7;
 
-    // Debounce search term
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearch(searchTerm);
-            setCurrentPage(1);
-        }, 500);
-        return () => clearTimeout(handler);
-    }, [searchTerm]);
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
-    // Fetch users
-    useEffect(() => {
-        const fetchUsers = async () => {
-            setLoading(true);
-            try {
-                const response = await API.get(`/super-admin/getusers`, {
-                    params: {
-                        page: currentPage,
-                        limit: itemsPerPage,
-                        search: debouncedSearch,
-                        sortBy: 'createdAt',
-                        sortOrder: 'desc'
-                    }
-                });
-                const data = response.data?.data;
-                if (data) {
-                    setUsers(data.users || []);
-                    setTotalUsers(data.total || 0);
-                }
-            } catch (error) {
-                console.error("Failed to fetch users:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  // Fetch users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllUsers({
+          page: currentPage,
+          limit: itemsPerPage,
+          search: debouncedSearch,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
 
-        fetchUsers();
-    }, [currentPage, debouncedSearch, itemsPerPage]);
+        const data = response?.data;
 
-    const totalPages = Math.ceil(totalUsers / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-
-    const getInitials = (name: string) => {
-        return name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .substring(0, 2);
+        if (data) {
+          setUsers(data.users || []);
+          setTotalUsers(data.total || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6 text-zinc-100"
-        >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white">Users</h1>
-                    <p className="text-zinc-500">Manage all users and their organization memberships.</p>
-                </div>
-                <div className="relative w-full sm:w-auto">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
-                    <Input
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 w-full sm:w-64 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-green-500 focus:border-green-500"
-                    />
-                </div>
-            </div>
+    fetchUsers();
+  }, [currentPage, debouncedSearch, itemsPerPage]);
 
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden">
-                <Table>
-                    <TableHeader className="bg-zinc-950/50">
-                        <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
-                            <TableHead className="w-[250px] text-zinc-400">User</TableHead>
-                            <TableHead className="text-zinc-400">Email</TableHead>
-                            <TableHead className="text-zinc-400">Organizations</TableHead>
-                            <TableHead className="text-zinc-400">Joined</TableHead>
-                            <TableHead className="text-right text-zinc-400">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {loading ? (
-                            <TableRow className="border-zinc-800">
-                                <TableCell colSpan={5} className="h-24 text-center">
-                                    <div className="flex items-center justify-center gap-2 text-zinc-500">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        Loading users...
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : users.length === 0 ? (
-                            <TableRow className="border-zinc-800">
-                                <TableCell colSpan={5} className="h-24 text-center text-zinc-500">
-                                    No users found.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            users.map((user) => (
-                                <TableRow key={user.userId} className="border-zinc-800 hover:bg-zinc-800/30 transition-colors">
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-9 w-9 border border-zinc-800">
-                                                <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
-                                                    {getInitials(user.fullName)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-zinc-200">{user.fullName}</span>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2 text-zinc-400 text-sm">
-                                            <Mail className="h-3 w-3" />
-                                            {user.email}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex flex-wrap gap-1">
-                                            {user.organizations.length > 0 ? (
-                                                user.organizations.map((org) => (
-                                                    <Badge key={org.organizationId} variant="outline" className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50">
-                                                        <Building2 className="h-3 w-3 mr-1" />
-                                                        {org.name} <span className="text-zinc-500 ml-1 text-[10px]">({org.role})</span>
-                                                    </Badge>
-                                                ))
-                                            ) : (
-                                                <span className="text-zinc-600 text-xs italic">No organizations</span>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-1 text-zinc-500 text-sm">
-                                            <Calendar className="h-3 w-3" /> {new Date(user.createdAt).toLocaleDateString()}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-zinc-800">
-                                                    <span className="sr-only">Open menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-zinc-200">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">View details</DropdownMenuItem>
-                                                <DropdownMenuSeparator className="bg-zinc-800" />
-                                                <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">Block user</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+  const totalPages = Math.ceil(totalUsers / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
-            <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
-                <div className="text-sm text-zinc-500">
-                    Showing <span className="font-medium text-zinc-300">{totalUsers > 0 ? startIndex + 1 : 0}</span> to{" "}
-                    <span className="font-medium text-zinc-300">
-                        {Math.min(startIndex + itemsPerPage, totalUsers)}
-                    </span>{" "}
-                    of <span className="font-medium text-zinc-300">{totalUsers}</span> users
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                        className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
-                    >
-                        <ChevronLeft className="h-4 w-4 mr-1" />
-                        Previous
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                        className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
-                    >
-                        Next
-                        <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                </div>
-            </div>
-        </motion.div>
-    );
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6 text-zinc-100"
+    >
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            Users
+          </h1>
+          <p className="text-zinc-500">
+            Manage all users and their organization memberships.
+          </p>
+        </div>
+        <div className="relative w-full sm:w-auto">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
+          <Input
+            placeholder="Search users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9 w-full sm:w-64 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-green-500 focus:border-green-500"
+          />
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-zinc-950/50">
+            <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
+              <TableHead className="w-[250px] text-zinc-400">User</TableHead>
+              <TableHead className="text-zinc-400">Email</TableHead>
+              <TableHead className="text-zinc-400">Organizations</TableHead>
+              <TableHead className="text-zinc-400">Joined</TableHead>
+              <TableHead className="text-right text-zinc-400">
+                Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow className="border-zinc-800">
+                <TableCell colSpan={5} className="h-24 text-center">
+                  <div className="flex items-center justify-center gap-2 text-zinc-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading users...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
+              <TableRow className="border-zinc-800">
+                <TableCell
+                  colSpan={5}
+                  className="h-24 text-center text-zinc-500"
+                >
+                  No users found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
+                <TableRow
+                  key={user.userId}
+                  className="border-zinc-800 hover:bg-zinc-800/30 transition-colors"
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9 border border-zinc-800">
+                        <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
+                          {getInitials(user.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-zinc-200">
+                          {user.fullName}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                      <Mail className="h-3 w-3" />
+                      {user.email}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {user.organizations.length > 0 ? (
+                        user.organizations.map((org) => (
+                          <Badge
+                            key={org.organizationId}
+                            variant="outline"
+                            className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50"
+                          >
+                            <Building2 className="h-3 w-3 mr-1" />
+                            {org.name}{" "}
+                            <span className="text-zinc-500 ml-1 text-[10px]">
+                              ({org.role})
+                            </span>
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-zinc-600 text-xs italic">
+                          No organizations
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1 text-zinc-500 text-sm">
+                      <Calendar className="h-3 w-3" />{" "}
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-zinc-800"
+                        >
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-zinc-900 border-zinc-800 text-zinc-200"
+                      >
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">
+                          View details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-zinc-800" />
+                        <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">
+                          Block user
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
+        <div className="text-sm text-zinc-500">
+          Showing{" "}
+          <span className="font-medium text-zinc-300">
+            {totalUsers > 0 ? startIndex + 1 : 0}
+          </span>{" "}
+          to{" "}
+          <span className="font-medium text-zinc-300">
+            {Math.min(startIndex + itemsPerPage, totalUsers)}
+          </span>{" "}
+          of <span className="font-medium text-zinc-300">{totalUsers}</span>{" "}
+          users
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
