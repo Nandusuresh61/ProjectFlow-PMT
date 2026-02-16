@@ -94,6 +94,7 @@ declare const AppMessages: {
     readonly PLAN_STATUS_UPDATED: "Plan Status updated.";
     readonly ONBOARDING_COMPLETED: "Onboarding completed successfully";
     readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
+    readonly USER_FETCHING_SUCCESSFUL: "User Fetching Successf";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{

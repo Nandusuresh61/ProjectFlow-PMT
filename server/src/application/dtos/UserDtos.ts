@@ -39,3 +39,32 @@ export type ResetPasswordRequestDto = {
   otp: string;
   newPassword: string;
 };
+
+
+export interface UserWithOrganizationsDTO {
+  userId: string;
+  fullName: string;
+  email: string;
+  createdAt: Date;
+  organizations: {
+    organizationId: string;
+    name: string;
+    role: string;
+  }[];
+}
+
+export interface UserQueryOptions {
+  page: number;
+  limit: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PaginatedUsersResult {
+  users: UserWithOrganizationsDTO[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}

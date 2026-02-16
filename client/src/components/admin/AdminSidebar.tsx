@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { toast } from "sonner";
+import { Logo } from "@/components/common/Logo";
 
 interface SidebarProps {
     collapsed: boolean;
@@ -48,19 +49,15 @@ export default function AdminSidebar({ collapsed, setCollapsed }: SidebarProps) 
         >
             <div className="flex items-center justify-between p-4 h-16 border-b border-zinc-800">
                 {!collapsed && (
-                    <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-                        <div className="w-8 h-8 rounded-lg bg-green-600 flex items-center justify-center text-white">
-                            PF
-                        </div>
-                        <span className="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
-                            ProjectFlow
-                        </span>
-                    </div>
+                    <Logo
+                        textClassName="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent"
+                    />
                 )}
                 {collapsed && (
-                    <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white mx-auto font-bold">
-                        PF
-                    </div>
+                    <Logo
+                        showText={false}
+                        className="mx-auto"
+                    />
                 )}
                 <Button
                     variant="ghost"

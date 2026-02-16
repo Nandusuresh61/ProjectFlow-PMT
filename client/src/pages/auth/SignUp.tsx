@@ -10,6 +10,9 @@ import { registerUser } from "@/services/auth/auth.api";
 import { toast } from "sonner";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { RegisterUserSchema } from "shared";
+
+import { Logo } from "@/components/common/Logo";
 
 export default function SignUp() {
   const isLoading = AuthUserState((state) => state.isLoading);
@@ -31,8 +34,11 @@ export default function SignUp() {
   };
 
   const handleSubmit = async () => {
-    if (!form.fullName || !form.email || !form.password) {
-      toast.error("Please fill in all required fields.");
+    const result = RegisterUserSchema.safeParse(form);
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      setLoading(false);
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -66,12 +72,12 @@ export default function SignUp() {
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link
           to="/"
-          className="flex items-center gap-2 font-bold text-xl tracking-tighter group"
+          className="group"
         >
-          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
-            PF
-          </div>
-          <span className="text-white">ProjectFlow</span>
+          <Logo
+            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            textClassName="text-white"
+          />
         </Link>
         <Link to="/login">
           <Button

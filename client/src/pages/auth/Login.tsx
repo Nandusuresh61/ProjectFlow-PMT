@@ -10,10 +10,12 @@ import { toast } from "sonner";
 import { loginUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { LoginUserSchema } from "shared";
 
 
 
 
+import { Logo } from "@/components/common/Logo";
 
 export default function Login() {
   const setUser = AuthUserState((state) => state.setUser);
@@ -34,19 +36,22 @@ export default function Login() {
 
   const handleLogin = async () => {
     setLoading(true);
-    if (!form.email && !form.password) {
-      toast.error("Please fill in all required fields.");
+
+    const result = LoginUserSchema.safeParse(form);
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
       setLoading(false);
       return;
     }
+
     try {
-      const response = await loginUser(form);
-      console.log(response);
+      const response = await loginUser(result.data);
+
       const user = response.data!.user;
       setUser(user);
-      toast.success(response.message);
 
-      setLoading(false);
+      toast.success(response.message);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -61,12 +66,12 @@ export default function Login() {
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link
           to="/"
-          className="flex items-center gap-2 font-bold text-xl tracking-tighter group"
+          className="group"
         >
-          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
-            PF
-          </div>
-          <span className="text-white">ProjectFlow</span>
+          <Logo
+            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            textClassName="text-white"
+          />
         </Link>
         <Link to="/signup">
           <Button

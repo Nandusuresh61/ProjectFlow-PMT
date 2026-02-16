@@ -38,6 +38,5 @@ export const logger = winston.createLogger({
   format: config.NODE_ENV === "production" ? prodFormat : devFormat,
   transports: [
     new winston.transports.Console(),
-    // Later: add file transport, Loki transport, etc.
   ],
 });

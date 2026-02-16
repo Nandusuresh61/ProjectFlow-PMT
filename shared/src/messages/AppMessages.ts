@@ -75,4 +75,6 @@ export const AppMessages = {
   ONBOARDING_COMPLETED: "Onboarding completed successfully",
 
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
+
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
 } as const;

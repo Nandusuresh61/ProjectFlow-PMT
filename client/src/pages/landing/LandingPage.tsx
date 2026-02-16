@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { Link } from "react-router-dom";
+import { Logo } from "@/components/common/Logo";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -60,18 +61,17 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-black/60 backdrop-blur-xl border-b border-white/5 py-3"
-          : "bg-transparent border-b border-transparent py-5"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
+        ? "bg-black/60 backdrop-blur-xl border-b border-white/5 py-3"
+        : "bg-transparent border-b border-transparent py-5"
+        }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter cursor-pointer group">
-          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
-            PF
-          </div>
-          <span className="text-white">ProjectFlow</span>
+        <div className="cursor-pointer group">
+          <Logo
+            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            textClassName="text-white text-2xl tracking-tighter"
+          />
         </div>
 
         {/* Desktop Nav */}
@@ -157,17 +157,15 @@ const PricingCard = ({
 }: PricingCardProps) => (
   <motion.div
     variants={fadeInUp}
-    className={`relative flex flex-col p-10 rounded-[2.5rem] transition-all duration-500 h-full ${
-      featured
-        ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.1)]"
-        : "bg-[#0A0A0A] text-white border border-white/5 hover:border-white/20"
-    }`}
+    className={`relative flex flex-col p-10 rounded-[2.5rem] transition-all duration-500 h-full ${featured
+      ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+      : "bg-[#0A0A0A] text-white border border-white/5 hover:border-white/20"
+      }`}
   >
     <div className="mb-10">
       <h4
-        className={`text-xs font-black uppercase tracking-[0.2em] mb-4 ${
-          featured ? "text-black/50" : "text-slate-500"
-        }`}
+        className={`text-xs font-black uppercase tracking-[0.2em] mb-4 ${featured ? "text-black/50" : "text-slate-500"
+          }`}
       >
         {tier}
       </h4>
@@ -199,11 +197,10 @@ const PricingCard = ({
 
     <MotionButton
       {...scaleHover}
-      className={`w-full py-6 rounded-2xl font-bold text-base transition-all h-auto ${
-        featured
-          ? "bg-black text-white hover:bg-black/80"
-          : "bg-white text-black hover:bg-white/90"
-      }`}
+      className={`w-full py-6 rounded-2xl font-bold text-base transition-all h-auto ${featured
+        ? "bg-black text-white hover:bg-black/80"
+        : "bg-white text-black hover:bg-white/90"
+        }`}
     >
       Get Started
     </MotionButton>
@@ -229,7 +226,7 @@ export default function LandingPage() {
             >
               <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Join the waitlist for ProjectFlow v2.0
+                Join the waitlist for ProjectFlow v1.0
               </span>
             </motion.div>
 
@@ -359,12 +356,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
             <div>
-              <div className="flex items-center gap-2 font-bold text-2xl tracking-tighter mb-6">
-                <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg">
-                  PF
-                </div>
-                ProjectFlow
-              </div>
+              <Logo
+                className="mb-6"
+                iconClassName="bg-white text-black"
+                textClassName="text-2xl tracking-tighter"
+              />
               <p className="text-slate-500 text-sm max-w-xs leading-relaxed">
                 The standard for modern agile software development.
               </p>

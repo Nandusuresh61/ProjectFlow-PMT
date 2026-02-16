@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { forgotPassoword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
+import { ForgotEmailSchema } from "shared";
 
 export default function ForgotPassword() {
   const setPendingEmail = AuthUserState((state) => state.setPendingEmail);
@@ -15,8 +16,11 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleSubmit = async () => {
-    if (!email) {
-      toast.error("Email required!");
+    const result = ForgotEmailSchema.safeParse(email);
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      setLoading(false);
       return;
     }
     try {
