@@ -109,7 +109,8 @@ var AppMessages = {
   PLAN_NOT_FOUND: "Plan not found.",
   PLAN_STATUS_UPDATED: "Plan Status updated.",
   ONBOARDING_COMPLETED: "Onboarding completed successfully",
-  USER_ALREADY_ONBOARDED: "User already completed onboarding"
+  USER_ALREADY_ONBOARDED: "User already completed onboarding",
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
 };
 
 // src/schema/TokenPayload.ts

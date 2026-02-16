@@ -39,3 +39,15 @@ export type ResetPasswordRequestDto = {
   otp: string;
   newPassword: string;
 };
+
+
+export interface UserWithOrganizationsDTO {
+  userId: string;
+  fullName: string;
+  email: string;
+  organizations: {
+    organizationId: string;
+    name: string;
+    role: string;
+  }[];
+}

@@ -8,6 +8,7 @@ import { errorMiddleware } from './presentation/middlewares/ErrorMiddlware';
 import cors from 'cors';
 import cookieParser from 'cookie-parser'
 import onboardingRoutes from "@/presentation/routes/OnboardingRoutes"
+import superAdminRoutes from "@/presentation/routes/superAdminRoutes"
 
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use('/api/auth', userRoutes)
 app.use('/api/plan', planRoutes)
 app.use('/api/onboarding', onboardingRoutes)
+app.use('/api/super-admin',superAdminRoutes)
 
 app.use(errorMiddleware);
 

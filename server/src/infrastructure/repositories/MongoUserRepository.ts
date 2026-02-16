@@ -70,7 +70,44 @@ export class MongoUserRepository implements IUserRepository {
         currentOrganizationId: user.currentOrganizationId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),
-      }
+      },
     );
+  }
+  async getAllUsersWithOrganizations(): Promise<any[]> {
+    const users = await UserModel.aggregate([
+      {
+        $lookup: {
+          from: "memberships",
+          localField: "userId",
+          foreignField: "userId",
+          as: "memberships",
+        },
+      },
+      {
+        $lookup: {
+          from: "organizations",
+          localField: "memberships.organizationId",
+          foreignField: "organizationId",
+          as: "organizationsData",
+        },
+      },
+    ]);
+
+    return users.map((user: any) => ({
+      userId: user.userId,
+      fullName: user.fullName,
+      email: user.email,
+      organizations: user.memberships.map((membership: any) => {
+        const org = user.organizationsData.find(
+          (o: any) => o.organizationId === membership.organizationId,
+        );
+
+        return {
+          organizationId: membership.organizationId,
+          name: org?.name || "Unknown",
+          role: membership.role,
+        };
+      }),
+    }));
   }
 }

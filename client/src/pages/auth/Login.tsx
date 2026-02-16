@@ -15,6 +15,8 @@ import { LoginUserSchema } from "shared";
 
 
 
+import { Logo } from "@/components/common/Logo";
+
 export default function Login() {
   const setUser = AuthUserState((state) => state.setUser);
   const isLoading = AuthUserState((state) => state.isLoading);
@@ -33,29 +35,29 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-  setLoading(true);
+    setLoading(true);
 
-  const result = LoginUserSchema.safeParse(form);
+    const result = LoginUserSchema.safeParse(form);
 
-  if (!result.success) {
-    toast.error(result.error.issues[0].message);
-    setLoading(false);
-    return;
-  }
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      setLoading(false);
+      return;
+    }
 
-  try {
-    const response = await loginUser(result.data);
+    try {
+      const response = await loginUser(result.data);
 
-    const user = response.data!.user;
-    setUser(user);
+      const user = response.data!.user;
+      setUser(user);
 
-    toast.success(response.message);
-  } catch (error: any) {
-    toast.error(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success(response.message);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <GridBackground />
@@ -64,12 +66,12 @@ export default function Login() {
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link
           to="/"
-          className="flex items-center gap-2 font-bold text-xl tracking-tighter group"
+          className="group"
         >
-          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
-            PF
-          </div>
-          <span className="text-white">ProjectFlow</span>
+          <Logo
+            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            textClassName="text-white"
+          />
         </Link>
         <Link to="/signup">
           <Button
