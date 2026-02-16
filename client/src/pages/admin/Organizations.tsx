@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Search,
@@ -7,7 +7,8 @@ import {
     ChevronRight,
     Building2,
     Mail,
-    Calendar
+    Calendar,
+    Loader2
 } from "lucide-react";
 import {
     Table,
@@ -29,49 +30,79 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { API } from "@/services/api";
 
 interface Organization {
-    id: string;
+    organizationId: string;
     name: string;
-    owner: string;
-    email: string;
-    plan: string;
-    members: number;
-    createdAt: string;
-    status: "Active" | "Inactive" | "Trial";
-    logo?: string;
+    role: string;
 }
 
-const dummyOrgs: Organization[] = [
-    { id: "1", name: "Acme Corp", owner: "John Doe", email: "john@acme.com", plan: "Professional", members: 12, createdAt: "2024-01-15", status: "Active" },
-    { id: "2", name: "TechStart Inc", owner: "Sarah Smith", email: "sarah@techstart.com", plan: "Enterprise", members: 45, createdAt: "2024-01-14", status: "Active" },
-    { id: "3", name: "Design Studio", owner: "Mike Johnson", email: "mike@design.com", plan: "Starter", members: 3, createdAt: "2024-01-13", status: "Active" },
-    { id: "4", name: "Global Solutions", owner: "Emily Davis", email: "emily@global.com", plan: "Enterprise", members: 120, createdAt: "2024-01-12", status: "Trial" },
-    { id: "5", name: "NextGen AI", owner: "David Wilson", email: "david@nextgen.com", plan: "Professional", members: 8, createdAt: "2024-01-11", status: "Active" },
-    { id: "6", name: "Cloud Systems", owner: "Jessica Brown", email: "jessica@cloud.com", plan: "Starter", members: 2, createdAt: "2024-01-10", status: "Inactive" },
-    { id: "7", name: "Data Corp", owner: "Robert Taylor", email: "robert@data.com", plan: "Professional", members: 15, createdAt: "2024-01-09", status: "Active" },
-    { id: "8", name: "Web Wizards", owner: "Lisa Anderson", email: "lisa@web.com", plan: "Starter", members: 4, createdAt: "2024-01-08", status: "Trial" },
-    { id: "9", name: "App Masters", owner: "Kevin Thomas", email: "kevin@app.com", plan: "Professional", members: 10, createdAt: "2024-01-07", status: "Active" },
-    { id: "10", name: "Security Plus", owner: "Amanda Martinez", email: "amanda@sec.com", plan: "Enterprise", members: 60, createdAt: "2024-01-06", status: "Active" },
-    { id: "11", name: "Green Energy", owner: "Brian White", email: "brian@green.com", plan: "Professional", members: 22, createdAt: "2024-01-05", status: "Active" },
-    { id: "12", name: "EduTech", owner: "Laura Garcia", email: "laura@edu.com", plan: "Starter", members: 5, createdAt: "2024-01-04", status: "Inactive" },
-];
+interface User {
+    userId: string;
+    fullName: string;
+    email: string;
+    createdAt: string;
+    organizations: Organization[];
+}
+
+interface PaginatedResponse {
+    users: User[];
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+}
 
 export default function Organizations() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [totalUsers, setTotalUsers] = useState(0);
     const itemsPerPage = 7;
 
-    const filteredOrgs = dummyOrgs.filter((org) =>
-        org.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        org.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        org.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Debounce search term
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setCurrentPage(1);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
 
-    const totalPages = Math.ceil(filteredOrgs.length / itemsPerPage);
+    // Fetch users
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            try {
+                const response = await API.get(`/super-admin/getusers`, {
+                    params: {
+                        page: currentPage,
+                        limit: itemsPerPage,
+                        search: debouncedSearch,
+                        sortBy: 'createdAt',
+                        sortOrder: 'desc'
+                    }
+                });
+                const data = response.data?.data;
+                if (data) {
+                    setUsers(data.users || []);
+                    setTotalUsers(data.total || 0);
+                }
+            } catch (error) {
+                console.error("Failed to fetch users:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUsers();
+    }, [currentPage, debouncedSearch, itemsPerPage]);
+
+    const totalPages = Math.ceil(totalUsers / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentOrgs = filteredOrgs.slice(startIndex, startIndex + itemsPerPage);
 
     const getInitials = (name: string) => {
         return name
@@ -91,18 +122,15 @@ export default function Organizations() {
         >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white">Organizations</h1>
-                    <p className="text-zinc-500">Manage detailed information about all workspace organizations.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-white">Users</h1>
+                    <p className="text-zinc-500">Manage all users and their organization memberships.</p>
                 </div>
                 <div className="relative w-full sm:w-auto">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
                     <Input
-                        placeholder="Search organizations..."
+                        placeholder="Search users..."
                         value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(1);
-                        }}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9 w-full sm:w-64 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-green-500 focus:border-green-500"
                     />
                 </div>
@@ -112,79 +140,67 @@ export default function Organizations() {
                 <Table>
                     <TableHeader className="bg-zinc-950/50">
                         <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
-                            <TableHead className="w-[250px] text-zinc-400">Organization</TableHead>
-                            <TableHead className="text-zinc-400">Owner</TableHead>
-                            <TableHead className="text-zinc-400">Plan</TableHead>
-                            <TableHead className="text-zinc-400">Members</TableHead>
-                            <TableHead className="text-zinc-400">Created</TableHead>
-                            <TableHead className="text-zinc-400">Status</TableHead>
+                            <TableHead className="w-[250px] text-zinc-400">User</TableHead>
+                            <TableHead className="text-zinc-400">Email</TableHead>
+                            <TableHead className="text-zinc-400">Organizations</TableHead>
+                            <TableHead className="text-zinc-400">Joined</TableHead>
                             <TableHead className="text-right text-zinc-400">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {currentOrgs.length === 0 ? (
+                        {loading ? (
                             <TableRow className="border-zinc-800">
-                                <TableCell colSpan={7} className="h-24 text-center text-zinc-500">
-                                    No organizations found.
+                                <TableCell colSpan={5} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2 text-zinc-500">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Loading users...
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : users.length === 0 ? (
+                            <TableRow className="border-zinc-800">
+                                <TableCell colSpan={5} className="h-24 text-center text-zinc-500">
+                                    No users found.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            currentOrgs.map((org) => (
-                                <TableRow key={org.id} className="border-zinc-800 hover:bg-zinc-800/30 transition-colors">
+                            users.map((user) => (
+                                <TableRow key={user.userId} className="border-zinc-800 hover:bg-zinc-800/30 transition-colors">
                                     <TableCell>
                                         <div className="flex items-center gap-3">
                                             <Avatar className="h-9 w-9 border border-zinc-800">
                                                 <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
-                                                    {getInitials(org.name)}
+                                                    {getInitials(user.fullName)}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div className="flex flex-col">
-                                                <span className="font-medium text-zinc-200">{org.name}</span>
-                                                <span className="text-xs text-zinc-500 flex items-center gap-1">
-                                                    <Building2 className="h-3 w-3" /> Workspace
-                                                </span>
+                                                <span className="font-medium text-zinc-200">{user.fullName}</span>
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex flex-col">
-                                            <span className="text-sm text-zinc-300">{org.owner}</span>
-                                            <span className="text-xs text-zinc-500 flex items-center gap-1">
-                                                <Mail className="h-3 w-3" /> {org.email}
-                                            </span>
+                                        <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                                            <Mail className="h-3 w-3" />
+                                            {user.email}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className="font-normal capitalize bg-transparent border-zinc-700 text-zinc-300">
-                                            {org.plan}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-1 text-zinc-400">
-                                            <span className="font-medium text-zinc-200">{org.members}</span> users
+                                        <div className="flex flex-wrap gap-1">
+                                            {user.organizations.length > 0 ? (
+                                                user.organizations.map((org) => (
+                                                    <Badge key={org.organizationId} variant="outline" className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50">
+                                                        <Building2 className="h-3 w-3 mr-1" />
+                                                        {org.name} <span className="text-zinc-500 ml-1 text-[10px]">({org.role})</span>
+                                                    </Badge>
+                                                ))
+                                            ) : (
+                                                <span className="text-zinc-600 text-xs italic">No organizations</span>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-1 text-zinc-500 text-sm">
-                                            <Calendar className="h-3 w-3" /> {new Date(org.createdAt).toLocaleDateString()}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center">
-                                            <span className={cn(
-                                                "text-[11px] px-2 py-0.5 rounded-full font-medium border flex items-center gap-1",
-                                                org.status === 'Active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                    org.status === 'Trial' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                                        'bg-red-500/10 text-red-500 border-red-500/20'
-                                            )}>
-                                                <span className={cn(
-                                                    "h-1.5 w-1.5 rounded-full",
-                                                    org.status === 'Active' ? 'bg-green-500' :
-                                                        org.status === 'Trial' ? 'bg-yellow-500' :
-                                                            'bg-red-500'
-                                                )} />
-                                                {org.status}
-                                            </span>
+                                            <Calendar className="h-3 w-3" /> {new Date(user.createdAt).toLocaleDateString()}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -198,9 +214,8 @@ export default function Organizations() {
                                             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800 text-zinc-200">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">View details</DropdownMenuItem>
-                                                <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">Edit organization</DropdownMenuItem>
                                                 <DropdownMenuSeparator className="bg-zinc-800" />
-                                                <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">Delete organization</DropdownMenuItem>
+                                                <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">Block user</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
@@ -213,11 +228,11 @@ export default function Organizations() {
 
             <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
                 <div className="text-sm text-zinc-500">
-                    Showing <span className="font-medium text-zinc-300">{filteredOrgs.length > 0 ? startIndex + 1 : 0}</span> to{" "}
+                    Showing <span className="font-medium text-zinc-300">{totalUsers > 0 ? startIndex + 1 : 0}</span> to{" "}
                     <span className="font-medium text-zinc-300">
-                        {Math.min(startIndex + itemsPerPage, filteredOrgs.length)}
+                        {Math.min(startIndex + itemsPerPage, totalUsers)}
                     </span>{" "}
-                    of <span className="font-medium text-zinc-300">{filteredOrgs.length}</span> organizations
+                    of <span className="font-medium text-zinc-300">{totalUsers}</span> users
                 </div>
                 <div className="flex items-center gap-2">
                     <Button

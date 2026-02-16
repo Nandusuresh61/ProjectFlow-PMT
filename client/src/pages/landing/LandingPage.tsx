@@ -62,8 +62,8 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled
-          ? "bg-black/60 backdrop-blur-xl border-b border-white/5 py-3"
-          : "bg-transparent border-b border-transparent py-5"
+        ? "bg-black/60 backdrop-blur-xl border-b border-white/5 py-3"
+        : "bg-transparent border-b border-transparent py-5"
         }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -158,8 +158,8 @@ const PricingCard = ({
   <motion.div
     variants={fadeInUp}
     className={`relative flex flex-col p-10 rounded-[2.5rem] transition-all duration-500 h-full ${featured
-        ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.1)]"
-        : "bg-[#0A0A0A] text-white border border-white/5 hover:border-white/20"
+      ? "bg-white text-black shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+      : "bg-[#0A0A0A] text-white border border-white/5 hover:border-white/20"
       }`}
   >
     <div className="mb-10">
@@ -198,8 +198,8 @@ const PricingCard = ({
     <MotionButton
       {...scaleHover}
       className={`w-full py-6 rounded-2xl font-bold text-base transition-all h-auto ${featured
-          ? "bg-black text-white hover:bg-black/80"
-          : "bg-white text-black hover:bg-white/90"
+        ? "bg-black text-white hover:bg-black/80"
+        : "bg-white text-black hover:bg-white/90"
         }`}
     >
       Get Started
@@ -226,7 +226,7 @@ export default function LandingPage() {
             >
               <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                Join the waitlist for ProjectFlow v2.0
+                Join the waitlist for ProjectFlow v1.0
               </span>
             </motion.div>
 

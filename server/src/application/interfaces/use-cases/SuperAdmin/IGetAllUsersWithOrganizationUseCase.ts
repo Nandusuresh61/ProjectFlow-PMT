@@ -1,5 +1,5 @@
-import { UserWithOrganizationsDTO } from "@/application/dtos/UserDtos";
+import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
 
 export interface IGetAllUsersWithOrganizationUsecase {
-  execute(): Promise<UserWithOrganizationsDTO[]>;
+  execute(options: UserQueryOptions): Promise<PaginatedUsersResult>;
 }

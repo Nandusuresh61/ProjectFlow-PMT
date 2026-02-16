@@ -1,5 +1,6 @@
 import { UserModel, UserDoc } from "../database/models/MongoUserModel";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 import { AuthProvider } from "@/domain/entities/auth/authProvider";
 
@@ -73,30 +74,56 @@ export class MongoUserRepository implements IUserRepository {
       },
     );
   }
-  async getAllUsersWithOrganizations(): Promise<any[]> {
-    const users = await UserModel.aggregate([
+  async getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult> {
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = options;
+    const skip = (page - 1) * limit;
+
+    const matchStage: any = {};
+    if (search) {
+      matchStage.$or = [
+        { fullName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const sortStage: any = {};
+    sortStage[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+    const result = await UserModel.aggregate([
+      { $match: matchStage },
+      { $sort: sortStage },
       {
-        $lookup: {
-          from: "memberships",
-          localField: "userId",
-          foreignField: "userId",
-          as: "memberships",
-        },
-      },
-      {
-        $lookup: {
-          from: "organizations",
-          localField: "memberships.organizationId",
-          foreignField: "organizationId",
-          as: "organizationsData",
+        $facet: {
+          users: [
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $lookup: {
+                from: "memberships",
+                localField: "userId",
+                foreignField: "userId",
+                as: "memberships",
+              },
+            },
+            {
+              $lookup: {
+                from: "organizations",
+                localField: "memberships.organizationId",
+                foreignField: "organizationId",
+                as: "organizationsData",
+              },
+            },
+          ],
+          total: [{ $count: "count" }],
         },
       },
     ]);
 
-    return users.map((user: any) => ({
+    const users = result[0].users.map((user: any) => ({
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
+      createdAt: user.createdAt,
       organizations: user.memberships.map((membership: any) => {
         const org = user.organizationsData.find(
           (o: any) => o.organizationId === membership.organizationId,
@@ -109,5 +136,15 @@ export class MongoUserRepository implements IUserRepository {
         };
       }),
     }));
+
+    const total = result[0].total[0]?.count || 0;
+
+    return {
+      users,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
   }
 }
