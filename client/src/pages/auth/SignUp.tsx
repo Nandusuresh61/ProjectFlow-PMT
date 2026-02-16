@@ -10,6 +10,7 @@ import { registerUser } from "@/services/auth/auth.api";
 import { toast } from "sonner";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
+import { RegisterUserSchema } from "shared";
 
 export default function SignUp() {
   const isLoading = AuthUserState((state) => state.isLoading);
@@ -31,8 +32,11 @@ export default function SignUp() {
   };
 
   const handleSubmit = async () => {
-    if (!form.fullName || !form.email || !form.password) {
-      toast.error("Please fill in all required fields.");
+    const result = RegisterUserSchema.safeParse(form);
+
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      setLoading(false);
       return;
     }
     if (form.password !== form.confirmPassword) {
