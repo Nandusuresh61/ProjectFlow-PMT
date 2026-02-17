@@ -1,6 +1,11 @@
 // src/enums/ErrorCode.ts
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
+  ErrorCode2["PLAN"] = "Plan Error";
+  ErrorCode2["ONBOARDING"] = "Onboarding Error";
+  ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
+  ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
+  ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -36,16 +41,76 @@ var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
   return TokenEnums2;
 })(TokenEnums || {});
 
+// src/enums/EmailEnums.ts
+var EmailType = /* @__PURE__ */ ((EmailType2) => {
+  EmailType2["OTP"] = "OTP";
+  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
+  EmailType2["INVITE_USER"] = "INVITE_USER";
+  return EmailType2;
+})(EmailType || {});
+
+// src/enums/OrganizationRolesEnum.ts
+var OrganizationRoleEnum = /* @__PURE__ */ ((OrganizationRoleEnum2) => {
+  OrganizationRoleEnum2["ORG_ADMIN"] = "ORG_ADMIN";
+  OrganizationRoleEnum2["MEMBER"] = "MEMBER";
+  return OrganizationRoleEnum2;
+})(OrganizationRoleEnum || {});
+
 // src/errors/AppError.ts
 var AppError = class extends Error {
+  statusCode;
+  errorCode;
+  isOperational;
   constructor(errorCode, message, statusCode) {
     super(message);
+    this.errorCode = errorCode;
+    this.statusCode = statusCode;
+    this.isOperational = true;
+    Error.captureStackTrace(this, this.constructor);
   }
 };
 
-// src/messages/AuthErrorMessages.ts
-var AuthErrorMessages = {
-  EMAIL_EXISTS: "The given email already exists! please try a different one"
+// src/messages/AppMessages.ts
+var AppMessages = {
+  EMAIL_ALREADY_EXISTS: "The given email already exists. Please try a different one.",
+  INVALID_EMAIL: "Invalid email address.",
+  INVALID_CREDENTIALS: "Invalid email or password.",
+  INVALID_AUTH_PROVIDER: "Invalid Auth Provider.",
+  INVALID_GOOGLE_TOKEN: "Invalid Google Token.",
+  INVALID_GOOGLE_PAYLOAD: "Invalid Google Payload",
+  INVALID_GOOGLE_CODE: "Invalid Google Auth Code.",
+  GOOGLE_AUTH_FAILED: "Google authentication failed.",
+  OTP_INVALID_OR_EXPIRED: "OTP is invalid or has expired.",
+  OTP_MAX_ATTEMPTS_REACHED: "Too many invalid OTP attempts. Please try again later.",
+  OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.",
+  UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
+  USER_NOT_FOUND: "User not found.",
+  TOKEN_EXPIRED: "Session expired. Please login again.",
+  TOKEN_INVALID: "Invalid authentication token.",
+  TOKEN_REFRESH_INVALID: "Invalid Refresh Token.",
+  OTP_SENT: "OTP has been sent to your email.",
+  OTP_RESENT: "OTP has been resent successfully.",
+  EMAIL_VERIFIED: "Email verified successfully.",
+  LOGIN_SUCCESS: "Login successful.",
+  LOGOUT_SUCCESS: "Logout successful.",
+  PASSWORD_RESET_SUCCESS: "Password reset successful.",
+  EMAIL_SENT_SUCCESS: "Email sent successfully.",
+  EMAIL_SENT_FAILED: "Unable to send email at the moment.",
+  EMAIL_SUBJECT_OTP: "Your OTP Code",
+  EMAIL_SUBJECT_RESEND_OTP: "Your Resend OTP Code",
+  EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password",
+  EMAIL_SUBJECT_INVITE_USER: "You have been invited",
+  INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
+  VALIDATION_FAILED: "Invalid input data.",
+  RESOURCE_NOT_FOUND: "Requested resource not found.",
+  OPERATION_SUCCESS: "Operation completed successfully.",
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+  PLAN_CREATED: "Plan Created Successful.",
+  PLAN_NOT_FOUND: "Plan not found.",
+  PLAN_STATUS_UPDATED: "Plan Status updated.",
+  ONBOARDING_COMPLETED: "Onboarding completed successfully",
+  USER_ALREADY_ONBOARDED: "User already completed onboarding",
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
 };
 
 // src/schema/TokenPayload.ts
@@ -57,11 +122,93 @@ var TokenPayloadSchema = z.object({
   isSuperAdmin: z.boolean(),
   type: z.enum(TokenEnums)
 });
+
+// src/schema/auth/RegisterUserSchema.ts
+import { z as z2 } from "zod";
+var RegisterUserSchema = z2.object({
+  fullName: z2.string().trim().min(3, "Full name must be at least 3 characters").max(50, "Full name must not exceed 50 characters").regex(
+    /^[A-Za-z ]+$/,
+    "Full name can contain only letters and spaces"
+  ),
+  email: z2.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  password: z2.string().min(8, "Password must be at least 8 characters").max(64, "Password must not exceed 64 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number").regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  ).regex(/^\S*$/, "Password must not contain spaces")
+});
+
+// src/schema/auth/LoginUserSchema.ts
+import { z as z3 } from "zod";
+var LoginUserSchema = z3.object({
+  email: z3.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  password: z3.string().min(1, "Password is required").max(64, "Password is too long")
+});
+
+// src/schema/auth/ForgotEmailSchema.ts
+import z4 from "zod";
+var ForgotEmailSchema = z4.object({
+  email: z4.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase())
+});
+
+// src/schema/auth/ResetPasswordSchema.ts
+import z5 from "zod";
+var ResetPasswordSchema = z5.object({
+  email: z5.string().trim().email("Invalid email address").transform((email2) => email2.toLowerCase()),
+  otp: z5.string().length(6, "OTP must be 6 digits"),
+  password: z5.string().min(8, "Password must be at least 8 characters").max(64, "Password must not exceed 64 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number").regex(
+    /[^A-Za-z0-9]/,
+    "Password must contain at least one special character"
+  ).regex(/^\S*$/, "Password must not contain spaces")
+});
+
+// src/schema/plan/PlanSchema.ts
+import { z as z6 } from "zod";
+var CreatePlanSchema = z6.object({
+  name: z6.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  priceMonthly: z6.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
+  description: z6.string({ message: "Description is required" }).min(1, "Description is required"),
+  maxProjects: z6.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxMembers: z6.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  features: z6.array(z6.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+});
+
+// src/schema/onboarding/CompleteOnboardingSchema.ts
+import { z as z7 } from "zod";
+var CompleteOnboardingSchema = z7.object({
+  workspaceName: z7.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
+  planId: z7.string().trim().min(1, "Plan ID is required")
+});
+
+// src/response/responseHandler.ts
+var ResponseHandler = {
+  success(message, data) {
+    return {
+      success: true,
+      message,
+      ...data && { data }
+    };
+  },
+  error(message) {
+    return {
+      success: false,
+      message
+    };
+  }
+};
 export {
   AppError,
-  AuthErrorMessages,
+  AppMessages,
+  CompleteOnboardingSchema,
+  CreatePlanSchema,
+  EmailType,
   ErrorCode,
+  ForgotEmailSchema,
   HttpStatusCode,
+  LoginUserSchema,
+  OrganizationRoleEnum,
+  RegisterUserSchema,
+  ResetPasswordSchema,
+  ResponseHandler,
   TokenEnums,
   TokenPayloadSchema
 };

@@ -1,6 +1,12 @@
+import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 
 export interface IUserRepository {
-    findByEmail(email: string): Promise<User>;
-    createUser(user: User):Promise<User>;
+  findById(id: string): Promise<User>;
+  findByEmail(email: string): Promise<User | null>;
+  createUser(user: User): Promise<User>;
+  updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;
+  update(user: User): Promise<void>;
+  getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult>;
+
 }

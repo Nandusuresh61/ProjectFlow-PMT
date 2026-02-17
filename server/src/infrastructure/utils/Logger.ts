@@ -24,7 +24,7 @@ const devFormat = combine(
 );
 
 //log text format for prod
-const prodFormat = combine(timestamp(), json());
+const prodFormat = combine(timestamp(), json());  
 
 export const logger = winston.createLogger({
   level: config.NODE_ENV === "production" ? "info" : "debug",
@@ -38,6 +38,5 @@ export const logger = winston.createLogger({
   format: config.NODE_ENV === "production" ? prodFormat : devFormat,
   transports: [
     new winston.transports.Console(),
-    // Later: add file transport, Loki transport, etc.
   ],
 });

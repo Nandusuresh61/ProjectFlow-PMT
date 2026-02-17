@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "test": "jest",
+    "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,16 +13,27 @@
   "packageManager": "pnpm@10.26.2",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.1",
+    "nodemailer": "^7.0.12",
+    "redis": "^5.10.0",
     "shared": "workspace:*",
-    "winston": "^3.19.0"
+    "winston": "^3.19.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.5",
+    "nodemon": "^3.1.11",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0"
   }
 }
