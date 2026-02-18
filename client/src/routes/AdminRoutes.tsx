@@ -1,9 +1,11 @@
+import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminRouteProtection from "./AdminRouteProtection";
-import SuperAdminLayout from "@/components/layouts/SuperAdminLayout";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import Organizations from "@/pages/admin/Organizations";
-import Plans from "@/pages/admin/Plans";
+const SuperAdminLayout = lazy(() => import("@/components/layouts/SuperAdminLayout"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const Organizations = lazy(() => import("@/pages/admin/Organizations"));
+const Plans = lazy(() => import("@/pages/admin/Plans"));
+
 
 export default function AdminRoutes() {
   return (

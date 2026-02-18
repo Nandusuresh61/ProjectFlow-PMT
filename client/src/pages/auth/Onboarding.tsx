@@ -12,6 +12,7 @@ import { completeOnboarding } from "@/services/onboarding/onboarding.api";
 import { toast } from "sonner";
 import { getPlans } from "@/services/plan/plan.api";
 import type { Plan } from "@/types/plan.types";
+import { Loader } from "@/components/ui/Loader";
 
 interface OnboardingState {
   workspaceName: string;
@@ -352,7 +353,7 @@ function StepPlan({
       </div>
 
       {loading ? (
-        <div className="text-center text-slate-400">Loading plans...</div>
+        <Loader text="Loading plans..." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {plans

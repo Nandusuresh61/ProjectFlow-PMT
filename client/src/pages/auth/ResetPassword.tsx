@@ -10,6 +10,7 @@ import { resetPassword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 
+
 export default function ResetPassword() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
   const navigate = useNavigate();
@@ -95,12 +96,12 @@ export default function ResetPassword() {
             <div className="space-y-2">
               <Label>New Password</Label>
               <PasswordInput
-                  id="password"
-                  value={newPassword}
-                  onChange={(e)=>{setNewPassword(e.target.value)}}
-                  placeholder="••••••••"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
-                />
+                id="password"
+                value={newPassword}
+                onChange={(e) => { setNewPassword(e.target.value) }}
+                placeholder="••••••••"
+                className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20"
+              />
             </div>
 
             <Button

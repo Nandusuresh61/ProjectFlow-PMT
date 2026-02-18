@@ -1,17 +1,19 @@
+import { lazy } from "react";
+
 import Login from "@/pages/auth/Login";
 import Otp from "@/pages/auth/Otp";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import SignUp from "@/pages/auth/SignUp";
-import Onboarding from "@/pages/auth/Onboarding";
-import Home from "@/pages/Home";
-import LandingPage from "@/pages/landing/LandingPage";
-import NotFound from "@/pages/NotFound";
-
 import { Routes, Route } from "react-router-dom";
 import PublicRoutes from "./PublicRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import GoogleCallback from "@/pages/auth/GoogleCallback";
+
+const Home = lazy(() => import("@/pages/Home"));
+const LandingPage = lazy(() => import("@/pages/landing/LandingPage"));
+const Onboarding = lazy(() => import("@/pages/auth/Onboarding"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function UserRoutes() {
   return (

@@ -12,6 +12,7 @@ import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { RegisterUserSchema } from "shared";
 
+
 import { Logo } from "@/components/common/Logo";
 
 export default function SignUp() {

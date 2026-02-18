@@ -4,12 +4,13 @@ import { logoutUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { LogOut, Loader2, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
+import { Loader } from "@/components/ui/Loader";
 
 export default function Home() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const user = AuthUserState((state) => state.user);
   const clearUser = AuthUserState((state) => state.clearUser);
 
@@ -48,7 +49,7 @@ export default function Home() {
       >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <Loader size="sm" variant="white" className="mr-2" />
             Logging out...
           </>
         ) : (

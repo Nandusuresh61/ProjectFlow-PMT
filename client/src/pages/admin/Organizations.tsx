@@ -8,8 +8,8 @@ import {
   Building2,
   Mail,
   Calendar,
-  Loader2,
 } from "lucide-react";
+import { Loader } from "@/components/ui/Loader";
 import {
   Table,
   TableBody,
@@ -150,11 +150,8 @@ export default function Organizations() {
           <TableBody>
             {loading ? (
               <TableRow className="border-zinc-800">
-                <TableCell colSpan={5} className="h-24 text-center">
-                  <div className="flex items-center justify-center gap-2 text-zinc-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading users...
-                  </div>
+                <TableCell colSpan={5} className="h-64 text-center">
+                  <Loader text="Loading users..." />
                 </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
