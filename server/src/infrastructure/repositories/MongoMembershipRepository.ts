@@ -1,25 +1,31 @@
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { Membership } from "@/domain/entities/membership/Membership";
-import { MembershipModel } from "../database/models/MongoMembershipModel";
+import { MembershipModel, MembershipDocument } from "../database/models/MongoMembershipModel";
+import { MongoBaseRepository } from "./MongoBaseRepository";
 
-export class MembershipRepository implements IMembershipRepository {
+export class MembershipRepository extends MongoBaseRepository<Membership, MembershipDocument> implements IMembershipRepository {
+  constructor() {
+    super(MembershipModel);
+  }
+
+  protected mapToEntity(doc: MembershipDocument): Membership {
+    return new Membership(
+      doc.membershipId,
+      doc.userId,
+      doc.workspaceId,
+      doc.role,
+      doc.joinedAt
+    );
+  }
 
   async create(membership: Membership): Promise<Membership> {
-    const created = await MembershipModel.create({
+    const membershipDoc = {
       membershipId: membership.membershipId,
       userId: membership.userId,
       workspaceId: membership.workspaceId,
       role: membership.role,
       joinedAt: membership.joinedAt,
-    });
-
-    return new Membership(
-      created.membershipId,
-      created.userId,
-      created.workspaceId,
-      created.role,
-      created.joinedAt
-    );
+    };
+    return super.create(membershipDoc);
   }
-
 }

@@ -3,9 +3,14 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 import { AuthProvider } from "@/domain/entities/auth/authProvider";
+import { MongoBaseRepository } from "./MongoBaseRepository";
 
-export class MongoUserRepository implements IUserRepository {
-  private toEntity(doc: UserDoc): User {
+export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> implements IUserRepository {
+  constructor() {
+    super(UserModel);
+  }
+
+  protected mapToEntity(doc: UserDoc): User {
     return {
       userId: doc.userId,
       fullName: doc.fullName,
@@ -22,16 +27,15 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<User> {
-    const user = await UserModel.findOne({ userId: id });
+    const user = await this.findOne({ userId: id });
     if (!user) {
       throw new Error("User not found");
     }
-    return this.toEntity(user);
+    return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await UserModel.findOne({ email });
-    return user ? this.toEntity(user) : null;
+    return this.findOne({ email });
   }
 
   async createUser(user: User): Promise<User> {
@@ -39,15 +43,14 @@ export class MongoUserRepository implements IUserRepository {
       ...user,
       authProvider: user.authProvider as string,
     };
-    const newUser = await UserModel.create(userDoc);
-    return this.toEntity(newUser);
+    return this.create(userDoc);
   }
 
   async updatePasswordByEmail(
     email: string,
     passwordHash: string,
   ): Promise<void> {
-    await UserModel.updateOne(
+    await this.updateOne(
       { email },
       {
         $set: {
@@ -59,7 +62,7 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   async update(user: User): Promise<void> {
-    await UserModel.updateOne(
+    await this.updateOne(
       { userId: user.userId },
       {
         fullName: user.fullName,
@@ -71,9 +74,10 @@ export class MongoUserRepository implements IUserRepository {
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),
-      },
+      }
     );
   }
+
   async getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = options;
     const skip = (page - 1) * limit;
@@ -89,7 +93,7 @@ export class MongoUserRepository implements IUserRepository {
     const sortStage: any = {};
     sortStage[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const result = await UserModel.aggregate([
+    const result = await this.model.aggregate([
       { $match: matchStage },
       { $sort: sortStage },
       {

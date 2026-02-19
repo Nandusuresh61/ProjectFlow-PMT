@@ -1,6 +1,19 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Document } from "mongoose";
 
-const planSchema = new Schema(
+export interface PlanDocument extends Document {
+  planId: string;
+  name: string;
+  priceMonthly: number;
+  description: string;
+  maxProjects: number;
+  maxMembers: number;
+  features: string[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const planSchema = new Schema<PlanDocument>(
   {
     planId: { type: String, required: true, unique: true },
     name: { type: String, required: true, unique: true },
@@ -14,4 +27,4 @@ const planSchema = new Schema(
   { timestamps: true },
 );
 
-export const PlanModel = model("Plan", planSchema);
+export const PlanModel = model<PlanDocument>("Plan", planSchema);

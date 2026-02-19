@@ -1,57 +1,14 @@
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { Plan } from "@/domain/entities/plan/Plan";
-import { PlanModel } from "../database/models/MongoPlanModel";
+import { PlanModel, PlanDocument } from "../database/models/MongoPlanModel";
+import { MongoBaseRepository } from "./MongoBaseRepository";
 
-export class MongoPlanRepository implements IPlanRepository {
-  async create(plan: Plan): Promise<Plan> {
-    const created = await PlanModel.create({
-      planId: plan.planId,
-      name: plan.name,
-      priceMonthly: plan.priceMonthly,
-      description: plan.description,
-      maxProjects: plan.maxProjects,
-      maxMembers: plan.maxMembers,
-      features: plan.features,
-      isActive: plan.isActive,
-    });
-
-    return this.mapToDomain(created);
+export class MongoPlanRepository extends MongoBaseRepository<Plan, PlanDocument> implements IPlanRepository {
+  constructor() {
+    super(PlanModel);
   }
 
-  async findById(planId: string): Promise<Plan | null> {
-    const found = await PlanModel.findOne({ planId });
-    if (!found) return null;
-    return this.mapToDomain(found);
-  }
-
-  async findAll(): Promise<Plan[]> {
-    const plans = await PlanModel.find();
-    return plans.map((doc) => this.mapToDomain(doc));
-  }
-
-  async findByName(name: string): Promise<Plan | null> {
-    const found = await PlanModel.findOne({ name });
-    if (!found) return null;
-    return this.mapToDomain(found);
-  }
-
-  async update(plan: Plan): Promise<void> {
-    await PlanModel.findOneAndUpdate(
-      { planId: plan.planId },
-      {
-        name: plan.name,
-        priceMonthly: plan.priceMonthly,
-        description: plan.description,
-        maxProjects: plan.maxProjects,
-        maxMembers: plan.maxMembers,
-        features: plan.features,
-        isActive: plan.isActive,
-        updatedAt: new Date(),
-      },
-    );
-  }
-
-  private mapToDomain(doc: any): Plan {
+  protected mapToEntity(doc: PlanDocument): Plan {
     return new Plan(
       doc.planId,
       doc.name,
@@ -63,6 +20,48 @@ export class MongoPlanRepository implements IPlanRepository {
       doc.isActive,
       doc.createdAt,
       doc.updatedAt,
+    );
+  }
+
+  async create(plan: Plan): Promise<Plan> {
+    const planDoc = {
+      planId: plan.planId,
+      name: plan.name,
+      priceMonthly: plan.priceMonthly,
+      description: plan.description,
+      maxProjects: plan.maxProjects,
+      maxMembers: plan.maxMembers,
+      features: plan.features,
+      isActive: plan.isActive,
+    };
+    return super.create(planDoc);
+  }
+
+  async findById(planId: string): Promise<Plan | null> {
+    return this.findOne({ planId });
+  }
+
+  async findAll(): Promise<Plan[]> {
+    return super.findAll();
+  }
+
+  async findByName(name: string): Promise<Plan | null> {
+    return this.findOne({ name });
+  }
+
+  async update(plan: Plan): Promise<void> {
+    await this.updateOne(
+      { planId: plan.planId },
+      {
+        name: plan.name,
+        priceMonthly: plan.priceMonthly,
+        description: plan.description,
+        maxProjects: plan.maxProjects,
+        maxMembers: plan.maxMembers,
+        features: plan.features,
+        isActive: plan.isActive,
+        updatedAt: new Date(),
+      }
     );
   }
 }
