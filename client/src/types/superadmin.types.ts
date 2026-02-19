@@ -1,15 +1,15 @@
-export interface Organization {
-  organizationId: string;
+export interface Workspace {
+  workspaceId: string;
   name: string;
   role: string;
 }
 
-export interface UserWithOrganizations {
+export interface UserWithWorkspaces {
   userId: string;
   fullName: string;
   email: string;
   createdAt: string;
-  organizations: Organization[];
+  workspaces: Workspace[];
 }
 
 export interface GetUsersParams {
@@ -21,7 +21,7 @@ export interface GetUsersParams {
 }
 
 export interface PaginatedUsers {
-  users: UserWithOrganizations[];
+  users: UserWithWorkspaces[];
   total: number;
   page: number;
   limit: number;

@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface OrganizationDocument extends Document {
-  organizationId: string;
+export interface WorkspaceDocument extends Document {
+  workspaceId: string;
   name: string;
   ownerId: string;
   planId: string;
@@ -9,9 +9,9 @@ export interface OrganizationDocument extends Document {
   updatedAt: Date;
 }
 
-const OrganizationSchema = new Schema<OrganizationDocument>(
+const WorkspaceSchema = new Schema<WorkspaceDocument>(
   {
-    organizationId: { type: String, required: true, unique: true },
+    workspaceId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     ownerId: { type: String, required: true },
     planId: { type: String, required: true },
@@ -19,7 +19,7 @@ const OrganizationSchema = new Schema<OrganizationDocument>(
   { timestamps: true },
 );
 
-export const OrganizationModel = mongoose.model<OrganizationDocument>(
-  "Organization",
-  OrganizationSchema,
+export const WorkspaceModel = mongoose.model<WorkspaceDocument>(
+  "Workspace",
+  WorkspaceSchema,
 );

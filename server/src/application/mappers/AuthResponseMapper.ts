@@ -9,7 +9,7 @@ export class AuthResponseMapper {
         email: data.user.email,
         isSuperAdmin: data.user.isSuperAdmin,
         isOnboarded: data.user.isOnboarded,
-        currentOrganizationId: data.user.currentOrganizationId,
+        currentWorkspaceId: data.user.currentWorkspaceId,
       },
     };
   }

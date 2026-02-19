@@ -33,8 +33,8 @@ import {
 
 import { getAllUsers } from "@/services/superAdmin/superadmin.api";
 
-interface Organization {
-  organizationId: string;
+interface Workspace {
+  workspaceId: string;
   name: string;
   role: string;
 }
@@ -44,11 +44,11 @@ interface User {
   fullName: string;
   email: string;
   createdAt: string;
-  organizations: Organization[];
+  workspaces: Workspace[];
 }
 
 
-export default function Organizations() {
+export default function Workspaces() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,7 +120,7 @@ export default function Organizations() {
             Users
           </h1>
           <p className="text-zinc-500">
-            Manage all users and their organization memberships.
+            Manage all users and their workspace memberships.
           </p>
         </div>
         <div className="relative w-full sm:w-auto">
@@ -140,7 +140,7 @@ export default function Organizations() {
             <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
               <TableHead className="w-[250px] text-zinc-400">User</TableHead>
               <TableHead className="text-zinc-400">Email</TableHead>
-              <TableHead className="text-zinc-400">Organizations</TableHead>
+              <TableHead className="text-zinc-400">Workspaces</TableHead>
               <TableHead className="text-zinc-400">Joined</TableHead>
               <TableHead className="text-right text-zinc-400">
                 Actions
@@ -191,23 +191,23 @@ export default function Organizations() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.organizations.length > 0 ? (
-                        user.organizations.map((org) => (
+                      {user.workspaces.length > 0 ? (
+                        user.workspaces.map((workspace) => (
                           <Badge
-                            key={org.organizationId}
+                            key={workspace.workspaceId}
                             variant="outline"
                             className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50"
                           >
                             <Building2 className="h-3 w-3 mr-1" />
-                            {org.name}{" "}
+                            {workspace.name}{" "}
                             <span className="text-zinc-500 ml-1 text-[10px]">
-                              ({org.role})
+                              ({workspace.role})
                             </span>
                           </Badge>
                         ))
                       ) : (
                         <span className="text-zinc-600 text-xs italic">
-                          No organizations
+                          No workspaces
                         </span>
                       )}
                     </div>

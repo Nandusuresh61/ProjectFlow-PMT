@@ -43,8 +43,8 @@ declare enum EmailType {
     INVITE_USER = "INVITE_USER"
 }
 
-declare enum OrganizationRoleEnum {
-    ORG_ADMIN = "ORG_ADMIN",
+declare enum WorkspaceRoleEnum {
+    WORKSPACE_ADMIN = "WORKSPACE_ADMIN",
     MEMBER = "MEMBER"
 }
 
@@ -160,4 +160,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, OrganizationRoleEnum, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType };
+export { AppError, AppMessages, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

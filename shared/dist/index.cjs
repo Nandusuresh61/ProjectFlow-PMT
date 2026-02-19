@@ -39,12 +39,12 @@ __export(index_exports, {
   ForgotEmailSchema: () => ForgotEmailSchema,
   HttpStatusCode: () => HttpStatusCode,
   LoginUserSchema: () => LoginUserSchema,
-  OrganizationRoleEnum: () => OrganizationRoleEnum,
   RegisterUserSchema: () => RegisterUserSchema,
   ResetPasswordSchema: () => ResetPasswordSchema,
   ResponseHandler: () => ResponseHandler,
   TokenEnums: () => TokenEnums,
-  TokenPayloadSchema: () => TokenPayloadSchema
+  TokenPayloadSchema: () => TokenPayloadSchema,
+  WorkspaceRoleEnum: () => WorkspaceRoleEnum
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -99,12 +99,12 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
   return EmailType2;
 })(EmailType || {});
 
-// src/enums/OrganizationRolesEnum.ts
-var OrganizationRoleEnum = /* @__PURE__ */ ((OrganizationRoleEnum2) => {
-  OrganizationRoleEnum2["ORG_ADMIN"] = "ORG_ADMIN";
-  OrganizationRoleEnum2["MEMBER"] = "MEMBER";
-  return OrganizationRoleEnum2;
-})(OrganizationRoleEnum || {});
+// src/enums/WorkspaceRolesEnum.ts
+var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
+  WorkspaceRoleEnum2["WORKSPACE_ADMIN"] = "WORKSPACE_ADMIN";
+  WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
+  return WorkspaceRoleEnum2;
+})(WorkspaceRoleEnum || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -256,10 +256,10 @@ var ResponseHandler = {
   ForgotEmailSchema,
   HttpStatusCode,
   LoginUserSchema,
-  OrganizationRoleEnum,
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,
   TokenEnums,
-  TokenPayloadSchema
+  TokenPayloadSchema,
+  WorkspaceRoleEnum
 });

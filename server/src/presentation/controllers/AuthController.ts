@@ -190,23 +190,23 @@ export class AuthController implements IAuthController {
   });
 
   getMe = asyncHandler(async (req: Request, res: Response) => {
-  const tokenPayload = (req as any).user;
+    const tokenPayload = (req as any).user;
 
-  const user = await this._userRepo.findById(tokenPayload.userId);
+    const user = await this._userRepo.findById(tokenPayload.userId);
 
-  res.status(200).json(
-    ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-      user: {
-        userId: user.userId,
-        fullName: user.fullName,
-        email: user.email,
-        isSuperAdmin: user.isSuperAdmin,
-        isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
-      },
-    })
-  );
-});
+    res.status(200).json(
+      ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
+        user: {
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          isSuperAdmin: user.isSuperAdmin,
+          isOnboarded: user.isOnboarded,
+          currentWorkspaceId: user.currentWorkspaceId,
+        },
+      })
+    );
+  });
 
   forgotOtp = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = ForgotEmailSchema.parse(req.body);

@@ -8,7 +8,7 @@ export class MembershipRepository implements IMembershipRepository {
     const created = await MembershipModel.create({
       membershipId: membership.membershipId,
       userId: membership.userId,
-      organizationId: membership.organizationId,
+      workspaceId: membership.workspaceId,
       role: membership.role,
       joinedAt: membership.joinedAt,
     });
@@ -16,7 +16,7 @@ export class MembershipRepository implements IMembershipRepository {
     return new Membership(
       created.membershipId,
       created.userId,
-      created.organizationId,
+      created.workspaceId,
       created.role,
       created.joinedAt
     );

@@ -10,7 +10,7 @@ export interface User {
   email: string;
   isSuperAdmin: boolean;
   isOnboarded: boolean;
-  currentOrganizationId?: string;
+  currentWorkspaceId?: string;
 }
 
 export interface AuthData {

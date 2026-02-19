@@ -8,7 +8,7 @@ export interface User {
     authProvider: AuthProvider;
     providerId?: string;
     isOnboarded: boolean;
-    currentOrganizationId?: string;
+    currentWorkspaceId?: string;
     isSuperAdmin: boolean;
     createdAt: Date
     updatedAt: Date

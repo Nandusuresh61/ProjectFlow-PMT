@@ -1,13 +1,13 @@
-import { GetAllUsersWithOrganizationUseCase } from "@/application/use-cases/Admin/GetAllUserWithOrganizationUsecase";
+import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/GetAllUserWithWorkspaceUsecase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
 import { AppMessages, HttpStatusCode, ResponseHandler } from "shared";
 
 export class SuperAdminUserController {
   constructor(
-    private readonly _getAllUsersWithOrganizationUseCase: GetAllUsersWithOrganizationUseCase,
+    private readonly _getAllUsersWithWorkspaceUseCase: GetAllUsersWithWorkspaceUseCase,
   ) { }
-  getAllUsersWithOrganizations = asyncHandler(
+  getAllUsersWithWorkspaces = asyncHandler(
     async (req: Request, res: Response) => {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -15,7 +15,7 @@ export class SuperAdminUserController {
       const sortBy = req.query.sortBy as string;
       const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
 
-      const result = await this._getAllUsersWithOrganizationUseCase.execute({
+      const result = await this._getAllUsersWithWorkspaceUseCase.execute({
         page,
         limit,
         search,

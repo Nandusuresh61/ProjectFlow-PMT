@@ -17,7 +17,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _uidGenerator: IUidGenerator,
-  ) {}
+  ) { }
 
   async execute(payload: OAuthUserPayload) {
     if (payload.provider !== AuthProvider.GOOGLE) {
@@ -68,7 +68,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
         isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
       },
       accessToken,
       refreshToken,

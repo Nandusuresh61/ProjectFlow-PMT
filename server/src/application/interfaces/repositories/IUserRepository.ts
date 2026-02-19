@@ -7,6 +7,6 @@ export interface IUserRepository {
   createUser(user: User): Promise<User>;
   updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;
   update(user: User): Promise<void>;
-  getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult>;
+  getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult>;
 
 }

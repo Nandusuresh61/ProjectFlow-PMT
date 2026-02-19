@@ -14,7 +14,7 @@ export class MongoUserRepository implements IUserRepository {
       authProvider: doc.authProvider as AuthProvider,
       providerId: doc.providerId,
       isOnboarded: doc.isOnboarded,
-      currentOrganizationId: doc.currentOrganizationId,
+      currentWorkspaceId: doc.currentWorkspaceId,
       isSuperAdmin: doc.isSuperAdmin,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -68,13 +68,13 @@ export class MongoUserRepository implements IUserRepository {
         authProvider: user.authProvider as string,
         providerId: user.providerId,
         isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),
       },
     );
   }
-  async getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult> {
+  async getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = options;
     const skip = (page - 1) * limit;
 
@@ -107,10 +107,10 @@ export class MongoUserRepository implements IUserRepository {
             },
             {
               $lookup: {
-                from: "organizations",
-                localField: "memberships.organizationId",
-                foreignField: "organizationId",
-                as: "organizationsData",
+                from: "workspaces",
+                localField: "memberships.workspaceId",
+                foreignField: "workspaceId",
+                as: "workspacesData",
               },
             },
           ],
@@ -124,14 +124,14 @@ export class MongoUserRepository implements IUserRepository {
       fullName: user.fullName,
       email: user.email,
       createdAt: user.createdAt,
-      organizations: user.memberships.map((membership: any) => {
-        const org = user.organizationsData.find(
-          (o: any) => o.organizationId === membership.organizationId,
+      workspaces: user.memberships.map((membership: any) => {
+        const workspace = user.workspacesData.find(
+          (o: any) => o.workspaceId === membership.workspaceId,
         );
 
         return {
-          organizationId: membership.organizationId,
-          name: org?.name || "Unknown",
+          workspaceId: membership.workspaceId,
+          name: workspace?.name || "Unknown",
           role: membership.role,
         };
       }),

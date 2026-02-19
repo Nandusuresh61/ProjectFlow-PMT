@@ -18,7 +18,7 @@ export class LoginUserUseCase {
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _passwordHash: IPasswordHasher,
-  ) {}
+  ) { }
 
   async execute(data: LoginRequestDto): Promise<UserAuthResponseDto> {
     const user = await this._userRepo.findByEmail(data.email);
@@ -62,7 +62,7 @@ export class LoginUserUseCase {
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
         isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
       },
       accessToken,
       refreshToken,

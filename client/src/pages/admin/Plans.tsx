@@ -151,7 +151,7 @@ export default function Plans() {
             Subscription Plans
           </h1>
           <p className="text-zinc-500">
-            Manage billing plans and features for organizations.
+            Manage billing plans and features for workspaces.
           </p>
         </div>
 

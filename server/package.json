@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "build": "tsc",
     "dev": "nodemon -r ts-node/register -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],

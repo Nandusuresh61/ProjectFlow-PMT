@@ -124,13 +124,13 @@ export default function Onboarding() {
         return;
       }
 
-      const organizationId = response.data.organizationId;
+      const workspaceId = response.data.workspaceId;
 
       AuthUserState.setState((state) => ({
         user: {
           ...state.user!,
           isOnboarded: true,
-          currentOrganizationId: organizationId,
+          currentWorkspaceId: workspaceId,
         },
       }));
 
