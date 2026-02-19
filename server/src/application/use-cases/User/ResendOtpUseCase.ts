@@ -11,6 +11,7 @@ import {
   ErrorCode,
   HttpStatusCode,
 } from "shared";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
   constructor(
@@ -19,10 +20,10 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _emailService: IEmailService
-  ) {}
+  ) { }
 
   async execute(email: string): Promise<void> {
-    const RESEND_COOLDOWN_MS = 60 * 1000; 
+    const RESEND_COOLDOWN_MS = 60 * 1000;
     const pending = await this._otpStore.get(email);
 
     if (!pending) {
@@ -34,17 +35,20 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     }
 
     const now = Date.now();
+    logger.info(`[ResendOtp] Checking cooldown for ${email}. LastSent: ${pending.lastOtpSentAt ? new Date(pending.lastOtpSentAt).toISOString() : 'N/A'}, Now: ${new Date(now).toISOString()}`);
 
     if (
       pending.lastOtpSentAt &&
       now - pending.lastOtpSentAt < RESEND_COOLDOWN_MS
     ) {
+      const remaining = RESEND_COOLDOWN_MS - (now - pending.lastOtpSentAt);
+      logger.info(`[ResendOtp] Cooldown active. Remaining: ${remaining}ms`);
       throw new AppError(
         ErrorCode.OTP_RESEND_COOLDOWN,
         AppMessages.OTP_RESEND_COOLDOWN,
         HttpStatusCode.TOO_MANY_REQUESTS
       );
-    } 
+    }
 
     // remove old otp
 
@@ -64,12 +68,13 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
         ...pending,
         otpHash,
         attempt: 0,
+        lastOtpSentAt: now,
       },
       300
     );
 
     // Otp to mail
-    console.log("Resend otp: ",otp)
+    logger.error(`>>> DEBUG OTP <<< [ResendOtp] New OTP for ${email}: ${otp}`);
 
     await this._emailService.sendMail({
       to: email,
