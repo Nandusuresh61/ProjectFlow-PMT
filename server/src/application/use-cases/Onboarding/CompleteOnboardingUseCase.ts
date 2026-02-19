@@ -5,8 +5,8 @@ import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepo
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
-import { Membership } from "@/domain/entities/membership/Membership";
-import { Workspace } from "@/domain/entities/workspace/Workspace";
+import { Membership } from "@/domain/entities/Membership";
+import { Workspace } from "@/domain/entities/Workspace";
 import {
   AppError,
   AppMessages,

@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AppMessages: () => AppMessages,
+  AuthProvider: () => AuthProvider,
   CompleteOnboardingSchema: () => CompleteOnboardingSchema,
   CreatePlanSchema: () => CreatePlanSchema,
   EmailType: () => EmailType,
@@ -105,6 +106,13 @@ var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
   WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
+
+// src/enums/AuthProviders.ts
+var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
+  AuthProvider2["LOCAL"] = "LOCAL";
+  AuthProvider2["GOOGLE"] = "GOOGLE";
+  return AuthProvider2;
+})(AuthProvider || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -249,6 +257,7 @@ var ResponseHandler = {
 0 && (module.exports = {
   AppError,
   AppMessages,
+  AuthProvider,
   CompleteOnboardingSchema,
   CreatePlanSchema,
   EmailType,

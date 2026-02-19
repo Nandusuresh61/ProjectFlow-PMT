@@ -3,3 +3,4 @@ export * from './HttpStatusCodes';
 export * from './TokenEnums';
 export * from './EmailEnums'
 export * from './WorkspaceRolesEnum'
+export * from './AuthProviders'

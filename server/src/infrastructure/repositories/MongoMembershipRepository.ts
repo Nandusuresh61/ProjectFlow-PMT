@@ -1,5 +1,5 @@
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
-import { Membership } from "@/domain/entities/membership/Membership";
+import { Membership } from "@/domain/entities/Membership";
 import { MembershipModel, MembershipDocument } from "../database/models/MongoMembershipModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
 

@@ -1,4 +1,4 @@
-import { Plan } from "@/domain/entities/plan/Plan";
+import { Plan } from "@/domain/entities/Plan";
 
 export interface ITogglePlanStatusUseCase {
   execute(planId: string): Promise<Plan>;

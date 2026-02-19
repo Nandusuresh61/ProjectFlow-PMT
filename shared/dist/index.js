@@ -56,6 +56,13 @@ var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
 
+// src/enums/AuthProviders.ts
+var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
+  AuthProvider2["LOCAL"] = "LOCAL";
+  AuthProvider2["GOOGLE"] = "GOOGLE";
+  return AuthProvider2;
+})(AuthProvider || {});
+
 // src/errors/AppError.ts
 var AppError = class extends Error {
   statusCode;
@@ -198,6 +205,7 @@ var ResponseHandler = {
 export {
   AppError,
   AppMessages,
+  AuthProvider,
   CompleteOnboardingSchema,
   CreatePlanSchema,
   EmailType,

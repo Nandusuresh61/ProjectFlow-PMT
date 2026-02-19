@@ -1,4 +1,5 @@
-import { AuthProvider } from "./auth/authProvider";
+import { AuthProvider } from "shared";
+
 
 export interface User {
     userId: string;

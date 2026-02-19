@@ -1,6 +1,6 @@
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IGetAllPlansUsecase } from "@/application/interfaces/use-cases/Plan/IGetAllPlansUseCase";
-import { Plan } from "@/domain/entities/plan/Plan";
+import { Plan } from "@/domain/entities/Plan";
 
 export class GetAllPlansUseCase implements IGetAllPlansUsecase{
   constructor(private readonly _planRepo: IPlanRepository) {}

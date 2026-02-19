@@ -1,5 +1,5 @@
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
-import { Workspace } from "@/domain/entities/workspace/Workspace";
+import { Workspace } from "@/domain/entities/Workspace";
 import { WorkspaceModel, WorkspaceDocument } from "../database/models/MongoWorkspaceModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
 

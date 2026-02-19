@@ -48,6 +48,11 @@ declare enum WorkspaceRoleEnum {
     MEMBER = "MEMBER"
 }
 
+declare enum AuthProvider {
+    LOCAL = "LOCAL",
+    GOOGLE = "GOOGLE"
+}
+
 declare class AppError extends Error {
     readonly statusCode: HttpStatusCode;
     readonly errorCode: ErrorCode;
@@ -160,4 +165,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

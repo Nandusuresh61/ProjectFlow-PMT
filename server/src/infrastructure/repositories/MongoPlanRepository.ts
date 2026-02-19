@@ -1,5 +1,5 @@
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
-import { Plan } from "@/domain/entities/plan/Plan";
+import { Plan } from "@/domain/entities/Plan";
 import { PlanModel, PlanDocument } from "../database/models/MongoPlanModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
 

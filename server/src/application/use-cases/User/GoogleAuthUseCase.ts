@@ -3,10 +3,11 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
+
 import {
   AppError,
   AppMessages,
+  AuthProvider,
   ErrorCode,
   HttpStatusCode,
   TokenEnums,

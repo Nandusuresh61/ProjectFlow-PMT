@@ -2,8 +2,9 @@ import { UserModel, UserDoc } from "../database/models/MongoUserModel";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
+
 import { MongoBaseRepository } from "./MongoBaseRepository";
+import { AuthProvider } from "shared";
 
 export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> implements IUserRepository {
   constructor() {
