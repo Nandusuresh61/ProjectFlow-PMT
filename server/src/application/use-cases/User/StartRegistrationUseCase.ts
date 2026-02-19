@@ -35,7 +35,7 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
     const otpHash = await this._passwordHasher.createHashPassword(otp);
 
     const now = Date.now();
-    logger.error(`>>> DEBUG OTP <<< [StartRegistration] OTP for ${data.email}: ${otp} | Time: ${new Date(now).toISOString()}`);
+    logger.error(` [StartRegistration] OTP for ${data.email}: ${otp} | Time: ${new Date(now).toISOString()}`);
 
     await this._otpStore.save(
       data.email,

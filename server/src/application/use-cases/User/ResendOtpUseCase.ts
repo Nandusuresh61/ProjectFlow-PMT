@@ -19,8 +19,8 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     private readonly _otpStore: IOtpStore,
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _passwordHasher: IPasswordHasher,
-    private readonly _emailService: IEmailService
-  ) { }
+    private readonly _emailService: IEmailService,
+  ) {}
 
   async execute(email: string): Promise<void> {
     const RESEND_COOLDOWN_MS = 60 * 1000;
@@ -30,12 +30,14 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.OTP_INVALID_OR_EXPIRED,
-        HttpStatusCode.BAD_REQUEST
+        HttpStatusCode.BAD_REQUEST,
       );
     }
 
     const now = Date.now();
-    logger.info(`[ResendOtp] Checking cooldown for ${email}. LastSent: ${pending.lastOtpSentAt ? new Date(pending.lastOtpSentAt).toISOString() : 'N/A'}, Now: ${new Date(now).toISOString()}`);
+    logger.info(
+      `[ResendOtp] Checking cooldown for ${email}. LastSent: ${pending.lastOtpSentAt ? new Date(pending.lastOtpSentAt).toISOString() : "N/A"}, Now: ${new Date(now).toISOString()}`,
+    );
 
     if (
       pending.lastOtpSentAt &&
@@ -46,7 +48,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
       throw new AppError(
         ErrorCode.OTP_RESEND_COOLDOWN,
         AppMessages.OTP_RESEND_COOLDOWN,
-        HttpStatusCode.TOO_MANY_REQUESTS
+        HttpStatusCode.TOO_MANY_REQUESTS,
       );
     }
 
@@ -70,7 +72,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
         attempt: 0,
         lastOtpSentAt: now,
       },
-      300
+      300,
     );
 
     // Otp to mail
