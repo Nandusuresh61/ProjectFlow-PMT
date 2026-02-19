@@ -27,3 +27,20 @@ export interface PaginatedUsers {
   limit: number;
   pages: number;
 }
+
+export interface UserWorkspaceDetails {
+  workspaceId: string;
+  name: string;
+  role: string;
+  planName: string;
+  ownerName: string;
+  memberCount: number;
+}
+
+export interface UserDetails {
+  userId: string;
+  fullName: string;
+  email: string;
+  createdAt: string;
+  workspaces: UserWorkspaceDetails[];
+}

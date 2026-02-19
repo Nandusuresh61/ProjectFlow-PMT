@@ -13,4 +13,11 @@ router.get(
   superAdminUserController.getAllUsersWithWorkspaces
 );
 
+router.get(
+  "/user/:userId",
+  authenticatedUser,
+  superAdminOnly,
+  superAdminUserController.getUserDetails
+);
+
 export default router;

@@ -1,6 +1,6 @@
 import { UserModel, UserDoc } from "../database/models/MongoUserModel";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
-import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
+import { UserQueryOptions, PaginatedUsersResult, UserDetailsDto } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 
 import { MongoBaseRepository } from "./MongoBaseRepository";
@@ -151,5 +151,108 @@ export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> impl
       limit,
       pages: Math.ceil(total / limit),
     };
+  }
+  async getUserDetails(userId: string): Promise<UserDetailsDto | null> {
+    const result = await this.model.aggregate([
+      { $match: { userId } },
+      {
+        $lookup: {
+          from: "memberships",
+          localField: "userId",
+          foreignField: "userId",
+          as: "memberships",
+        },
+      },
+      { $unwind: "$memberships" },
+      {
+        $lookup: {
+          from: "workspaces",
+          localField: "memberships.workspaceId",
+          foreignField: "workspaceId",
+          as: "workspace",
+        },
+      },
+      { $unwind: "$workspace" },
+      {
+        $lookup: {
+          from: "plans",
+          localField: "workspace.planId",
+          foreignField: "planId",
+          as: "plan",
+        },
+      },
+      {
+        $unwind: {
+          path: "$plan",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "workspace.ownerId",
+          foreignField: "userId",
+          as: "owner",
+        },
+      },
+      {
+        $unwind: {
+          path: "$owner",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "memberships",
+          localField: "workspace.workspaceId",
+          foreignField: "workspaceId",
+          pipeline: [{ $count: "count" }],
+          as: "memberCount",
+        },
+      },
+      {
+        $addFields: {
+          memberCount: {
+            $ifNull: [{ $arrayElemAt: ["$memberCount.count", 0] }, 0],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          userId: { $first: "$userId" },
+          fullName: { $first: "$fullName" },
+          email: { $first: "$email" },
+          createdAt: { $first: "$createdAt" },
+          workspaces: {
+            $push: {
+              workspaceId: "$workspace.workspaceId",
+              name: "$workspace.name",
+              role: "$memberships.role",
+              planName: { $ifNull: ["$plan.name", "Unknown"] },
+              ownerName: { $ifNull: ["$owner.fullName", "Unknown"] },
+              memberCount: "$memberCount",
+            },
+          },
+        },
+      },
+    ]);
+
+    if (!result || result.length === 0) {
+      // If user has no workspaces, they won't appear in the aggregation because of $unwind "$memberships"
+      // Fallback: fetch user basic details
+      const user = await this.model.findOne({ userId });
+      if (!user) return null;
+
+      return {
+        userId: user.userId,
+        fullName: user.fullName,
+        email: user.email,
+        createdAt: user.createdAt,
+        workspaces: [],
+      };
+    }
+
+    return result[0];
   }
 }

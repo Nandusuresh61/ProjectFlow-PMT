@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminRouteProtection from "./AdminRouteProtection";
 const SuperAdminLayout = lazy(() => import("@/components/layouts/SuperAdminLayout"));
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
-const Workspaces = lazy(() => import("@/pages/admin/Workspaces"));
+const Workspaces = lazy(() => import("@/pages/admin/WorkspaceUsers"));
 const Plans = lazy(() => import("@/pages/admin/Plans"));
 
 

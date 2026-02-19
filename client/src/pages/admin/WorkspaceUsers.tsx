@@ -31,7 +31,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { getAllUsers } from "@/services/superAdmin/superadmin.api";
+import { getAllUsers, getUserDetails } from "@/services/superAdmin/superadmin.api";
+import { UserDetailsModal } from "@/components/admin/UserDetailsModal";
+import type { UserDetails } from "@/types/superadmin.types";
 
 interface Workspace {
   workspaceId: string;
@@ -56,6 +58,11 @@ export default function Workspaces() {
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
   const itemsPerPage = 7;
+
+  // Modal State
+  const [selectedUserDetails, setSelectedUserDetails] = useState<UserDetails | null>(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search term
   useEffect(() => {
@@ -105,6 +112,22 @@ export default function Workspaces() {
       .join("")
       .toUpperCase()
       .substring(0, 2);
+  };
+
+  const handleViewDetails = async (userId: string) => {
+    setIsModalOpen(true);
+    setIsDetailsLoading(true);
+    setSelectedUserDetails(null); // Reset previous details
+    try {
+      const response = await getUserDetails(userId);
+      if (response?.data) {
+        setSelectedUserDetails(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+    } finally {
+      setIsDetailsLoading(false);
+    }
   };
 
   return (
@@ -234,7 +257,10 @@ export default function Workspaces() {
                         className="bg-zinc-900 border-zinc-800 text-zinc-200"
                       >
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">
+                        <DropdownMenuItem
+                          className="focus:bg-zinc-800 focus:text-white"
+                          onClick={() => handleViewDetails(user.userId)}
+                        >
                           View details
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-zinc-800" />
@@ -287,6 +313,13 @@ export default function Workspaces() {
           </Button>
         </div>
       </div>
-    </motion.div>
+
+      <UserDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={selectedUserDetails}
+        loading={isDetailsLoading}
+      />
+    </motion.div >
   );
 }

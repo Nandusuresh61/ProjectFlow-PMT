@@ -68,3 +68,20 @@ export interface PaginatedUsersResult {
   limit: number;
   pages: number;
 }
+
+export interface UserWorkspaceDetails {
+  workspaceId: string;
+  name: string;
+  role: string;
+  planName: string;
+  ownerName: string;
+  memberCount: number;
+}
+
+export interface UserDetailsDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  createdAt: Date;
+  workspaces: UserWorkspaceDetails[];
+}

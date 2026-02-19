@@ -6,6 +6,7 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
+  ErrorCode2["RESOURCE_NOT_FOUND"] = "Resource Not Found";
   return ErrorCode2;
 })(ErrorCode || {});
 

@@ -1,11 +1,13 @@
 import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/GetAllUserWithWorkspaceUsecase";
+import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDetailsUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import { AppMessages, HttpStatusCode, ResponseHandler } from "shared";
+import { AppMessages, HttpStatusCode, ResponseHandler, AppError, ErrorCode } from "shared";
 
 export class SuperAdminUserController {
   constructor(
     private readonly _getAllUsersWithWorkspaceUseCase: GetAllUsersWithWorkspaceUseCase,
+    private readonly _getUserDetailsUseCase: GetUserDetailsUseCase,
   ) { }
   getAllUsersWithWorkspaces = asyncHandler(
     async (req: Request, res: Response) => {
@@ -29,4 +31,23 @@ export class SuperAdminUserController {
         );
     },
   );
+
+  getUserDetails = asyncHandler(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const result = await this._getUserDetailsUseCase.execute(userId);
+
+    if (!result) {
+      throw new AppError(
+        ErrorCode.RESOURCE_NOT_FOUND,
+        "User not found",
+        HttpStatusCode.NOT_FOUND
+      );
+    }
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success("User details fetched successfully", result),
+      );
+  });
 }

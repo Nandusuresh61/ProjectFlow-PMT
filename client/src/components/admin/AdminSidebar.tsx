@@ -23,10 +23,8 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin/dashboard" },
-        { icon: Building2, label: "Workspaces", path: "/super-admin/workspaces" },
+        { icon: Users, label: "Users", path: "/super-admin/workspaces" },
         { icon: CreditCard, label: "Plans", path: "/super-admin/plans" },
-        { icon: Users, label: "Users", path: "/super-admin/users" },
-        { icon: UserPlus, label: "Admins", path: "/super-admin/admins" },
     ];
 
     const handleLogout = async () => {
