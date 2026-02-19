@@ -10,6 +10,7 @@ import { forgotPassoword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { ForgotEmailSchema } from "shared";
 
+
 export default function ForgotPassword() {
   const setPendingEmail = AuthUserState((state) => state.setPendingEmail);
   const [email, setEmail] = useState("");

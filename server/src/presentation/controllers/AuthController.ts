@@ -26,6 +26,7 @@ import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/I
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -46,6 +47,8 @@ export class AuthController implements IAuthController {
       const validatedData = RegisterUserSchema.parse(req.body);
 
       const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
+
+      logger.error(`>>> DEBUG OTP <<< [AuthController] startRegister called with email: ${dto.email}`);
 
       await this._startRegisterUseCase.execute(dto);
 
@@ -91,6 +94,8 @@ export class AuthController implements IAuthController {
   resendOtp = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       const { email } = req.body;
+
+      logger.info(`[AuthController] resendOtp called with email: ${email}`);
 
       await this._resendOtpUseCase.execute(email);
 
@@ -190,23 +195,23 @@ export class AuthController implements IAuthController {
   });
 
   getMe = asyncHandler(async (req: Request, res: Response) => {
-  const tokenPayload = (req as any).user;
+    const tokenPayload = (req as any).user;
 
-  const user = await this._userRepo.findById(tokenPayload.userId);
+    const user = await this._userRepo.findById(tokenPayload.userId);
 
-  res.status(200).json(
-    ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-      user: {
-        userId: user.userId,
-        fullName: user.fullName,
-        email: user.email,
-        isSuperAdmin: user.isSuperAdmin,
-        isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
-      },
-    })
-  );
-});
+    res.status(200).json(
+      ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
+        user: {
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          isSuperAdmin: user.isSuperAdmin,
+          isOnboarded: user.isOnboarded,
+          currentWorkspaceId: user.currentWorkspaceId,
+        },
+      })
+    );
+  });
 
   forgotOtp = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = ForgotEmailSchema.parse(req.body);

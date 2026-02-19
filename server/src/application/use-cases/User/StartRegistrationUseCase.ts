@@ -6,6 +6,7 @@ import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHash
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
 import { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export class StartRegistrationUseCase implements IStartRegisterUseCase {
   constructor(
@@ -14,7 +15,7 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
     private readonly _otpStore: IOtpStore,
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _emailService: IEmailService
-  ) {}
+  ) { }
   async execute(data: StartRegisterDto): Promise<void> {
     const existingUser = await this._userRepo.findByEmail(data.email);
 
@@ -33,6 +34,9 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
 
     const otpHash = await this._passwordHasher.createHashPassword(otp);
 
+    const now = Date.now();
+    logger.error(` [StartRegistration] OTP for ${data.email}: ${otp} | Time: ${new Date(now).toISOString()}`);
+
     await this._otpStore.save(
       data.email,
       {
@@ -41,11 +45,11 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
         passwordHash,
         otpHash,
         attempt: 0,
-        lastOtpSentAt: Date.now()
+        lastOtpSentAt: now
       },
       300
     );
-    console.log(`OTP for ${data.email} => `, otp);
+
     await this._emailService.sendMail({
       to: data.email,
       subject: AppMessages.EMAIL_SUBJECT_OTP,

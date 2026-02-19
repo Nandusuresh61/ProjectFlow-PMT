@@ -8,8 +8,8 @@ import {
   Building2,
   Mail,
   Calendar,
-  Loader2,
 } from "lucide-react";
+import { Loader } from "@/components/ui/Loader";
 import {
   Table,
   TableBody,
@@ -31,10 +31,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { getAllUsers } from "@/services/superAdmin/superadmin.api";
+import { getAllUsers, getUserDetails } from "@/services/superAdmin/superadmin.api";
+import { UserDetailsModal } from "@/components/admin/UserDetailsModal";
+import type { UserDetails } from "@/types/superadmin.types";
 
-interface Organization {
-  organizationId: string;
+interface Workspace {
+  workspaceId: string;
   name: string;
   role: string;
 }
@@ -44,11 +46,11 @@ interface User {
   fullName: string;
   email: string;
   createdAt: string;
-  organizations: Organization[];
+  workspaces: Workspace[];
 }
 
 
-export default function Organizations() {
+export default function Workspaces() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +58,11 @@ export default function Organizations() {
   const [loading, setLoading] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
   const itemsPerPage = 7;
+
+  // Modal State
+  const [selectedUserDetails, setSelectedUserDetails] = useState<UserDetails | null>(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search term
   useEffect(() => {
@@ -107,6 +114,22 @@ export default function Organizations() {
       .substring(0, 2);
   };
 
+  const handleViewDetails = async (userId: string) => {
+    setIsModalOpen(true);
+    setIsDetailsLoading(true);
+    setSelectedUserDetails(null); // Reset previous details
+    try {
+      const response = await getUserDetails(userId);
+      if (response?.data) {
+        setSelectedUserDetails(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+    } finally {
+      setIsDetailsLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -120,7 +143,7 @@ export default function Organizations() {
             Users
           </h1>
           <p className="text-zinc-500">
-            Manage all users and their organization memberships.
+            Manage all users and their workspace memberships.
           </p>
         </div>
         <div className="relative w-full sm:w-auto">
@@ -140,7 +163,7 @@ export default function Organizations() {
             <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
               <TableHead className="w-[250px] text-zinc-400">User</TableHead>
               <TableHead className="text-zinc-400">Email</TableHead>
-              <TableHead className="text-zinc-400">Organizations</TableHead>
+              <TableHead className="text-zinc-400">Workspaces</TableHead>
               <TableHead className="text-zinc-400">Joined</TableHead>
               <TableHead className="text-right text-zinc-400">
                 Actions
@@ -150,11 +173,8 @@ export default function Organizations() {
           <TableBody>
             {loading ? (
               <TableRow className="border-zinc-800">
-                <TableCell colSpan={5} className="h-24 text-center">
-                  <div className="flex items-center justify-center gap-2 text-zinc-500">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading users...
-                  </div>
+                <TableCell colSpan={5} className="h-64 text-center">
+                  <Loader text="Loading users..." />
                 </TableCell>
               </TableRow>
             ) : users.length === 0 ? (
@@ -194,23 +214,23 @@ export default function Organizations() {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {user.organizations.length > 0 ? (
-                        user.organizations.map((org) => (
+                      {user.workspaces.length > 0 ? (
+                        user.workspaces.map((workspace) => (
                           <Badge
-                            key={org.organizationId}
+                            key={workspace.workspaceId}
                             variant="outline"
                             className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50"
                           >
                             <Building2 className="h-3 w-3 mr-1" />
-                            {org.name}{" "}
+                            {workspace.name}{" "}
                             <span className="text-zinc-500 ml-1 text-[10px]">
-                              ({org.role})
+                              ({workspace.role})
                             </span>
                           </Badge>
                         ))
                       ) : (
                         <span className="text-zinc-600 text-xs italic">
-                          No organizations
+                          No workspaces
                         </span>
                       )}
                     </div>
@@ -237,7 +257,10 @@ export default function Organizations() {
                         className="bg-zinc-900 border-zinc-800 text-zinc-200"
                       >
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white">
+                        <DropdownMenuItem
+                          className="focus:bg-zinc-800 focus:text-white"
+                          onClick={() => handleViewDetails(user.userId)}
+                        >
                           View details
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-zinc-800" />
@@ -290,6 +313,13 @@ export default function Organizations() {
           </Button>
         </div>
       </div>
-    </motion.div>
+
+      <UserDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        user={selectedUserDetails}
+        loading={isDetailsLoading}
+      />
+    </motion.div >
   );
 }

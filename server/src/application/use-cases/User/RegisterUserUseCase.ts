@@ -6,15 +6,15 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
-import { TokenEnums } from "shared";
+
+import { AuthProvider, TokenEnums } from "shared";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _uidGenerator: IUidGenerator,
     private readonly _tokenService: ITokenService,
-  ) {}
+  ) { }
 
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
     const now = new Date();
@@ -51,7 +51,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         email: newUser.email,
         isSuperAdmin: newUser.isSuperAdmin,
         isOnboarded: newUser.isOnboarded,
-        currentOrganizationId: newUser.currentOrganizationId,
+        currentWorkspaceId: newUser.currentWorkspaceId,
       },
       accessToken,
       refreshToken,

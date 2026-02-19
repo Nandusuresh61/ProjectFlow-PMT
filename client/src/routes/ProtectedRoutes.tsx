@@ -1,5 +1,6 @@
 import { AuthUserState } from "@/store/auth.store";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Loader } from "@/components/ui/Loader";
 
 export default function ProtectedRoutes() {
   const isAuthenticated = AuthUserState((state) => state.isAuthenticated);
@@ -8,7 +9,7 @@ export default function ProtectedRoutes() {
   const location = useLocation();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loader fullScreen />;
   }
 
   if (!isAuthenticated) {

@@ -1,4 +1,4 @@
-import { Membership } from "@/domain/entities/membership/Membership";
+import { Membership } from "@/domain/entities/Membership";
 
 
 export interface IMembershipRepository {

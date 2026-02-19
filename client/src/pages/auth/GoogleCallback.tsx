@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { googleAuth } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
+import { Loader } from "@/components/ui/Loader";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
@@ -42,12 +43,5 @@ export default function GoogleCallback() {
     handleGoogleAuth();
   }, [navigate, setUser, setLoading]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-black text-white">
-      <div className="flex flex-col items-center gap-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
-        <p>Signing you in with Google...</p>
-      </div>
-    </div>
-  );
+  return <Loader fullScreen text="Authenticating..." />;
 }

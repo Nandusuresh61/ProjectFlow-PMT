@@ -1,4 +1,5 @@
-import { AuthProvider } from "./auth/authProvider";
+import { AuthProvider } from "shared";
+
 
 export interface User {
     userId: string;
@@ -8,7 +9,7 @@ export interface User {
     authProvider: AuthProvider;
     providerId?: string;
     isOnboarded: boolean;
-    currentOrganizationId?: string;
+    currentWorkspaceId?: string;
     isSuperAdmin: boolean;
     createdAt: Date
     updatedAt: Date

@@ -13,7 +13,7 @@ export type UserAuthResponseDto = {
     email: string;
     isSuperAdmin: boolean;
     isOnboarded: boolean,
-    currentOrganizationId: string,
+    currentWorkspaceId: string,
   };
   accessToken: string;
   refreshToken: string;
@@ -41,13 +41,13 @@ export type ResetPasswordRequestDto = {
 };
 
 
-export interface UserWithOrganizationsDTO {
+export interface UserWithWorkspacesDTO {
   userId: string;
   fullName: string;
   email: string;
   createdAt: Date;
-  organizations: {
-    organizationId: string;
+  workspaces: {
+    workspaceId: string;
     name: string;
     role: string;
   }[];
@@ -62,9 +62,26 @@ export interface UserQueryOptions {
 }
 
 export interface PaginatedUsersResult {
-  users: UserWithOrganizationsDTO[];
+  users: UserWithWorkspacesDTO[];
   total: number;
   page: number;
   limit: number;
   pages: number;
+}
+
+export interface UserWorkspaceDetails {
+  workspaceId: string;
+  name: string;
+  role: string;
+  planName: string;
+  ownerName: string;
+  memberCount: number;
+}
+
+export interface UserDetailsDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  createdAt: Date;
+  workspaces: UserWorkspaceDetails[];
 }

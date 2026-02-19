@@ -1,11 +1,17 @@
 import { UserModel, UserDoc } from "../database/models/MongoUserModel";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
-import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
+import { UserQueryOptions, PaginatedUsersResult, UserDetailsDto } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
 
-export class MongoUserRepository implements IUserRepository {
-  private toEntity(doc: UserDoc): User {
+import { MongoBaseRepository } from "./MongoBaseRepository";
+import { AuthProvider } from "shared";
+
+export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> implements IUserRepository {
+  constructor() {
+    super(UserModel);
+  }
+
+  protected mapToEntity(doc: UserDoc): User {
     return {
       userId: doc.userId,
       fullName: doc.fullName,
@@ -14,7 +20,7 @@ export class MongoUserRepository implements IUserRepository {
       authProvider: doc.authProvider as AuthProvider,
       providerId: doc.providerId,
       isOnboarded: doc.isOnboarded,
-      currentOrganizationId: doc.currentOrganizationId,
+      currentWorkspaceId: doc.currentWorkspaceId,
       isSuperAdmin: doc.isSuperAdmin,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
@@ -22,16 +28,15 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<User> {
-    const user = await UserModel.findOne({ userId: id });
+    const user = await this.findOne({ userId: id });
     if (!user) {
       throw new Error("User not found");
     }
-    return this.toEntity(user);
+    return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await UserModel.findOne({ email });
-    return user ? this.toEntity(user) : null;
+    return this.findOne({ email });
   }
 
   async createUser(user: User): Promise<User> {
@@ -39,15 +44,14 @@ export class MongoUserRepository implements IUserRepository {
       ...user,
       authProvider: user.authProvider as string,
     };
-    const newUser = await UserModel.create(userDoc);
-    return this.toEntity(newUser);
+    return this.create(userDoc);
   }
 
   async updatePasswordByEmail(
     email: string,
     passwordHash: string,
   ): Promise<void> {
-    await UserModel.updateOne(
+    await this.updateOne(
       { email },
       {
         $set: {
@@ -59,7 +63,7 @@ export class MongoUserRepository implements IUserRepository {
   }
 
   async update(user: User): Promise<void> {
-    await UserModel.updateOne(
+    await this.updateOne(
       { userId: user.userId },
       {
         fullName: user.fullName,
@@ -68,13 +72,14 @@ export class MongoUserRepository implements IUserRepository {
         authProvider: user.authProvider as string,
         providerId: user.providerId,
         isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),
-      },
+      }
     );
   }
-  async getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult> {
+
+  async getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult> {
     const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = options;
     const skip = (page - 1) * limit;
 
@@ -89,7 +94,7 @@ export class MongoUserRepository implements IUserRepository {
     const sortStage: any = {};
     sortStage[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const result = await UserModel.aggregate([
+    const result = await this.model.aggregate([
       { $match: matchStage },
       { $sort: sortStage },
       {
@@ -107,10 +112,10 @@ export class MongoUserRepository implements IUserRepository {
             },
             {
               $lookup: {
-                from: "organizations",
-                localField: "memberships.organizationId",
-                foreignField: "organizationId",
-                as: "organizationsData",
+                from: "workspaces",
+                localField: "memberships.workspaceId",
+                foreignField: "workspaceId",
+                as: "workspacesData",
               },
             },
           ],
@@ -124,14 +129,14 @@ export class MongoUserRepository implements IUserRepository {
       fullName: user.fullName,
       email: user.email,
       createdAt: user.createdAt,
-      organizations: user.memberships.map((membership: any) => {
-        const org = user.organizationsData.find(
-          (o: any) => o.organizationId === membership.organizationId,
+      workspaces: user.memberships.map((membership: any) => {
+        const workspace = user.workspacesData.find(
+          (o: any) => o.workspaceId === membership.workspaceId,
         );
 
         return {
-          organizationId: membership.organizationId,
-          name: org?.name || "Unknown",
+          workspaceId: membership.workspaceId,
+          name: workspace?.name || "Unknown",
           role: membership.role,
         };
       }),
@@ -146,5 +151,108 @@ export class MongoUserRepository implements IUserRepository {
       limit,
       pages: Math.ceil(total / limit),
     };
+  }
+  async getUserDetails(userId: string): Promise<UserDetailsDto | null> {
+    const result = await this.model.aggregate([
+      { $match: { userId } },
+      {
+        $lookup: {
+          from: "memberships",
+          localField: "userId",
+          foreignField: "userId",
+          as: "memberships",
+        },
+      },
+      { $unwind: "$memberships" },
+      {
+        $lookup: {
+          from: "workspaces",
+          localField: "memberships.workspaceId",
+          foreignField: "workspaceId",
+          as: "workspace",
+        },
+      },
+      { $unwind: "$workspace" },
+      {
+        $lookup: {
+          from: "plans",
+          localField: "workspace.planId",
+          foreignField: "planId",
+          as: "plan",
+        },
+      },
+      {
+        $unwind: {
+          path: "$plan",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "workspace.ownerId",
+          foreignField: "userId",
+          as: "owner",
+        },
+      },
+      {
+        $unwind: {
+          path: "$owner",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "memberships",
+          localField: "workspace.workspaceId",
+          foreignField: "workspaceId",
+          pipeline: [{ $count: "count" }],
+          as: "memberCount",
+        },
+      },
+      {
+        $addFields: {
+          memberCount: {
+            $ifNull: [{ $arrayElemAt: ["$memberCount.count", 0] }, 0],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+          userId: { $first: "$userId" },
+          fullName: { $first: "$fullName" },
+          email: { $first: "$email" },
+          createdAt: { $first: "$createdAt" },
+          workspaces: {
+            $push: {
+              workspaceId: "$workspace.workspaceId",
+              name: "$workspace.name",
+              role: "$memberships.role",
+              planName: { $ifNull: ["$plan.name", "Unknown"] },
+              ownerName: { $ifNull: ["$owner.fullName", "Unknown"] },
+              memberCount: "$memberCount",
+            },
+          },
+        },
+      },
+    ]);
+
+    if (!result || result.length === 0) {
+      // If user has no workspaces, they won't appear in the aggregation because of $unwind "$memberships"
+      // Fallback: fetch user basic details
+      const user = await this.model.findOne({ userId });
+      if (!user) return null;
+
+      return {
+        userId: user.userId,
+        fullName: user.fullName,
+        email: user.email,
+        createdAt: user.createdAt,
+        workspaces: [],
+      };
+    }
+
+    return result[0];
   }
 }

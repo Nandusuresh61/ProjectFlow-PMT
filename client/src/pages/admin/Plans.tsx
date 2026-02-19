@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Check, Loader2, X } from "lucide-react";
+import { Plus, Check, X } from "lucide-react";
+import { Loader } from "@/components/ui/Loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -150,7 +151,7 @@ export default function Plans() {
             Subscription Plans
           </h1>
           <p className="text-zinc-500">
-            Manage billing plans and features for organizations.
+            Manage billing plans and features for workspaces.
           </p>
         </div>
 
@@ -296,7 +297,7 @@ export default function Plans() {
                 disabled={loading}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader size="sm" variant="white" className="mr-2" />}
                 Create Plan
               </Button>
             </DialogFooter>

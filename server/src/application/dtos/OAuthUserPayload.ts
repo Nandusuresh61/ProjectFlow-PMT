@@ -1,4 +1,5 @@
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
+import { AuthProvider } from "shared";
+
 
 export interface OAuthUserPayload {
   email: string;

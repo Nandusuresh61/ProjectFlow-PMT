@@ -11,7 +11,11 @@ import onboardingRoutes from "@/presentation/routes/OnboardingRoutes"
 import superAdminRoutes from "@/presentation/routes/superAdminRoutes"
 
 
+import morgan from 'morgan';
+
 const app = express();
+
+app.use(morgan('dev'));
 connectDB();
 connectRedis();
 
@@ -27,7 +31,7 @@ app.use(cookieParser());
 app.use('/api/auth', userRoutes)
 app.use('/api/plan', planRoutes)
 app.use('/api/onboarding', onboardingRoutes)
-app.use('/api/super-admin',superAdminRoutes)
+app.use('/api/super-admin', superAdminRoutes)
 
 app.use(errorMiddleware);
 

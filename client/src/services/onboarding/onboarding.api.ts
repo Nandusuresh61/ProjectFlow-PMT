@@ -5,8 +5,8 @@ import type { ApiResponse } from "@/types/auth.types";
 
 export const completeOnboarding = async (
   payload: CompleteOnboardingPayload,
-): Promise<ApiResponse<{ organizationId: string }>> => {
-  const { data } = await API.post<ApiResponse<{ organizationId: string }>>(
+): Promise<ApiResponse<{ workspaceId: string }>> => {
+  const { data } = await API.post<ApiResponse<{ workspaceId: string }>>(
     "/onboarding/complete",
     payload,
   );

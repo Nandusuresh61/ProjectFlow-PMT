@@ -32,6 +32,7 @@ var index_exports = {};
 __export(index_exports, {
   AppError: () => AppError,
   AppMessages: () => AppMessages,
+  AuthProvider: () => AuthProvider,
   CompleteOnboardingSchema: () => CompleteOnboardingSchema,
   CreatePlanSchema: () => CreatePlanSchema,
   EmailType: () => EmailType,
@@ -39,12 +40,12 @@ __export(index_exports, {
   ForgotEmailSchema: () => ForgotEmailSchema,
   HttpStatusCode: () => HttpStatusCode,
   LoginUserSchema: () => LoginUserSchema,
-  OrganizationRoleEnum: () => OrganizationRoleEnum,
   RegisterUserSchema: () => RegisterUserSchema,
   ResetPasswordSchema: () => ResetPasswordSchema,
   ResponseHandler: () => ResponseHandler,
   TokenEnums: () => TokenEnums,
-  TokenPayloadSchema: () => TokenPayloadSchema
+  TokenPayloadSchema: () => TokenPayloadSchema,
+  WorkspaceRoleEnum: () => WorkspaceRoleEnum
 });
 module.exports = __toCommonJS(index_exports);
 
@@ -56,6 +57,7 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
+  ErrorCode2["RESOURCE_NOT_FOUND"] = "Resource Not Found";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -99,12 +101,19 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
   return EmailType2;
 })(EmailType || {});
 
-// src/enums/OrganizationRolesEnum.ts
-var OrganizationRoleEnum = /* @__PURE__ */ ((OrganizationRoleEnum2) => {
-  OrganizationRoleEnum2["ORG_ADMIN"] = "ORG_ADMIN";
-  OrganizationRoleEnum2["MEMBER"] = "MEMBER";
-  return OrganizationRoleEnum2;
-})(OrganizationRoleEnum || {});
+// src/enums/WorkspaceRolesEnum.ts
+var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
+  WorkspaceRoleEnum2["WORKSPACE_ADMIN"] = "WORKSPACE_ADMIN";
+  WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
+  return WorkspaceRoleEnum2;
+})(WorkspaceRoleEnum || {});
+
+// src/enums/AuthProviders.ts
+var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
+  AuthProvider2["LOCAL"] = "LOCAL";
+  AuthProvider2["GOOGLE"] = "GOOGLE";
+  return AuthProvider2;
+})(AuthProvider || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -249,6 +258,7 @@ var ResponseHandler = {
 0 && (module.exports = {
   AppError,
   AppMessages,
+  AuthProvider,
   CompleteOnboardingSchema,
   CreatePlanSchema,
   EmailType,
@@ -256,10 +266,10 @@ var ResponseHandler = {
   ForgotEmailSchema,
   HttpStatusCode,
   LoginUserSchema,
-  OrganizationRoleEnum,
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,
   TokenEnums,
-  TokenPayloadSchema
+  TokenPayloadSchema,
+  WorkspaceRoleEnum
 });

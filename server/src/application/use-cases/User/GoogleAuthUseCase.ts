@@ -3,10 +3,11 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import { AuthProvider } from "@/domain/entities/auth/authProvider";
+
 import {
   AppError,
   AppMessages,
+  AuthProvider,
   ErrorCode,
   HttpStatusCode,
   TokenEnums,
@@ -17,7 +18,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _uidGenerator: IUidGenerator,
-  ) {}
+  ) { }
 
   async execute(payload: OAuthUserPayload) {
     if (payload.provider !== AuthProvider.GOOGLE) {
@@ -68,7 +69,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
         isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
       },
       accessToken,
       refreshToken,
