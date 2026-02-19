@@ -11,7 +11,11 @@ import onboardingRoutes from "@/presentation/routes/OnboardingRoutes"
 import superAdminRoutes from "@/presentation/routes/superAdminRoutes"
 
 
+import morgan from 'morgan';
+
 const app = express();
+
+app.use(morgan('dev'));
 connectDB();
 connectRedis();
 
