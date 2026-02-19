@@ -5,7 +5,6 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-// import { ScrollArea } from "@/components/ui/scroll-area";
 import { Building2, Crown, Users, CreditCard, Mail, Calendar } from "lucide-react";
 import type { UserDetails } from "@/types/superadmin.types";
 import { Loader } from "@/components/ui/Loader";
