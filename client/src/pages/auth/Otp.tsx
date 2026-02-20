@@ -1,28 +1,43 @@
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { AuthUserState } from "@/store/auth.store";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
+import { Logo } from "@/components/common/Logo";
+import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+
+type OtpValues = { otp: string };
+
+const fields: FormField<OtpValues>[] = [
+  {
+    name: "otp",
+    label: "One-Time Password",
+    type: "text",
+    placeholder: "123456",
+    inputClassName:
+      "text-center text-2xl tracking-[0.5em] font-mono h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20",
+    inputProps: { maxLength: 6, inputMode: "numeric", pattern: "[0-9]*" },
+  },
+];
+
+const INITIAL_VALUES: OtpValues = { otp: "" };
 
 export default function Otp() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
   const setUser = AuthUserState((state) => state.setUser);
   const navigate = useNavigate();
-  const [otpInput, setOtpinput] = useState("");
   const [timer, setTimer] = useState(60);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    }
+    if (!pendingEmail) navigate("/signup");
+  }, [pendingEmail, navigate]);
+
+  useEffect(() => {
+    if (timer <= 0) return;
+    const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     return () => clearInterval(interval);
   }, [timer]);
 
@@ -33,23 +48,16 @@ export default function Otp() {
     }
     try {
       const response = await resendOtp({ email: pendingEmail });
-
       toast.success(response.message);
       setTimer(60);
     } catch (error: any) {
-      toast.error(error.message || "Failed to send otp!");
+      toast.error(error.message || "Failed to send OTP!");
     }
   };
 
-  useEffect(() => {
-    if (!pendingEmail) {
-      navigate("/signup");
-    }
-  }, [pendingEmail, navigate]);
-
-  const handleSubmit = async () => {
-    if (otpInput.length !== 6) {
-      toast.error("Otp must be 6 digits!");
+  const handleSubmit = async (values: OtpValues) => {
+    if (values.otp.length !== 6) {
+      toast.error("OTP must be 6 digits!");
       return;
     }
     if (!pendingEmail) {
@@ -57,42 +65,46 @@ export default function Otp() {
       navigate("/signup");
       return;
     }
-
     try {
-      const response = await verifyUserOtp({
-        email: pendingEmail,
-        otp: otpInput,
-      });
+      const response = await verifyUserOtp({ email: pendingEmail, otp: values.otp });
       setUser(response.data!.user);
       toast.success(response.message);
-      setTimeout(() => {
-        navigate("/home");
-      }, 300);
+      setTimeout(() => navigate("/home"), 300);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
+  const ResendFooter = (
+    <div className="text-center text-sm">
+      <span className="text-slate-500">Didn't receive the code? </span>
+      {timer > 0 ? (
+        <span className="text-slate-500">Resend in {timer}s</span>
+      ) : (
+        <button
+          type="button"
+          onClick={handleResend}
+          className="text-white underline hover:text-slate-200 transition-colors"
+        >
+          Click to resend
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
       <GridBackground />
 
-      {/* Navbar Minimal */}
       <nav className="relative z-10 p-6 flex items-center justify-between">
-        <Link
-          to="/"
-          className="flex items-center gap-2 font-bold text-xl tracking-tighter group"
-        >
-          <div className="bg-white text-black w-8 h-8 flex items-center justify-center rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
-            PF
-          </div>
-          <span className="text-white">ProjectFlow</span>
+        <Link to="/" className="group">
+          <Logo
+            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            textClassName="text-white"
+          />
         </Link>
         <Link to="/login">
-          <Button
-            variant="ghost"
-            className="text-slate-400 hover:text-white hover:bg-white/5"
-          >
+          <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5">
             Log in
           </Button>
         </Link>
@@ -106,53 +118,22 @@ export default function Otp() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              Verify your email
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">Verify your email</h1>
             <p className="text-slate-500">
               We've sent a code to{" "}
               <span className="text-white font-medium">{pendingEmail}</span>
             </p>
           </div>
 
-          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 space-y-6 shadow-2xl backdrop-blur-sm">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="otp" className="text-slate-400">
-                  One-Time Password
-                </Label>
-                <Input
-                  id="otp"
-                  placeholder="123456"
-                  value={otpInput}
-                  onChange={(e) => setOtpinput(e.target.value)}
-                  type="text"
-                  maxLength={6}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20 text-center text-2xl tracking-[0.5em] font-mono h-14"
-                />
-              </div>
-            </div>
-
-            <Button
-              onClick={handleSubmit}
-              className="w-full font-bold h-12 bg-white text-black hover:bg-slate-200"
-            >
-              Verify Email
-            </Button>
-
-            <div className="text-center text-sm">
-              <span className="text-slate-500">Didn't receive the code? </span>
-              {timer > 0 ? (
-                <span className="text-slate-500">Resend in {timer}s</span>
-              ) : (
-                <button
-                  onClick={handleResend}
-                  className="text-white underline hover:text-slate-200"
-                >
-                  Click to resend
-                </button>
-              )}
-            </div>
+          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+            <CustomForm
+              fields={fields}
+              initialValues={INITIAL_VALUES}
+              onSubmit={handleSubmit}
+              submitLabel="Verify Email"
+              loadingLabel="Verifying..."
+              footer={ResendFooter}
+            />
           </div>
         </motion.div>
       </main>

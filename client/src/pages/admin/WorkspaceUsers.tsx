@@ -10,14 +10,6 @@ import {
   Calendar,
 } from "lucide-react";
 import { Loader } from "@/components/ui/Loader";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +26,7 @@ import {
 import { getAllUsers, getUserDetails } from "@/services/superAdmin/superadmin.api";
 import { UserDetailsModal } from "@/components/admin/UserDetailsModal";
 import type { UserDetails } from "@/types/superadmin.types";
+import CustomTable, { type TableColumn } from "@/components/table/CustomTable";
 
 interface Workspace {
   workspaceId: string;
@@ -49,6 +42,13 @@ interface User {
   workspaces: Workspace[];
 }
 
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .substring(0, 2);
 
 export default function Workspaces() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -87,7 +87,6 @@ export default function Workspaces() {
         });
 
         const data = response?.data;
-
         if (data) {
           setUsers(data.users || []);
           setTotalUsers(data.total || 0);
@@ -105,19 +104,10 @@ export default function Workspaces() {
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2);
-  };
-
   const handleViewDetails = async (userId: string) => {
     setIsModalOpen(true);
     setIsDetailsLoading(true);
-    setSelectedUserDetails(null); // Reset previous details
+    setSelectedUserDetails(null);
     try {
       const response = await getUserDetails(userId);
       if (response?.data) {
@@ -130,6 +120,167 @@ export default function Workspaces() {
     }
   };
 
+  // ── Column definitions ────────────────────────────────────────────────────
+  const columns: TableColumn<User>[] = [
+    {
+      key: "fullName",
+      header: "User",
+      headerClassName: "w-[250px] text-zinc-400",
+      cellClassName: "text-zinc-200",
+      render: (user) => (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border border-zinc-800">
+            <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
+              {getInitials(user.fullName)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="font-medium text-zinc-200">{user.fullName}</span>
+        </div>
+      ),
+    },
+    {
+      key: "email",
+      header: "Email",
+      headerClassName: "text-zinc-400",
+      cellClassName: "text-zinc-400",
+      render: (user) => (
+        <div className="flex items-center gap-2 text-sm">
+          <Mail className="h-3 w-3" />
+          {user.email}
+        </div>
+      ),
+    },
+    {
+      key: "workspaces",
+      header: "Workspaces",
+      headerClassName: "text-zinc-400",
+      render: (user) => (
+        <div className="flex flex-wrap gap-1">
+          {user.workspaces.length > 0 ? (
+            user.workspaces.map((workspace) => (
+              <Badge
+                key={workspace.workspaceId}
+                variant="outline"
+                className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50"
+              >
+                <Building2 className="h-3 w-3 mr-1" />
+                {workspace.name}
+                <span className="text-zinc-500 ml-1 text-[10px]">({workspace.role})</span>
+              </Badge>
+            ))
+          ) : (
+            <span className="text-zinc-600 text-xs italic">No workspaces</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Joined",
+      headerClassName: "text-zinc-400",
+      cellClassName: "text-zinc-500",
+      render: (user) => (
+        <div className="flex items-center gap-1 text-sm">
+          <Calendar className="h-3 w-3" />
+          {new Date(user.createdAt).toLocaleDateString()}
+        </div>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      headerClassName: "text-right text-zinc-400",
+      cellClassName: "text-right",
+      render: (user) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-zinc-800"
+            >
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="bg-zinc-900 border-zinc-800 text-zinc-200"
+          >
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem
+              className="focus:bg-zinc-800 focus:text-white"
+              onClick={() => handleViewDetails(user.userId)}
+            >
+              View details
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">
+              Block user
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ];
+
+  // ── Toolbar: search input ─────────────────────────────────────────────────
+  const toolbar = (
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-white">Users</h1>
+        <p className="text-zinc-500">Manage all users and their workspace memberships.</p>
+      </div>
+      <div className="relative w-full sm:w-auto">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
+        <Input
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-9 w-full sm:w-64 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-green-500 focus:border-green-500"
+        />
+      </div>
+    </div>
+  );
+
+  // ── Footer: server-side pagination controls ───────────────────────────────
+  const footer = (
+    <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
+      <div className="text-sm text-zinc-500">
+        Showing{" "}
+        <span className="font-medium text-zinc-300">
+          {totalUsers > 0 ? startIndex + 1 : 0}
+        </span>{" "}
+        to{" "}
+        <span className="font-medium text-zinc-300">
+          {Math.min(startIndex + itemsPerPage, totalUsers)}
+        </span>{" "}
+        of <span className="font-medium text-zinc-300">{totalUsers}</span> users
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+          className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+          className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
+        >
+          Next
+          <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -137,182 +288,24 @@ export default function Workspaces() {
       transition={{ duration: 0.3 }}
       className="space-y-6 text-zinc-100"
     >
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Users
-          </h1>
-          <p className="text-zinc-500">
-            Manage all users and their workspace memberships.
-          </p>
-        </div>
-        <div className="relative w-full sm:w-auto">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
-          <Input
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 w-full sm:w-64 bg-zinc-900 border-zinc-800 text-zinc-200 focus:ring-green-500 focus:border-green-500"
-          />
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-zinc-950/50">
-            <TableRow className="border-zinc-800 hover:bg-zinc-900/50">
-              <TableHead className="w-[250px] text-zinc-400">User</TableHead>
-              <TableHead className="text-zinc-400">Email</TableHead>
-              <TableHead className="text-zinc-400">Workspaces</TableHead>
-              <TableHead className="text-zinc-400">Joined</TableHead>
-              <TableHead className="text-right text-zinc-400">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow className="border-zinc-800">
-                <TableCell colSpan={5} className="h-64 text-center">
-                  <Loader text="Loading users..." />
-                </TableCell>
-              </TableRow>
-            ) : users.length === 0 ? (
-              <TableRow className="border-zinc-800">
-                <TableCell
-                  colSpan={5}
-                  className="h-24 text-center text-zinc-500"
-                >
-                  No users found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow
-                  key={user.userId}
-                  className="border-zinc-800 hover:bg-zinc-800/30 transition-colors"
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-9 w-9 border border-zinc-800">
-                        <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
-                          {getInitials(user.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="font-medium text-zinc-200">
-                          {user.fullName}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-zinc-400 text-sm">
-                      <Mail className="h-3 w-3" />
-                      {user.email}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {user.workspaces.length > 0 ? (
-                        user.workspaces.map((workspace) => (
-                          <Badge
-                            key={workspace.workspaceId}
-                            variant="outline"
-                            className="font-normal border-zinc-700 text-zinc-300 bg-zinc-800/50"
-                          >
-                            <Building2 className="h-3 w-3 mr-1" />
-                            {workspace.name}{" "}
-                            <span className="text-zinc-500 ml-1 text-[10px]">
-                              ({workspace.role})
-                            </span>
-                          </Badge>
-                        ))
-                      ) : (
-                        <span className="text-zinc-600 text-xs italic">
-                          No workspaces
-                        </span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1 text-zinc-500 text-sm">
-                      <Calendar className="h-3 w-3" />{" "}
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0 text-zinc-500 hover:text-white hover:bg-zinc-800"
-                        >
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="bg-zinc-900 border-zinc-800 text-zinc-200"
-                      >
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          className="focus:bg-zinc-800 focus:text-white"
-                          onClick={() => handleViewDetails(user.userId)}
-                        >
-                          View details
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-zinc-800" />
-                        <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">
-                          Block user
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
-        <div className="text-sm text-zinc-500">
-          Showing{" "}
-          <span className="font-medium text-zinc-300">
-            {totalUsers > 0 ? startIndex + 1 : 0}
-          </span>{" "}
-          to{" "}
-          <span className="font-medium text-zinc-300">
-            {Math.min(startIndex + itemsPerPage, totalUsers)}
-          </span>{" "}
-          of <span className="font-medium text-zinc-300">{totalUsers}</span>{" "}
-          users
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white disabled:opacity-50"
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        </div>
-      </div>
+      <CustomTable<User>
+        columns={columns}
+        data={users}
+        rowKey={(user) => user.userId}
+        isLoading={loading}
+        skeletonRows={itemsPerPage}
+        emptyState={
+          <div className="h-24 flex items-center justify-center text-zinc-500">
+            No users found.
+          </div>
+        }
+        tableClassName="bg-zinc-900"
+        className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-sm overflow-hidden"
+        toolbar={toolbar}
+        footer={footer}
+        // Pagination is server-side — handled via the footer slot above
+        paginate={false}
+      />
 
       <UserDetailsModal
         isOpen={isModalOpen}
@@ -320,6 +313,9 @@ export default function Workspaces() {
         user={selectedUserDetails}
         loading={isDetailsLoading}
       />
-    </motion.div >
+
+      {/* Loading overlay kept for screen reader accessibility */}
+      {loading && <span className="sr-only"><Loader text="Loading users..." /></span>}
+    </motion.div>
   );
 }

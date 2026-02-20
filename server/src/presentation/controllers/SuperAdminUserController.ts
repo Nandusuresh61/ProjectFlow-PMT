@@ -39,7 +39,7 @@ export class SuperAdminUserController {
     if (!result) {
       throw new AppError(
         ErrorCode.RESOURCE_NOT_FOUND,
-        "User not found",
+        AppMessages.USER_NOT_FOUND,
         HttpStatusCode.NOT_FOUND
       );
     }
@@ -47,7 +47,7 @@ export class SuperAdminUserController {
     res
       .status(HttpStatusCode.OK)
       .json(
-        ResponseHandler.success("User details fetched successfully", result),
+        ResponseHandler.success(AppMessages.USER_FETCHING_SUCCESSFUL, result),
       );
   });
 }
