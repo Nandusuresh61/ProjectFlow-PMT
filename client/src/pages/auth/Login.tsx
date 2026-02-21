@@ -26,7 +26,7 @@ const fields: FormField<LoginValues>[] = [
     labelSuffix: (
       <Link
         to="/forgot-password"
-        className="text-xs text-slate-500 hover:text-white transition-colors underline-offset-4 hover:underline"
+        className="text-xs text-[#576CBC]/60 hover:text-[#A5D7E8] transition-colors underline-offset-4 hover:underline"
       >
         Forgot password?
       </Link>
@@ -43,7 +43,7 @@ const OAuthFooter = (
         <span className="w-full border-t border-white/10" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-[#0A0A0A] px-2 text-slate-500">Or continue with</span>
+        <span className="bg-[#060c16] px-2 text-[#576CBC]/60 font-bold tracking-widest">Or continue with</span>
       </div>
     </div>
     <GoogleAuthButton />
@@ -69,18 +69,18 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">
       <GridBackground />
 
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link to="/" className="group">
           <Logo
-            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            iconClassName="bg-[#A5D7E8] text-[#0B2447] shadow-[0_0_20px_rgba(165,215,232,0.2)] group-hover:scale-110 transition-transform"
             textClassName="text-white"
           />
         </Link>
         <Link to="/signup">
-          <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5">
+          <Button variant="ghost" className="text-[#576CBC]/60 hover:text-white hover:bg-white/5">
             Sign up
           </Button>
         </Link>
@@ -94,11 +94,11 @@ export default function Login() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-            <p className="text-slate-500">Enter your credentials to access your account</p>
+            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Welcome back</h1>
+            <p className="text-[#576CBC]/60 font-medium">Initialize session protocols to continue.</p>
           </div>
 
-          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-3xl p-10 shadow-3xl backdrop-blur-md">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
@@ -111,9 +111,9 @@ export default function Login() {
             />
           </div>
 
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-[#576CBC]/60 font-medium">
             Don't have an account?{" "}
-            <Link to="/signup" className="underline hover:text-white">
+            <Link to="/signup" className="text-[#A5D7E8] font-bold hover:underline underline-offset-4">
               Sign up
             </Link>
           </p>

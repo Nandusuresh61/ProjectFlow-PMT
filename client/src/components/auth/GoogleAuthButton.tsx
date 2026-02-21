@@ -18,7 +18,7 @@ export const GoogleAuthButton = () => {
     return (
         <Button
             variant="outline"
-            className="w-full border-white/10 bg-transparent hover:bg-white/5 text-white hover:text-white"
+            className="w-full border-[#576CBC]/20 bg-white/5 hover:bg-white/10 hover:border-[#A5D7E8]/30 text-white hover:text-white transition-all"
             type="button"
             onClick={handleGoogleLogin}
         >

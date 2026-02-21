@@ -1,0 +1,73 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { AuthUserState } from '@/store/auth.store';
+import { logoutUser } from '@/services/auth/auth.api';
+import { BackgroundAtmosphere } from './components/BaseComponents';
+import { Sidebar, Header } from './components/LayoutComponents';
+import { DashboardView } from './views/DashboardView';
+import { TeamView } from './views/TeamView';
+import { PlaceholderView, InviteModal } from './views/ComplementaryViews';
+
+export default function WorkspaceHome() {
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const user = AuthUserState((state) => state.user);
+    const clearUser = AuthUserState((state) => state.clearUser);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            const response = await logoutUser();
+            toast.success(response.message || "Logged out successfully");
+            setTimeout(() => {
+                clearUser();
+                navigate('/login');
+            }, 800);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to logout");
+            setIsLoggingOut(false);
+        }
+    };
+
+    return (
+        <div className="flex min-h-screen bg-[#060c16] font-sans text-white selection:bg-[#A5D7E8] selection:text-[#0B2447] overflow-x-hidden">
+            <BackgroundAtmosphere />
+
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+
+            <main className="flex-1 flex flex-col min-w-0">
+                <Header activeTab={activeTab} user={user} onLogout={handleLogout} />
+
+                <div className="p-12 lg:p-24 max-w-[1700px] mx-auto w-full">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, scale: 0.95, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 1.05, y: -50 }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                        >
+                            {activeTab === 'dashboard' ? (
+                                <DashboardView openInvite={() => setIsInviteModalOpen(true)} />
+                            ) : activeTab === 'team' ? (
+                                <TeamView openInvite={() => setIsInviteModalOpen(true)} />
+                            ) : (
+                                <PlaceholderView activeTab={activeTab} setActiveTab={setActiveTab} />
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </main>
+
+            <InviteModal
+                isOpen={isInviteModalOpen}
+                onClose={() => setIsInviteModalOpen(false)}
+            />
+        </div>
+    );
+}

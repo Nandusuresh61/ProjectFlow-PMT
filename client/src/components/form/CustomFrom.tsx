@@ -191,7 +191,7 @@ function CustomForm<T extends Record<string, string>>({
                             <div className="flex items-center justify-between">
                                 <Label
                                     htmlFor={field.name}
-                                    className="text-slate-400 text-sm font-medium"
+                                    className="text-[#576CBC]/60 text-sm font-bold uppercase tracking-widest"
                                 >
                                     {field.label}
                                 </Label>
@@ -208,7 +208,7 @@ function CustomForm<T extends Record<string, string>>({
                                     onBlur={handleBlur(field.name)}
                                     placeholder={field.placeholder ?? "••••••••"}
                                     className={cn(
-                                        "bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20",
+                                        "bg-[#19376D]/10 border-[#576CBC]/20 text-white placeholder:text-[#576CBC]/40 focus-visible:ring-[#A5D7E8]/20 focus-visible:border-[#A5D7E8]/50",
                                         showError && "border-red-500/60 focus-visible:ring-red-500/30",
                                         field.inputClassName
                                     )}
@@ -224,7 +224,7 @@ function CustomForm<T extends Record<string, string>>({
                                     onBlur={handleBlur(field.name)}
                                     placeholder={field.placeholder}
                                     className={cn(
-                                        "bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20",
+                                        "bg-[#19376D]/10 border-[#576CBC]/20 text-white placeholder:text-[#576CBC]/40 focus-visible:ring-[#A5D7E8]/20 focus-visible:border-[#A5D7E8]/50 transition-all",
                                         showError && "border-red-500/60 focus-visible:ring-red-500/30",
                                         field.inputClassName
                                     )}
@@ -248,7 +248,7 @@ function CustomForm<T extends Record<string, string>>({
                 type="submit"
                 disabled={loading}
                 className={cn(
-                    "w-full font-bold h-12 bg-white text-black hover:bg-slate-200 mt-6",
+                    "w-full font-bold h-12 bg-[#A5D7E8] text-[#0B2447] hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.3)] mt-6",
                     submitClassName
                 )}
             >
