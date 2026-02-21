@@ -28,4 +28,15 @@ export class MembershipRepository extends MongoBaseRepository<Membership, Member
     };
     return super.create(membershipDoc);
   }
+
+  async findByUserAndWorkspace(
+  userId: string,
+  workspaceId: string
+): Promise<Membership | null> {
+  return this.findOne({ userId, workspaceId });
+}
+
+async countByWorkspace(workspaceId: string): Promise<number> {
+  return MembershipModel.countDocuments({ workspaceId });
+}
 }

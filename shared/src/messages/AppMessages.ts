@@ -76,5 +76,16 @@ export const AppMessages = {
 
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
 
-  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
+
+  WORKSPACE_NOT_FOUND: "Workspace not found",
+
+  INVITATION_SENT_SUCCESS: "Invitation sent success",
+
+  INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+  
+  MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
+
+  USER_ALREADY_MEMBER: "User Already Member in this workspace"
+
 } as const;

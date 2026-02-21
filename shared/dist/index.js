@@ -2,6 +2,7 @@
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
   ErrorCode2["PLAN"] = "Plan Error";
+  ErrorCode2["CONFLICT"] = "Conflit";
   ErrorCode2["ONBOARDING"] = "Onboarding Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
@@ -64,6 +65,15 @@ var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
   return AuthProvider2;
 })(AuthProvider || {});
 
+// src/enums/InvitationStatusEnum.ts
+var InvitationStatus = /* @__PURE__ */ ((InvitationStatus2) => {
+  InvitationStatus2["PENDING"] = "PENDING";
+  InvitationStatus2["ACCEPTED"] = "ACCEPTED";
+  InvitationStatus2["EXPIRED"] = "EXPIRED";
+  InvitationStatus2["CANCELLED"] = "CANCELLED";
+  return InvitationStatus2;
+})(InvitationStatus || {});
+
 // src/errors/AppError.ts
 var AppError = class extends Error {
   statusCode;
@@ -118,7 +128,12 @@ var AppMessages = {
   PLAN_STATUS_UPDATED: "Plan Status updated.",
   ONBOARDING_COMPLETED: "Onboarding completed successfully",
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
-  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
+  WORKSPACE_NOT_FOUND: "Workspace not found",
+  INVITATION_SENT_SUCCESS: "Invitation sent success",
+  INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+  MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
+  USER_ALREADY_MEMBER: "User Already Member in this workspace"
 };
 
 // src/schema/TokenPayload.ts
@@ -187,6 +202,13 @@ var CompleteOnboardingSchema = z7.object({
   planId: z7.string().trim().min(1, "Plan ID is required")
 });
 
+// src/schema/invitation/CreateInvitationSchema.ts
+import { z as z8 } from "zod";
+var CreateInvitationSchema = z8.object({
+  email: z8.string().email(),
+  role: z8.nativeEnum(WorkspaceRoleEnum)
+});
+
 // src/response/responseHandler.ts
 var ResponseHandler = {
   success(message, data) {
@@ -208,11 +230,13 @@ export {
   AppMessages,
   AuthProvider,
   CompleteOnboardingSchema,
+  CreateInvitationSchema,
   CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
   HttpStatusCode,
+  InvitationStatus,
   LoginUserSchema,
   RegisterUserSchema,
   ResetPasswordSchema,

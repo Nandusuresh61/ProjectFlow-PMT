@@ -3,6 +3,7 @@ import z, { z as z$1 } from 'zod';
 declare enum ErrorCode {
     AUTH = "Authentication Error",
     PLAN = "Plan Error",
+    CONFLICT = "Conflit",
     ONBOARDING = "Onboarding Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
@@ -54,6 +55,13 @@ declare enum AuthProvider {
     GOOGLE = "GOOGLE"
 }
 
+declare enum InvitationStatus {
+    PENDING = "PENDING",
+    ACCEPTED = "ACCEPTED",
+    EXPIRED = "EXPIRED",
+    CANCELLED = "CANCELLED"
+}
+
 declare class AppError extends Error {
     readonly statusCode: HttpStatusCode;
     readonly errorCode: ErrorCode;
@@ -101,6 +109,11 @@ declare const AppMessages: {
     readonly ONBOARDING_COMPLETED: "Onboarding completed successfully";
     readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
     readonly USER_FETCHING_SUCCESSFUL: "User Fetching Successfull";
+    readonly WORKSPACE_NOT_FOUND: "Workspace not found";
+    readonly INVITATION_SENT_SUCCESS: "Invitation sent success";
+    readonly INVITATION_ALREADY_SENT: " Invitation already sent to this email";
+    readonly MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded";
+    readonly USER_ALREADY_MEMBER: "User Already Member in this workspace";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -152,6 +165,11 @@ declare const CompleteOnboardingSchema: z$1.ZodObject<{
     planId: z$1.ZodString;
 }, z$1.core.$strip>;
 
+declare const CreateInvitationSchema: z$1.ZodObject<{
+    email: z$1.ZodString;
+    role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+}, z$1.core.$strip>;
+
 type SuccessResponse<T> = {
     success: true;
     message: string;
@@ -166,4 +184,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
