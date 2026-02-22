@@ -1,7 +1,14 @@
 import { motion } from 'framer-motion';
+import type { ReactNode } from 'react';
 
-export const Button = ({ children, variant = 'primary', className = '', ...props }: any) => {
-    const variants: any = {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    children: ReactNode;
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+    className?: string;
+}
+
+export const Button = ({ children, variant = 'primary', className = '', ...props }: ButtonProps) => {
+    const variants: Record<string, string> = {
         primary: 'bg-[#A5D7E8] text-[#0B2447] hover:shadow-[0_0_25px_rgba(165,215,232,0.4)] hover:bg-white',
         secondary: 'bg-white/5 text-[#A5D7E8] border border-white/10 hover:bg-white/10 backdrop-blur-md',
         outline: 'bg-transparent text-[#576CBC] border border-[#576CBC]/30 hover:border-[#A5D7E8] hover:bg-[#A5D7E8]/10',
@@ -21,7 +28,15 @@ export const Button = ({ children, variant = 'primary', className = '', ...props
     );
 };
 
-export const Card = ({ children, className = '', title, headerAction, delay = 0 }: any) => (
+interface CardProps {
+    children: ReactNode;
+    className?: string;
+    title?: string;
+    headerAction?: ReactNode;
+    delay?: number;
+}
+
+export const Card = ({ children, className = '', title, headerAction, delay = 0 }: CardProps) => (
     <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -39,8 +54,13 @@ export const Card = ({ children, className = '', title, headerAction, delay = 0 
     </motion.div>
 );
 
-export const Badge = ({ children, variant = 'info' }: any) => {
-    const colors: any = {
+interface BadgeProps {
+    children: ReactNode;
+    variant?: 'info' | 'success' | 'warning' | 'danger' | 'admin';
+}
+
+export const Badge = ({ children, variant = 'info' }: BadgeProps) => {
+    const colors: Record<string, string> = {
         info: 'bg-[#19376D]/30 text-[#A5D7E8] border-[#A5D7E8]/20',
         success: 'bg-[#A5D7E8]/10 text-[#A5D7E8] border-[#A5D7E8]/20',
         warning: 'bg-[#576CBC]/20 text-[#A5D7E8] border-[#576CBC]/30',
@@ -77,3 +97,4 @@ export const BackgroundAtmosphere = () => (
         <div className="absolute inset-0 bg-[#0B2447]/20 opacity-80 mix-blend-overlay" />
     </div>
 );
+

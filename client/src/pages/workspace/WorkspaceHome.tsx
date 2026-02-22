@@ -13,6 +13,7 @@ import { PlaceholderView, InviteModal } from './views/ComplementaryViews';
 export default function WorkspaceHome() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -35,32 +36,40 @@ export default function WorkspaceHome() {
     };
 
     return (
-        <div className="flex min-h-screen bg-[#060c16] font-sans text-white selection:bg-[#A5D7E8] selection:text-[#0B2447] overflow-x-hidden">
+        <div className="flex h-screen w-full bg-[#060c16] font-sans text-white selection:bg-[#A5D7E8] selection:text-[#0B2447] overflow-hidden">
             <BackgroundAtmosphere />
 
-            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <Sidebar
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isCollapsed={isSidebarCollapsed}
+                onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            />
 
-            <main className="flex-1 flex flex-col min-w-0">
+            <main className="flex-1 flex flex-col min-w-0 relative h-full">
                 <Header activeTab={activeTab} user={user} onLogout={handleLogout} />
+                {isLoggingOut && <div className="sr-only">Logging out...</div>}
 
-                <div className="p-12 lg:p-24 max-w-[1700px] mx-auto w-full">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, scale: 0.95, y: 50 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 1.05, y: -50 }}
-                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                            {activeTab === 'dashboard' ? (
-                                <DashboardView openInvite={() => setIsInviteModalOpen(true)} />
-                            ) : activeTab === 'team' ? (
-                                <TeamView openInvite={() => setIsInviteModalOpen(true)} />
-                            ) : (
-                                <PlaceholderView activeTab={activeTab} setActiveTab={setActiveTab} />
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-12 lg:p-16 custom-scrollbar">
+                    <div className="max-w-[1600px] mx-auto w-full">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, scale: 0.98, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 1.02, y: -20 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                {activeTab === 'dashboard' ? (
+                                    <DashboardView openInvite={() => setIsInviteModalOpen(true)} />
+                                ) : activeTab === 'team' ? (
+                                    <TeamView openInvite={() => setIsInviteModalOpen(true)} />
+                                ) : (
+                                    <PlaceholderView activeTab={activeTab} setActiveTab={setActiveTab} />
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
                 </div>
             </main>
 
@@ -71,3 +80,4 @@ export default function WorkspaceHome() {
         </div>
     );
 }
+

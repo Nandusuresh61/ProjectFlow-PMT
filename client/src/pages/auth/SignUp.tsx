@@ -9,6 +9,7 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { RegisterUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
 
 type SignUpValues = {
   fullName: string;
@@ -76,6 +77,7 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">
+      <BackgroundAtmosphere />
       <GridBackground />
 
       <nav className="relative z-10 p-6 flex items-center justify-between">
@@ -94,9 +96,9 @@ export default function SignUp() {
 
       <main className="flex-grow flex items-center justify-center p-4 md:p-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.95, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
@@ -104,7 +106,7 @@ export default function SignUp() {
             <p className="text-[#576CBC]/60 font-medium">Join the collective to start shipping.</p>
           </div>
 
-          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-3xl p-10 shadow-3xl backdrop-blur-md">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}

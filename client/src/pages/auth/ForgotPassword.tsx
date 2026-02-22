@@ -8,6 +8,7 @@ import { AuthUserState } from "@/store/auth.store";
 import { ForgotEmailSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
 
 type ForgotPasswordValues = { email: string };
 
@@ -25,7 +26,7 @@ const INITIAL_VALUES: ForgotPasswordValues = { email: "" };
 
 const BackToLoginFooter = (
   <div className="text-center text-sm">
-    <Link to="/login" className="text-slate-500 hover:text-white transition-colors">
+    <Link to="/login" className="text-[#576CBC]/60 hover:text-[#A5D7E8] font-bold transition-colors underline-offset-4 hover:underline">
       ← Back to Login
     </Link>
   </div>
@@ -47,18 +48,19 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">
+      <BackgroundAtmosphere />
       <GridBackground />
 
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link to="/" className="group">
           <Logo
-            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            iconClassName="bg-[#A5D7E8] text-[#0B2447] shadow-[0_0_20px_rgba(165,215,232,0.2)] group-hover:scale-110 transition-transform"
             textClassName="text-white"
           />
         </Link>
         <Link to="/login">
-          <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5">
+          <Button variant="ghost" className="text-[#576CBC]/60 hover:text-white hover:bg-white/5">
             Log in
           </Button>
         </Link>
@@ -66,17 +68,17 @@ export default function ForgotPassword() {
 
       <main className="flex-grow flex items-center justify-center p-4 md:p-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.95, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Forgot Password?</h1>
-            <p className="text-slate-500">Enter your email to receive a verification code</p>
+            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Forgot Password?</h1>
+            <p className="text-[#576CBC]/60 font-medium">Enter your email to receive a verification code</p>
           </div>
 
-          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}

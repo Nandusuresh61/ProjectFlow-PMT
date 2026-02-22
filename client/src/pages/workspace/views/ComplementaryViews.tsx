@@ -1,4 +1,4 @@
-import { Zap, X, ChevronDown, Send } from 'lucide-react';
+import { Zap, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const PlaceholderView = ({ activeTab, setActiveTab }: any) => (

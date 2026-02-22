@@ -9,6 +9,7 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { LoginUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
 
 type LoginValues = { email: string; password: string };
 
@@ -70,6 +71,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">
+      <BackgroundAtmosphere />
       <GridBackground />
 
       <nav className="relative z-10 p-6 flex items-center justify-between">
@@ -98,7 +100,7 @@ export default function Login() {
             <p className="text-[#576CBC]/60 font-medium">Initialize session protocols to continue.</p>
           </div>
 
-          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-3xl p-10 shadow-3xl backdrop-blur-md">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}

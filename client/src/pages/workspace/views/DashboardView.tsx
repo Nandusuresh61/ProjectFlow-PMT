@@ -1,27 +1,47 @@
 import {
-    Plus,
-    ArrowUpRight,
     FolderOpen,
     ListTodo,
     Users,
     BarChart3,
-    Calendar,
-    ChevronRight,
-    CheckCircle2,
-    MessageSquare,
+    Plus,
     Zap
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/BaseComponents';
 
-export const DashboardView = ({ openInvite }: any) => {
-    const stats = [
+
+interface Stat {
+    label: string;
+    value: string;
+    trend?: string;
+    trendColor?: string;
+    sub: string;
+    icon: LucideIcon;
+}
+
+interface Activity {
+    id: string;
+    user: string;
+    name: string;
+    action: string;
+    obj: string;
+    time: string;
+    type: string;
+}
+
+interface DashboardViewProps {
+    openInvite: () => void;
+}
+
+export const DashboardView = ({ openInvite }: DashboardViewProps) => {
+    const stats: Stat[] = [
         { label: 'Active Projects', value: '8', trend: '↑ 12%', trendColor: 'text-emerald-400', sub: '2 ending this week', icon: FolderOpen },
         { label: 'Open Issues', value: '134', trend: '↓ 8%', trendColor: 'text-rose-400', sub: '24 assigned to you', icon: ListTodo },
         { label: 'Team Members', value: '42', sub: '5 online now', icon: Users },
         { label: 'Sprint Progress', value: '68%', trend: 'On track', trendColor: 'text-emerald-400', sub: '3 days remaining', icon: BarChart3 },
     ];
 
-    const activities = [
+    const activities: Activity[] = [
         { id: '1', user: 'JD', name: 'James Doe', action: 'Created Issue', obj: 'PF-245', time: '2 min ago', type: 'Create' },
         { id: '2', user: 'SM', name: 'Sarah Miller', action: 'Completed', obj: 'PF-234', time: '15 min ago', type: 'Complete' },
         { id: '3', user: 'AK', name: 'Alex Kumar', action: 'Commented on', obj: 'PF-228', time: '1 hour ago', type: 'Comment' },
@@ -29,15 +49,15 @@ export const DashboardView = ({ openInvite }: any) => {
     ];
 
     return (
-        <div className="space-y-10 max-w-7xl mx-auto">
-            <div className="text-center py-6">
+        <div className="space-y-10">
+            <div className="text-left py-2">
                 <h1 className="text-4xl font-black text-white mb-2">Welcome back, Admin</h1>
-                <p className="text-[#576CBC]/60 font-medium">Here's what's happening with your projects today.</p>
+                <p className="text-[#576CBC]/60 font-medium tracking-tight">Here's what's happening with your projects today.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                 {stats.map((stat, i) => (
-                    <Card key={i} delay={i * 0.1} className="p-6 rounded-3xl !border-white/5 !bg-white/[0.03]">
+                    <Card key={i} delay={i * 0.1} className="!p-6 !rounded-3xl !border-white/5 !bg-white/[0.03]">
                         <div className="flex justify-between items-start mb-4">
                             <div>
                                 <p className="text-xs font-bold text-[#576CBC]/60 mb-1">{stat.label}</p>
@@ -61,12 +81,12 @@ export const DashboardView = ({ openInvite }: any) => {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] overflow-hidden">
                         <div className="px-10 py-8 flex justify-between items-center border-b border-white/5">
-                            <h3 className="text-lg font-bold text-white">Recent Activity</h3>
+                            <h3 className="text-lg font-bold text-white tracking-tight">Recent Activity</h3>
                             <button className="text-xs font-bold text-[#A5D7E8] hover:underline">View all</button>
                         </div>
                         <div className="divide-y divide-white/5">
                             {activities.map((act) => (
-                                <div key={act.id} className="px-10 py-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors">
+                                <div key={act.id} className="px-10 py-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer">
                                     <div className="flex items-center gap-6">
                                         <div className="w-10 h-10 bg-[#19376D] rounded-full flex items-center justify-center text-[10px] font-black text-[#A5D7E8]">
                                             {act.user}
@@ -89,7 +109,7 @@ export const DashboardView = ({ openInvite }: any) => {
 
                 <div className="space-y-6">
                     <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] p-10">
-                        <h3 className="text-lg font-bold text-white mb-8">Quick Actions</h3>
+                        <h3 className="text-lg font-bold text-white mb-8 tracking-tight">Quick Actions</h3>
                         <div className="space-y-4">
                             <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
                                 <Plus size={18} className="text-[#A5D7E8]" />
@@ -110,3 +130,4 @@ export const DashboardView = ({ openInvite }: any) => {
         </div>
     );
 };
+

@@ -10,14 +10,28 @@ import {
     Search,
     Bell,
     ChevronDown,
-    Zap,
-    Menu,
     ChevronRight
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Logo } from '@/components/common/Logo';
 
-export const Sidebar = ({ activeTab, setActiveTab }: any) => {
-    const menuItems = [
+
+interface SidebarProps {
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
+    isCollapsed: boolean;
+    onToggle: () => void;
+}
+
+interface MenuItem {
+    id: string;
+    icon: LucideIcon;
+    label: string;
+}
+
+export const Sidebar = ({ activeTab, setActiveTab, isCollapsed, onToggle }: SidebarProps) => {
+    const menuItems: MenuItem[] = [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { id: 'projects', icon: Briefcase, label: 'Projects' },
         { id: 'issues', icon: Layers, label: 'Issues' },
@@ -29,24 +43,34 @@ export const Sidebar = ({ activeTab, setActiveTab }: any) => {
     ];
 
     return (
-        <aside className="w-64 h-screen flex flex-col bg-[#0B2447]/40 backdrop-blur-2xl border-r border-white/5 sticky top-0 overflow-hidden hidden lg:flex">
-            <div className="py-8 px-6">
-                <div className="flex items-center gap-3 mb-10 px-2">
-                    <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center text-white font-black text-xs">
-                        PF
-                    </div>
-                    <span className="text-lg font-bold text-white tracking-tight">
-                        ProjectFlow
-                    </span>
-                </div>
+        <motion.aside
+            animate={{ width: isCollapsed ? 80 : 256 }}
+            className="h-screen flex flex-col bg-[#0B2447]/40 backdrop-blur-2xl border-r border-white/5 sticky top-0 left-0 z-50 overflow-hidden hidden lg:flex flex-shrink-0"
+        >
+            <div className={`py-8 overflow-y-auto no-scrollbar flex-1 ${isCollapsed ? 'px-4' : 'px-6'}`}>
+                <Logo
+                    showText={!isCollapsed}
+                    onClick={onToggle}
+                    className={`mb-10 px-2 cursor-pointer group transition-all ${isCollapsed ? 'justify-center' : ''}`}
+                    iconClassName="bg-[#A5D7E8] text-[#0B2447] shadow-[0_0_20px_rgba(165,215,232,0.2)] group-hover:scale-110 transition-transform"
+                    textClassName="text-white text-lg tracking-tight"
+                />
 
                 <nav className="space-y-1">
-                    <p className="text-[10px] uppercase tracking-widest font-bold text-[#576CBC]/60 mb-4 px-3">Navigation</p>
+                    {!isCollapsed && (
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-[10px] uppercase tracking-widest font-bold text-[#576CBC]/60 mb-4 px-3"
+                        >
+                            Navigation
+                        </motion.p>
+                    )}
                     {menuItems.map((item) => (
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all relative group ${activeTab === item.id
+                            className={`w-full flex items-center rounded-xl transition-all relative group h-11 ${isCollapsed ? 'justify-center px-0' : 'gap-3 px-3'} ${activeTab === item.id
                                 ? 'text-white bg-white/5'
                                 : 'text-[#576CBC]/70 hover:text-white hover:bg-white/5'
                                 }`}
@@ -59,26 +83,38 @@ export const Sidebar = ({ activeTab, setActiveTab }: any) => {
                                 />
                             )}
                             <item.icon size={18} className={`${activeTab === item.id ? 'text-[#A5D7E8]' : 'opacity-60 group-hover:opacity-100'}`} />
-                            <span className="text-sm font-medium">{item.label}</span>
+                            {!isCollapsed && (
+                                <motion.span
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="text-sm font-medium whitespace-nowrap"
+                                >
+                                    {item.label}
+                                </motion.span>
+                            )}
                         </button>
                     ))}
                 </nav>
             </div>
-        </aside>
+        </motion.aside>
     );
 };
 
-export const Header = ({ activeTab, user, onLogout }: any) => (
-    <header className="h-16 bg-white/[0.02] border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-8">
+interface HeaderProps {
+    activeTab: string;
+    user: any;
+    onLogout: () => void;
+}
+
+export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
+    <header className="h-16 bg-[#060c16]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-8 flex-shrink-0">
         <div className="flex items-center gap-6">
-            <button className="text-[#576CBC]/60 hover:text-white transition-colors">
-                <Menu size={20} />
-            </button>
-            <div className="h-4 w-[1px] bg-white/10" />
             <div className="flex items-center gap-2 cursor-pointer group px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-                <div className="w-6 h-6 bg-[#19376D] rounded flex items-center justify-center text-[10px] font-black">
-                    PF
-                </div>
+                <Logo
+                    showText={false}
+                    iconClassName="w-6 h-6 bg-[#19376D] text-[#A5D7E8] group-hover:bg-[#A5D7E8] group-hover:text-[#0B2447] transition-all"
+                    className="flex-shrink-0"
+                />
                 <span className="text-sm font-semibold text-white/90">Acme Corp</span>
                 <ChevronDown size={14} className="text-[#576CBC]/60 group-hover:text-white" />
             </div>
@@ -116,3 +152,4 @@ export const Header = ({ activeTab, user, onLogout }: any) => (
         </div>
     </header>
 );
+
