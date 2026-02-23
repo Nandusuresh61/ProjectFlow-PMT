@@ -8,7 +8,8 @@ declare enum ErrorCode {
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN",
-    RESOURCE_NOT_FOUND = "Resource Not Found"
+    RESOURCE_NOT_FOUND = "Resource Not Found",
+    INVALID_OPERATION = "Invalid Operat"
 }
 
 declare enum HttpStatusCode {
@@ -112,6 +113,10 @@ declare const AppMessages: {
     readonly WORKSPACE_NOT_FOUND: "Workspace not found";
     readonly INVITATION_SENT_SUCCESS: "Invitation sent success";
     readonly INVITATION_ALREADY_SENT: " Invitation already sent to this email";
+    readonly INVALID_INVITATION: "Invalid Invitation";
+    readonly INVITATION_EXPIRED: "Invitation Expired!";
+    readonly INVITATION_ACCEPTED: "Invitation Accepted";
+    readonly INVITATION_ALREADY_USED: "Invitation Already Used";
     readonly MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded";
     readonly USER_ALREADY_MEMBER: "User Already Member in this workspace";
 };

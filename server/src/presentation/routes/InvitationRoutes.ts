@@ -10,4 +10,9 @@ router.post(
   invitationController.inviteUser,
 );
 
+router.post(
+  "/:workspaceId/accept",
+  authenticatedUser,
+  invitationController.acceptInvitation,
+);
 export default router;

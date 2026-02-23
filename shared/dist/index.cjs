@@ -61,6 +61,7 @@ var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
   ErrorCode2["RESOURCE_NOT_FOUND"] = "Resource Not Found";
+  ErrorCode2["INVALID_OPERATION"] = "Invalid Operation";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -185,6 +186,10 @@ var AppMessages = {
   WORKSPACE_NOT_FOUND: "Workspace not found",
   INVITATION_SENT_SUCCESS: "Invitation sent success",
   INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+  INVALID_INVITATION: "Invalid Invitation",
+  INVITATION_EXPIRED: "Invitation Expired!",
+  INVITATION_ACCEPTED: "Invitation Accepted",
+  INVITATION_ALREADY_USED: "Invitation Already Used",
   MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
   USER_ALREADY_MEMBER: "User Already Member in this workspace"
 };

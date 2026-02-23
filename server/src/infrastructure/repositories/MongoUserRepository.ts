@@ -1,12 +1,19 @@
 import { UserModel, UserDoc } from "../database/models/MongoUserModel";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
-import { UserQueryOptions, PaginatedUsersResult, UserDetailsDto } from "@/application/dtos/UserDtos";
+import {
+  UserQueryOptions,
+  PaginatedUsersResult,
+  UserDetailsDto,
+} from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 
 import { MongoBaseRepository } from "./MongoBaseRepository";
 import { AuthProvider } from "shared";
 
-export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> implements IUserRepository {
+export class MongoUserRepository
+  extends MongoBaseRepository<User, UserDoc>
+  implements IUserRepository
+{
   constructor() {
     super(UserModel);
   }
@@ -75,24 +82,32 @@ export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> impl
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),
-      }
+      },
     );
   }
 
-  async getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult> {
-    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = options;
+  async getAllUsersWithWorkspaces(
+    options: UserQueryOptions,
+  ): Promise<PaginatedUsersResult> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = options;
     const skip = (page - 1) * limit;
 
     const matchStage: any = {};
     if (search) {
       matchStage.$or = [
-        { fullName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
+        { fullName: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
       ];
     }
 
     const sortStage: any = {};
-    sortStage[sortBy] = sortOrder === 'asc' ? 1 : -1;
+    sortStage[sortBy] = sortOrder === "asc" ? 1 : -1;
 
     const result = await this.model.aggregate([
       { $match: matchStage },
@@ -254,5 +269,11 @@ export class MongoUserRepository extends MongoBaseRepository<User, UserDoc> impl
     }
 
     return result[0];
+  }
+  async updateCurrentWorkspace(
+    userId: string,
+    currentWorkspaceId: string,
+  ): Promise<void> {
+    await UserModel.updateOne({ userId }, { $set: { currentWorkspaceId } });
   }
 }

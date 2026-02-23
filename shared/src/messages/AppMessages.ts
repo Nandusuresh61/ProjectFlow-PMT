@@ -83,6 +83,14 @@ export const AppMessages = {
   INVITATION_SENT_SUCCESS: "Invitation sent success",
 
   INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+
+  INVALID_INVITATION: "Invalid Invitation",
+
+  INVITATION_EXPIRED: "Invitation Expired!",
+
+  INVITATION_ACCEPTED: "Invitation Accepted",
+  
+  INVITATION_ALREADY_USED: "Invitation Already Used",
   
   MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
 

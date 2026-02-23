@@ -8,10 +8,12 @@ import {
   ResponseHandler,
   WorkspaceRoleEnum,
 } from "shared";
+import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
 
 export class InvitationController {
   constructor(
     private readonly _createInvitationUseCase: ICreateInvitationUseCase,
+    private readonly _acceptInvitationUseCase: IAcceptInvitationUseCase
   ) {}
 
   inviteUser = asyncHandler(
@@ -36,4 +38,20 @@ export class InvitationController {
         .json(ResponseHandler.success(AppMessages.INVITATION_SENT_SUCCESS));
     },
   );
+
+  acceptInvitation = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { token } = req.body;
+    const userId = (req as any).user?.userId;
+
+    const result = await this._acceptInvitationUseCase.execute(token, userId);
+
+    res.status(HttpStatusCode.OK).json(
+      ResponseHandler.success(
+        AppMessages.INVITATION_ACCEPTED,
+        result
+      )
+    );
+  }
+);
 }

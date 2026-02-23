@@ -8,6 +8,7 @@ import { EmailService } from "../services/EmailService";
 import { PasswordHash } from "../services/PasswordHash";
 import { UidService } from "../services/UidService";
 import { InvitationController } from "@/presentation/controllers/InvitationController";
+import { AcceptInvitationUseCase } from "@/application/use-cases/Invitation/AcceptInvitationUseCase";
 
 const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
@@ -30,7 +31,14 @@ const createInvitationUseCase = new CreateInvitationUseCase(
   uidGenerator,
 );
 
+const acceptInvitationUseCase = new AcceptInvitationUseCase(
+  invitationRepo,
+  membershipRepo,
+  userRepo,
+  passwordHasher,
+);
 
 export const invitationController = new InvitationController(
-    createInvitationUseCase
-)
+  createInvitationUseCase,
+  acceptInvitationUseCase,
+);
