@@ -166,8 +166,10 @@ declare const CompleteOnboardingSchema: z$1.ZodObject<{
 }, z$1.core.$strip>;
 
 declare const CreateInvitationSchema: z$1.ZodObject<{
-    email: z$1.ZodString;
-    role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+    invites: z$1.ZodArray<z$1.ZodObject<{
+        email: z$1.ZodString;
+        role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+    }, z$1.core.$strip>>;
 }, z$1.core.$strip>;
 
 type SuccessResponse<T> = {

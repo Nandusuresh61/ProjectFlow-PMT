@@ -32,7 +32,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/plan", planRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/super-admin", superAdminRoutes);
-app.use("/api/workspaces", invitationRoutes);
+app.use("/api/workspace", invitationRoutes);
 
 app.use(errorMiddleware);
 

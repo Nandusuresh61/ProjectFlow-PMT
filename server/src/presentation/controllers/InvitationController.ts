@@ -21,13 +21,16 @@ export class InvitationController {
       const workspaceId = req.params.workspaceId;
       const inviterId = (req as any).user?.userId;
 
-      await this._createInvitationUseCase.execute({
-        workspaceId,
-        inviterId,
-        email: validatedData.email,
-        role: validatedData.role as WorkspaceRoleEnum,
-      });
-
+      await Promise.all(
+        validatedData.invites.map((invite) =>
+          this._createInvitationUseCase.execute({
+            workspaceId,
+            inviterId,
+            email: invite.email,
+            role: invite.role,
+          }),
+        ),
+      );
       res
         .status(HttpStatusCode.CREATED)
         .json(ResponseHandler.success(AppMessages.INVITATION_SENT_SUCCESS));

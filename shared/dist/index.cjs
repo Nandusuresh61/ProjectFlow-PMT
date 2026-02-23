@@ -258,8 +258,12 @@ var CompleteOnboardingSchema = import_zod7.z.object({
 // src/schema/invitation/CreateInvitationSchema.ts
 var import_zod8 = require("zod");
 var CreateInvitationSchema = import_zod8.z.object({
-  email: import_zod8.z.string().email(),
-  role: import_zod8.z.nativeEnum(WorkspaceRoleEnum)
+  invites: import_zod8.z.array(
+    import_zod8.z.object({
+      email: import_zod8.z.string().email(),
+      role: import_zod8.z.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).min(1)
 });
 
 // src/response/responseHandler.ts
