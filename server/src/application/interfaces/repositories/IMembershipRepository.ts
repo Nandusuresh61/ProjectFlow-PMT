@@ -8,4 +8,5 @@ export interface IMembershipRepository {
     workspaceId: string
   ): Promise<Membership | null>;
   countByWorkspace(workspaceId: string): Promise<number>;
+  countByUserId(userId: string): Promise<number>;
 }

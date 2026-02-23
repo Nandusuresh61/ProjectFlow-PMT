@@ -17,6 +17,7 @@ import { RedisResetPasswordOtpStore } from "../cache/RedisResetPasswordOtpStore"
 import { ResetPasswordUseCase } from "@/application/use-cases/User/ResetPasswordUseCase";
 import { GoogleOAuthService } from "../services/GoogleOAuthService";
 import { GoogleAuthUseCase } from "@/application/use-cases/User/GoogleAuthUseCase";
+import { MembershipRepository } from "../repositories/MongoMembershipRepository";
 
 /**
  * Infrastructure layer use case
@@ -31,6 +32,7 @@ const otpGenerator = new OtpGenerator();
 const emailService = new EmailService();
 const resetOtpStore = new RedisResetPasswordOtpStore();
 const googleOAuthService = new GoogleOAuthService();
+const membershipRepository = new MembershipRepository();
 
 
 /**
@@ -104,5 +106,6 @@ export const authController = new AuthController(
   resetPasswordUseCase,
   googleOAuthService,
   googleAuthUseCase,
-  userRepository
+  userRepository,
+  membershipRepository
 );
