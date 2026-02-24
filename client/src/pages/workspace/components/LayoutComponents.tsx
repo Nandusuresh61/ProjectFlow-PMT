@@ -10,7 +10,8 @@ import {
     Search,
     Bell,
     ChevronDown,
-    ChevronRight
+    ChevronRight,
+    LogOut
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -148,6 +149,16 @@ export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
                 >
                     {user?.fullName?.substring(0, 2).toUpperCase() || "AD"}
                 </motion.div>
+
+                <motion.button
+                    onClick={onLogout}
+                    whileHover={{ scale: 1.02, backgroundColor: "rgba(244, 63, 94, 0.1)" }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-rose-500/20 text-rose-500 hover:border-rose-500/40 transition-colors ml-2"
+                >
+                    <LogOut size={14} />
+                    <span className="text-xs font-bold uppercase tracking-wider">Logout</span>
+                </motion.button>
             </div>
         </div>
     </header>
