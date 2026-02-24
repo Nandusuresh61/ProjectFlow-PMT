@@ -4,10 +4,11 @@ import { toast } from "sonner";
 import { googleAuth } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { Loader } from "@/components/ui/Loader";
+import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
-  const setUser = AuthUserState((state) => state.setUser);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const setLoading = AuthUserState((state) => state.setLoading);
 
   useEffect(() => {
@@ -25,7 +26,19 @@ export default function GoogleCallback() {
         const response = await googleAuth(code);
 
         if (response.data && response.data.user) {
-          setUser(response.data.user);
+          const pendingToken = localStorage.getItem("invite_token");
+          if (pendingToken) {
+            try {
+              await acceptInvitation(pendingToken);
+              localStorage.removeItem("invite_token");
+              toast.success("Joined workspace successfully!");
+            } catch (inviteErr) {
+              console.error("Failed to accept invitation:", inviteErr);
+            }
+          }
+
+          await checkAuth();
+
           toast.success("Login successful");
           navigate("/home");
         } else {
@@ -41,7 +54,7 @@ export default function GoogleCallback() {
     };
 
     handleGoogleAuth();
-  }, [navigate, setUser, setLoading]);
+  }, [navigate, checkAuth, setLoading]);
 
   return <Loader fullScreen text="Authenticating..." />;
 }

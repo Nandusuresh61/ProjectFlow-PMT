@@ -36,6 +36,7 @@ const acceptInvitationUseCase = new AcceptInvitationUseCase(
   membershipRepo,
   userRepo,
   passwordHasher,
+  uidGenerator
 );
 
 export const invitationController = new InvitationController(

@@ -32,7 +32,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
     private readonly _emailService: IEmailService,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _uidGenerator: IUidGenerator,
-  ) {}
+  ) { }
 
   async execute(dto: CreateInvitationDto): Promise<void> {
     const { workspaceId, inviterId, email, role } = dto;
@@ -135,7 +135,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
      * Generate secure token
      */
     const rawToken = crypto.randomBytes(32).toString("hex");
-    const tokenHash = await this._passwordHasher.createHashPassword(rawToken);
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
 
     /**
      *  Create invitation entity

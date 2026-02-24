@@ -17,7 +17,6 @@ import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface OnboardingState {
   workspaceName: string;
@@ -27,7 +26,6 @@ interface OnboardingState {
 
 type WorkspaceValues = { workspaceName: string };
 
-// ─── Step config ──────────────────────────────────────────────────────────────
 
 const steps = [
   { id: 1, name: "Workspace" },
@@ -54,7 +52,6 @@ const slideVariants = {
   exit: (d: number) => ({ x: d < 0 ? 50 : -50, opacity: 0 }),
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -71,8 +68,10 @@ export default function Onboarding() {
   const user = AuthUserState((state) => state.user);
 
   useEffect(() => {
-    if (user?.isOnboarded) navigate("/home");
-  }, [user]);
+  if (user && user.membershipCount > 0) {
+    navigate("/home");
+  }
+}, [user, navigate]);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -101,7 +100,6 @@ export default function Onboarding() {
     setCurrentStep((s) => s - 1);
   };
 
-  // ── Step 1 submit (via CustomForm) ────────────────────────────────────────
   const handleWorkspaceSubmit = async (values: WorkspaceValues) => {
     const name = values.workspaceName.trim();
     if (!workspaceRegex.test(name)) {
@@ -114,41 +112,37 @@ export default function Onboarding() {
     goNext();
   };
 
-  // ── Step 3 finish ─────────────────────────────────────────────────────────
   const handleFinish = async () => {
-    if (!formData.workspaceName.trim()) {
-      toast.error("Workspace name is required");
+  if (!formData.workspaceName.trim()) {
+    toast.error("Workspace name is required");
+    return;
+  }
+
+  if (!formData.planId) {
+    toast.error("Please select a plan");
+    return;
+  }
+
+  try {
+    const response = await completeOnboarding({
+      workspaceName: formData.workspaceName,
+      planId: formData.planId,
+    });
+
+    if (!response.data) {
+      toast.error("Failed to complete onboarding: No data received");
       return;
     }
-    if (!formData.planId) {
-      toast.error("Please select a plan");
-      return;
-    }
-    try {
-      const response = await completeOnboarding({
-        workspaceName: formData.workspaceName,
-        planId: formData.planId,
-      });
 
-      if (!response.data) {
-        toast.error("Failed to complete onboarding: No data received");
-        return;
-      }
+    const checkAuth = AuthUserState.getState().checkAuth;
+    await checkAuth();
 
-      AuthUserState.setState((state) => ({
-        user: {
-          ...state.user!,
-          isOnboarded: true,
-          currentWorkspaceId: response.data!.workspaceId,
-        },
-      }));
-
-      toast.success("Workspace created successfully 🎉");
-      navigate("/home");
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+    toast.success("Workspace created successfully 🎉");
+    navigate("/home");
+  } catch (error: any) {
+    toast.error(error.message);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">

@@ -212,7 +212,6 @@ export class AuthController implements IAuthController {
           fullName: user.fullName,
           email: user.email,
           isSuperAdmin: user.isSuperAdmin,
-          isOnboarded: user.isOnboarded,
           currentWorkspaceId: user.currentWorkspaceId,
           membershipCount
         },

@@ -6,9 +6,8 @@ export interface User {
     fullName: string;
     email: string;
     passwordHash?: string;
-    authProvider: AuthProvider;
+    authProvider: string;
     providerId?: string;
-    isOnboarded: boolean;
     currentWorkspaceId?: string;
     isSuperAdmin: boolean;
     createdAt: Date

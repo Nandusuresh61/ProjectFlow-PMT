@@ -12,8 +12,7 @@ import { AuthProvider } from "shared";
 
 export class MongoUserRepository
   extends MongoBaseRepository<User, UserDoc>
-  implements IUserRepository
-{
+  implements IUserRepository {
   constructor() {
     super(UserModel);
   }
@@ -26,7 +25,6 @@ export class MongoUserRepository
       passwordHash: doc.passwordHash,
       authProvider: doc.authProvider as AuthProvider,
       providerId: doc.providerId,
-      isOnboarded: doc.isOnboarded,
       currentWorkspaceId: doc.currentWorkspaceId,
       isSuperAdmin: doc.isSuperAdmin,
       createdAt: doc.createdAt,
@@ -78,7 +76,6 @@ export class MongoUserRepository
         passwordHash: user.passwordHash,
         authProvider: user.authProvider as string,
         providerId: user.providerId,
-        isOnboarded: user.isOnboarded,
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         updatedAt: new Date(),

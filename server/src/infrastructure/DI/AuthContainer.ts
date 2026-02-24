@@ -70,6 +70,7 @@ const loginUserUseCase = new LoginUserUseCase(
   userRepository,
   tokenService,
   passwordHasher,
+  membershipRepository
 );
 
 const refreshTokenUseCase = new RefreshTokenUseCase(tokenService);
@@ -92,7 +93,8 @@ const resetPasswordUseCase = new ResetPasswordUseCase(
 const googleAuthUseCase = new GoogleAuthUseCase(
   userRepository,
   tokenService,
-  uidService
+  uidService,
+  membershipRepository
 );
 
 

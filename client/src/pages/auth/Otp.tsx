@@ -9,6 +9,7 @@ import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 type OtpValues = { otp: string };
 
@@ -28,7 +29,7 @@ const INITIAL_VALUES: OtpValues = { otp: "" };
 
 export default function Otp() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
-  const setUser = AuthUserState((state) => state.setUser);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const navigate = useNavigate();
   const [timer, setTimer] = useState(60);
 
@@ -67,10 +68,24 @@ export default function Otp() {
       return;
     }
     try {
-      const response = await verifyUserOtp({ email: pendingEmail, otp: values.otp });
-      setUser(response.data!.user);
+      const response = await verifyUserOtp({
+        email: pendingEmail,
+        otp: values.otp,
+      });
       toast.success(response.message);
-      setTimeout(() => navigate("/home"), 300);
+      const pendingToken = localStorage.getItem("invite_token");
+      if (pendingToken) {
+        try {
+          await acceptInvitation(pendingToken);
+          localStorage.removeItem("invite_token");
+          toast.success("Joined workspace successfully!");
+        } catch (inviteErr) {
+          console.error("Invitation failed:", inviteErr);
+        }
+      }
+
+      await checkAuth();
+      navigate("/home");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -80,7 +95,9 @@ export default function Otp() {
     <div className="text-center text-sm">
       <span className="text-[#576CBC]/60">Didn't receive the code? </span>
       {timer > 0 ? (
-        <span className="text-[#576CBC]/60 font-medium">Resend in {timer}s</span>
+        <span className="text-[#576CBC]/60 font-medium">
+          Resend in {timer}s
+        </span>
       ) : (
         <button
           type="button"
@@ -106,7 +123,10 @@ export default function Otp() {
           />
         </Link>
         <Link to="/login">
-          <Button variant="ghost" className="text-[#576CBC]/60 hover:text-white hover:bg-white/5">
+          <Button
+            variant="ghost"
+            className="text-[#576CBC]/60 hover:text-white hover:bg-white/5"
+          >
             Log in
           </Button>
         </Link>
@@ -120,7 +140,9 @@ export default function Otp() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Verify email</h1>
+            <h1 className="text-4xl font-black tracking-tight text-white uppercase">
+              Verify email
+            </h1>
             <p className="text-[#576CBC]/60 font-medium">
               We've sent a code to{" "}
               <span className="text-white font-bold">{pendingEmail}</span>

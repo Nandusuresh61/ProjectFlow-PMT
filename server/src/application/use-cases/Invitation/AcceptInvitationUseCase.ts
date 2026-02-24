@@ -6,13 +6,16 @@ import { AppError, AppMessages, ErrorCode, HttpStatusCode, InvitationStatus } fr
 import crypto from "crypto";
 import { Membership } from "@/domain/entities/Membership";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
+import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+
 export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
   constructor(
     private readonly _invitationRepo: IInvitationRepository,
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _userRepo: IUserRepository,
-    private readonly _passwordHasher: IPasswordHasher
-  ) {}
+    private readonly _passwordHasher: IPasswordHasher,
+    private readonly _uidGenerator: IUidGenerator
+  ) { }
 
   async execute(
     token: string,
@@ -28,7 +31,7 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
       );
     }
 
-    const tokenHash = await this._passwordHasher.createHashPassword(token);;
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
     const invitation = await this._invitationRepo.findByTokenHash(tokenHash);
 
@@ -65,7 +68,7 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
     }
 
     const membership = new Membership(
-      undefined,
+      this._uidGenerator.createId(),
       user.userId,
       invitation.workspaceId,
       invitation.role,
@@ -80,7 +83,7 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
       InvitationStatus.ACCEPTED
     );
 
-    await this._userRepo.updateCurrentWorkspace(user.userId,invitation.workspaceId);
+    await this._userRepo.updateCurrentWorkspace(user.userId, invitation.workspaceId);
 
     return { workspaceId: invitation.workspaceId };
   }

@@ -38,7 +38,8 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       );
     }
 
-    if (user.isOnboarded) {
+    const membershipCount = await this._membershipRepo.countByUserId(userId);
+    if (membershipCount > 0) {
       throw new AppError(
         ErrorCode.ONBOARDING,
         AppMessages.USER_ALREADY_ONBOARDED,
@@ -79,7 +80,6 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
 
     await this._membershipRepo.create(membership);
 
-    user.isOnboarded = true;
     user.currentWorkspaceId = createdWorkspace.workspaceId;
 
     await this._userRepo.update(user);

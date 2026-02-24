@@ -55,21 +55,26 @@ const OAuthFooter = (
 );
 
 export default function Login() {
-  const setUser = AuthUserState((state) => state.setUser);
   const isLoading = AuthUserState((state) => state.isLoading);
   const setLoading = AuthUserState((state) => state.setLoading);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
 
   const handleLogin = async (values: LoginValues) => {
     setLoading(true);
     try {
       const response = await loginUser(values);
-      setUser(response.data!.user);
       const pendingToken = localStorage.getItem("invite_token");
 
       if (pendingToken) {
-        await acceptInvitation(pendingToken);
-        localStorage.removeItem("invite_token");
+        try {
+          await acceptInvitation(pendingToken);
+          localStorage.removeItem("invite_token");
+        } catch (inviteErr) {
+          console.error("Invitation failed:", inviteErr);
+        }
       }
+
+      await checkAuth();
       toast.success(response.message);
     } catch (error: any) {
       toast.error(error.message);

@@ -22,7 +22,7 @@ export default function AcceptInvitation() {
 
     if (!isAuthenticated) {
       localStorage.setItem("invite_token", token);
-      toast.success("Invitation accepted successfully");
+      toast.success("Invitation link captured. Please log in or sign up to continue.");
       navigate("/login");
       return;
     }
@@ -35,7 +35,7 @@ export default function AcceptInvitation() {
         navigate("/");
       } catch (error: any) {
         toast.error(error.message);
-        navigate("/");  
+        navigate("/");
       }
     };
     processInvitation();

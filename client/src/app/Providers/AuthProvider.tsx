@@ -1,39 +1,18 @@
 import { useEffect } from "react";
-import { getMe } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
-
-export const AuthProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const setUser = AuthUserState((state) => state.setUser);
-  const clearUser = AuthUserState((state) => state.clearUser);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const setLoading = AuthUserState((state) => state.setLoading);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const isAuthenticated = AuthUserState.getState().isAuthenticated;
-
-      if (!isAuthenticated) {
-        setLoading(false);
-        return;
-      }
-
+    const init = async () => {
       setLoading(true);
-
-      try {
-        const response = await getMe();
-        setUser(response.data!.user);
-      } catch {
-        clearUser();
-      } finally {
-        setLoading(false);
-      }
+      await checkAuth();
+      setLoading(false);
     };
 
-    initAuth();
-  }, [setUser, clearUser, setLoading]);
+    init();
+  }, [checkAuth, setLoading]);
 
   return <>{children}</>;
 };

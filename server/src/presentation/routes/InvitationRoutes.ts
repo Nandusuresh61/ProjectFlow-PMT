@@ -11,7 +11,7 @@ router.post(
 );
 
 router.post(
-  "/accept",
+  "/invite/accept",
   authenticatedUser,
   invitationController.acceptInvitation,
 );

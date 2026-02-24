@@ -10,7 +10,7 @@ import { RegisterUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
-import { acceptInvitation } from "@/services/Invitation/invitation.api";
+
 
 type SignUpValues = {
   fullName: string;
@@ -80,17 +80,7 @@ export default function SignUp() {
       });
       toast.success(response.message);
       setPendingEmail(values.email);
-      const pendingToken = localStorage.getItem("invite_token");
-
-      if (pendingToken) {
-        try {
-          await acceptInvitation(pendingToken);
-          localStorage.removeItem("invite_token");
-        } catch (error: any) {
-          console.error("Invitation accept failed:", error);
-        }
-      }
-      setTimeout(() => navigate("/verify-otp"), 500);
+      navigate("/verify-otp");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
