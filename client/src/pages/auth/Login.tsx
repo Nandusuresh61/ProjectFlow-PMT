@@ -10,6 +10,7 @@ import { LoginUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 type LoginValues = { email: string; password: string };
 
@@ -44,7 +45,9 @@ const OAuthFooter = (
         <span className="w-full border-t border-white/10" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-[#060c16] px-2 text-[#576CBC]/60 font-bold tracking-widest">Or continue with</span>
+        <span className="bg-[#060c16] px-2 text-[#576CBC]/60 font-bold tracking-widest">
+          Or continue with
+        </span>
       </div>
     </div>
     <GoogleAuthButton />
@@ -61,6 +64,12 @@ export default function Login() {
     try {
       const response = await loginUser(values);
       setUser(response.data!.user);
+      const pendingToken = localStorage.getItem("invite_token");
+
+      if (pendingToken) {
+        await acceptInvitation(pendingToken);
+        localStorage.removeItem("invite_token");
+      }
       toast.success(response.message);
     } catch (error: any) {
       toast.error(error.message);
@@ -82,7 +91,10 @@ export default function Login() {
           />
         </Link>
         <Link to="/signup">
-          <Button variant="ghost" className="text-[#576CBC]/60 hover:text-white hover:bg-white/5">
+          <Button
+            variant="ghost"
+            className="text-[#576CBC]/60 hover:text-white hover:bg-white/5"
+          >
             Sign up
           </Button>
         </Link>
@@ -96,8 +108,12 @@ export default function Login() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Welcome back</h1>
-            <p className="text-[#576CBC]/60 font-medium">Initialize session protocols to continue.</p>
+            <h1 className="text-4xl font-black tracking-tight text-white uppercase">
+              Welcome back
+            </h1>
+            <p className="text-[#576CBC]/60 font-medium">
+              Initialize session protocols to continue.
+            </p>
           </div>
 
           <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
@@ -115,7 +131,10 @@ export default function Login() {
 
           <p className="text-center text-sm text-[#576CBC]/60 font-medium">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-[#A5D7E8] font-bold hover:underline underline-offset-4">
+            <Link
+              to="/signup"
+              className="text-[#A5D7E8] font-bold hover:underline underline-offset-4"
+            >
               Sign up
             </Link>
           </p>

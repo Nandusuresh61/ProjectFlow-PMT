@@ -10,6 +10,7 @@ import { RegisterUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 type SignUpValues = {
   fullName: string;
@@ -19,8 +20,18 @@ type SignUpValues = {
 };
 
 const fields: FormField<SignUpValues>[] = [
-  { name: "fullName", label: "Full Name", type: "text", placeholder: "John Doe" },
-  { name: "email", label: "Email", type: "email", placeholder: "m@example.com" },
+  {
+    name: "fullName",
+    label: "Full Name",
+    type: "text",
+    placeholder: "John Doe",
+  },
+  {
+    name: "email",
+    label: "Email",
+    type: "email",
+    placeholder: "m@example.com",
+  },
   { name: "password", label: "Password", type: "password" },
   { name: "confirmPassword", label: "Confirm Password", type: "password" },
 ];
@@ -39,7 +50,9 @@ const OAuthFooter = (
         <span className="w-full border-t border-white/10" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-[#060c16] px-2 text-[#576CBC]/60 font-bold tracking-widest">Or continue with</span>
+        <span className="bg-[#060c16] px-2 text-[#576CBC]/60 font-bold tracking-widest">
+          Or continue with
+        </span>
       </div>
     </div>
     <GoogleAuthButton />
@@ -67,6 +80,16 @@ export default function SignUp() {
       });
       toast.success(response.message);
       setPendingEmail(values.email);
+      const pendingToken = localStorage.getItem("invite_token");
+
+      if (pendingToken) {
+        try {
+          await acceptInvitation(pendingToken);
+          localStorage.removeItem("invite_token");
+        } catch (error: any) {
+          console.error("Invitation accept failed:", error);
+        }
+      }
       setTimeout(() => navigate("/verify-otp"), 500);
     } catch (error: any) {
       toast.error(error.message);
@@ -88,7 +111,10 @@ export default function SignUp() {
           />
         </Link>
         <Link to="/login">
-          <Button variant="ghost" className="text-[#576CBC]/60 hover:text-white hover:bg-white/5">
+          <Button
+            variant="ghost"
+            className="text-[#576CBC]/60 hover:text-white hover:bg-white/5"
+          >
             Log in
           </Button>
         </Link>
@@ -102,8 +128,12 @@ export default function SignUp() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Create Account</h1>
-            <p className="text-[#576CBC]/60 font-medium">Join the collective to start shipping.</p>
+            <h1 className="text-4xl font-black tracking-tight text-white uppercase">
+              Create Account
+            </h1>
+            <p className="text-[#576CBC]/60 font-medium">
+              Join the collective to start shipping.
+            </p>
           </div>
 
           <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
@@ -121,9 +151,14 @@ export default function SignUp() {
 
           <p className="text-center text-sm text-[#576CBC]/60 font-medium">
             By clicking continue, you agree to our{" "}
-            <a href="#" className="text-[#A5D7E8] font-bold hover:underline">Terms of Service</a>{" "}
+            <a href="#" className="text-[#A5D7E8] font-bold hover:underline">
+              Terms of Service
+            </a>{" "}
             and{" "}
-            <a href="#" className="text-[#A5D7E8] font-bold hover:underline">Privacy Policy</a>.
+            <a href="#" className="text-[#A5D7E8] font-bold hover:underline">
+              Privacy Policy
+            </a>
+            .
           </p>
         </motion.div>
       </main>

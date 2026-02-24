@@ -11,7 +11,7 @@ router.post(
 );
 
 router.post(
-  "/:workspaceId/accept",
+  "/accept",
   authenticatedUser,
   invitationController.acceptInvitation,
 );

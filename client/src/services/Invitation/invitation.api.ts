@@ -8,3 +8,8 @@ export const InviteMember = async (
   const response = await API.post(`/workspace/${workspaceId}/invite`, payload);
   return response.data;
 };
+
+export const acceptInvitation = async (token: string) => {
+  const response = await API.post('/appworkspace/invite', { token });
+  return response.data;
+};
