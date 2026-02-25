@@ -47,8 +47,10 @@ declare enum EmailType {
 }
 
 declare enum WorkspaceRoleEnum {
+    WORKSPACE_OWNER = "WORKSPACE_OWNER",
     WORKSPACE_ADMIN = "WORKSPACE_ADMIN",
-    MEMBER = "MEMBER"
+    WORKSPACE_MEMBER = "WORKSPACE_MEMBER",
+    WORKSPACE_VIEWER = "WORKSPACE_VIEWER"
 }
 
 declare enum AuthProvider {

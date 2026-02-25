@@ -74,7 +74,7 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       this._uidGenerator.createId(),
       userId,
       createdWorkspace.workspaceId!,
-      WorkspaceRoleEnum.WORKSPACE_ADMIN,
+      WorkspaceRoleEnum.WORKSPACE_OWNER,
       now,
     );
 

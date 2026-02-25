@@ -15,6 +15,11 @@ export abstract class MongoBaseRepository<TEntity, TDoc extends Document> {
     return found ? this.mapToEntity(found) : null;
   }
 
+  async find(filter: any): Promise<TEntity[]> {
+    const docs = await this.model.find(filter).exec();
+    return docs.map((doc) => this.mapToEntity(doc));
+  }
+
   async findAll(skip: number = 0, limit: number = 10): Promise<TEntity[]> {
     const docs = await this.model.find().skip(skip).limit(limit).exec();
     return docs.map((doc) => this.mapToEntity(doc));

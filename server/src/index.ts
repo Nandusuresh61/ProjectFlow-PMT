@@ -9,7 +9,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import onboardingRoutes from "@/presentation/routes/OnboardingRoutes";
 import superAdminRoutes from "@/presentation/routes/superAdminRoutes";
-import invitationRoutes from "@/presentation/routes/InvitationRoutes";
+import workspaceRoutes from "@/presentation/routes/workspaceRoutes";
 
 import morgan from "morgan";
 
@@ -32,7 +32,7 @@ app.use("/api/auth", userRoutes);
 app.use("/api/plan", planRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/super-admin", superAdminRoutes);
-app.use("/api/workspace", invitationRoutes);
+app.use("/api/workspace", workspaceRoutes);
 
 app.use(errorMiddleware);
 

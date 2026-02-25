@@ -8,8 +8,7 @@ import { MongoBaseRepository } from "./MongoBaseRepository";
 
 export class MembershipRepository
   extends MongoBaseRepository<Membership, MembershipDocument>
-  implements IMembershipRepository
-{
+  implements IMembershipRepository {
   constructor() {
     super(MembershipModel);
   }
@@ -48,5 +47,9 @@ export class MembershipRepository
 
   async countByUserId(userId: string): Promise<number> {
     return MembershipModel.countDocuments({ userId });
+  }
+
+  async findByWorkspace(workspaceId: string): Promise<Membership[]> {
+    return this.find({ workspaceId });
   }
 }

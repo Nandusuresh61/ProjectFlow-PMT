@@ -35,7 +35,7 @@ export const PlaceholderView = ({ activeTab, setActiveTab }: any) => (
 
 export const InviteModal = ({ isOpen, onClose }: any) => {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<WorkspaceRoleEnum>(WorkspaceRoleEnum.MEMBER);
+  const [role, setRole] = useState<WorkspaceRoleEnum>(WorkspaceRoleEnum.WORKSPACE_MEMBER);
   const [loading, setLoading] = useState(false);
   const currentWorkspaceId = AuthUserState(
     (state) => state.user?.currentWorkspaceId,
@@ -130,14 +130,14 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
                       onChange={(e) =>
                         setRole(
                           e.target.value as
-                            | WorkspaceRoleEnum.MEMBER
-                            | WorkspaceRoleEnum.WORKSPACE_ADMIN,
+                          | WorkspaceRoleEnum.WORKSPACE_MEMBER
+                          | WorkspaceRoleEnum.WORKSPACE_ADMIN,
                         )
                       }
                       className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white appearance-none focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
                     >
                       <option
-                        value={WorkspaceRoleEnum.MEMBER}
+                        value={WorkspaceRoleEnum.WORKSPACE_MEMBER}
                         className="bg-[#0B2447]"
                       >
                         Member

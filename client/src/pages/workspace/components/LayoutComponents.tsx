@@ -124,26 +124,25 @@ export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
         </div>
 
         <div className="flex items-center gap-6">
-            <div className="relative group flex items-center">
+            {/* <div className="relative group flex items-center">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#576CBC]/40 group-focus-within:text-[#A5D7E8] transition-colors" size={16} />
                 <input
                     type="text"
                     placeholder="Search issues, projects..."
                     className="bg-white/5 border border-white/5 rounded-lg py-2 pl-10 pr-4 text-xs w-64 text-white focus:outline-none focus:bg-white/[0.08] transition-all"
                 />
-            </div>
+            </div> */}
 
-            <div className="relative cursor-pointer group">
+            {/* <div className="relative cursor-pointer group">
                 <Bell size={20} className="text-[#576CBC]/60 group-hover:text-white transition-colors" />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#060c16]" />
-            </div>
+            </div> */}
 
             <div className="flex items-center gap-3 pl-4 border-l border-white/5">
                 <div className="text-right hidden sm:block">
                     <p className="text-xs font-bold text-white leading-none mb-1">{user?.fullName || "Admin"}</p>
                 </div>
                 <motion.div
-                    onClick={onLogout}
                     whileHover={{ scale: 1.05 }}
                     className="w-8 h-8 rounded-lg bg-black text-white text-[10px] font-black flex items-center justify-center cursor-pointer border border-white/10"
                 >

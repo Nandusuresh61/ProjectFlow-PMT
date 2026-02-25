@@ -54,8 +54,10 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
 
 // src/enums/WorkspaceRolesEnum.ts
 var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
+  WorkspaceRoleEnum2["WORKSPACE_OWNER"] = "WORKSPACE_OWNER";
   WorkspaceRoleEnum2["WORKSPACE_ADMIN"] = "WORKSPACE_ADMIN";
-  WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_MEMBER"] = "WORKSPACE_MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_VIEWER"] = "WORKSPACE_VIEWER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
 

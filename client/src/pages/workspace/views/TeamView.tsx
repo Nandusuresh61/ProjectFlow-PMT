@@ -1,13 +1,17 @@
 import { UserPlus, Search, Share2 } from 'lucide-react';
 import { Card, Badge } from '../components/BaseComponents';
+import { useEffect, useState } from 'react';
+import { getMembers } from '@/services/workspace/team.api';
+import { AuthUserState } from '@/store/auth.store';
+import { WorkspaceRoleEnum } from 'shared';
+import { getRoleLabel } from '@/lib/utils';
 
 interface Member {
-    name: string;
+    fullName: string;
     email: string;
-    role: 'Admin' | 'Member' | 'Viewer';
+    role: WorkspaceRoleEnum;
     status: 'active' | 'inactive';
-    projects: number;
-    avatar: string;
+    projects?: number;
 }
 
 interface TeamViewProps {
@@ -15,14 +19,22 @@ interface TeamViewProps {
 }
 
 export const TeamView = ({ openInvite }: TeamViewProps) => {
-    const members: Member[] = [
-        { name: 'John Doe', email: 'john@projectflow.com', role: 'Admin', status: 'active', projects: 5, avatar: 'JD' },
-        { name: 'Sarah Miller', email: 'sarah@projectflow.com', role: 'Member', status: 'active', projects: 3, avatar: 'SM' },
-        { name: 'Alex Kumar', email: 'alex@projectflow.com', role: 'Member', status: 'active', projects: 4, avatar: 'AK' },
-        { name: 'Lisa Thompson', email: 'lisa@projectflow.com', role: 'Member', status: 'active', projects: 2, avatar: 'LT' },
-        { name: 'Mike Chen', email: 'mike@projectflow.com', role: 'Viewer', status: 'inactive', projects: 1, avatar: 'MC' },
-        { name: 'Emma Wilson', email: 'emma@projectflow.com', role: 'Member', status: 'active', projects: 3, avatar: 'EW' },
-    ];
+
+    const currentWorkspaceId = AuthUserState((state) => state.user?.currentWorkspaceId);
+    const [members, setMembers] = useState<Member[]>([]);
+
+    useEffect(() => {
+        if (!currentWorkspaceId) return;
+        const fetchMembers = async () => {
+            const res = await getMembers(currentWorkspaceId);
+            setMembers(res.data);
+        };
+        fetchMembers()
+    }, [currentWorkspaceId])
+
+    console.log(members)
+
+
 
     return (
         <div className="space-y-10">
@@ -52,27 +64,28 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {members.map((member, i) => (
                     <Card key={i} delay={i * 0.05} className="!p-8 !rounded-[2.5rem] !bg-white/[0.03] !border-white/5 relative group">
-                        <button className="absolute top-6 right-6 p-2 text-white/20 hover:text-white transition-colors">
-                            <Share2 size={20} />
-                        </button>
-
                         <div className="flex items-center gap-5 mb-6">
                             <div className="w-14 h-14 bg-[#19376D] rounded-full flex items-center justify-center text-sm font-black text-[#A5D7E8]">
-                                {member.avatar}
+                                {member?.fullName?.substring(0, 2).toUpperCase() || "N/A"}
                             </div>
                             <div>
-                                <h4 className="text-lg font-bold text-white tracking-tight">{member.name}</h4>
+                                <h4 className="text-lg font-bold text-white tracking-tight">{member.fullName}</h4>
                                 <p className="text-xs text-[#576CBC]/40 font-medium">{member.email}</p>
                             </div>
                         </div>
 
                         <div className="flex gap-3 mb-8">
-                            <Badge variant={member.role === 'Admin' ? 'admin' : 'info'}>{member.role}</Badge>
-                            <Badge variant={member.status === 'active' ? 'success' : 'warning'}>{member.status}</Badge>
+                            <Badge variant={
+                                member.role === WorkspaceRoleEnum.WORKSPACE_OWNER ? 'admin' :
+                                    member.role === WorkspaceRoleEnum.WORKSPACE_ADMIN ? 'admin' : 'info'
+                            }>
+                                {getRoleLabel(member.role)}
+                            </Badge>
+                            {/* <Badge variant={member.status === 'active' ? 'success' : 'warning'}>{member.status}</Badge> */}
                         </div>
 
                         <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                            <span className="text-xs font-medium text-[#576CBC]/60">Working on {member.projects} projects</span>
+                            <span className="text-xs font-medium text-[#576CBC]/60">Working on {member.projects || 0} projects</span>
                         </div>
                     </Card>
                 ))}

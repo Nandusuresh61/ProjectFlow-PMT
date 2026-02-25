@@ -58,7 +58,11 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
       workspaceId,
     );
 
-    if (!membership || membership.role !== WorkspaceRoleEnum.WORKSPACE_ADMIN) {
+    if (
+      membership.role !== WorkspaceRoleEnum.WORKSPACE_OWNER &&
+      membership.role !== WorkspaceRoleEnum.WORKSPACE_ADMIN &&
+      workspace.ownerId !== inviterId
+    ) {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.UNAUTHORIZED_ACCESS,
@@ -135,7 +139,10 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
      * Generate secure token
      */
     const rawToken = crypto.randomBytes(32).toString("hex");
-    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
 
     /**
      *  Create invitation entity
