@@ -1,18 +1,12 @@
 import { useEffect } from "react";
 import { AuthUserState } from "@/store/auth.store";
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const checkAuth = AuthUserState((state) => state.checkAuth);
-  const setLoading = AuthUserState((state) => state.setLoading);
+  const initializeAuth = AuthUserState((state) => state.initializeAuth);
 
   useEffect(() => {
-    const init = async () => {
-      setLoading(true);
-      await checkAuth();
-      setLoading(false);
-    };
-
-    init();
-  }, [checkAuth, setLoading]);
+    initializeAuth();
+  }, [initializeAuth]);
 
   return <>{children}</>;
 };

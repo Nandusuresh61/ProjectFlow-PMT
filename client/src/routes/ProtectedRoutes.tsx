@@ -1,14 +1,23 @@
 import { AuthUserState } from "@/store/auth.store";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader } from "@/components/ui/Loader";
+import { useEffect, useState } from "react";
 
 export default function ProtectedRoutes() {
   const isAuthenticated = AuthUserState((state) => state.isAuthenticated);
   const user = AuthUserState((state) => state.user);
-  const isLoading = AuthUserState((state) => state.isLoading);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const location = useLocation();
 
-  if (isLoading) {
+  // authChecked prevents the "not authenticated → redirect to /login" flash
+  // on the first render before the async checkAuth has resolved.
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    checkAuth().finally(() => setAuthChecked(true));
+  }, []); // runs once on mount — only fires for protected pages
+
+  if (!authChecked) {
     return <Loader fullScreen />;
   }
 
