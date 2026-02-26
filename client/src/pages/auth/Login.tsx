@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { toast } from "sonner";
@@ -58,6 +58,7 @@ export default function Login() {
   const isLoading = AuthUserState((state) => state.isLoading);
   const setLoading = AuthUserState((state) => state.setLoading);
   const checkAuth = AuthUserState((state) => state.checkAuth);
+  const navigate = useNavigate();
 
   const handleLogin = async (values: LoginValues) => {
     setLoading(true);
@@ -69,6 +70,7 @@ export default function Login() {
         try {
           await acceptInvitation(pendingToken);
           localStorage.removeItem("invite_token");
+          toast.success("Joined workspace successfully!");
         } catch (inviteErr) {
           console.error("Invitation failed:", inviteErr);
         }
@@ -76,6 +78,7 @@ export default function Login() {
 
       await checkAuth();
       toast.success(response.message);
+      navigate("/home");
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -8,6 +8,12 @@ import { WorkspaceRoleEnum } from "shared";
 const router = Router();
 
 
+router.post(
+  "/invite/accept",
+  authenticatedUser,
+  invitationController.acceptInvitation
+);
+
 // Invitation Api
 router.post(
   "/:workspaceId/invite",

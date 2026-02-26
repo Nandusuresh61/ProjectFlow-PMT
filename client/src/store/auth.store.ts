@@ -15,15 +15,16 @@ interface AuthState {
   setLoading: (value: boolean) => void;
   setPendingEmail: (email: string | null) => void;
   checkAuth: () => Promise<void>;
+  initializeAuth: () => Promise<void>;
 }
 
 
 export const AuthUserState = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: true,
+      isLoading: false,
       pendingEmail: null,
 
       setUser: (user) =>
@@ -44,6 +45,7 @@ export const AuthUserState = create<AuthState>()(
       setLoading: (value) => set({ isLoading: value }),
 
       setPendingEmail: (email) => set({ pendingEmail: email }),
+
       checkAuth: async () => {
         set({ isLoading: true });
         try {
@@ -59,6 +61,13 @@ export const AuthUserState = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
           });
+        }
+      },
+
+      
+      initializeAuth: async () => {
+        if (get().isAuthenticated) {
+          await get().checkAuth();
         }
       },
     }),
