@@ -4,6 +4,7 @@ import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWor
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
 import { Membership } from "@/domain/entities/Membership";
 import { Workspace } from "@/domain/entities/Workspace";
@@ -21,7 +22,8 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
     private readonly _workspaceRepo: IWorkspaceRepository,
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _planRepo: IPlanRepository,
-    private readonly _uidGenerator: IUidGenerator
+    private readonly _uidGenerator: IUidGenerator,
+    private readonly _createInvitationUseCase: ICreateInvitationUseCase
   ) { }
 
   async execute(
@@ -83,6 +85,19 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
     user.currentWorkspaceId = createdWorkspace.workspaceId;
 
     await this._userRepo.update(user);
+
+    if (dto.invites && dto.invites.length > 0) {
+      await Promise.all(
+        dto.invites.map((invite) =>
+          this._createInvitationUseCase.execute({
+            workspaceId: createdWorkspace.workspaceId,
+            inviterId: userId,
+            email: invite.email,
+            role: invite.role,
+          })
+        )
+      );
+    }
 
     return { workspaceId: createdWorkspace.workspaceId };
   }

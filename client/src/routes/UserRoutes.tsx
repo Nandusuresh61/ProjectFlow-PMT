@@ -13,7 +13,7 @@ import AcceptInvitation from "@/pages/invite/AcceptInvitation";
 
 const Home = lazy(() => import("@/pages/Home"));
 const LandingPage = lazy(() => import("@/pages/landing/LandingPage"));
-const Onboarding = lazy(() => import("@/pages/auth/Onboarding"));
+const Onboarding = lazy(() => import("@/pages/onboarding/Onboarding"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function UserRoutes() {

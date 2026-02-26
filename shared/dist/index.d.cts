@@ -170,6 +170,10 @@ type CreatePlanSchemaType = z$1.infer<typeof CreatePlanSchema>;
 declare const CompleteOnboardingSchema: z$1.ZodObject<{
     workspaceName: z$1.ZodString;
     planId: z$1.ZodString;
+    invites: z$1.ZodOptional<z$1.ZodArray<z$1.ZodObject<{
+        email: z$1.ZodString;
+        role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+    }, z$1.core.$strip>>>;
 }, z$1.core.$strip>;
 
 declare const CreateInvitationSchema: z$1.ZodObject<{

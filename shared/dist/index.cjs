@@ -259,7 +259,13 @@ var CreatePlanSchema = import_zod6.z.object({
 var import_zod7 = require("zod");
 var CompleteOnboardingSchema = import_zod7.z.object({
   workspaceName: import_zod7.z.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
-  planId: import_zod7.z.string().trim().min(1, "Plan ID is required")
+  planId: import_zod7.z.string().trim().min(1, "Plan ID is required"),
+  invites: import_zod7.z.array(
+    import_zod7.z.object({
+      email: import_zod7.z.string().email("Invalid email address"),
+      role: import_zod7.z.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).optional()
 });
 
 // src/schema/invitation/CreateInvitationSchema.ts

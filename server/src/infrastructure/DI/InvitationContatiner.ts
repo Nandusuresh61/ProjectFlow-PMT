@@ -20,7 +20,7 @@ const emailService = new EmailService();
 const passwordHasher = new PasswordHash();
 const uidGenerator = new UidService();
 
-const createInvitationUseCase = new CreateInvitationUseCase(
+export const createInvitationUseCase = new CreateInvitationUseCase(
   workspaceRepo,
   membershipRepo,
   planRepo,

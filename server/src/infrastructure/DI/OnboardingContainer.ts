@@ -5,6 +5,7 @@ import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
 import { MongoUserRepository } from "../repositories/MongoUserRepository";
 import { UidService } from "../services/UidService";
 import { OnboardingController } from "@/presentation/controllers/OnboardingController";
+import { createInvitationUseCase } from "./InvitationContatiner";
 
 const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
@@ -17,7 +18,8 @@ const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   workspaceRepo,
   membershipRepo,
   planRepo,
-  uidGenerator
+  uidGenerator,
+  createInvitationUseCase
 );
 
 export const onboardingController = new OnboardingController(

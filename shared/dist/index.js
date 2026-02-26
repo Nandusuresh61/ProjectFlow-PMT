@@ -206,7 +206,13 @@ var CreatePlanSchema = z6.object({
 import { z as z7 } from "zod";
 var CompleteOnboardingSchema = z7.object({
   workspaceName: z7.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
-  planId: z7.string().trim().min(1, "Plan ID is required")
+  planId: z7.string().trim().min(1, "Plan ID is required"),
+  invites: z7.array(
+    z7.object({
+      email: z7.string().email("Invalid email address"),
+      role: z7.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).optional()
 });
 
 // src/schema/invitation/CreateInvitationSchema.ts
