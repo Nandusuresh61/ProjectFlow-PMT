@@ -41,6 +41,7 @@ export default function Onboarding() {
   const [direction, setDirection] = useState(0);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansLoading, setPlansLoading] = useState(true);
+  const [finishLoading, setFinishLoading] = useState(false);
   const [formData, setFormData] = useState<OnboardingState>({
     workspaceName: "",
     planId: "",
@@ -113,6 +114,7 @@ export default function Onboarding() {
         role: m.role,
       }));
 
+    setFinishLoading(true);
     try {
       const response = await completeOnboarding({
         workspaceName: formData.workspaceName,
@@ -132,6 +134,8 @@ export default function Onboarding() {
       navigate("/home");
     } catch (error: any) {
       toast.error(error.message || "Failed to complete onboarding");
+    } finally {
+      setFinishLoading(false);
     }
   };
   return (
@@ -146,7 +150,7 @@ export default function Onboarding() {
         />
       </nav>
 
-      <main className="flex-grow flex flex-col items-center justify-center p-4 md:p-6 relative z-10 w-full max-w-4xl mx-auto">
+      <main className="flex-grow flex flex-col items-center justify-center px-4 py-4 md:p-6 relative z-10 w-full max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -235,6 +239,7 @@ export default function Onboarding() {
                     updateData={updateData}
                     onBack={goBack}
                     onFinish={handleFinish}
+                    isLoading={finishLoading}
                   />
                 )}
               </motion.div>

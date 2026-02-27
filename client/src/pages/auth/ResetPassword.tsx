@@ -75,7 +75,7 @@ export default function ResetPassword() {
         </Link>
       </nav>
 
-      <main className="flex-grow flex items-center justify-center p-4 md:p-6 relative z-10">
+      <main className="flex-grow flex items-center justify-center px-4 py-6 md:p-6 relative z-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -83,14 +83,14 @@ export default function ResetPassword() {
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-4xl font-black tracking-tight text-white uppercase">Reset Password</h1>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase">Reset Password</h1>
             <p className="text-[#576CBC]/60 font-medium">
               OTP sent to{" "}
               <span className="text-white font-bold">{pendingEmail}</span>
             </p>
           </div>
 
-          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-[3rem] p-10 shadow-3xl backdrop-blur-3xl">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-3xl sm:rounded-[3rem] p-6 sm:p-10 shadow-3xl backdrop-blur-3xl">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}

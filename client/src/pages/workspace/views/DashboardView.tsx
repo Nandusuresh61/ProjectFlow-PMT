@@ -51,7 +51,7 @@ export const DashboardView = ({ openInvite }: DashboardViewProps) => {
     return (
         <div className="space-y-10">
             <div className="text-left py-2">
-                <h1 className="text-4xl font-black text-white mb-2">Welcome back, Admin</h1>
+                <h1 className="text-2xl sm:text-4xl font-black text-white mb-2">Welcome back, Admin</h1>
                 <p className="text-[#576CBC]/60 font-medium tracking-tight">Here's what's happening with your projects today.</p>
             </div>
 
@@ -80,13 +80,13 @@ export const DashboardView = ({ openInvite }: DashboardViewProps) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] overflow-hidden">
-                        <div className="px-10 py-8 flex justify-between items-center border-b border-white/5">
+                        <div className="px-4 sm:px-10 py-6 sm:py-8 flex justify-between items-center border-b border-white/5">
                             <h3 className="text-lg font-bold text-white tracking-tight">Recent Activity</h3>
                             <button className="text-xs font-bold text-[#A5D7E8] hover:underline">View all</button>
                         </div>
                         <div className="divide-y divide-white/5">
                             {activities.map((act) => (
-                                <div key={act.id} className="px-10 py-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer">
+                                <div key={act.id} className="px-4 sm:px-10 py-4 sm:py-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer">
                                     <div className="flex items-center gap-6">
                                         <div className="w-10 h-10 bg-[#19376D] rounded-full flex items-center justify-center text-[10px] font-black text-[#A5D7E8]">
                                             {act.user}
@@ -108,7 +108,7 @@ export const DashboardView = ({ openInvite }: DashboardViewProps) => {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] p-10">
+                    <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] p-6 sm:p-10">
                         <h3 className="text-lg font-bold text-white mb-8 tracking-tight">Quick Actions</h3>
                         <div className="space-y-4">
                             <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">

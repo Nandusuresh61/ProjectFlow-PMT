@@ -9,13 +9,12 @@ export default function ProtectedRoutes() {
   const checkAuth = AuthUserState((state) => state.checkAuth);
   const location = useLocation();
 
-  // authChecked prevents the "not authenticated → redirect to /login" flash
-  // on the first render before the async checkAuth has resolved.
+
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     checkAuth().finally(() => setAuthChecked(true));
-  }, []); // runs once on mount — only fires for protected pages
+  }, []); 
 
   if (!authChecked) {
     return <Loader fullScreen />;

@@ -40,6 +40,7 @@ export interface StepTeamProps {
   updateData: (data: Partial<OnboardingState>) => void;
   onBack: () => void;
   onFinish: () => void;
+  isLoading?: boolean;
 }
 
 export interface StepWorkspaceProps {

@@ -216,7 +216,7 @@ export default function LandingPage() {
         <GridBackground />
 
         {/* --- HERO --- */}
-        <section className="relative pt-48 pb-32 px-6">
+        <section className="relative pt-32 md:pt-48 pb-16 md:pb-32 px-4 md:px-6">
           <div className="max-w-5xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -234,7 +234,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-5xl md:text-[9rem] font-black tracking-tighter leading-[0.9] md:leading-[0.85] mb-8 md:mb-12 bg-clip-text text-transparent bg-gradient-to-b from-white to-[#A5D7E8]/40"
+              className="text-4xl sm:text-6xl md:text-[8rem] lg:text-[9rem] font-black tracking-tighter leading-[0.9] md:leading-[0.85] mb-6 md:mb-12 bg-clip-text text-transparent bg-gradient-to-b from-white to-[#A5D7E8]/40"
             >
               SHIP FASTER <br />
               TOGETHER.
@@ -267,7 +267,7 @@ export default function LandingPage() {
         </section>
 
         {/* --- FEATURES --- */}
-        <section id="features" className="py-32 px-6">
+        <section id="features" className="py-16 md:py-32 px-4 md:px-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 md:mb-24 gap-8">
               <div className="max-w-2xl">
@@ -312,7 +312,7 @@ export default function LandingPage() {
         {/* --- PRICING --- */}
         <section
           id="pricing"
-          className="py-32 px-6 bg-white/[0.02] border-y border-white/5"
+          className="py-16 md:py-32 px-4 md:px-6 bg-white/[0.02] border-y border-white/5"
         >
           <div className="max-w-7xl mx-auto">
             <div className="text-center max-w-2xl mx-auto mb-24">
@@ -352,7 +352,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="py-24 px-6 border-t border-white/5">
+      <footer className="py-16 md:py-24 px-4 md:px-6 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
             <div>

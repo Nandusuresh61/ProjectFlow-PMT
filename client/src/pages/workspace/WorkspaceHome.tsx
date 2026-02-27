@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { AuthUserState } from '@/store/auth.store';
 import { logoutUser } from '@/services/auth/auth.api';
 import { BackgroundAtmosphere } from './components/BaseComponents';
-import { Sidebar, Header } from './components/LayoutComponents';
+import { Sidebar, Header, MobileNav } from './components/LayoutComponents';
 import { DashboardView } from './views/DashboardView';
 import { TeamView } from './views/TeamView';
 import { PlaceholderView, InviteModal } from './views/ComplementaryViews';
@@ -39,6 +39,7 @@ export default function WorkspaceHome() {
         <div className="flex h-screen w-full bg-[#060c16] font-sans text-white selection:bg-[#A5D7E8] selection:text-[#0B2447] overflow-hidden">
             <BackgroundAtmosphere />
 
+            {/* Desktop sidebar */}
             <Sidebar
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -50,7 +51,8 @@ export default function WorkspaceHome() {
                 <Header activeTab={activeTab} user={user} onLogout={handleLogout} />
                 {isLoggingOut && <div className="sr-only">Logging out...</div>}
 
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-12 lg:p-16 custom-scrollbar">
+                {/* Content area — add bottom padding on mobile for the nav bar */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 lg:p-12 pb-20 lg:pb-12 custom-scrollbar">
                     <div className="max-w-[1600px] mx-auto w-full">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -73,6 +75,9 @@ export default function WorkspaceHome() {
                 </div>
             </main>
 
+            {/* Mobile bottom navigation */}
+            <MobileNav activeTab={activeTab} setActiveTab={setActiveTab} />
+
             <InviteModal
                 isOpen={isInviteModalOpen}
                 onClose={() => setIsInviteModalOpen(false)}
@@ -80,4 +85,3 @@ export default function WorkspaceHome() {
         </div>
     );
 }
-

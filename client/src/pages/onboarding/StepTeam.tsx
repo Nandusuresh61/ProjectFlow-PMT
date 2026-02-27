@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { StepTeamProps } from "@/types/onboarding.types";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { WorkspaceRoleEnum } from "shared";
 
-export function StepTeam({ data, updateData, onBack, onFinish }: StepTeamProps) {
+export function StepTeam({ data, updateData, onBack, onFinish, isLoading }: StepTeamProps) {
     const handleChange = (
         index: number,
         field: "email" | "role",
@@ -69,7 +70,7 @@ export function StepTeam({ data, updateData, onBack, onFinish }: StepTeamProps) 
                         updateData({
                             teamMembers: [
                                 ...data.teamMembers,
-                                { email: "", role: "WORKSPACE_MEMBER" },
+                                { email: "", role: WorkspaceRoleEnum.WORKSPACE_MEMBER },
                             ],
                         })
                     }
@@ -90,9 +91,17 @@ export function StepTeam({ data, updateData, onBack, onFinish }: StepTeamProps) 
 
                 <Button
                     onClick={onFinish}
-                    className="bg-[#A5D7E8] text-[#0B2447] hover:bg-[#A5D7E8]/90 font-black px-10 h-12 rounded-xl uppercase tracking-wider shadow-lg"
+                    disabled={isLoading}
+                    className="bg-[#A5D7E8] text-[#0B2447] hover:bg-[#A5D7E8]/90 font-black px-10 h-12 rounded-xl uppercase tracking-wider shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                    Finish Setup
+                    {isLoading ? (
+                        <>
+                            <Loader2 size={16} className="animate-spin" />
+                            Setting up...
+                        </>
+                    ) : (
+                        "Finish Setup"
+                    )}
                 </Button>
             </div>
         </div>

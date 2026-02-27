@@ -7,8 +7,6 @@ import {
     Video,
     Activity,
     Settings,
-    Search,
-    Bell,
     ChevronDown,
     ChevronRight,
     LogOut
@@ -108,37 +106,23 @@ interface HeaderProps {
 }
 
 export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
-    <header className="h-16 bg-[#060c16]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-8 flex-shrink-0">
-        <div className="flex items-center gap-6">
+    <header className="h-16 bg-[#060c16]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-4 md:px-8 flex-shrink-0">
+        <div className="flex items-center gap-2 md:gap-6">
             <div className="flex items-center gap-2 cursor-pointer group px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
                 <Logo
                     showText={false}
                     iconClassName="w-6 h-6 bg-[#19376D] text-[#A5D7E8] group-hover:bg-[#A5D7E8] group-hover:text-[#0B2447] transition-all"
                     className="flex-shrink-0"
                 />
-                <span className="text-sm font-semibold text-white/90">Acme Corp</span>
-                <ChevronDown size={14} className="text-[#576CBC]/60 group-hover:text-white" />
+                <span className="text-sm font-semibold text-white/90 hidden sm:block">Acme Corp</span>
+                <ChevronDown size={14} className="text-[#576CBC]/60 group-hover:text-white hidden sm:block" />
             </div>
-            <ChevronRight size={14} className="text-white/20" />
+            <ChevronRight size={14} className="text-white/20 hidden sm:block" />
             <span className="text-sm font-bold text-white capitalize">{activeTab}</span>
         </div>
 
-        <div className="flex items-center gap-6">
-            {/* <div className="relative group flex items-center">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#576CBC]/40 group-focus-within:text-[#A5D7E8] transition-colors" size={16} />
-                <input
-                    type="text"
-                    placeholder="Search issues, projects..."
-                    className="bg-white/5 border border-white/5 rounded-lg py-2 pl-10 pr-4 text-xs w-64 text-white focus:outline-none focus:bg-white/[0.08] transition-all"
-                />
-            </div> */}
-
-            {/* <div className="relative cursor-pointer group">
-                <Bell size={20} className="text-[#576CBC]/60 group-hover:text-white transition-colors" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-[#060c16]" />
-            </div> */}
-
-            <div className="flex items-center gap-3 pl-4 border-l border-white/5">
+        <div className="flex items-center gap-3 md:gap-6">
+            <div className="flex items-center gap-2 md:gap-3 pl-3 md:pl-4 border-l border-white/5">
                 <div className="text-right hidden sm:block">
                     <p className="text-xs font-bold text-white leading-none mb-1">{user?.fullName || "Admin"}</p>
                 </div>
@@ -153,13 +137,43 @@ export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
                     onClick={onLogout}
                     whileHover={{ scale: 1.02, backgroundColor: "rgba(244, 63, 94, 0.1)" }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-rose-500/20 text-rose-500 hover:border-rose-500/40 transition-colors ml-2"
+                    className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 rounded-lg border border-rose-500/20 text-rose-500 hover:border-rose-500/40 transition-colors ml-1 md:ml-2"
                 >
                     <LogOut size={14} />
-                    <span className="text-xs font-bold uppercase tracking-wider">Logout</span>
+                    <span className="text-xs font-bold uppercase tracking-wider hidden sm:block">Logout</span>
                 </motion.button>
             </div>
         </div>
     </header>
 );
 
+// Mobile bottom nav bar — displayed only on screens smaller than lg
+interface MobileNavProps {
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
+}
+
+export const MobileNav = ({ activeTab, setActiveTab }: MobileNavProps) => {
+    const navItems: MenuItem[] = [
+        { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
+        { id: 'projects', icon: Briefcase, label: 'Projects' },
+        { id: 'team', icon: Users, label: 'Team' },
+        { id: 'activity', icon: Activity, label: 'Activity' },
+        { id: 'settings', icon: Settings, label: 'Settings' },
+    ];
+
+    return (
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#060c16]/95 backdrop-blur-xl border-t border-white/5 flex items-center justify-around px-2 h-16">
+            {navItems.map((item) => (
+                <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`flex flex-col items-center gap-1 flex-1 py-1 transition-all ${activeTab === item.id ? 'text-[#A5D7E8]' : 'text-[#576CBC]/60'}`}
+                >
+                    <item.icon size={20} />
+                    <span className="text-[9px] font-bold uppercase tracking-wide">{item.label}</span>
+                </button>
+            ))}
+        </nav>
+    );
+};
