@@ -209,7 +209,9 @@ export default function Workspaces() {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               className="focus:bg-zinc-800 focus:text-white"
-              onClick={() => handleViewDetails(user.userId)}
+              onSelect={() => {
+                setTimeout(() => handleViewDetails(user.userId), 100);
+              }}
             >
               View details
             </DropdownMenuItem>

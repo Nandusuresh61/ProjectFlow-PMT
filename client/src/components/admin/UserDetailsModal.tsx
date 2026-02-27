@@ -22,8 +22,6 @@ export function UserDetailsModal({
     user,
     loading,
 }: UserDetailsModalProps) {
-    if (!user && !loading) return null;
-
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[600px] bg-zinc-900 border-zinc-800 text-zinc-100">
