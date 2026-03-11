@@ -50,7 +50,7 @@ export class AuthController implements IAuthController {
 
       const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
 
-      logger.error(`>>>  OTP <<< [AuthController] startRegister called with email: ${dto.email}`);
+      logger.info(`>>>  OTP <<< [AuthController] startRegister called with email: ${dto.email}`);
 
       await this._startRegisterUseCase.execute(dto);
 
