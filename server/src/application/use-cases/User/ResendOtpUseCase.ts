@@ -76,7 +76,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     );
 
     // Otp to mail
-    logger.error(`>>> DEBUG OTP <<< [ResendOtp] New OTP for ${email}: ${otp}`);
+    logger.info(`>>>  OTP <<< [ResendOtp] New OTP for ${email}: ${otp}`);
 
     await this._emailService.sendMail({
       to: email,

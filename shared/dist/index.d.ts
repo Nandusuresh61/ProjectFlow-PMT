@@ -3,11 +3,13 @@ import z, { z as z$1 } from 'zod';
 declare enum ErrorCode {
     AUTH = "Authentication Error",
     PLAN = "Plan Error",
+    CONFLICT = "Conflit",
     ONBOARDING = "Onboarding Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN",
-    RESOURCE_NOT_FOUND = "Resource Not Found"
+    RESOURCE_NOT_FOUND = "Resource Not Found",
+    INVALID_OPERATION = "Invalid Operation"
 }
 
 declare enum HttpStatusCode {
@@ -45,13 +47,22 @@ declare enum EmailType {
 }
 
 declare enum WorkspaceRoleEnum {
+    WORKSPACE_OWNER = "WORKSPACE_OWNER",
     WORKSPACE_ADMIN = "WORKSPACE_ADMIN",
-    MEMBER = "MEMBER"
+    WORKSPACE_MEMBER = "WORKSPACE_MEMBER",
+    WORKSPACE_VIEWER = "WORKSPACE_VIEWER"
 }
 
 declare enum AuthProvider {
     LOCAL = "LOCAL",
     GOOGLE = "GOOGLE"
+}
+
+declare enum InvitationStatus {
+    PENDING = "PENDING",
+    ACCEPTED = "ACCEPTED",
+    EXPIRED = "EXPIRED",
+    CANCELLED = "CANCELLED"
 }
 
 declare class AppError extends Error {
@@ -101,6 +112,15 @@ declare const AppMessages: {
     readonly ONBOARDING_COMPLETED: "Onboarding completed successfully";
     readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
     readonly USER_FETCHING_SUCCESSFUL: "User Fetching Successfull";
+    readonly WORKSPACE_NOT_FOUND: "Workspace not found";
+    readonly INVITATION_SENT_SUCCESS: "Invitation sent success";
+    readonly INVITATION_ALREADY_SENT: " Invitation already sent to this email";
+    readonly INVALID_INVITATION: "Invalid Invitation";
+    readonly INVITATION_EXPIRED: "Invitation Expired!";
+    readonly INVITATION_ACCEPTED: "Invitation Accepted";
+    readonly INVITATION_ALREADY_USED: "Invitation Already Used";
+    readonly MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded";
+    readonly USER_ALREADY_MEMBER: "User Already Member in this workspace";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -150,6 +170,17 @@ type CreatePlanSchemaType = z$1.infer<typeof CreatePlanSchema>;
 declare const CompleteOnboardingSchema: z$1.ZodObject<{
     workspaceName: z$1.ZodString;
     planId: z$1.ZodString;
+    invites: z$1.ZodOptional<z$1.ZodArray<z$1.ZodObject<{
+        email: z$1.ZodString;
+        role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+    }, z$1.core.$strip>>>;
+}, z$1.core.$strip>;
+
+declare const CreateInvitationSchema: z$1.ZodObject<{
+    invites: z$1.ZodArray<z$1.ZodObject<{
+        email: z$1.ZodString;
+        role: z$1.ZodEnum<typeof WorkspaceRoleEnum>;
+    }, z$1.core.$strip>>;
 }, z$1.core.$strip>;
 
 type SuccessResponse<T> = {
@@ -166,4 +197,4 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

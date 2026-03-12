@@ -209,7 +209,9 @@ export default function Workspaces() {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               className="focus:bg-zinc-800 focus:text-white"
-              onClick={() => handleViewDetails(user.userId)}
+              onSelect={() => {
+                setTimeout(() => handleViewDetails(user.userId), 100);
+              }}
             >
               View details
             </DropdownMenuItem>
@@ -244,7 +246,7 @@ export default function Workspaces() {
 
   // ── Footer: server-side pagination controls ───────────────────────────────
   const footer = (
-    <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-zinc-800 pt-4 gap-3">
       <div className="text-sm text-zinc-500">
         Showing{" "}
         <span className="font-medium text-zinc-300">

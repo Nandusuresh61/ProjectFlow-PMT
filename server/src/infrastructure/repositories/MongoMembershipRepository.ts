@@ -1,9 +1,14 @@
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { Membership } from "@/domain/entities/Membership";
-import { MembershipModel, MembershipDocument } from "../database/models/MongoMembershipModel";
+import {
+  MembershipModel,
+  MembershipDocument,
+} from "../database/models/MongoMembershipModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
 
-export class MembershipRepository extends MongoBaseRepository<Membership, MembershipDocument> implements IMembershipRepository {
+export class MembershipRepository
+  extends MongoBaseRepository<Membership, MembershipDocument>
+  implements IMembershipRepository {
   constructor() {
     super(MembershipModel);
   }
@@ -14,7 +19,7 @@ export class MembershipRepository extends MongoBaseRepository<Membership, Member
       doc.userId,
       doc.workspaceId,
       doc.role,
-      doc.joinedAt
+      doc.joinedAt,
     );
   }
 
@@ -27,5 +32,24 @@ export class MembershipRepository extends MongoBaseRepository<Membership, Member
       joinedAt: membership.joinedAt,
     };
     return super.create(membershipDoc);
+  }
+
+  async findByUserAndWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<Membership | null> {
+    return this.findOne({ userId, workspaceId });
+  }
+
+  async countByWorkspace(workspaceId: string): Promise<number> {
+    return MembershipModel.countDocuments({ workspaceId });
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    return MembershipModel.countDocuments({ userId });
+  }
+
+  async findByWorkspace(workspaceId: string): Promise<Membership[]> {
+    return this.find({ workspaceId });
   }
 }

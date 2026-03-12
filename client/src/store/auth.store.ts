@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types/auth.types";
+import { getMe } from "@/services/auth/auth.api";
 
 interface AuthState {
   user: User | null;
@@ -13,15 +14,17 @@ interface AuthState {
   clearUser: () => void;
   setLoading: (value: boolean) => void;
   setPendingEmail: (email: string | null) => void;
+  checkAuth: () => Promise<void>;
+  initializeAuth: () => Promise<void>;
 }
 
 
 export const AuthUserState = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: true,
+      isLoading: false,
       pendingEmail: null,
 
       setUser: (user) =>
@@ -42,6 +45,31 @@ export const AuthUserState = create<AuthState>()(
       setLoading: (value) => set({ isLoading: value }),
 
       setPendingEmail: (email) => set({ pendingEmail: email }),
+
+      checkAuth: async () => {
+        set({ isLoading: true });
+        try {
+          const response = await getMe();
+          set({
+            user: response.data!.user,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } catch {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
+      },
+
+      
+      initializeAuth: async () => {
+        if (get().isAuthenticated) {
+          await get().checkAuth();
+        }
+      },
     }),
     {
       name: "auth-store",

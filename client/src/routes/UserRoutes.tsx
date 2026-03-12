@@ -9,10 +9,11 @@ import PublicRoutes from "./PublicRoutes";
 import ProtectedRoutes from "./ProtectedRoutes";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import GoogleCallback from "@/pages/auth/GoogleCallback";
+import AcceptInvitation from "@/pages/invite/AcceptInvitation";
 
 const Home = lazy(() => import("@/pages/Home"));
 const LandingPage = lazy(() => import("@/pages/landing/LandingPage"));
-const Onboarding = lazy(() => import("@/pages/auth/Onboarding"));
+const Onboarding = lazy(() => import("@/pages/onboarding/Onboarding"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 export default function UserRoutes() {
@@ -27,6 +28,7 @@ export default function UserRoutes() {
         <Route path="/verify-otp" element={<Otp />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/invite/accept" element={<AcceptInvitation />} />
       </Route>
 
       {/* User Protected Routes */}

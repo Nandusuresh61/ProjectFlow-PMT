@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Building2, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users, UserPlus } from "lucide-react";
+import { LayoutDashboard, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth/auth.api";
@@ -19,7 +19,7 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
     const location = useLocation();
     const navigate = useNavigate();
     const clearUser = AuthUserState((state) => state.clearUser);
-    const [, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin/dashboard" },
@@ -139,9 +139,10 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
                             collapsed && "justify-center px-0"
                         )}
                         onClick={handleLogout}
+                        disabled={isLoading}
                     >
                         <LogOut size={20} className="flex-shrink-0" />
-                        {!collapsed && "Logout"}
+                        {!collapsed && (isLoading ? "Logging out..." : "Logout")}
                     </Button>
                 </div>
             </div>

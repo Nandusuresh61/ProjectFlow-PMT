@@ -3,7 +3,6 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-
 import {
   AppError,
   AppMessages,
@@ -12,12 +11,14 @@ import {
   HttpStatusCode,
   TokenEnums,
 } from "shared";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _uidGenerator: IUidGenerator,
+    private readonly _membershipRepo: IMembershipRepository
   ) { }
 
   async execute(payload: OAuthUserPayload) {
@@ -38,7 +39,6 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         email: payload.email,
         authProvider: AuthProvider.GOOGLE,
         providerId: payload.providerId,
-        isOnboarded: false,
         isSuperAdmin: false,
         createdAt: now,
         updatedAt: now,
@@ -46,6 +46,8 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
 
       await this._userRepo.createUser(user);
     }
+
+    const membershipCount = await this._membershipRepo.countByUserId(user.userId);
 
     const accessToken = this._tokenService.createAccessToken({
       userId: user.userId,
@@ -68,8 +70,8 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
-        isOnboarded: user.isOnboarded,
         currentWorkspaceId: user.currentWorkspaceId,
+        membershipCount,
       },
       accessToken,
       refreshToken,

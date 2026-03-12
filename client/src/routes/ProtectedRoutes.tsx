@@ -1,14 +1,22 @@
 import { AuthUserState } from "@/store/auth.store";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Loader } from "@/components/ui/Loader";
+import { useEffect, useState } from "react";
 
 export default function ProtectedRoutes() {
   const isAuthenticated = AuthUserState((state) => state.isAuthenticated);
   const user = AuthUserState((state) => state.user);
-  const isLoading = AuthUserState((state) => state.isLoading);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const location = useLocation();
 
-  if (isLoading) {
+
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    checkAuth().finally(() => setAuthChecked(true));
+  }, []); 
+
+  if (!authChecked) {
     return <Loader fullScreen />;
   }
 
@@ -20,8 +28,7 @@ export default function ProtectedRoutes() {
     return <Navigate to="/super-admin/dashboard" replace />;
   }
 
-
-  if (!user?.isOnboarded && location.pathname !== "/onboarding") {
+  if (user && user.membershipCount === 0 && location.pathname !== "/onboarding") {
     return <Navigate to="/onboarding" replace />;
   }
 

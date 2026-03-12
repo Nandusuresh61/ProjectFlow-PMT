@@ -2,11 +2,13 @@
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
   ErrorCode2["PLAN"] = "Plan Error";
+  ErrorCode2["CONFLICT"] = "Conflit";
   ErrorCode2["ONBOARDING"] = "Onboarding Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
   ErrorCode2["RESOURCE_NOT_FOUND"] = "Resource Not Found";
+  ErrorCode2["INVALID_OPERATION"] = "Invalid Operation";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -52,8 +54,10 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
 
 // src/enums/WorkspaceRolesEnum.ts
 var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
+  WorkspaceRoleEnum2["WORKSPACE_OWNER"] = "WORKSPACE_OWNER";
   WorkspaceRoleEnum2["WORKSPACE_ADMIN"] = "WORKSPACE_ADMIN";
-  WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_MEMBER"] = "WORKSPACE_MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_VIEWER"] = "WORKSPACE_VIEWER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
 
@@ -63,6 +67,15 @@ var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
   AuthProvider2["GOOGLE"] = "GOOGLE";
   return AuthProvider2;
 })(AuthProvider || {});
+
+// src/enums/InvitationStatusEnum.ts
+var InvitationStatus = /* @__PURE__ */ ((InvitationStatus2) => {
+  InvitationStatus2["PENDING"] = "PENDING";
+  InvitationStatus2["ACCEPTED"] = "ACCEPTED";
+  InvitationStatus2["EXPIRED"] = "EXPIRED";
+  InvitationStatus2["CANCELLED"] = "CANCELLED";
+  return InvitationStatus2;
+})(InvitationStatus || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -118,7 +131,16 @@ var AppMessages = {
   PLAN_STATUS_UPDATED: "Plan Status updated.",
   ONBOARDING_COMPLETED: "Onboarding completed successfully",
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
-  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
+  WORKSPACE_NOT_FOUND: "Workspace not found",
+  INVITATION_SENT_SUCCESS: "Invitation sent success",
+  INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+  INVALID_INVITATION: "Invalid Invitation",
+  INVITATION_EXPIRED: "Invitation Expired!",
+  INVITATION_ACCEPTED: "Invitation Accepted",
+  INVITATION_ALREADY_USED: "Invitation Already Used",
+  MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
+  USER_ALREADY_MEMBER: "User Already Member in this workspace"
 };
 
 // src/schema/TokenPayload.ts
@@ -184,7 +206,24 @@ var CreatePlanSchema = z6.object({
 import { z as z7 } from "zod";
 var CompleteOnboardingSchema = z7.object({
   workspaceName: z7.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
-  planId: z7.string().trim().min(1, "Plan ID is required")
+  planId: z7.string().trim().min(1, "Plan ID is required"),
+  invites: z7.array(
+    z7.object({
+      email: z7.string().email("Invalid email address"),
+      role: z7.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).optional()
+});
+
+// src/schema/invitation/CreateInvitationSchema.ts
+import { z as z8 } from "zod";
+var CreateInvitationSchema = z8.object({
+  invites: z8.array(
+    z8.object({
+      email: z8.string().email(),
+      role: z8.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).min(1)
 });
 
 // src/response/responseHandler.ts
@@ -208,11 +247,13 @@ export {
   AppMessages,
   AuthProvider,
   CompleteOnboardingSchema,
+  CreateInvitationSchema,
   CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
   HttpStatusCode,
+  InvitationStatus,
   LoginUserSchema,
   RegisterUserSchema,
   ResetPasswordSchema,

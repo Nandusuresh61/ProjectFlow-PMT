@@ -34,11 +34,13 @@ __export(index_exports, {
   AppMessages: () => AppMessages,
   AuthProvider: () => AuthProvider,
   CompleteOnboardingSchema: () => CompleteOnboardingSchema,
+  CreateInvitationSchema: () => CreateInvitationSchema,
   CreatePlanSchema: () => CreatePlanSchema,
   EmailType: () => EmailType,
   ErrorCode: () => ErrorCode,
   ForgotEmailSchema: () => ForgotEmailSchema,
   HttpStatusCode: () => HttpStatusCode,
+  InvitationStatus: () => InvitationStatus,
   LoginUserSchema: () => LoginUserSchema,
   RegisterUserSchema: () => RegisterUserSchema,
   ResetPasswordSchema: () => ResetPasswordSchema,
@@ -53,11 +55,13 @@ module.exports = __toCommonJS(index_exports);
 var ErrorCode = /* @__PURE__ */ ((ErrorCode2) => {
   ErrorCode2["AUTH"] = "Authentication Error";
   ErrorCode2["PLAN"] = "Plan Error";
+  ErrorCode2["CONFLICT"] = "Conflit";
   ErrorCode2["ONBOARDING"] = "Onboarding Error";
   ErrorCode2["EMAIL_SEND_FAILED"] = "Email send failed!";
   ErrorCode2["EMAIL_SERVICE_UNAVAILABLE"] = "Email Service Unavailable!";
   ErrorCode2["OTP_RESEND_COOLDOWN"] = "OTP_RESEND_COOLDOWN";
   ErrorCode2["RESOURCE_NOT_FOUND"] = "Resource Not Found";
+  ErrorCode2["INVALID_OPERATION"] = "Invalid Operation";
   return ErrorCode2;
 })(ErrorCode || {});
 
@@ -103,8 +107,10 @@ var EmailType = /* @__PURE__ */ ((EmailType2) => {
 
 // src/enums/WorkspaceRolesEnum.ts
 var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
+  WorkspaceRoleEnum2["WORKSPACE_OWNER"] = "WORKSPACE_OWNER";
   WorkspaceRoleEnum2["WORKSPACE_ADMIN"] = "WORKSPACE_ADMIN";
-  WorkspaceRoleEnum2["MEMBER"] = "MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_MEMBER"] = "WORKSPACE_MEMBER";
+  WorkspaceRoleEnum2["WORKSPACE_VIEWER"] = "WORKSPACE_VIEWER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
 
@@ -114,6 +120,15 @@ var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
   AuthProvider2["GOOGLE"] = "GOOGLE";
   return AuthProvider2;
 })(AuthProvider || {});
+
+// src/enums/InvitationStatusEnum.ts
+var InvitationStatus = /* @__PURE__ */ ((InvitationStatus2) => {
+  InvitationStatus2["PENDING"] = "PENDING";
+  InvitationStatus2["ACCEPTED"] = "ACCEPTED";
+  InvitationStatus2["EXPIRED"] = "EXPIRED";
+  InvitationStatus2["CANCELLED"] = "CANCELLED";
+  return InvitationStatus2;
+})(InvitationStatus || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -169,7 +184,16 @@ var AppMessages = {
   PLAN_STATUS_UPDATED: "Plan Status updated.",
   ONBOARDING_COMPLETED: "Onboarding completed successfully",
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
-  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull"
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
+  WORKSPACE_NOT_FOUND: "Workspace not found",
+  INVITATION_SENT_SUCCESS: "Invitation sent success",
+  INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+  INVALID_INVITATION: "Invalid Invitation",
+  INVITATION_EXPIRED: "Invitation Expired!",
+  INVITATION_ACCEPTED: "Invitation Accepted",
+  INVITATION_ALREADY_USED: "Invitation Already Used",
+  MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
+  USER_ALREADY_MEMBER: "User Already Member in this workspace"
 };
 
 // src/schema/TokenPayload.ts
@@ -235,7 +259,24 @@ var CreatePlanSchema = import_zod6.z.object({
 var import_zod7 = require("zod");
 var CompleteOnboardingSchema = import_zod7.z.object({
   workspaceName: import_zod7.z.string().trim().min(2, "Workspace name must be at least 2 characters").max(100, "Workspace name cannot exceed 100 characters"),
-  planId: import_zod7.z.string().trim().min(1, "Plan ID is required")
+  planId: import_zod7.z.string().trim().min(1, "Plan ID is required"),
+  invites: import_zod7.z.array(
+    import_zod7.z.object({
+      email: import_zod7.z.string().email("Invalid email address"),
+      role: import_zod7.z.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).optional()
+});
+
+// src/schema/invitation/CreateInvitationSchema.ts
+var import_zod8 = require("zod");
+var CreateInvitationSchema = import_zod8.z.object({
+  invites: import_zod8.z.array(
+    import_zod8.z.object({
+      email: import_zod8.z.string().email(),
+      role: import_zod8.z.nativeEnum(WorkspaceRoleEnum)
+    })
+  ).min(1)
 });
 
 // src/response/responseHandler.ts
@@ -260,11 +301,13 @@ var ResponseHandler = {
   AppMessages,
   AuthProvider,
   CompleteOnboardingSchema,
+  CreateInvitationSchema,
   CreatePlanSchema,
   EmailType,
   ErrorCode,
   ForgotEmailSchema,
   HttpStatusCode,
+  InvitationStatus,
   LoginUserSchema,
   RegisterUserSchema,
   ResetPasswordSchema,

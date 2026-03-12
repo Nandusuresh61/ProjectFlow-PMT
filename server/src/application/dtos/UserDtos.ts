@@ -12,8 +12,8 @@ export type UserAuthResponseDto = {
     fullName: string;
     email: string;
     isSuperAdmin: boolean;
-    isOnboarded: boolean,
-    currentWorkspaceId: string,
+    currentWorkspaceId?: string;
+    membershipCount: number;
   };
   accessToken: string;
   refreshToken: string;

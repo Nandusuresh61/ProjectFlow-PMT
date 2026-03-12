@@ -28,4 +28,8 @@ export class WorkspaceRepository extends MongoBaseRepository<Workspace, Workspac
     };
     return super.create(workspaceDoc);
   }
+
+  async findById(workspaceId: string) {
+  return this.findOne({ workspaceId });
+}
 }

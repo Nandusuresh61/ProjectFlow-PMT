@@ -9,7 +9,7 @@ export interface User {
   fullName: string;
   email: string;
   isSuperAdmin: boolean;
-  isOnboarded: boolean;
+  membershipCount: number;
   currentWorkspaceId?: string;
 }
 

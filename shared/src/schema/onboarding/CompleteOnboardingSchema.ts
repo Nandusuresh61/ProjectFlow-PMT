@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { WorkspaceRoleEnum } from "../../enums";
 
 export const CompleteOnboardingSchema = z.object({
   workspaceName: z
@@ -11,4 +12,13 @@ export const CompleteOnboardingSchema = z.object({
     .string()
     .trim()
     .min(1, "Plan ID is required"),
+
+  invites: z
+    .array(
+      z.object({
+        email: z.string().email("Invalid email address"),
+        role: z.nativeEnum(WorkspaceRoleEnum),
+      }),
+    )
+    .optional(),
 });

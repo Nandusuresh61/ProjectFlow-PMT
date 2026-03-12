@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 type OtpValues = { otp: string };
 
@@ -18,7 +20,7 @@ const fields: FormField<OtpValues>[] = [
     type: "text",
     placeholder: "123456",
     inputClassName:
-      "text-center text-2xl tracking-[0.5em] font-mono h-14 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-white/20",
+      "text-center text-4xl tracking-[0.5em] font-black h-20 bg-[#19376D]/10 border-[#576CBC]/20 text-[#A5D7E8] placeholder:text-[#576CBC]/20 focus-visible:ring-[#A5D7E8]/30 rounded-2xl",
     inputProps: { maxLength: 6, inputMode: "numeric", pattern: "[0-9]*" },
   },
 ];
@@ -27,7 +29,7 @@ const INITIAL_VALUES: OtpValues = { otp: "" };
 
 export default function Otp() {
   const pendingEmail = AuthUserState((state) => state.pendingEmail);
-  const setUser = AuthUserState((state) => state.setUser);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
   const navigate = useNavigate();
   const [timer, setTimer] = useState(60);
 
@@ -66,10 +68,24 @@ export default function Otp() {
       return;
     }
     try {
-      const response = await verifyUserOtp({ email: pendingEmail, otp: values.otp });
-      setUser(response.data!.user);
+      const response = await verifyUserOtp({
+        email: pendingEmail,
+        otp: values.otp,
+      });
       toast.success(response.message);
-      setTimeout(() => navigate("/home"), 300);
+      const pendingToken = localStorage.getItem("invite_token");
+      if (pendingToken) {
+        try {
+          await acceptInvitation(pendingToken);
+          localStorage.removeItem("invite_token");
+          toast.success("Joined workspace successfully!");
+        } catch (inviteErr) {
+          console.error("Invitation failed:", inviteErr);
+        }
+      }
+
+      await checkAuth();
+      navigate("/home");
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -77,14 +93,16 @@ export default function Otp() {
 
   const ResendFooter = (
     <div className="text-center text-sm">
-      <span className="text-slate-500">Didn't receive the code? </span>
+      <span className="text-[#576CBC]/60">Didn't receive the code? </span>
       {timer > 0 ? (
-        <span className="text-slate-500">Resend in {timer}s</span>
+        <span className="text-[#576CBC]/60 font-medium">
+          Resend in {timer}s
+        </span>
       ) : (
         <button
           type="button"
           onClick={handleResend}
-          className="text-white underline hover:text-slate-200 transition-colors"
+          className="text-[#A5D7E8] font-bold hover:underline underline-offset-4 transition-all"
         >
           Click to resend
         </button>
@@ -93,39 +111,45 @@ export default function Otp() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#060c16] text-white font-sans flex flex-col relative overflow-hidden selection:bg-[#A5D7E8] selection:text-[#0B2447]">
+      <BackgroundAtmosphere />
       <GridBackground />
 
       <nav className="relative z-10 p-6 flex items-center justify-between">
         <Link to="/" className="group">
           <Logo
-            iconClassName="bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform"
+            iconClassName="bg-[#A5D7E8] text-[#0B2447] shadow-[0_0_20px_rgba(165,215,232,0.2)] group-hover:scale-110 transition-transform"
             textClassName="text-white"
           />
         </Link>
         <Link to="/login">
-          <Button variant="ghost" className="text-slate-400 hover:text-white hover:bg-white/5">
+          <Button
+            variant="ghost"
+            className="text-[#576CBC]/60 hover:text-white hover:bg-white/5"
+          >
             Log in
           </Button>
         </Link>
       </nav>
 
-      <main className="flex-grow flex items-center justify-center p-4 md:p-6 relative z-10">
+      <main className="flex-grow flex items-center justify-center px-4 py-6 md:p-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={{ opacity: 0, scale: 0.95, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="w-full max-w-md space-y-8"
         >
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Verify your email</h1>
-            <p className="text-slate-500">
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase">
+              Verify email
+            </h1>
+            <p className="text-[#576CBC]/60 font-medium">
               We've sent a code to{" "}
-              <span className="text-white font-medium">{pendingEmail}</span>
+              <span className="text-white font-bold">{pendingEmail}</span>
             </p>
           </div>
 
-          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-8 shadow-2xl backdrop-blur-sm">
+          <div className="bg-[#19376D]/10 border border-[#576CBC]/20 rounded-3xl sm:rounded-[3rem] p-6 sm:p-10 shadow-3xl backdrop-blur-3xl">
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
