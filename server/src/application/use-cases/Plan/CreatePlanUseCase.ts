@@ -2,7 +2,7 @@ import { CreatePlanDto } from "@/application/dtos/PlanDto";
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICreatePlanUseCase } from "@/application/interfaces/use-cases/Plan/ICreatePlanUseCase";
-import { Plan } from "@/domain/entities/plan/Plan";
+import { Plan } from "@/domain/entities/Plan";
 import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
 
 export class CreatePlanUseCase implements ICreatePlanUseCase{

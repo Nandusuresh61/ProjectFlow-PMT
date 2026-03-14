@@ -1,13 +1,15 @@
-import { GetAllUsersWithOrganizationUseCase } from "@/application/use-cases/Admin/GetAllUserWithOrganizationUsecase";
+import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/GetAllUserWithWorkspaceUsecase";
+import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDetailsUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import { AppMessages, HttpStatusCode, ResponseHandler } from "shared";
+import { AppMessages, HttpStatusCode, ResponseHandler, AppError, ErrorCode } from "shared";
 
 export class SuperAdminUserController {
   constructor(
-    private readonly _getAllUsersWithOrganizationUseCase: GetAllUsersWithOrganizationUseCase,
+    private readonly _getAllUsersWithWorkspaceUseCase: GetAllUsersWithWorkspaceUseCase,
+    private readonly _getUserDetailsUseCase: GetUserDetailsUseCase,
   ) { }
-  getAllUsersWithOrganizations = asyncHandler(
+  getAllUsersWithWorkspaces = asyncHandler(
     async (req: Request, res: Response) => {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
@@ -15,7 +17,7 @@ export class SuperAdminUserController {
       const sortBy = req.query.sortBy as string;
       const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
 
-      const result = await this._getAllUsersWithOrganizationUseCase.execute({
+      const result = await this._getAllUsersWithWorkspaceUseCase.execute({
         page,
         limit,
         search,
@@ -29,4 +31,23 @@ export class SuperAdminUserController {
         );
     },
   );
+
+  getUserDetails = asyncHandler(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    const result = await this._getUserDetailsUseCase.execute(userId);
+
+    if (!result) {
+      throw new AppError(
+        ErrorCode.RESOURCE_NOT_FOUND,
+        AppMessages.USER_NOT_FOUND,
+        HttpStatusCode.NOT_FOUND
+      );
+    }
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.USER_FETCHING_SUCCESSFUL, result),
+      );
+  });
 }

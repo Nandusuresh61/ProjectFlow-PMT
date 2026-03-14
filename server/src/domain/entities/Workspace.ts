@@ -1,10 +1,10 @@
-export class Organization {
+export class Workspace {
   constructor(
-    public organizationId: string | undefined,
+    public workspaceId: string | undefined,
     public name: string,
     public ownerId: string,
     public planId: string,
     public createdAt: Date,
     public updatedAt: Date
-  ) {}
+  ) { }
 }

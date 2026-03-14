@@ -1,12 +1,13 @@
 import { CompleteOnboardingUseCase } from "@/application/use-cases/Onboarding/CompleteOnboardingUseCase";
 import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { OrganizationRepository } from "../repositories/MongoOrganizationRepository";
+import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
 import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
 import { MongoUserRepository } from "../repositories/MongoUserRepository";
 import { UidService } from "../services/UidService";
 import { OnboardingController } from "@/presentation/controllers/OnboardingController";
+import { createInvitationUseCase } from "./InvitationContatiner";
 
-const orgRepo = new OrganizationRepository();
+const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
 const userRepo = new MongoUserRepository();
 const planRepo = new MongoPlanRepository();
@@ -14,10 +15,11 @@ const uidGenerator = new UidService();
 
 const completeOnboardingUseCase = new CompleteOnboardingUseCase(
   userRepo,
-  orgRepo,
+  workspaceRepo,
   membershipRepo,
   planRepo,
-  uidGenerator
+  uidGenerator,
+  createInvitationUseCase
 );
 
 export const onboardingController = new OnboardingController(

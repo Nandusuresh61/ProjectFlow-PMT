@@ -7,8 +7,16 @@ export default function PublicRoutes() {
   const user = AuthUserState((state) => state.user);
 
   if (isAuthenticated) {
+    if (window.location.pathname === "/invite/accept") {
+      return <Outlet />;
+    }
+
     if (user?.isSuperAdmin) {
       return <Navigate to="/super-admin" replace />;
+    }
+
+    if (user && user.membershipCount === 0) {
+      return <Navigate to="/onboarding" replace />;
     }
     return <Navigate to="/home" replace />;
   }

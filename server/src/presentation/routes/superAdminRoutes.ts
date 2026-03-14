@@ -1,4 +1,4 @@
-import { GetAllUsersWithOrganizationUseCase } from "@/application/use-cases/Admin/GetAllUserWithOrganizationUsecase";
+import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/GetAllUserWithWorkspaceUsecase";
 import { Router } from "express";
 import { authenticatedUser } from "../middlewares/AuthMiddleware";
 import { superAdminOnly } from "../middlewares/AdminMiddleware";
@@ -10,7 +10,14 @@ router.get(
   "/getusers",
   authenticatedUser,
   superAdminOnly,
-  superAdminUserController.getAllUsersWithOrganizations
+  superAdminUserController.getAllUsersWithWorkspaces
+);
+
+router.get(
+  "/user/:userId",
+  authenticatedUser,
+  superAdminOnly,
+  superAdminUserController.getUserDetails
 );
 
 export default router;

@@ -11,7 +11,7 @@ import {
 export class OnboardingController {
   constructor(
     private readonly _completeOnboardingUseCase: ICompleteOnboardingUseCase,
-  ) {}
+  ) { }
 
   completeOnboarding = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -23,6 +23,7 @@ export class OnboardingController {
         userId,
         workspaceName: validatedData.workspaceName,
         planId: validatedData.planId,
+        invites: validatedData.invites,
       });
 
       res

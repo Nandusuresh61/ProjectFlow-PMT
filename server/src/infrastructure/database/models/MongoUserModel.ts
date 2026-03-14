@@ -7,8 +7,7 @@ export interface UserDoc extends Document {
   passwordHash?: string;
   authProvider: string;
   providerId?: string;
-  isOnboarded: boolean;
-  currentOrganizationId?: string;
+  currentWorkspaceId?: string;
   isSuperAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -41,11 +40,7 @@ const UserSchema = new Schema<UserDoc>({
     type: String,
     required: false,
   },
-  isOnboarded: {
-    type: Boolean,
-    default: false,
-  },
-  currentOrganizationId: {
+  currentWorkspaceId: {
     type: String,
     required: false,
   },

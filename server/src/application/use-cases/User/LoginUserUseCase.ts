@@ -12,13 +12,15 @@ import {
   HttpStatusCode,
   TokenEnums,
 } from "shared";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 
 export class LoginUserUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _tokenService: ITokenService,
     private readonly _passwordHash: IPasswordHasher,
-  ) {}
+    private readonly _membershipRepo: IMembershipRepository
+  ) { }
 
   async execute(data: LoginRequestDto): Promise<UserAuthResponseDto> {
     const user = await this._userRepo.findByEmail(data.email);
@@ -41,6 +43,8 @@ export class LoginUserUseCase {
         HttpStatusCode.CONFLICT,
       );
 
+    const membershipCount = await this._membershipRepo.countByUserId(user.userId);
+
     const accessToken = this._tokenService.createAccessToken({
       userId: user.userId,
       fullName: user.fullName,
@@ -61,8 +65,8 @@ export class LoginUserUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
-        isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
+        currentWorkspaceId: user.currentWorkspaceId,
+        membershipCount,
       },
       accessToken,
       refreshToken,

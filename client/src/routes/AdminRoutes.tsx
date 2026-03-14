@@ -1,9 +1,11 @@
+import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminRouteProtection from "./AdminRouteProtection";
-import SuperAdminLayout from "@/components/layouts/SuperAdminLayout";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import Organizations from "@/pages/admin/Organizations";
-import Plans from "@/pages/admin/Plans";
+const SuperAdminLayout = lazy(() => import("@/components/layouts/SuperAdminLayout"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const Workspaces = lazy(() => import("@/pages/admin/WorkspaceUsers"));
+const Plans = lazy(() => import("@/pages/admin/Plans"));
+
 
 export default function AdminRoutes() {
   return (
@@ -12,7 +14,7 @@ export default function AdminRoutes() {
         <Route element={<SuperAdminLayout />}>
           <Route path="/" element={<Navigate to="/super-admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="organizations" element={<Organizations />} />
+          <Route path="workspaces" element={<Workspaces />} />
           <Route path="plans" element={<Plans />} />
         </Route>
       </Route>

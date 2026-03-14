@@ -1,25 +1,55 @@
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
-import { Membership } from "@/domain/entities/membership/Membership";
-import { MembershipModel } from "../database/models/MongoMembershipModel";
+import { Membership } from "@/domain/entities/Membership";
+import {
+  MembershipModel,
+  MembershipDocument,
+} from "../database/models/MongoMembershipModel";
+import { MongoBaseRepository } from "./MongoBaseRepository";
 
-export class MembershipRepository implements IMembershipRepository {
+export class MembershipRepository
+  extends MongoBaseRepository<Membership, MembershipDocument>
+  implements IMembershipRepository {
+  constructor() {
+    super(MembershipModel);
+  }
 
-  async create(membership: Membership): Promise<Membership> {
-    const created = await MembershipModel.create({
-      membershipId: membership.membershipId,
-      userId: membership.userId,
-      organizationId: membership.organizationId,
-      role: membership.role,
-      joinedAt: membership.joinedAt,
-    });
-
+  protected mapToEntity(doc: MembershipDocument): Membership {
     return new Membership(
-      created.membershipId,
-      created.userId,
-      created.organizationId,
-      created.role,
-      created.joinedAt
+      doc.membershipId,
+      doc.userId,
+      doc.workspaceId,
+      doc.role,
+      doc.joinedAt,
     );
   }
 
+  async create(membership: Membership): Promise<Membership> {
+    const membershipDoc = {
+      membershipId: membership.membershipId,
+      userId: membership.userId,
+      workspaceId: membership.workspaceId,
+      role: membership.role,
+      joinedAt: membership.joinedAt,
+    };
+    return super.create(membershipDoc);
+  }
+
+  async findByUserAndWorkspace(
+    userId: string,
+    workspaceId: string,
+  ): Promise<Membership | null> {
+    return this.findOne({ userId, workspaceId });
+  }
+
+  async countByWorkspace(workspaceId: string): Promise<number> {
+    return MembershipModel.countDocuments({ workspaceId });
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    return MembershipModel.countDocuments({ userId });
+  }
+
+  async findByWorkspace(workspaceId: string): Promise<Membership[]> {
+    return this.find({ workspaceId });
+  }
 }

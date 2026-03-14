@@ -1,13 +1,25 @@
 import { AuthUserState } from "@/store/auth.store";
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function AdminHeader() {
+interface AdminHeaderProps {
+    onMenuClick: () => void;
+}
+
+export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
     const user = AuthUserState((state) => state.user);
 
     return (
-        <header className="h-16 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-10">
+        <header className="h-16 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md px-4 md:px-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-4">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden text-zinc-400 hover:text-white"
+                    onClick={onMenuClick}
+                >
+                    <Menu size={20} />
+                </Button>
                 <h2 className="text-lg font-semibold text-white">Super Admin Panel</h2>
             </div>
 

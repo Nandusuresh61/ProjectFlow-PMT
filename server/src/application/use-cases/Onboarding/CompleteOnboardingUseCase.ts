@@ -1,32 +1,34 @@
 import { CompleteOnboardingDto } from "@/application/dtos/CompleteOnboardingDto";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
-import { IOrganizationRepository } from "@/application/interfaces/repositories/IOrganizationRepository";
+import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
-import { Membership } from "@/domain/entities/membership/Membership";
-import { Organization } from "@/domain/entities/org/Organization";
+import { Membership } from "@/domain/entities/Membership";
+import { Workspace } from "@/domain/entities/Workspace";
 import {
   AppError,
   AppMessages,
   ErrorCode,
   HttpStatusCode,
-  OrganizationRoleEnum,
+  WorkspaceRoleEnum,
 } from "shared";
 
 export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
-    private readonly _orgRepo: IOrganizationRepository,
+    private readonly _workspaceRepo: IWorkspaceRepository,
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _planRepo: IPlanRepository,
-    private readonly _uidGenerator: IUidGenerator
-  ) {}
+    private readonly _uidGenerator: IUidGenerator,
+    private readonly _createInvitationUseCase: ICreateInvitationUseCase
+  ) { }
 
   async execute(
     dto: CompleteOnboardingDto,
-  ): Promise<{ organizationId: string }> {
+  ): Promise<{ workspaceId: string }> {
     const { userId, workspaceName, planId } = dto;
 
     const user = await this._userRepo.findById(userId);
@@ -38,7 +40,8 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       );
     }
 
-    if (user.isOnboarded) {
+    const membershipCount = await this._membershipRepo.countByUserId(userId);
+    if (membershipCount > 0) {
       throw new AppError(
         ErrorCode.ONBOARDING,
         AppMessages.USER_ALREADY_ONBOARDED,
@@ -58,7 +61,7 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
 
     const now = new Date();
 
-    const organization = new Organization(
+    const workspace = new Workspace(
       this._uidGenerator.createId(),
       workspaceName.trim(),
       userId,
@@ -67,23 +70,35 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       now,
     );
 
-    const createdOrg = await this._orgRepo.create(organization);
+    const createdWorkspace = await this._workspaceRepo.create(workspace);
 
     const membership = new Membership(
       this._uidGenerator.createId(),
       userId,
-      createdOrg.organizationId!,
-      OrganizationRoleEnum.ORG_ADMIN,
+      createdWorkspace.workspaceId!,
+      WorkspaceRoleEnum.WORKSPACE_OWNER,
       now,
     );
 
     await this._membershipRepo.create(membership);
 
-    user.isOnboarded = true;
-    user.currentOrganizationId = createdOrg.organizationId;
+    user.currentWorkspaceId = createdWorkspace.workspaceId;
 
     await this._userRepo.update(user);
 
-    return { organizationId: createdOrg.organizationId };
+    if (dto.invites && dto.invites.length > 0) {
+      await Promise.all(
+        dto.invites.map((invite) =>
+          this._createInvitationUseCase.execute({
+            workspaceId: createdWorkspace.workspaceId,
+            inviterId: userId,
+            email: invite.email,
+            role: invite.role,
+          })
+        )
+      );
+    }
+
+    return { workspaceId: createdWorkspace.workspaceId };
   }
 }

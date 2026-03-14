@@ -1,4 +1,4 @@
-import { UserQueryOptions, PaginatedUsersResult } from "@/application/dtos/UserDtos";
+import { UserQueryOptions, PaginatedUsersResult, UserDetailsDto } from "@/application/dtos/UserDtos";
 import { User } from "@/domain/entities/User";
 
 export interface IUserRepository {
@@ -7,6 +7,8 @@ export interface IUserRepository {
   createUser(user: User): Promise<User>;
   updatePasswordByEmail(email: string, passwordHash: string): Promise<void>;
   update(user: User): Promise<void>;
-  getAllUsersWithOrganizations(options: UserQueryOptions): Promise<PaginatedUsersResult>;
+  getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult>;
+  getUserDetails(userId: string): Promise<UserDetailsDto | null>;
+  updateCurrentWorkspace(userId:string,currentWorkspaceId: string): Promise<void>
 
 }

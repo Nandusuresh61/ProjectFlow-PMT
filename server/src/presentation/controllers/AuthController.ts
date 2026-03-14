@@ -26,6 +26,8 @@ import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/I
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { logger } from "@/infrastructure/utils/Logger";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -38,7 +40,8 @@ export class AuthController implements IAuthController {
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
     private readonly _googleOAuthService: IOAuthProviderService,
     private readonly _googleAuthUseCase: IGoogleAuthUseCase,
-    private readonly _userRepo: IUserRepository
+    private readonly _userRepo: IUserRepository,
+    private readonly _membershipRepo: IMembershipRepository
   ) { }
 
   startRegister = asyncHandler(
@@ -46,6 +49,8 @@ export class AuthController implements IAuthController {
       const validatedData = RegisterUserSchema.parse(req.body);
 
       const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
+
+      logger.info(`>>>  OTP <<< [AuthController] startRegister called with email: ${dto.email}`);
 
       await this._startRegisterUseCase.execute(dto);
 
@@ -91,6 +96,8 @@ export class AuthController implements IAuthController {
   resendOtp = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
       const { email } = req.body;
+
+      logger.info(`[AuthController] resendOtp called with email: ${email}`);
 
       await this._resendOtpUseCase.execute(email);
 
@@ -190,23 +197,27 @@ export class AuthController implements IAuthController {
   });
 
   getMe = asyncHandler(async (req: Request, res: Response) => {
-  const tokenPayload = (req as any).user;
+    const tokenPayload = (req as any).user;
 
-  const user = await this._userRepo.findById(tokenPayload.userId);
+    const user = await this._userRepo.findById(tokenPayload.userId);
 
-  res.status(200).json(
-    ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-      user: {
-        userId: user.userId,
-        fullName: user.fullName,
-        email: user.email,
-        isSuperAdmin: user.isSuperAdmin,
-        isOnboarded: user.isOnboarded,
-        currentOrganizationId: user.currentOrganizationId,
-      },
-    })
+    const membershipCount = await this._membershipRepo.countByUserId(
+    user.userId
   );
-});
+
+    res.status(200).json(
+      ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
+        user: {
+          userId: user.userId,
+          fullName: user.fullName,
+          email: user.email,
+          isSuperAdmin: user.isSuperAdmin,
+          currentWorkspaceId: user.currentWorkspaceId,
+          membershipCount
+        },
+      })
+    );
+  });
 
   forgotOtp = asyncHandler(async (req: Request, res: Response) => {
     const validatedData = ForgotEmailSchema.parse(req.body);

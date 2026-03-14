@@ -81,9 +81,9 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-4 grid-cols-1 xl:grid-cols-7">
                 <motion.div
-                    className="col-span-4"
+                    className="xl:col-span-4"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
@@ -93,10 +93,10 @@ export default function AdminDashboard() {
                             <CardTitle className="text-white">Monthly Revenue</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="h-[240px] flex items-end justify-between gap-2 pt-4 px-2">
+                            <div className="h-[200px] sm:h-[240px] flex items-end justify-between gap-1 sm:gap-2 pt-4 px-1 sm:px-2">
                                 {/* Dummy Chart Bars */}
                                 {[35, 45, 30, 60, 75, 50, 65, 80, 70, 90, 85, 95].map((height, i) => (
-                                    <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
+                                    <div key={i} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 group">
                                         <div className="relative w-full bg-zinc-800/50 rounded-t-md h-full overflow-hidden flex items-end">
                                             <motion.div
                                                 className="w-full bg-green-600 hover:bg-green-500 transition-colors rounded-t-md relative group-hover:shadow-[0_0_15px_rgba(34,197,94,0.5)]"
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
                                             >
                                             </motion.div>
                                         </div>
-                                        <span className="text-xs text-zinc-500 font-medium group-hover:text-green-500 transition-colors">
+                                        <span className="text-[10px] sm:text-xs text-zinc-500 font-medium group-hover:text-green-500 transition-colors">
                                             {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]}
                                         </span>
                                     </div>
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
                 </motion.div>
 
                 <motion.div
-                    className="col-span-3"
+                    className="xl:col-span-3"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
@@ -131,17 +131,17 @@ export default function AdminDashboard() {
                                 {recentOrgs.map((org, i) => (
                                     <div key={i} className="flex items-center justify-between border-b border-zinc-800 pb-2 last:border-0 last:pb-0 hover:bg-zinc-800/50 p-2 rounded-lg transition-colors cursor-pointer">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold text-xs ring-1 ring-zinc-700">
+                                            <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold text-xs ring-1 ring-zinc-700 flex-shrink-0">
                                                 {org.name.substring(0, 2).toUpperCase()}
                                             </div>
-                                            <div>
-                                                <p className="text-sm font-medium text-zinc-200">{org.name}</p>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium text-zinc-200 truncate">{org.name}</p>
                                                 <p className="text-xs text-zinc-500">{org.date}</p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-right flex-shrink-0 ml-2">
                                             <span className={cn(
-                                                "text-[10px] px-2 py-0.5 rounded-full font-medium border",
+                                                "text-[10px] px-2 py-0.5 rounded-full font-medium border whitespace-nowrap",
                                                 org.status === 'Active' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
                                                     org.status === 'Trial' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
                                                         'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'

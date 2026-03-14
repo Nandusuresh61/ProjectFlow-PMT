@@ -9,8 +9,8 @@ export interface User {
   fullName: string;
   email: string;
   isSuperAdmin: boolean;
-  isOnboarded: boolean;
-  currentOrganizationId?: string;
+  membershipCount: number;
+  currentWorkspaceId?: string;
 }
 
 export interface AuthData {
