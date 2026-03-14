@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -8,17 +8,24 @@ import { BackgroundAtmosphere } from './components/BaseComponents';
 import { Sidebar, Header, MobileNav } from './components/LayoutComponents';
 import { DashboardView } from './views/DashboardView';
 import { TeamView } from './views/TeamView';
-import { PlaceholderView, InviteModal } from './views/ComplementaryViews';
+import { PlaceholderView, InviteModal, CreateWorkspaceModal } from './views/ComplementaryViews';
+import { useWorkspaceStore } from '@/store/workspace.store';
 
 export default function WorkspaceHome() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const user = AuthUserState((state) => state.user);
     const clearUser = AuthUserState((state) => state.clearUser);
+    const { fetchWorkspaces } = useWorkspaceStore();
+
+    useEffect(() => {
+        fetchWorkspaces();
+    }, [fetchWorkspaces]);
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -48,7 +55,12 @@ export default function WorkspaceHome() {
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative h-full">
-                <Header activeTab={activeTab} user={user} onLogout={handleLogout} />
+                <Header 
+                    activeTab={activeTab} 
+                    user={user} 
+                    onLogout={handleLogout} 
+                    onOpenCreateWorkspace={() => setIsCreateWorkspaceModalOpen(true)}
+                />
                 {isLoggingOut && <div className="sr-only">Logging out...</div>}
 
                 {/* Content area — add bottom padding on mobile for the nav bar */}
@@ -81,6 +93,11 @@ export default function WorkspaceHome() {
             <InviteModal
                 isOpen={isInviteModalOpen}
                 onClose={() => setIsInviteModalOpen(false)}
+            />
+
+            <CreateWorkspaceModal
+                isOpen={isCreateWorkspaceModalOpen}
+                onClose={() => setIsCreateWorkspaceModalOpen(false)}
             />
         </div>
     );

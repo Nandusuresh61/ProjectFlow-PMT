@@ -1,4 +1,4 @@
-import { UserPlus, Search, Share2 } from 'lucide-react';
+import { UserPlus, Search } from 'lucide-react';
 import { Card, Badge } from '../components/BaseComponents';
 import { useEffect, useState } from 'react';
 import { getMembers } from '@/services/workspace/team.api';
@@ -20,8 +20,12 @@ interface TeamViewProps {
 
 export const TeamView = ({ openInvite }: TeamViewProps) => {
 
-    const currentWorkspaceId = AuthUserState((state) => state.user?.currentWorkspaceId);
+    const user = AuthUserState((state) => state.user);
+    const currentWorkspaceId = user?.currentWorkspaceId;
     const [members, setMembers] = useState<Member[]>([]);
+
+    const currentUserRole = members.find(m => m.email === user?.email)?.role;
+    const canInvite = currentUserRole === WorkspaceRoleEnum.WORKSPACE_ADMIN || currentUserRole === WorkspaceRoleEnum.WORKSPACE_OWNER;
 
     useEffect(() => {
         if (!currentWorkspaceId) return;
@@ -43,13 +47,15 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
                     <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Team Members</h1>
                     <p className="text-[#576CBC]/60 font-medium tracking-tight">Manage team members and their roles</p>
                 </div>
-                <button
-                    onClick={openInvite}
-                    className="flex items-center gap-2 bg-[#A5D7E8] text-[#0B2447] px-6 py-3 rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
-                >
-                    <UserPlus size={18} />
-                    <span>Invite Member</span>
-                </button>
+                {canInvite && (
+                    <button
+                        onClick={openInvite}
+                        className="flex items-center gap-2 bg-[#A5D7E8] text-[#0B2447] px-6 py-3 rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
+                    >
+                        <UserPlus size={18} />
+                        <span>Invite Member</span>
+                    </button>
+                )}
             </div>
 
             <div className="relative mb-8 max-w-md">

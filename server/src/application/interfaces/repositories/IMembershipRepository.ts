@@ -9,4 +9,5 @@ export interface IMembershipRepository {
   countByWorkspace(workspaceId: string): Promise<number>;
   countByUserId(userId: string): Promise<number>;
   findByWorkspace(workspaceId: string): Promise<Membership[]>;
+  findByUserId(userId: string): Promise<Membership[]>;
 }

@@ -7,13 +7,13 @@ import {
     Video,
     Activity,
     Settings,
-    ChevronDown,
     ChevronRight,
     LogOut
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Logo } from '@/components/common/Logo';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 
 
 interface SidebarProps {
@@ -103,19 +103,14 @@ interface HeaderProps {
     activeTab: string;
     user: any;
     onLogout: () => void;
+    onOpenCreateWorkspace: () => void;
 }
 
-export const Header = ({ activeTab, user, onLogout }: HeaderProps) => (
+export const Header = ({ activeTab, user, onLogout, onOpenCreateWorkspace }: HeaderProps) => (
     <header className="h-16 bg-[#060c16]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-4 md:px-8 flex-shrink-0">
         <div className="flex items-center gap-2 md:gap-6">
-            <div className="flex items-center gap-2 cursor-pointer group px-2 py-1 rounded-lg hover:bg-white/5 transition-colors">
-                <Logo
-                    showText={false}
-                    iconClassName="w-6 h-6 bg-[#19376D] text-[#A5D7E8] group-hover:bg-[#A5D7E8] group-hover:text-[#0B2447] transition-all"
-                    className="flex-shrink-0"
-                />
-                <span className="text-sm font-semibold text-white/90 hidden sm:block">Acme Corp</span>
-                <ChevronDown size={14} className="text-[#576CBC]/60 group-hover:text-white hidden sm:block" />
+            <div className="hidden sm:block translate-y-[-1px]">
+                <WorkspaceSwitcher onOpenCreate={onOpenCreateWorkspace} />
             </div>
             <ChevronRight size={14} className="text-white/20 hidden sm:block" />
             <span className="text-sm font-bold text-white capitalize">{activeTab}</span>

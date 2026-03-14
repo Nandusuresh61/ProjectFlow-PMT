@@ -52,4 +52,8 @@ export class MembershipRepository
   async findByWorkspace(workspaceId: string): Promise<Membership[]> {
     return this.find({ workspaceId });
   }
+
+  async findByUserId(userId: string): Promise<Membership[]> {
+    return this.find({ userId });
+  }
 }
