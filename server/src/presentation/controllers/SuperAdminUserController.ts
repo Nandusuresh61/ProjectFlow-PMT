@@ -3,11 +3,13 @@ import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDeta
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
 import { AppMessages, HttpStatusCode, ResponseHandler, AppError, ErrorCode } from "shared";
+import { IGetAllUsersWithWorkspaceUsecase } from "@/application/interfaces/use-cases/SuperAdmin/IGetAllUsersWithWorkspaceUseCase";
+import { IGetUserDetailsUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetUserDetailsUseCase";
 
 export class SuperAdminUserController {
   constructor(
-    private readonly _getAllUsersWithWorkspaceUseCase: GetAllUsersWithWorkspaceUseCase,
-    private readonly _getUserDetailsUseCase: GetUserDetailsUseCase,
+    private readonly _getAllUsersWithWorkspaceUseCase: IGetAllUsersWithWorkspaceUsecase,
+    private readonly _getUserDetailsUseCase: IGetUserDetailsUseCase,
   ) { }
   getAllUsersWithWorkspaces = asyncHandler(
     async (req: Request, res: Response) => {

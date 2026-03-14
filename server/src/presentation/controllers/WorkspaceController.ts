@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
-import { ResponseHandler, AppMessages } from "shared";
+import { ResponseHandler, AppMessages, HttpStatusCode } from "shared";
 import { IGetWorkspaceMembersUseCase } from "@/application/interfaces/use-cases/workspace/IGetWorkspaceMembersUseCase";
 
 export class WorkspaceController {
@@ -13,7 +13,7 @@ export class WorkspaceController {
     console.log(members)
 
     res
-      .status(200)
+      .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, members));
   });
 }
