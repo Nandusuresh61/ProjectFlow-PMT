@@ -1,5 +1,6 @@
 import { UserPlus, Search } from 'lucide-react';
-import { Card, Badge } from '../components/BaseComponents';
+import { Card } from '../components/Card';
+import { Badge } from '../components/Badge';
 import { useEffect, useState } from 'react';
 import { getMembers } from '@/services/workspace/team.api';
 import { AuthUserState } from '@/store/auth.store';

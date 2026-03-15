@@ -9,7 +9,7 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { LoginUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
 
 type LoginValues = { email: string; password: string };
