@@ -10,6 +10,7 @@ import { Header } from './components/Header';
 import { MobileNav } from './components/MobileNav';
 import { DashboardView } from './views/DashboardView';
 import { TeamView } from './views/TeamView';
+import { SettingsView } from './views/SettingsView';
 import { PlaceholderView, InviteModal, CreateWorkspaceModal } from './views/ComplementaryViews';
 import { useWorkspaceStore } from '@/store/workspace.store';
 
@@ -80,6 +81,8 @@ export default function WorkspaceHome() {
                                     <DashboardView openInvite={() => setIsInviteModalOpen(true)} />
                                 ) : activeTab === 'team' ? (
                                     <TeamView openInvite={() => setIsInviteModalOpen(true)} />
+                                ) : activeTab === 'settings' ? (
+                                    <SettingsView />
                                 ) : (
                                     <PlaceholderView activeTab={activeTab} setActiveTab={setActiveTab} />
                                 )}
