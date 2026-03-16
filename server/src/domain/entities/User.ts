@@ -1,15 +1,15 @@
-import { AuthProvider } from "shared";
-
-
-export interface User {
-    userId: string;
-    fullName: string;
-    email: string;
-    passwordHash?: string;
-    authProvider: string;
-    providerId?: string;
-    currentWorkspaceId?: string;
-    isSuperAdmin: boolean;
-    createdAt: Date
-    updatedAt: Date
+export class User {
+  constructor(
+    public userId: string,
+    public fullName: string,
+    public email: string,
+    public passwordHash: string | undefined,
+    public authProvider: string,
+    public providerId: string | undefined,
+    public currentWorkspaceId: string | undefined,
+    public isSuperAdmin: boolean,
+    public profileImage: string | null,
+    public createdAt: Date,
+    public updatedAt: Date,
+  ) {}
 }

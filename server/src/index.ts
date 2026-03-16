@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 import onboardingRoutes from "@/presentation/routes/OnboardingRoutes";
 import superAdminRoutes from "@/presentation/routes/superAdminRoutes";
 import workspaceRoutes from "@/presentation/routes/workspaceRoutes";
-
+import userProfile from "@/presentation/routes/ProfileRoutes";
 import morgan from "morgan";
 
 const app = express();
@@ -33,6 +33,7 @@ app.use("/api/plan", planRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/super-admin", superAdminRoutes);
 app.use("/api/workspace", workspaceRoutes);
+app.use("/api/profile",userProfile);
 
 app.use(errorMiddleware);
 

@@ -1,4 +1,5 @@
 import { Document, model, Schema } from "mongoose";
+import { string } from "zod";
 
 export interface UserDoc extends Document {
   userId: string;
@@ -9,6 +10,7 @@ export interface UserDoc extends Document {
   providerId?: string;
   currentWorkspaceId?: string;
   isSuperAdmin: boolean;
+  profileImage?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +49,9 @@ const UserSchema = new Schema<UserDoc>({
   isSuperAdmin: {
     type: Boolean,
     default: false,
+  },
+  profileImage: {
+    type: String
   },
   createdAt: {
     type: Date,
