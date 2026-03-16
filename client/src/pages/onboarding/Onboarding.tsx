@@ -10,7 +10,7 @@ import { getPlans } from "@/services/plan/plan.api";
 import type { Plan } from "@/types/plan.types";
 import { Logo } from "@/components/common/Logo";
 import { GridBackground } from "@/components/ui/gridBackground";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import type {
   OnboardingState,
   WorkspaceValues,

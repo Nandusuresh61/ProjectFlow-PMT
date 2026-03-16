@@ -6,7 +6,7 @@ import { resetPassword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 
 type ResetPasswordValues = { otp: string; newPassword: string };
 

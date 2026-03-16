@@ -8,7 +8,7 @@ import { AuthUserState } from "@/store/auth.store";
 import { ForgotEmailSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 
 type ForgotPasswordValues = { email: string };
 

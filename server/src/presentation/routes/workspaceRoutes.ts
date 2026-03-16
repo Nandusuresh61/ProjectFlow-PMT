@@ -14,6 +14,27 @@ router.post(
   invitationController.acceptInvitation
 );
 
+// User Workspaces
+router.get(
+  "/user/workspaces",
+  authenticatedUser,
+  workspaceController.getUserWorkspaces
+);
+
+// Switch Workspace
+router.put(
+  "/:workspaceId/switch",
+  authenticatedUser,
+  workspaceController.switchWorkspace
+);
+
+// Create Workspace
+router.post(
+  "/create",
+  authenticatedUser,
+  workspaceController.createWorkspace
+);
+
 // Invitation Api
 router.post(
   "/:workspaceId/invite",
