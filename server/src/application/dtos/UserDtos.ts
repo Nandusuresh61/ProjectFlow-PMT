@@ -1,5 +1,3 @@
-import { LoginUserSchemaType, RegisterUserSchemaType } from "shared";
-
 export type RegisterVerifiedUserDto = {
   fullName: string;
   email: string;
