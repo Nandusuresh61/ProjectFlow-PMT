@@ -11,7 +11,7 @@ export class ProfileController {
   ) {}
 
   getProfile = asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.body;
+    const { userId } = (req as any).user;
 
     let result = await this._getUserProfileUseCase.execute(userId);
 

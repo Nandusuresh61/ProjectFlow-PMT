@@ -2,7 +2,6 @@ import { UpdateUserProfileDto } from "@/application/dtos/UserProfileDto";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IUpdateUserProfileUseCase } from "@/application/interfaces/use-cases/User/IUpdateUserProfileUseCase";
 import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
-import { undefinedProcessor } from "zod/v4/core/json-schema-processors.cjs";
 
 export class UpdatUserProfileUseCase implements IUpdateUserProfileUseCase {
   constructor(private readonly _userRepo: IUserRepository) {}

@@ -1,4 +1,5 @@
 import axios, { HttpStatusCode } from "axios";
+import { API_ROUTES } from "@/constants/api.constants";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -9,9 +10,9 @@ export const API = axios.create({
 });
 
 const AUTH_ROUTES = [
-  "/auth/login",
-  "/auth/signup",
-  "/auth/refresh",
+  API_ROUTES.AUTH.LOGIN,
+  API_ROUTES.AUTH.SIGNUP,
+  API_ROUTES.AUTH.REFRESH,
 ];
 
 API.interceptors.response.use(
