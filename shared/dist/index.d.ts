@@ -36,8 +36,8 @@ declare enum HttpStatusCode {
 }
 
 declare enum TokenEnums {
-    ACCESS_TOKEN = "Access Token",
-    REFRESH_TOKEN = "Refresh Token"
+    ACCESS_TOKEN = "ACCESS_TOKEN",
+    REFRESH_TOKEN = "REFRESH_TOKEN"
 }
 
 declare enum EmailType {
@@ -113,6 +113,7 @@ declare const AppMessages: {
     readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
     readonly USER_FETCHING_SUCCESSFUL: "User Fetching Successfull";
     readonly WORKSPACE_NOT_FOUND: "Workspace not found";
+    readonly WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!";
     readonly INVITATION_SENT_SUCCESS: "Invitation sent success";
     readonly INVITATION_ALREADY_SENT: " Invitation already sent to this email";
     readonly INVALID_INVITATION: "Invalid Invitation";
@@ -121,6 +122,8 @@ declare const AppMessages: {
     readonly INVITATION_ALREADY_USED: "Invitation Already Used";
     readonly MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded";
     readonly USER_ALREADY_MEMBER: "User Already Member in this workspace";
+    readonly USER_BLOCKED: "Your account has been blocked. Please contact support.";
+    readonly USER_BLOCK_STATUS_UPDATED: "User block status updated successfully.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -128,6 +131,7 @@ declare const TokenPayloadSchema: z.ZodObject<{
     fullName: z.ZodString;
     email: z.ZodString;
     isSuperAdmin: z.ZodBoolean;
+    isBlocked: z.ZodBoolean;
     type: z.ZodEnum<typeof TokenEnums>;
 }, z.core.$strip>;
 type TokenPayloadType = z.infer<typeof TokenPayloadSchema>;
@@ -202,6 +206,7 @@ interface IUser {
     fullName: string;
     email: string;
     isSuperAdmin: boolean;
+    isBlocked: boolean;
     currentWorkspaceId?: string;
     profileImage?: string | null;
     membershipCount?: number;
@@ -210,6 +215,7 @@ interface ITokenPayload {
     userId: string;
     email: string;
     isSuperAdmin: boolean;
+    isBlocked: boolean;
 }
 
 export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, type ITokenPayload, type IUser, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

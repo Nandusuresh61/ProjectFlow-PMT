@@ -8,6 +8,7 @@ export class AuthResponseMapper {
         fullName: data.user.fullName,
         email: data.user.email,
         isSuperAdmin: data.user.isSuperAdmin,
+        isBlocked: data.user.isBlocked,
         currentWorkspaceId: data.user.currentWorkspaceId,
         membershipCount: data.user.membershipCount,
       },

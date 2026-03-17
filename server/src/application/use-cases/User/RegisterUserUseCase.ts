@@ -29,6 +29,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         undefined,
         undefined,
         false,
+        false,
         null,
         now,
         now,
@@ -40,6 +41,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       fullName: newUser.fullName,
       email: newUser.email,
       isSuperAdmin: newUser.isSuperAdmin,
+      isBlocked: newUser.isBlocked,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -47,6 +49,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       fullName: newUser.fullName,
       email: newUser.email,
       isSuperAdmin: newUser.isSuperAdmin,
+      isBlocked: newUser.isBlocked,
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {
@@ -55,6 +58,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
         fullName: newUser.fullName,
         email: newUser.email,
         isSuperAdmin: newUser.isSuperAdmin,
+        isBlocked: newUser.isBlocked,
         currentWorkspaceId: newUser.currentWorkspaceId,
         membershipCount: 0,
       },

@@ -10,6 +10,7 @@ export type UserAuthResponseDto = {
     fullName: string;
     email: string;
     isSuperAdmin: boolean;
+    isBlocked: boolean;
     currentWorkspaceId?: string;
     membershipCount: number;
   };
@@ -43,6 +44,7 @@ export interface UserWithWorkspacesDTO {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: Date;
   workspaces: {
     workspaceId: string;
@@ -80,6 +82,7 @@ export interface UserDetailsDto {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: Date;
   workspaces: UserWorkspaceDetails[];
 }

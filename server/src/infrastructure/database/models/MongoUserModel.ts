@@ -10,6 +10,7 @@ export interface UserDoc extends Document {
   providerId?: string;
   currentWorkspaceId?: string;
   isSuperAdmin: boolean;
+  isBlocked: boolean;
   profileImage?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -47,6 +48,10 @@ const UserSchema = new Schema<UserDoc>({
     required: false,
   },
   isSuperAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isBlocked: {
     type: Boolean,
     default: false,
   },

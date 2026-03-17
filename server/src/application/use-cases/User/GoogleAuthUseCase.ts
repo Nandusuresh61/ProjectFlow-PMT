@@ -43,12 +43,21 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         payload.providerId,
         undefined,
         false,
+        false,
         null,
         now,
         now,
       );
 
       await this._userRepo.createUser(user);
+    }
+
+    if (user.isBlocked) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.USER_BLOCKED,
+        HttpStatusCode.FORBIDDEN
+      );
     }
 
     const membershipCount = await this._membershipRepo.countByUserId(user.userId);
@@ -58,6 +67,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -65,6 +75,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
       type: TokenEnums.REFRESH_TOKEN,
     });
 
@@ -74,6 +85,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
       },

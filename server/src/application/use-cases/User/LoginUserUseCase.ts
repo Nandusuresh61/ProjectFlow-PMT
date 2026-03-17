@@ -43,6 +43,14 @@ export class LoginUserUseCase {
         HttpStatusCode.CONFLICT,
       );
 
+    if (user.isBlocked) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.USER_BLOCKED,
+        HttpStatusCode.FORBIDDEN
+      );
+    }
+
     const membershipCount = await this._membershipRepo.countByUserId(user.userId);
 
     const accessToken = this._tokenService.createAccessToken({
@@ -50,6 +58,7 @@ export class LoginUserUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -57,6 +66,7 @@ export class LoginUserUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {
@@ -65,6 +75,7 @@ export class LoginUserUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
       },

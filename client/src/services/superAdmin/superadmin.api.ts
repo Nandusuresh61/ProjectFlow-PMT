@@ -17,3 +17,10 @@ export const getUserDetails = async (
   const { data } = await API.get(API_ROUTES.SUPER_ADMIN.USER_DETAILS(userId));
   return data;
 };
+
+export const toggleBlockUser = async (
+  userId: string
+): Promise<ApiResponse<null>> => {
+  const { data } = await API.patch(API_ROUTES.SUPER_ADMIN.TOGGLE_BLOCK(userId));
+  return data;
+};

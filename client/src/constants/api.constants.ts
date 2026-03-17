@@ -34,5 +34,6 @@ export const API_ROUTES = {
   SUPER_ADMIN: {
     GET_USERS: "/super-admin/getusers",
     USER_DETAILS: (userId: string) => `/super-admin/user/${userId}`,
+    TOGGLE_BLOCK: (userId: string) => `/super-admin/toggle-block/${userId}`,
   },
 } as const;

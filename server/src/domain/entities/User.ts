@@ -8,6 +8,7 @@ export class User {
     public providerId: string | undefined,
     public currentWorkspaceId: string | undefined,
     public isSuperAdmin: boolean,
+    public isBlocked: boolean,
     public profileImage: string | null,
     public createdAt: Date,
     public updatedAt: Date,

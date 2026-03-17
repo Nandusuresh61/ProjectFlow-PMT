@@ -20,4 +20,11 @@ router.get(
   superAdminUserController.getUserDetails
 );
 
+router.patch(
+  "/toggle-block/:userId",
+  authenticatedUser,
+  superAdminOnly,
+  superAdminUserController.toggleUserBlock
+);
+
 export default router;

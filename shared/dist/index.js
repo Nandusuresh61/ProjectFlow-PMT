@@ -39,8 +39,8 @@ var HttpStatusCode = /* @__PURE__ */ ((HttpStatusCode2) => {
 
 // src/enums/TokenEnums.ts
 var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
-  TokenEnums2["ACCESS_TOKEN"] = "Access Token";
-  TokenEnums2["REFRESH_TOKEN"] = "Refresh Token";
+  TokenEnums2["ACCESS_TOKEN"] = "ACCESS_TOKEN";
+  TokenEnums2["REFRESH_TOKEN"] = "REFRESH_TOKEN";
   return TokenEnums2;
 })(TokenEnums || {});
 
@@ -133,6 +133,7 @@ var AppMessages = {
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
   USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
   WORKSPACE_NOT_FOUND: "Workspace not found",
+  WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
   INVITATION_SENT_SUCCESS: "Invitation sent success",
   INVITATION_ALREADY_SENT: " Invitation already sent to this email",
   INVALID_INVITATION: "Invalid Invitation",
@@ -140,7 +141,9 @@ var AppMessages = {
   INVITATION_ACCEPTED: "Invitation Accepted",
   INVITATION_ALREADY_USED: "Invitation Already Used",
   MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
-  USER_ALREADY_MEMBER: "User Already Member in this workspace"
+  USER_ALREADY_MEMBER: "User Already Member in this workspace",
+  USER_BLOCKED: "Your account has been blocked. Please contact support.",
+  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully."
 };
 
 // src/schema/TokenPayload.ts
@@ -150,7 +153,8 @@ var TokenPayloadSchema = z.object({
   fullName: z.string(),
   email: z.string(),
   isSuperAdmin: z.boolean(),
-  type: z.enum(TokenEnums)
+  isBlocked: z.boolean(),
+  type: z.nativeEnum(TokenEnums)
 });
 
 // src/schema/auth/RegisterUserSchema.ts

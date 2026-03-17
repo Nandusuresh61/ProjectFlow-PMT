@@ -1,16 +1,17 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { toast } from "sonner";
 import { loginUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-import { LoginUserSchema } from "shared";
+import { AppMessages, LoginUserSchema } from "shared";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
+import { useEffect } from "react";
 
 type LoginValues = { email: string; password: string };
 
@@ -59,6 +60,19 @@ export default function Login() {
   const setLoading = AuthUserState((state) => state.setLoading);
   const checkAuth = AuthUserState((state) => state.checkAuth);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "blocked") {
+      toast.error(AppMessages.USER_BLOCKED, {
+        duration: 5000,
+        id: "blocked-toast",
+      });
+      
+      navigate("/login", { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const handleLogin = async (values: LoginValues) => {
     setLoading(true);
@@ -70,7 +84,7 @@ export default function Login() {
         try {
           await acceptInvitation(pendingToken);
           localStorage.removeItem("invite_token");
-          toast.success("Joined workspace successfully!");
+          toast.success(AppMessages.WORKSPACE_JOIN_SUCCESS);
         } catch (inviteErr) {
           console.error("Invitation failed:", inviteErr);
         }
