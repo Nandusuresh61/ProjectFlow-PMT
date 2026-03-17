@@ -1,5 +1,5 @@
 export interface CreatePlanDto {
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;

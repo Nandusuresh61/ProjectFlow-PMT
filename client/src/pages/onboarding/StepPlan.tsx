@@ -43,7 +43,7 @@ export function StepPlan({
                                 )}
                             >
                                 <h3 className="text-xl font-black uppercase tracking-tight mb-1">
-                                    {plan.name}
+                                    {plan.type}
                                 </h3>
                                 <div className="flex items-baseline gap-1 mb-2">
                                     <span className="text-2xl font-black text-[#A5D7E8]">

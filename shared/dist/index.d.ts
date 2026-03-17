@@ -40,17 +40,17 @@ declare enum TokenEnums {
     REFRESH_TOKEN = "REFRESH_TOKEN"
 }
 
-declare enum EmailType {
-    OTP = "OTP",
-    RESET_PASSWORD = "RESET_PASSWORD",
-    INVITE_USER = "INVITE_USER"
-}
-
 declare enum WorkspaceRoleEnum {
     WORKSPACE_OWNER = "WORKSPACE_OWNER",
     WORKSPACE_ADMIN = "WORKSPACE_ADMIN",
     WORKSPACE_MEMBER = "WORKSPACE_MEMBER",
     WORKSPACE_VIEWER = "WORKSPACE_VIEWER"
+}
+
+declare enum PlanType {
+    FREE = "FREE",
+    PRO = "PRO",
+    ENTERPRISE = "ENTERPRISE"
 }
 
 declare enum AuthProvider {
@@ -63,6 +63,12 @@ declare enum InvitationStatus {
     ACCEPTED = "ACCEPTED",
     EXPIRED = "EXPIRED",
     CANCELLED = "CANCELLED"
+}
+
+declare enum EmailType {
+    OTP = "OTP",
+    RESET_PASSWORD = "RESET_PASSWORD",
+    INVITE_USER = "INVITE_USER"
 }
 
 declare class AppError extends Error {
@@ -162,7 +168,7 @@ declare const ResetPasswordSchema: z.ZodObject<{
 type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;
 
 declare const CreatePlanSchema: z$1.ZodObject<{
-    name: z$1.ZodString;
+    type: z$1.ZodEnum<typeof PlanType>;
     priceMonthly: z$1.ZodNumber;
     description: z$1.ZodString;
     maxProjects: z$1.ZodNumber;
@@ -218,4 +224,4 @@ interface ITokenPayload {
     isBlocked: boolean;
 }
 
-export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, type ITokenPayload, type IUser, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, type ITokenPayload, type IUser, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, PlanType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

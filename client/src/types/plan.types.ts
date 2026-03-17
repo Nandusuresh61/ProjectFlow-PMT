@@ -1,5 +1,5 @@
 export interface CreatePlanPayload {
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;
@@ -9,7 +9,7 @@ export interface CreatePlanPayload {
 
 export interface Plan {
   planId: string;
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;

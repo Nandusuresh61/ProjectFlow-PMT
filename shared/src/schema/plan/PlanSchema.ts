@@ -1,7 +1,8 @@
+import { PlanType } from "../../enums/PlanType";
 import { z } from "zod";
 
 export const CreatePlanSchema = z.object({
-  name: z.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  type: z.nativeEnum(PlanType, { message: "Invalid plan type" }),
 
   priceMonthly: z.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
 
@@ -14,6 +15,14 @@ export const CreatePlanSchema = z.object({
   features: z
     .array(z.string().min(1), { message: "Features are required" })
     .min(1, "At least one feature is required"),
+}).refine((data) => {
+  if (data.type === PlanType.FREE && data.priceMonthly !== 0) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Free plan must have 0 price",
+  path: ["priceMonthly"],
 });
 
 export type CreatePlanSchemaType = z.infer<typeof CreatePlanSchema>;

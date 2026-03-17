@@ -1,7 +1,7 @@
 export class Plan {
   constructor(
     public readonly planId: string,
-    public name: string,
+    public type: string,
     public priceMonthly: number,
     public description: string,
     public maxProjects: number,

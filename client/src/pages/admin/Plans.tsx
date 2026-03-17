@@ -26,10 +26,11 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { createPlan, getPlans, togglePlanStatus } from "@/services/plan/plan.api";
+import { PlanType } from "shared";
 
 interface Plan {
   planId: string;
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;
@@ -46,8 +47,8 @@ export default function Plans() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
+    type: PlanType.FREE,
+    price: "0",
     description: "",
     maxProjects: "",
     maxMembers: "",
@@ -70,10 +71,20 @@ export default function Plans() {
   const [featuresList, setFeaturesList] = useState<string[]>([""]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+
+      // If type changes to FREE, force price to 0
+      if (name === "type" && value === PlanType.FREE) {
+        newData.price = "0";
+      }
+
+      return newData;
+    });
   };
 
   const handleFeatureChange = (index: number, value: string) => {
@@ -98,30 +109,32 @@ export default function Plans() {
       const validFeatures = featuresList.filter((f) => f.trim() !== "");
 
       const payload = {
-        name: formData.name,
-        priceMonthly: Number(formData.price),
+        type: formData.type,
+        priceMonthly: formData.type === PlanType.FREE ? 0 : Number(formData.price),
         description: formData.description,
         maxProjects: Number(formData.maxProjects),
         maxMembers: Number(formData.maxMembers),
         features: validFeatures,
       };
 
-      const res = await createPlan(payload);
+      await createPlan(payload);
 
-      setPlans((prev) => [...prev, res.data]);
+      // Refresh plans to show updated statuses (auto-deactivation)
+      const res = await getPlans();
+      setPlans(res.data);
 
       toast.success("Plan created successfully!");
       setIsDialogOpen(false);
       setFormData({
-        name: "",
-        price: "",
+        type: PlanType.FREE,
+        price: "0",
         description: "",
         maxProjects: "",
         maxMembers: "",
       });
       setFeaturesList([""]);
     } catch (error: any) {
-      toast.error(error.message || "Failed to create plan");
+      toast.error(error.response?.data?.message || error.message || "Failed to create plan");
     } finally {
       setLoading(false);
     }
@@ -170,24 +183,27 @@ export default function Plans() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="name" className="text-zinc-300">
-                  Plan Name
+                <Label htmlFor="type" className="text-zinc-300">
+                  Plan Type
                 </Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="e.g. Starter"
-                  value={formData.name}
+                <select
+                  id="type"
+                  name="type"
+                  value={formData.type}
                   onChange={handleInputChange}
-                  className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
-                />
+                  className="flex h-9 w-full rounded-md border border-zinc-800 bg-zinc-950 px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500 disabled:cursor-not-allowed disabled:opacity-50 text-zinc-100"
+                >
+                  <option value={PlanType.FREE}>Free</option>
+                  <option value={PlanType.PRO}>Pro</option>
+                  <option value={PlanType.ENTERPRISE}>Enterprise</option>
+                </select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="price" className="text-zinc-300">
+                <Label htmlFor="price" className={cn("text-zinc-300", formData.type === PlanType.FREE && "opacity-50")}>
                   Price (Monthly in ₹)
                 </Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-zinc-500">
+                  <span className={cn("absolute left-3 top-2.5 text-zinc-500", formData.type === PlanType.FREE && "opacity-50")}>
                     ₹
                   </span>
                   <Input
@@ -195,7 +211,8 @@ export default function Plans() {
                     name="price"
                     type="number"
                     placeholder="0"
-                    className="pl-7 bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
+                    disabled={formData.type === PlanType.FREE}
+                    className="pl-7 bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500 disabled:opacity-50"
                     value={formData.price}
                     onChange={handleInputChange}
                   />
@@ -332,7 +349,7 @@ export default function Plans() {
                   <span className="text-sm font-normal text-zinc-500">/mo</span>
                 </CardTitle>
                 <CardTitle className="text-lg font-medium text-green-500 mt-2">
-                  {plan.name}
+                  {plan.type}
                 </CardTitle>
                 <CardDescription className="text-zinc-400">
                   {plan.description}

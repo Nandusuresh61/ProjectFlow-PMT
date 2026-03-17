@@ -42,6 +42,7 @@ __export(index_exports, {
   HttpStatusCode: () => HttpStatusCode,
   InvitationStatus: () => InvitationStatus,
   LoginUserSchema: () => LoginUserSchema,
+  PlanType: () => PlanType,
   RegisterUserSchema: () => RegisterUserSchema,
   ResetPasswordSchema: () => ResetPasswordSchema,
   ResponseHandler: () => ResponseHandler,
@@ -97,14 +98,6 @@ var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
   return TokenEnums2;
 })(TokenEnums || {});
 
-// src/enums/EmailEnums.ts
-var EmailType = /* @__PURE__ */ ((EmailType2) => {
-  EmailType2["OTP"] = "OTP";
-  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
-  EmailType2["INVITE_USER"] = "INVITE_USER";
-  return EmailType2;
-})(EmailType || {});
-
 // src/enums/WorkspaceRolesEnum.ts
 var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
   WorkspaceRoleEnum2["WORKSPACE_OWNER"] = "WORKSPACE_OWNER";
@@ -113,6 +106,14 @@ var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
   WorkspaceRoleEnum2["WORKSPACE_VIEWER"] = "WORKSPACE_VIEWER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
+
+// src/enums/PlanType.ts
+var PlanType = /* @__PURE__ */ ((PlanType2) => {
+  PlanType2["FREE"] = "FREE";
+  PlanType2["PRO"] = "PRO";
+  PlanType2["ENTERPRISE"] = "ENTERPRISE";
+  return PlanType2;
+})(PlanType || {});
 
 // src/enums/AuthProviders.ts
 var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
@@ -129,6 +130,14 @@ var InvitationStatus = /* @__PURE__ */ ((InvitationStatus2) => {
   InvitationStatus2["CANCELLED"] = "CANCELLED";
   return InvitationStatus2;
 })(InvitationStatus || {});
+
+// src/enums/EmailEnums.ts
+var EmailType = /* @__PURE__ */ ((EmailType2) => {
+  EmailType2["OTP"] = "OTP";
+  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
+  EmailType2["INVITE_USER"] = "INVITE_USER";
+  return EmailType2;
+})(EmailType || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -251,12 +260,20 @@ var ResetPasswordSchema = import_zod5.default.object({
 // src/schema/plan/PlanSchema.ts
 var import_zod6 = require("zod");
 var CreatePlanSchema = import_zod6.z.object({
-  name: import_zod6.z.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  type: import_zod6.z.nativeEnum(PlanType, { message: "Invalid plan type" }),
   priceMonthly: import_zod6.z.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
   description: import_zod6.z.string({ message: "Description is required" }).min(1, "Description is required"),
   maxProjects: import_zod6.z.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
   maxMembers: import_zod6.z.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
   features: import_zod6.z.array(import_zod6.z.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+}).refine((data) => {
+  if (data.type === "FREE" /* FREE */ && data.priceMonthly !== 0) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Free plan must have 0 price",
+  path: ["priceMonthly"]
 });
 
 // src/schema/onboarding/CompleteOnboardingSchema.ts
@@ -313,6 +330,7 @@ var ResponseHandler = {
   HttpStatusCode,
   InvitationStatus,
   LoginUserSchema,
+  PlanType,
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,
