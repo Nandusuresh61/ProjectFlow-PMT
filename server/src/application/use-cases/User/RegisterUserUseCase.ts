@@ -8,6 +8,7 @@ import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 
 import { AuthProvider, TokenEnums } from "shared";
+import { User } from "@/domain/entities/User";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {
   constructor(
@@ -18,16 +19,21 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
 
   async execute(user: RegisterVerifiedUserDto): Promise<UserAuthResponseDto> {
     const now = new Date();
-    const newUser = await this._userRepo.createUser({
-      userId: this._uidGenerator.createId(),
-      fullName: user.fullName,
-      email: user.email,
-      passwordHash: user.passwordHash,
-      authProvider: AuthProvider.LOCAL,
-      isSuperAdmin: false,
-      createdAt: now,
-      updatedAt: now,
-    });
+    const newUser = await this._userRepo.createUser(
+      new User(
+        this._uidGenerator.createId(),
+        user.fullName,
+        user.email,
+        user.passwordHash,
+        AuthProvider.LOCAL,
+        undefined,
+        undefined,
+        false,
+        null,
+        now,
+        now,
+      )
+    );
 
     const accessToken = this._tokenService.createAccessToken({
       userId: newUser.userId,

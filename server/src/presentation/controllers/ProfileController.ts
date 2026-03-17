@@ -2,6 +2,7 @@ import { IGetUserProfileUseCase } from "@/application/interfaces/use-cases/User/
 import { IUpdateUserProfileUseCase } from "@/application/interfaces/use-cases/User/IUpdateUserProfileUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { AppMessages, HttpStatusCode, ResponseHandler } from "shared";
 
 export class ProfileController {
@@ -10,8 +11,8 @@ export class ProfileController {
     private readonly _updateUserProfileUseCase: IUpdateUserProfileUseCase,
   ) {}
 
-  getProfile = asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = (req as any).user;
+  getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { userId } = req.user!;
 
     let result = await this._getUserProfileUseCase.execute(userId);
 

@@ -9,6 +9,7 @@ import {
   WorkspaceRoleEnum,
 } from "shared";
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 
 export class InvitationController {
   constructor(
@@ -17,11 +18,11 @@ export class InvitationController {
   ) {}
 
   inviteUser = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: AuthRequest, res: Response): Promise<void> => {
       const validatedData = CreateInvitationSchema.parse(req.body);
 
       const workspaceId = req.params.workspaceId;
-      const inviterId = (req as any).user?.userId;
+      const inviterId = req.user?.userId;
 
       await Promise.all(
         validatedData.invites.map((invite) =>
@@ -40,9 +41,9 @@ export class InvitationController {
   );
 
   acceptInvitation = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const { token } = req.body;
-    const userId = (req as any).user?.userId;
+    const userId = req.user?.userId;
 
     const result = await this._acceptInvitationUseCase.execute(token, userId);
 

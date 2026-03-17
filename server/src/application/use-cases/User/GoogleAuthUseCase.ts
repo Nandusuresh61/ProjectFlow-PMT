@@ -12,6 +12,7 @@ import {
   TokenEnums,
 } from "shared";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { User } from "@/domain/entities/User";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -33,16 +34,19 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
 
     if (!user) {
       const now = new Date();
-      user = {
-        userId: this._uidGenerator.createId(),
-        fullName: payload.fullName,
-        email: payload.email,
-        authProvider: AuthProvider.GOOGLE,
-        providerId: payload.providerId,
-        isSuperAdmin: false,
-        createdAt: now,
-        updatedAt: now,
-      };
+      user = new User(
+        this._uidGenerator.createId(),
+        payload.fullName,
+        payload.email,
+        undefined,
+        AuthProvider.GOOGLE,
+        payload.providerId,
+        undefined,
+        false,
+        null,
+        now,
+        now,
+      );
 
       await this._userRepo.createUser(user);
     }

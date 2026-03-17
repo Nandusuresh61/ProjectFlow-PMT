@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError, ErrorCode, HttpStatusCode, AppMessages } from "shared";
+import { AppError, ErrorCode, HttpStatusCode, AppMessages, ITokenPayload } from "shared";
 import { config } from "@/app.config";
 import jwt from "jsonwebtoken";
 
-interface AuthRequest extends Request {
-  user?: any;
+export interface AuthRequest extends Request {
+  user?: ITokenPayload;
 }
 
 export const authenticatedUser = (
@@ -24,7 +24,7 @@ export const authenticatedUser = (
     }
 
     try {
-      const decoded = jwt.verify(token, config.ACCESS_TOKEN_SECRET);
+      const decoded = jwt.verify(token, config.ACCESS_TOKEN_SECRET) as unknown as ITokenPayload;
       req.user = decoded;
       next();
     } catch (error) {

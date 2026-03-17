@@ -28,6 +28,7 @@ import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoo
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { logger } from "@/infrastructure/utils/Logger";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -196,8 +197,8 @@ export class AuthController implements IAuthController {
       .json(ResponseHandler.success(AppMessages.LOGOUT_SUCCESS));
   });
 
-  getMe = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
 
     const user = await this._userRepo.findById(tokenPayload.userId);
 

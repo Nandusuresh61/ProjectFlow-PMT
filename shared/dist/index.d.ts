@@ -197,4 +197,19 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+interface IUser {
+    userId: string;
+    fullName: string;
+    email: string;
+    isSuperAdmin: boolean;
+    currentWorkspaceId?: string;
+    profileImage?: string | null;
+    membershipCount?: number;
+}
+interface ITokenPayload {
+    userId: string;
+    email: string;
+    isSuperAdmin: boolean;
+}
+
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, type ITokenPayload, type IUser, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
