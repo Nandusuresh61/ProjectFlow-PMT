@@ -18,6 +18,16 @@ export type UserAuthResponseDto = {
   refreshToken: string;
 };
 
+export interface GetMeResponseDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  isSuperAdmin: boolean;
+  currentWorkspaceId?: string;
+  membershipCount: number;
+}
+
+
 export type StartRegisterDto = {
   fullName: string;
   email: string;

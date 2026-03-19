@@ -18,6 +18,7 @@ import { ResetPasswordUseCase } from "@/application/use-cases/User/ResetPassword
 import { GoogleOAuthService } from "../services/GoogleOAuthService";
 import { GoogleAuthUseCase } from "@/application/use-cases/User/GoogleAuthUseCase";
 import { MembershipRepository } from "../repositories/MongoMembershipRepository";
+import { GetMeUseCase } from "@/application/use-cases/User/GetMeUseCase";
 
 /**
  * Infrastructure layer use case
@@ -98,6 +99,8 @@ const googleAuthUseCase = new GoogleAuthUseCase(
 );
 
 
+const getMeUseCase = new GetMeUseCase(userRepository, membershipRepository);
+
 export const authController = new AuthController(
   startRegisterUseCase,
   verifyOtpUseCase,
@@ -108,6 +111,5 @@ export const authController = new AuthController(
   resetPasswordUseCase,
   googleOAuthService,
   googleAuthUseCase,
-  userRepository,
-  membershipRepository
+  getMeUseCase
 );
