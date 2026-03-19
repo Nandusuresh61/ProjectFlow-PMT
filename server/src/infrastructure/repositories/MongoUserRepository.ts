@@ -27,6 +27,8 @@ export class MongoUserRepository
       providerId: doc.providerId,
       currentWorkspaceId: doc.currentWorkspaceId,
       isSuperAdmin: doc.isSuperAdmin,
+      isBlocked: doc.isBlocked,
+      profileImage: doc.profileImage || null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -78,6 +80,7 @@ export class MongoUserRepository
         providerId: user.providerId,
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
         updatedAt: new Date(),
       },
     );
@@ -95,7 +98,7 @@ export class MongoUserRepository
     } = options;
     const skip = (page - 1) * limit;
 
-    const matchStage: any = {};
+    const matchStage: Record<string, any> = {};
     if (search) {
       matchStage.$or = [
         { fullName: { $regex: search, $options: "i" } },
@@ -103,7 +106,7 @@ export class MongoUserRepository
       ];
     }
 
-    const sortStage: any = {};
+    const sortStage: Record<string, 1 | -1> = {};
     sortStage[sortBy] = sortOrder === "asc" ? 1 : -1;
 
     const result = await this.model.aggregate([
@@ -136,14 +139,15 @@ export class MongoUserRepository
       },
     ]);
 
-    const users = result[0].users.map((user: any) => ({
+    const users = result[0].users.map((user: UserDoc & { memberships: any[], workspacesData: any[] }) => ({
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
+      isBlocked: user.isBlocked,
       createdAt: user.createdAt,
-      workspaces: user.memberships.map((membership: any) => {
+      workspaces: user.memberships.map((membership: { workspaceId: string, role: string }) => {
         const workspace = user.workspacesData.find(
-          (o: any) => o.workspaceId === membership.workspaceId,
+          (o: { workspaceId: string, name: string }) => o.workspaceId === membership.workspaceId,
         );
 
         return {
@@ -235,6 +239,7 @@ export class MongoUserRepository
           userId: { $first: "$userId" },
           fullName: { $first: "$fullName" },
           email: { $first: "$email" },
+          isBlocked: { $first: "$isBlocked" },
           createdAt: { $first: "$createdAt" },
           workspaces: {
             $push: {
@@ -260,6 +265,7 @@ export class MongoUserRepository
         userId: user.userId,
         fullName: user.fullName,
         email: user.email,
+        isBlocked: user.isBlocked,
         createdAt: user.createdAt,
         workspaces: [],
       };

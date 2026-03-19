@@ -8,6 +8,7 @@ export interface UserWithWorkspaces {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: string;
   workspaces: Workspace[];
 }
@@ -41,6 +42,7 @@ export interface UserDetails {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: string;
   workspaces: UserWorkspaceDetails[];
 }

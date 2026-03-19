@@ -8,7 +8,9 @@ import {
   Building2,
   Mail,
   Calendar,
+  ShieldAlert,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Loader } from "@/components/ui/Loader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { getAllUsers, getUserDetails } from "@/services/superAdmin/superadmin.api";
+import { getAllUsers, getUserDetails, toggleBlockUser } from "@/services/superAdmin/superadmin.api";
 import { UserDetailsModal } from "@/components/admin/UserDetailsModal";
 import type { UserDetails } from "@/types/superadmin.types";
 import CustomTable, { type TableColumn } from "@/components/table/CustomTable";
@@ -38,6 +40,7 @@ interface User {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: string;
   workspaces: Workspace[];
 }
@@ -120,6 +123,24 @@ export default function Workspaces() {
     }
   };
 
+  const handleToggleBlock = async (userId: string) => {
+    try {
+      const response = await toggleBlockUser(userId);
+      if (response?.success) {
+        toast.success(response.message || "User block status updated");
+        // Update local state
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.userId === userId ? { ...u, isBlocked: !u.isBlocked } : u
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to toggle block status:", error);
+      toast.error("An error occurred while toggling block status");
+    }
+  };
+
   // ── Column definitions ────────────────────────────────────────────────────
   const columns: TableColumn<User>[] = [
     {
@@ -135,6 +156,12 @@ export default function Workspaces() {
             </AvatarFallback>
           </Avatar>
           <span className="font-medium text-zinc-200">{user.fullName}</span>
+          {user.isBlocked && (
+            <Badge variant="destructive" className="ml-2 text-[10px] h-4 px-1.5 py-0 bg-red-500/10 text-red-500 border-red-500/20">
+              <ShieldAlert className="h-2.5 w-2.5 mr-1" />
+              Blocked
+            </Badge>
+          )}
         </div>
       ),
     },
@@ -216,8 +243,13 @@ export default function Workspaces() {
               View details
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-800" />
-            <DropdownMenuItem className="text-red-500 focus:bg-red-500/10 focus:text-red-400">
-              Block user
+            <DropdownMenuItem
+              className={`${
+                user.isBlocked ? "text-green-500 focus:bg-green-500/10 focus:text-green-400" : "text-red-500 focus:bg-red-500/10 focus:text-red-400"
+              }`}
+              onSelect={() => handleToggleBlock(user.userId)}
+            >
+              {user.isBlocked ? "Unblock user" : "Block user"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

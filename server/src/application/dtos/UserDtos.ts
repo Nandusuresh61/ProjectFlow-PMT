@@ -1,5 +1,3 @@
-import { LoginUserSchemaType, RegisterUserSchemaType } from "shared";
-
 export type RegisterVerifiedUserDto = {
   fullName: string;
   email: string;
@@ -12,12 +10,23 @@ export type UserAuthResponseDto = {
     fullName: string;
     email: string;
     isSuperAdmin: boolean;
+    isBlocked: boolean;
     currentWorkspaceId?: string;
     membershipCount: number;
   };
   accessToken: string;
   refreshToken: string;
 };
+
+export interface GetMeResponseDto {
+  userId: string;
+  fullName: string;
+  email: string;
+  isSuperAdmin: boolean;
+  currentWorkspaceId?: string;
+  membershipCount: number;
+}
+
 
 export type StartRegisterDto = {
   fullName: string;
@@ -45,6 +54,7 @@ export interface UserWithWorkspacesDTO {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: Date;
   workspaces: {
     workspaceId: string;
@@ -82,6 +92,7 @@ export interface UserDetailsDto {
   userId: string;
   fullName: string;
   email: string;
+  isBlocked: boolean;
   createdAt: Date;
   workspaces: UserWorkspaceDetails[];
 }

@@ -11,6 +11,7 @@ export interface User {
   isSuperAdmin: boolean;
   membershipCount: number;
   currentWorkspaceId?: string;
+  profileImage?: string | null;
 }
 
 export interface AuthData {

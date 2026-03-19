@@ -2,7 +2,7 @@ import { model, Schema, Document } from "mongoose";
 
 export interface PlanDocument extends Document {
   planId: string;
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;
@@ -16,7 +16,7 @@ export interface PlanDocument extends Document {
 const planSchema = new Schema<PlanDocument>(
   {
     planId: { type: String, required: true, unique: true },
-    name: { type: String, required: true, unique: true },
+    type: { type: String, required: true },
     priceMonthly: { type: Number, required: true },
     description: { type: String, required: true },
     maxProjects: { type: Number, required: true },

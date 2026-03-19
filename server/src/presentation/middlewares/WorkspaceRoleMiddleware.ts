@@ -1,12 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AppError, ErrorCode, HttpStatusCode, AppMessages } from "shared";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { WorkspaceRoleEnum } from "shared";
-
-interface AuthRequest extends Request {
-  user?: any;
-}
+import { AuthRequest } from "./AuthMiddleware";
 
 export class WorkspaceRoleMiddleware {
   constructor(

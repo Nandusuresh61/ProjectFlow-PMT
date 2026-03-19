@@ -6,7 +6,8 @@ export const TokenPayloadSchema = z.object({
   fullName: z.string(),
   email: z.string(),
   isSuperAdmin: z.boolean(),
-  type: z.enum(TokenEnums),
+  isBlocked: z.boolean(),
+  type: z.nativeEnum(TokenEnums),
 });
 
 export type TokenPayloadType = z.infer<typeof TokenPayloadSchema>;

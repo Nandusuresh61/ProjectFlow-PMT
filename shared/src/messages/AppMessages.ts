@@ -80,6 +80,8 @@ export const AppMessages = {
 
   WORKSPACE_NOT_FOUND: "Workspace not found",
 
+  WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
+
   INVITATION_SENT_SUCCESS: "Invitation sent success",
 
   INVITATION_ALREADY_SENT: " Invitation already sent to this email",
@@ -94,6 +96,10 @@ export const AppMessages = {
   
   MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
 
-  USER_ALREADY_MEMBER: "User Already Member in this workspace"
+  USER_ALREADY_MEMBER: "User Already Member in this workspace",
+
+  USER_BLOCKED: "Your account has been blocked. Please contact support.",
+
+  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully."
 
 } as const;

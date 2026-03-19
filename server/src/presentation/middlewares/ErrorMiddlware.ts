@@ -3,7 +3,7 @@ import { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
 
 export const errorMiddleware = (
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction

@@ -36,14 +36,8 @@ declare enum HttpStatusCode {
 }
 
 declare enum TokenEnums {
-    ACCESS_TOKEN = "Access Token",
-    REFRESH_TOKEN = "Refresh Token"
-}
-
-declare enum EmailType {
-    OTP = "OTP",
-    RESET_PASSWORD = "RESET_PASSWORD",
-    INVITE_USER = "INVITE_USER"
+    ACCESS_TOKEN = "ACCESS_TOKEN",
+    REFRESH_TOKEN = "REFRESH_TOKEN"
 }
 
 declare enum WorkspaceRoleEnum {
@@ -51,6 +45,12 @@ declare enum WorkspaceRoleEnum {
     WORKSPACE_ADMIN = "WORKSPACE_ADMIN",
     WORKSPACE_MEMBER = "WORKSPACE_MEMBER",
     WORKSPACE_VIEWER = "WORKSPACE_VIEWER"
+}
+
+declare enum PlanType {
+    FREE = "FREE",
+    PRO = "PRO",
+    ENTERPRISE = "ENTERPRISE"
 }
 
 declare enum AuthProvider {
@@ -63,6 +63,12 @@ declare enum InvitationStatus {
     ACCEPTED = "ACCEPTED",
     EXPIRED = "EXPIRED",
     CANCELLED = "CANCELLED"
+}
+
+declare enum EmailType {
+    OTP = "OTP",
+    RESET_PASSWORD = "RESET_PASSWORD",
+    INVITE_USER = "INVITE_USER"
 }
 
 declare class AppError extends Error {
@@ -113,6 +119,7 @@ declare const AppMessages: {
     readonly USER_ALREADY_ONBOARDED: "User already completed onboarding";
     readonly USER_FETCHING_SUCCESSFUL: "User Fetching Successfull";
     readonly WORKSPACE_NOT_FOUND: "Workspace not found";
+    readonly WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!";
     readonly INVITATION_SENT_SUCCESS: "Invitation sent success";
     readonly INVITATION_ALREADY_SENT: " Invitation already sent to this email";
     readonly INVALID_INVITATION: "Invalid Invitation";
@@ -121,6 +128,8 @@ declare const AppMessages: {
     readonly INVITATION_ALREADY_USED: "Invitation Already Used";
     readonly MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded";
     readonly USER_ALREADY_MEMBER: "User Already Member in this workspace";
+    readonly USER_BLOCKED: "Your account has been blocked. Please contact support.";
+    readonly USER_BLOCK_STATUS_UPDATED: "User block status updated successfully.";
 };
 
 declare const TokenPayloadSchema: z.ZodObject<{
@@ -128,6 +137,7 @@ declare const TokenPayloadSchema: z.ZodObject<{
     fullName: z.ZodString;
     email: z.ZodString;
     isSuperAdmin: z.ZodBoolean;
+    isBlocked: z.ZodBoolean;
     type: z.ZodEnum<typeof TokenEnums>;
 }, z.core.$strip>;
 type TokenPayloadType = z.infer<typeof TokenPayloadSchema>;
@@ -158,7 +168,7 @@ declare const ResetPasswordSchema: z.ZodObject<{
 type ResetPasswordSchemaType = z.infer<typeof ResetPasswordSchema>;
 
 declare const CreatePlanSchema: z$1.ZodObject<{
-    name: z$1.ZodString;
+    type: z$1.ZodEnum<typeof PlanType>;
     priceMonthly: z$1.ZodNumber;
     description: z$1.ZodString;
     maxProjects: z$1.ZodNumber;
@@ -197,4 +207,21 @@ declare const ResponseHandler: {
     error(message: string): ErrorResponse;
 };
 
-export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };
+interface IUser {
+    userId: string;
+    fullName: string;
+    email: string;
+    isSuperAdmin: boolean;
+    isBlocked: boolean;
+    currentWorkspaceId?: string;
+    profileImage?: string | null;
+    membershipCount?: number;
+}
+interface ITokenPayload {
+    userId: string;
+    email: string;
+    isSuperAdmin: boolean;
+    isBlocked: boolean;
+}
+
+export { AppError, AppMessages, AuthProvider, CompleteOnboardingSchema, CreateInvitationSchema, CreatePlanSchema, type CreatePlanSchemaType, EmailType, ErrorCode, ForgotEmailSchema, type ForgotEmailSchemaType, HttpStatusCode, type ITokenPayload, type IUser, InvitationStatus, LoginUserSchema, type LoginUserSchemaType, PlanType, RegisterUserSchema, type RegisterUserSchemaType, ResetPasswordSchema, type ResetPasswordSchemaType, ResponseHandler, TokenEnums, TokenPayloadSchema, type TokenPayloadType, WorkspaceRoleEnum };

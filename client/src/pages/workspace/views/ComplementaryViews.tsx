@@ -156,7 +156,7 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
                   </div>
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
                     Message (Optional)
                   </label>
@@ -165,7 +165,7 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
                     rows={3}
                     className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all resize-none"
                   />
-                </div>
+                </div> */}
               </div>
 
               <div className="mt-10 flex gap-4">

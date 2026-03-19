@@ -25,9 +25,9 @@ import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/Us
 import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/IResetPasswordUseCase";
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { IGetMeUseCase } from "@/application/interfaces/use-cases/User/IGetMeUseCase";
 import { logger } from "@/infrastructure/utils/Logger";
-import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -40,8 +40,7 @@ export class AuthController implements IAuthController {
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
     private readonly _googleOAuthService: IOAuthProviderService,
     private readonly _googleAuthUseCase: IGoogleAuthUseCase,
-    private readonly _userRepo: IUserRepository,
-    private readonly _membershipRepo: IMembershipRepository
+    private readonly _getMeUseCase: IGetMeUseCase
   ) { }
 
   startRegister = asyncHandler(
@@ -196,25 +195,14 @@ export class AuthController implements IAuthController {
       .json(ResponseHandler.success(AppMessages.LOGOUT_SUCCESS));
   });
 
-  getMe = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
 
-    const user = await this._userRepo.findById(tokenPayload.userId);
-
-    const membershipCount = await this._membershipRepo.countByUserId(
-    user.userId
-  );
+    const userProfile = await this._getMeUseCase.execute(tokenPayload.userId);
 
     res.status(200).json(
       ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-        user: {
-          userId: user.userId,
-          fullName: user.fullName,
-          email: user.email,
-          isSuperAdmin: user.isSuperAdmin,
-          currentWorkspaceId: user.currentWorkspaceId,
-          membershipCount
-        },
+        user: userProfile
       })
     );
   });

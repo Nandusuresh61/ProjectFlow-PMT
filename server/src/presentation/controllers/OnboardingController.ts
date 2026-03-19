@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
 import {
@@ -14,10 +15,10 @@ export class OnboardingController {
   ) { }
 
   completeOnboarding = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: AuthRequest, res: Response): Promise<void> => {
       const validatedData = CompleteOnboardingSchema.parse(req.body);
 
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.userId;
 
       const result = await this._completeOnboardingUseCase.execute({
         userId,

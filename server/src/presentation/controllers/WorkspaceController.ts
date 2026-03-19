@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { ResponseHandler, AppMessages, HttpStatusCode } from "shared";
 import { IGetWorkspaceMembersUseCase } from "@/application/interfaces/use-cases/workspace/IGetWorkspaceMembersUseCase";
@@ -25,16 +26,16 @@ export class WorkspaceController {
       .json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, members));
   });
 
-  getUserWorkspaces = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  getUserWorkspaces = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
     
     const workspaces = await this._getUserWorkspacesUseCase.execute(tokenPayload.userId);
     
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, workspaces));
   });
 
-  switchWorkspace = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  switchWorkspace = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
     const { workspaceId } = req.params;
 
     const result = await this._switchWorkspaceUseCase.execute(tokenPayload.userId, workspaceId);
@@ -42,8 +43,8 @@ export class WorkspaceController {
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(result.message));
   });
 
-  createWorkspace = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  createWorkspace = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
     const { workspaceName, planId } = req.body;
 
     const result = await this._createWorkspaceUseCase.execute(tokenPayload.userId, workspaceName, planId);

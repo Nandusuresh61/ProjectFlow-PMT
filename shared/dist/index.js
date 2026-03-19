@@ -39,18 +39,10 @@ var HttpStatusCode = /* @__PURE__ */ ((HttpStatusCode2) => {
 
 // src/enums/TokenEnums.ts
 var TokenEnums = /* @__PURE__ */ ((TokenEnums2) => {
-  TokenEnums2["ACCESS_TOKEN"] = "Access Token";
-  TokenEnums2["REFRESH_TOKEN"] = "Refresh Token";
+  TokenEnums2["ACCESS_TOKEN"] = "ACCESS_TOKEN";
+  TokenEnums2["REFRESH_TOKEN"] = "REFRESH_TOKEN";
   return TokenEnums2;
 })(TokenEnums || {});
-
-// src/enums/EmailEnums.ts
-var EmailType = /* @__PURE__ */ ((EmailType2) => {
-  EmailType2["OTP"] = "OTP";
-  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
-  EmailType2["INVITE_USER"] = "INVITE_USER";
-  return EmailType2;
-})(EmailType || {});
 
 // src/enums/WorkspaceRolesEnum.ts
 var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
@@ -60,6 +52,14 @@ var WorkspaceRoleEnum = /* @__PURE__ */ ((WorkspaceRoleEnum2) => {
   WorkspaceRoleEnum2["WORKSPACE_VIEWER"] = "WORKSPACE_VIEWER";
   return WorkspaceRoleEnum2;
 })(WorkspaceRoleEnum || {});
+
+// src/enums/PlanType.ts
+var PlanType = /* @__PURE__ */ ((PlanType2) => {
+  PlanType2["FREE"] = "FREE";
+  PlanType2["PRO"] = "PRO";
+  PlanType2["ENTERPRISE"] = "ENTERPRISE";
+  return PlanType2;
+})(PlanType || {});
 
 // src/enums/AuthProviders.ts
 var AuthProvider = /* @__PURE__ */ ((AuthProvider2) => {
@@ -76,6 +76,14 @@ var InvitationStatus = /* @__PURE__ */ ((InvitationStatus2) => {
   InvitationStatus2["CANCELLED"] = "CANCELLED";
   return InvitationStatus2;
 })(InvitationStatus || {});
+
+// src/enums/EmailEnums.ts
+var EmailType = /* @__PURE__ */ ((EmailType2) => {
+  EmailType2["OTP"] = "OTP";
+  EmailType2["RESET_PASSWORD"] = "RESET_PASSWORD";
+  EmailType2["INVITE_USER"] = "INVITE_USER";
+  return EmailType2;
+})(EmailType || {});
 
 // src/errors/AppError.ts
 var AppError = class extends Error {
@@ -133,6 +141,7 @@ var AppMessages = {
   USER_ALREADY_ONBOARDED: "User already completed onboarding",
   USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
   WORKSPACE_NOT_FOUND: "Workspace not found",
+  WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
   INVITATION_SENT_SUCCESS: "Invitation sent success",
   INVITATION_ALREADY_SENT: " Invitation already sent to this email",
   INVALID_INVITATION: "Invalid Invitation",
@@ -140,7 +149,9 @@ var AppMessages = {
   INVITATION_ACCEPTED: "Invitation Accepted",
   INVITATION_ALREADY_USED: "Invitation Already Used",
   MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
-  USER_ALREADY_MEMBER: "User Already Member in this workspace"
+  USER_ALREADY_MEMBER: "User Already Member in this workspace",
+  USER_BLOCKED: "Your account has been blocked. Please contact support.",
+  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully."
 };
 
 // src/schema/TokenPayload.ts
@@ -150,7 +161,8 @@ var TokenPayloadSchema = z.object({
   fullName: z.string(),
   email: z.string(),
   isSuperAdmin: z.boolean(),
-  type: z.enum(TokenEnums)
+  isBlocked: z.boolean(),
+  type: z.nativeEnum(TokenEnums)
 });
 
 // src/schema/auth/RegisterUserSchema.ts
@@ -194,12 +206,20 @@ var ResetPasswordSchema = z5.object({
 // src/schema/plan/PlanSchema.ts
 import { z as z6 } from "zod";
 var CreatePlanSchema = z6.object({
-  name: z6.string({ message: "Plan name is required" }).min(1, "Plan name is required"),
+  type: z6.nativeEnum(PlanType, { message: "Invalid plan type" }),
   priceMonthly: z6.number({ message: "Price is required" }).min(0, "Price cannot be negative"),
   description: z6.string({ message: "Description is required" }).min(1, "Description is required"),
   maxProjects: z6.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
   maxMembers: z6.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
   features: z6.array(z6.string().min(1), { message: "Features are required" }).min(1, "At least one feature is required")
+}).refine((data) => {
+  if (data.type === "FREE" /* FREE */ && data.priceMonthly !== 0) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Free plan must have 0 price",
+  path: ["priceMonthly"]
 });
 
 // src/schema/onboarding/CompleteOnboardingSchema.ts
@@ -255,6 +275,7 @@ export {
   HttpStatusCode,
   InvitationStatus,
   LoginUserSchema,
+  PlanType,
   RegisterUserSchema,
   ResetPasswordSchema,
   ResponseHandler,

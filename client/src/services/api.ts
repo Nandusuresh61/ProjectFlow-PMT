@@ -1,4 +1,5 @@
 import axios, { HttpStatusCode } from "axios";
+import { API_ROUTES } from "@/constants/api.constants";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -9,9 +10,9 @@ export const API = axios.create({
 });
 
 const AUTH_ROUTES = [
-  "/auth/login",
-  "/auth/signup",
-  "/auth/refresh",
+  API_ROUTES.AUTH.LOGIN,
+  API_ROUTES.AUTH.SIGNUP,
+  API_ROUTES.AUTH.REFRESH,
 ];
 
 API.interceptors.response.use(
@@ -19,6 +20,24 @@ API.interceptors.response.use(
 
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    if (status === HttpStatusCode.Forbidden && 
+        (message === "Your account has been blocked. Please contact support." || 
+         message?.toLowerCase().includes("blocked"))) {
+      
+      const { AuthUserState } = await import("@/store/auth.store");
+      const { toast } = await import("sonner");
+      
+      AuthUserState.getState().clearUser();
+      toast.error("Your account has been blocked. Please contact support.");
+      window.location.href = "/login?status=blocked";
+      
+      return Promise.reject({
+        message: message || "Your account has been blocked.",
+        status: status,
+      });
+    }
 
     const isAuthRoute = AUTH_ROUTES.some((route) =>
       originalRequest.url?.includes(route)
@@ -26,17 +45,12 @@ API.interceptors.response.use(
 
     if (isAuthRoute) {
       return Promise.reject({
-        message:
-          error?.response?.data?.message ||
-          "Authentication failed",
-        status: error?.response?.status,
+        message: message || "Authentication failed",
+        status: status,
       });
     }
 
-    if (
-      error.response?.status === HttpStatusCode.Unauthorized &&
-      !originalRequest._retry
-    ) {
+    if (status === HttpStatusCode.Unauthorized && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -53,11 +67,8 @@ API.interceptors.response.use(
     }
 
     return Promise.reject({
-      message:
-        error?.response?.data?.message ||
-        error?.message ||
-        "Something went wrong",
-      status: error?.response?.status,
+      message: message || error?.message || "Something went wrong",
+      status: status || error?.response?.status,
     });
   }
 );
