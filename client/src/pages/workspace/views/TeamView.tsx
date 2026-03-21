@@ -4,7 +4,7 @@ import { Badge } from '../components/Badge';
 import { useEffect, useState } from 'react';
 import { getMembers } from '@/services/workspace/team.api';
 import { AuthUserState } from '@/store/auth.store';
-import { WorkspaceRoleEnum } from 'shared';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { getRoleLabel } from '@/lib/utils';
 
 interface Member {

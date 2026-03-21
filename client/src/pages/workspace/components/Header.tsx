@@ -1,11 +1,11 @@
 import { ChevronRight, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
-import type { IUser } from 'shared';
+import type { User } from '@/types/auth.types';
 
 export interface HeaderProps {
     activeTab: string;
-    user: IUser | null;
+    user: User | null;
     onLogout: () => void;
     onOpenCreateWorkspace: () => void;
 }
