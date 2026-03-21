@@ -46,7 +46,6 @@ const InvitationSchema = new Schema<InvitationDocument>({
   expiresAt: {
     type: Date,
     required: true,
-    index: true,
   },
   createdAt: {
     type: Date,
