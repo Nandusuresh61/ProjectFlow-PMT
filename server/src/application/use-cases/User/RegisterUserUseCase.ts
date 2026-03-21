@@ -7,7 +7,8 @@ import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 
-import { AuthProvider, TokenEnums } from "shared";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
+import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { User } from "@/domain/entities/User";
 
 export class RegisterUserUseCase implements IRegisterUserUseCase {

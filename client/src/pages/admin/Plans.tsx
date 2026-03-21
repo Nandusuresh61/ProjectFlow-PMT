@@ -26,7 +26,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { createPlan, getPlans, togglePlanStatus } from "@/services/plan/plan.api";
-import { PlanType } from "shared";
+import { PlanType } from "@/shared/enums/PlanType";
 
 interface Plan {
   planId: string;

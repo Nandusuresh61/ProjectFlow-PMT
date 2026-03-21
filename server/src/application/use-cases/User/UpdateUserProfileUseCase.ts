@@ -1,7 +1,10 @@
 import { UpdateUserProfileDto } from "@/application/dtos/UserProfileDto";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IUpdateUserProfileUseCase } from "@/application/interfaces/use-cases/User/IUpdateUserProfileUseCase";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
 export class UpdatUserProfileUseCase implements IUpdateUserProfileUseCase {
   constructor(private readonly _userRepo: IUserRepository) {}

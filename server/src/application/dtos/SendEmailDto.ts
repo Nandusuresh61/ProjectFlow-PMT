@@ -1,4 +1,4 @@
-import { EmailType } from "shared";
+import { EmailType } from "@/shared/enums/EmailEnums";
 
 export interface SendEmailDto {
   to: string;

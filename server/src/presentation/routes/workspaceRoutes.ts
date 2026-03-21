@@ -3,7 +3,7 @@ import { authenticatedUser } from "../middlewares/AuthMiddleware";
 import { invitationController } from "@/infrastructure/DI/InvitationContatiner";
 import { workspaceController } from "@/infrastructure/DI/WorkspaceContatiner";
 import { workspaceRoleMiddleware } from "@/infrastructure/DI/WorkspaceRoleContatiner";
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 const router = Router();
 

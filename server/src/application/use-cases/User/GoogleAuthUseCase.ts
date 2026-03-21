@@ -3,14 +3,12 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import {
-  AppError,
-  AppMessages,
-  AuthProvider,
-  ErrorCode,
-  HttpStatusCode,
-  TokenEnums,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { User } from "@/domain/entities/User";
 

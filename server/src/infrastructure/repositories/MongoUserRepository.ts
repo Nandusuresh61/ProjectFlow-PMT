@@ -8,7 +8,7 @@ import {
 import { User } from "@/domain/entities/User";
 
 import { MongoBaseRepository } from "./MongoBaseRepository";
-import { AuthProvider } from "shared";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
 
 export class MongoUserRepository
   extends MongoBaseRepository<User, UserDoc>

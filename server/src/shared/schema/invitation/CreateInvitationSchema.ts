@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WorkspaceRoleEnum } from "../../enums";
+import { WorkspaceRoleEnum } from "../../enums/WorkspaceRolesEnum";
 
 export const CreateInvitationSchema = z.object({
   invites: z

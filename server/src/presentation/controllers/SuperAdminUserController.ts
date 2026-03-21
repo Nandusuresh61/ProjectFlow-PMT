@@ -2,7 +2,11 @@ import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/G
 import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDetailsUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import { AppMessages, HttpStatusCode, ResponseHandler, AppError, ErrorCode } from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { IGetAllUsersWithWorkspaceUsecase } from "@/application/interfaces/use-cases/SuperAdmin/IGetAllUsersWithWorkspaceUseCase";
 import { IGetUserDetailsUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetUserDetailsUseCase";
 import { IToggleUserBlockUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IToggleUserBlockUseCase";

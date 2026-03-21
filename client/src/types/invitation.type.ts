@@ -1,4 +1,4 @@
-import type { WorkspaceRoleEnum } from "shared";
+import type { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export interface InviteMember {
     email: string,

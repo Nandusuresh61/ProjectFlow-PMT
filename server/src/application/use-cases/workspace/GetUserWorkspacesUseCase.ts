@@ -2,7 +2,10 @@ import { IGetUserWorkspacesUseCase } from "@/application/interfaces/use-cases/wo
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { Workspace } from "@/domain/entities/Workspace";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
 export class GetUserWorkspacesUseCase implements IGetUserWorkspacesUseCase {
   constructor(

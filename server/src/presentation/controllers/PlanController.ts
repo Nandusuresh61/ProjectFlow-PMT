@@ -1,12 +1,10 @@
 import { ICreatePlanUseCase } from "@/application/interfaces/use-cases/Plan/ICreatePlanUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import {
-  AppMessages,
-  CreatePlanSchema,
-  HttpStatusCode,
-  ResponseHandler,
-} from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { CreatePlanSchema } from "@/shared/schema/plan/PlanSchema";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
 import { IGetAllPlansUsecase } from "@/application/interfaces/use-cases/Plan/IGetAllPlansUseCase";
 import { ITogglePlanStatusUseCase } from "@/application/interfaces/use-cases/Plan/ITogglePlanStatusUseCase";
 import { PlanMapper } from "@/application/mappers/PlanMapper";

@@ -1,16 +1,14 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
-import {
-  AppMessages,
-  AppError,
-  LoginUserSchema,
-  RegisterUserSchema,
-  ResponseHandler,
-  ErrorCode,
-  ForgotEmailSchema,
-  ResetPasswordSchema,
-} from "shared";
-import { HttpStatusCode } from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { AppError } from "@/shared/errors/AppError";
+import { LoginUserSchema } from "@/shared/schema/auth/LoginUserSchema";
+import { RegisterUserSchema } from "@/shared/schema/auth/RegisterUserSchema";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { ForgotEmailSchema } from "@/shared/schema/auth/ForgotEmailSchema";
+import { ResetPasswordSchema } from "@/shared/schema/auth/ResetPasswordSchema";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { config } from "@/app.config";
 
 import { IAuthController } from "../interfaces/IAuthController";

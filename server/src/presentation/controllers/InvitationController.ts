@@ -1,13 +1,11 @@
 import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import {
-  AppMessages,
-  CreateInvitationSchema,
-  HttpStatusCode,
-  ResponseHandler,
-  WorkspaceRoleEnum,
-} from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 

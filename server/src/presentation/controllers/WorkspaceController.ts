@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { asyncHandler } from "../utils/AsyncHandler";
-import { ResponseHandler, AppMessages, HttpStatusCode } from "shared";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { IGetWorkspaceMembersUseCase } from "@/application/interfaces/use-cases/workspace/IGetWorkspaceMembersUseCase";
 import { IGetUserWorkspacesUseCase } from "@/application/interfaces/use-cases/workspace/IGetUserWorkspacesUseCase";
 import { ISwitchWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ISwitchWorkspaceUseCase";

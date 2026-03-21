@@ -2,12 +2,10 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
-import {
-  CompleteOnboardingSchema,
-  ResponseHandler,
-  HttpStatusCode,
-  AppMessages,
-} from "shared";
+import { CompleteOnboardingSchema } from "@/shared/schema/onboarding/CompleteOnboardingSchema";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class OnboardingController {
   constructor(

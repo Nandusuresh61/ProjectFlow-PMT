@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-import { WorkspaceRoleEnum } from "shared"
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))

@@ -1,7 +1,11 @@
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { OAuth2Client } from "google-auth-library";
 import { OAuthUserPayload } from "@/application/dtos/OAuthUserPayload";
-import { AppError, AppMessages, AuthProvider, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { config } from "@/app.config";
 
 export class GoogleOAuthService implements IOAuthProviderService {

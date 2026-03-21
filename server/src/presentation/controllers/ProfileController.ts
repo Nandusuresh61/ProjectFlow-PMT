@@ -3,7 +3,9 @@ import { IUpdateUserProfileUseCase } from "@/application/interfaces/use-cases/Us
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
-import { AppMessages, HttpStatusCode, ResponseHandler } from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
 
 export class ProfileController {
   constructor(

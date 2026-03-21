@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { InvitationStatus } from "shared";
-import { WorkspaceRoleEnum } from "shared";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export interface InvitationDocument extends Document {
   invitationId: string;

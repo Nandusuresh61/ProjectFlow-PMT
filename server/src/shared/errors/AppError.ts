@@ -1,4 +1,4 @@
-import { ErrorCode } from "../enums";
+import { ErrorCode } from "../enums/ErrorCode";
 import { HttpStatusCode } from "../enums/HttpStatusCodes";
 
 export class AppError extends Error {

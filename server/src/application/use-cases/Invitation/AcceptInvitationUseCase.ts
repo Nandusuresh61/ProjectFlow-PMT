@@ -2,7 +2,11 @@ import { IInvitationRepository } from "@/application/interfaces/repositories/IIn
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode, InvitationStatus } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
 import crypto from "crypto";
 import { Membership } from "@/domain/entities/Membership";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";

@@ -1,7 +1,7 @@
 import { Zap, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { toast } from "sonner";
 import { InviteMember } from "@/services/Invitation/invitation.api";
 import { AuthUserState } from "@/store/auth.store";

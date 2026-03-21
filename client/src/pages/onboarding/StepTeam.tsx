@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { StepTeamProps } from "@/types/onboarding.types";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export function StepTeam({ data, updateData, onBack, onFinish, isLoading }: StepTeamProps) {
     const handleChange = (

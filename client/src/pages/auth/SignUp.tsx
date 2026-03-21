@@ -6,7 +6,7 @@ import { registerUser } from "@/services/auth/auth.api";
 import { toast } from "sonner";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-import { RegisterUserSchema } from "shared";
+import { RegisterUserSchema } from "@/shared/schema/auth/RegisterUserSchema";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";

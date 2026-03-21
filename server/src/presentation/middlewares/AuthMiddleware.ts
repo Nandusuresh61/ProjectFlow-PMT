@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError, ErrorCode, HttpStatusCode, AppMessages, ITokenPayload } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ITokenPayload } from "@/shared/types/user.types";
 import { config } from "@/app.config";
 import jwt from "jsonwebtoken";
 import { UserModel } from "@/infrastructure/database/models/MongoUserModel";
