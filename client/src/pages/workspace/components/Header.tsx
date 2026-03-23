@@ -2,46 +2,76 @@ import { ChevronRight, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import type { User } from '@/types/auth.types';
+import type { SidebarMode, Project } from '../types/sidebar.types';
 
 export interface HeaderProps {
     activeTab: string;
+    mode: SidebarMode;
+    selectedProject: Project | null;
     user: User | null;
     onLogout: () => void;
     onOpenCreateWorkspace: () => void;
 }
 
-export const Header = ({ activeTab, user, onLogout, onOpenCreateWorkspace }: HeaderProps) => (
-    <header className="h-16 bg-[#060c16]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40 flex items-center justify-between px-4 md:px-8 flex-shrink-0">
-        <div className="flex items-center gap-2 md:gap-6">
-            <div className="hidden sm:block translate-y-[-1px]">
+const tabLabel = (tab: string): string =>
+    tab.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+export const Header = ({
+    activeTab,
+    mode,
+    selectedProject,
+    user,
+    onLogout,
+    onOpenCreateWorkspace,
+}: HeaderProps) => (
+    <header className="h-14 bg-[#060d1a]/90 backdrop-blur-xl sticky top-0 z-40 flex items-center justify-between px-5 flex-shrink-0">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm">
+            <div className="hidden sm:block">
                 <WorkspaceSwitcher onOpenCreate={onOpenCreateWorkspace} />
             </div>
-            <ChevronRight size={14} className="text-white/20 hidden sm:block" />
-            <span className="text-sm font-bold text-white capitalize">{activeTab}</span>
+            <ChevronRight size={13} className="text-white/15 hidden sm:block" />
+            {mode === 'project' && selectedProject && (
+                <>
+                    <span className="text-white/40 font-medium text-[13px]">Projects</span>
+                    <ChevronRight size={13} className="text-white/15" />
+                    <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: selectedProject.color }}
+                    />
+                    <span className="text-white font-semibold text-[13px]">
+                        {selectedProject.name}
+                    </span>
+                    <ChevronRight size={13} className="text-white/15" />
+                </>
+            )}
+            <span className="text-white/60 font-medium text-[13px]">{tabLabel(activeTab)}</span>
         </div>
 
-        <div className="flex items-center gap-3 md:gap-6">
-            <div className="flex items-center gap-2 md:gap-3 pl-3 md:pl-4 border-l border-white/5">
-                <div className="text-right hidden sm:block">
-                    <p className="text-xs font-bold text-white leading-none mb-1">{user?.fullName || "Admin"}</p>
-                </div>
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="w-8 h-8 rounded-lg bg-black text-white text-[10px] font-black flex items-center justify-center cursor-pointer border border-white/10"
-                >
-                    {user?.fullName?.substring(0, 2).toUpperCase() || "AD"}
-                </motion.div>
-
-                <motion.button
-                    onClick={onLogout}
-                    whileHover={{ scale: 1.02, backgroundColor: "rgba(244, 63, 94, 0.1)" }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1.5 rounded-lg border border-rose-500/20 text-rose-500 hover:border-rose-500/40 transition-colors ml-1 md:ml-2"
-                >
-                    <LogOut size={14} />
-                    <span className="text-xs font-bold uppercase tracking-wider hidden sm:block">Logout</span>
-                </motion.button>
+        {/* Right actions */}
+        <div className="flex items-center gap-3 pl-4">
+            <div className="text-right hidden sm:block">
+                <p className="text-[11px] font-semibold text-white/80 leading-none">
+                    {user?.fullName || 'User'}
+                </p>
             </div>
+            <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="w-7 h-7 rounded-lg bg-[#19376D] text-[#A5D7E8] text-[10px] font-black flex items-center justify-center cursor-pointer border border-white/10"
+            >
+                {user?.fullName?.substring(0, 2).toUpperCase() || 'PF'}
+            </motion.div>
+            <motion.button
+                onClick={onLogout}
+                whileHover={{ scale: 1.02, backgroundColor: 'rgba(244, 63, 94, 0.08)' }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-500/20 text-rose-400 hover:border-rose-500/40 transition-colors"
+            >
+                <LogOut size={13} />
+                <span className="text-[11px] font-bold uppercase tracking-wider hidden sm:block">
+                    Logout
+                </span>
+            </motion.button>
         </div>
     </header>
 );
