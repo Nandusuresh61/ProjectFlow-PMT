@@ -1,4 +1,4 @@
-import { ChevronRight, LogOut } from 'lucide-react';
+import { ChevronRight, LogOut, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import type { User } from '@/types/auth.types';
@@ -11,6 +11,7 @@ export interface HeaderProps {
     user: User | null;
     onLogout: () => void;
     onOpenCreateWorkspace: () => void;
+    onToggleMobileSidebar: () => void;
 }
 
 const tabLabel = (tab: string): string =>
@@ -23,11 +24,22 @@ export const Header = ({
     user,
     onLogout,
     onOpenCreateWorkspace,
+    onToggleMobileSidebar,
 }: HeaderProps) => (
     <header className="h-14 bg-[#060d1a]/90 backdrop-blur-xl sticky top-0 z-40 flex items-center justify-between px-5 flex-shrink-0">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm">
-            <div className="hidden sm:block">
+        <div className="flex items-center gap-3">
+            {/* Mobile Sidebar Toggle */}
+            <button
+                onClick={onToggleMobileSidebar}
+                className="lg:hidden p-1.5 -ml-2 text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                aria-label="Open sidebar"
+            >
+                <Menu size={20} />
+            </button>
+            
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-sm">
+                <div className="hidden sm:block">
                 <WorkspaceSwitcher onOpenCreate={onOpenCreateWorkspace} />
             </div>
             <ChevronRight size={13} className="text-white/15 hidden sm:block" />
@@ -46,6 +58,7 @@ export const Header = ({
                 </>
             )}
             <span className="text-white/60 font-medium text-[13px]">{tabLabel(activeTab)}</span>
+            </div>
         </div>
 
         {/* Right actions */}

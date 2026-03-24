@@ -32,6 +32,8 @@ export interface SidebarProps {
     onTabChange: (tab: string) => void;
     isCollapsed: boolean;
     onToggle: () => void;
+    isMobileOpen: boolean;
+    onCloseMobile: () => void;
     selectedProject: Project | null;
     projects: Project[];
     onSelectProject: (project: Project) => void;
@@ -45,6 +47,8 @@ export const Sidebar = ({
     onTabChange,
     isCollapsed,
     onToggle,
+    isMobileOpen,
+    onCloseMobile,
     selectedProject,
     projects,
     onSelectProject,
@@ -54,11 +58,27 @@ export const Sidebar = ({
     const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
 
     return (
-        <motion.aside
-            animate={{ width: isCollapsed ? 72 : 232 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="h-screen flex flex-col bg-[#060d1a] sticky top-0 left-0 z-50 overflow-hidden hidden lg:flex flex-shrink-0"
-        >
+        <>
+            {/* Mobile Backdrop */}
+            <AnimatePresence>
+                {isMobileOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onCloseMobile}
+                        className="lg:hidden fixed inset-0 bg-[#060d1a]/80 backdrop-blur-sm z-40 transition-opacity"
+                    />
+                )}
+            </AnimatePresence>
+
+            <motion.aside
+                animate={{ width: isCollapsed ? 72 : 232 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className={`h-screen flex flex-col bg-[#060d1a] lg:sticky top-0 left-0 z-50 overflow-hidden flex-shrink-0 transition-transform duration-300 ease-in-out fixed lg:translate-x-0 border-r border-white/5 lg:border-none shadow-2xl lg:shadow-none
+                    ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+                `}
+            >
             {/* Logo */}
             <div className={`pt-6 pb-4 flex-shrink-0 ${isCollapsed ? 'px-4' : 'px-5'}`}>
                 <Logo
@@ -99,7 +119,8 @@ export const Sidebar = ({
                     )}
                 </AnimatePresence>
             </div>
-        </motion.aside>
+            </motion.aside>
+        </>
     );
 };
 

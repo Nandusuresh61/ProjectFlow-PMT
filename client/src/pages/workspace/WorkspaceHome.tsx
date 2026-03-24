@@ -68,6 +68,7 @@ export default function WorkspaceHome() {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -90,7 +91,14 @@ export default function WorkspaceHome() {
         setActiveTab('dashboard');
     };
 
-    const handleTabChange = (tab: string) => setActiveTab(tab);
+    const handleTabChange = (tab: string) => {
+        if (tab === 'projects' && sidebarMode === 'workspace') {
+            // On mobile, the "Projects" tab should open the sidebar drawer to select a project
+            setIsMobileSidebarOpen(true);
+            return;
+        }
+        setActiveTab(tab);
+    };
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -114,6 +122,8 @@ export default function WorkspaceHome() {
                 onTabChange={handleTabChange}
                 isCollapsed={isSidebarCollapsed}
                 onToggle={() => setIsSidebarCollapsed(v => !v)}
+                isMobileOpen={isMobileSidebarOpen}
+                onCloseMobile={() => setIsMobileSidebarOpen(false)}
                 selectedProject={selectedProject}
                 projects={MOCK_PROJECTS}
                 onSelectProject={handleSelectProject}
@@ -129,6 +139,7 @@ export default function WorkspaceHome() {
                     user={user}
                     onLogout={handleLogout}
                     onOpenCreateWorkspace={() => setIsCreateWorkspaceModalOpen(true)}
+                    onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
                 />
                 {isLoggingOut && <div className="sr-only">Logging out…</div>}
 
@@ -154,7 +165,7 @@ export default function WorkspaceHome() {
                 </div>
             </main>
 
-            <MobileNav activeTab={activeTab} onTabChange={handleTabChange} />
+            <MobileNav activeTab={activeTab} onTabChange={handleTabChange} mode={sidebarMode} />
 
             <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
             <CreateWorkspaceModal isOpen={isCreateWorkspaceModalOpen} onClose={() => setIsCreateWorkspaceModalOpen(false)} />
