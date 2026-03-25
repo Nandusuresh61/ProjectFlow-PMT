@@ -50,6 +50,7 @@ export class GoogleOAuthService implements IOAuthProviderService {
         fullName: payload.name ?? payload.email,
         provider: AuthProvider.GOOGLE,
         providerId: payload.sub,
+        profileImage: payload.picture,
       };
     } catch (error) {
       throw new AppError(

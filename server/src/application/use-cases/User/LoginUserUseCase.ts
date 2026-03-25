@@ -76,6 +76,7 @@ export class LoginUserUseCase {
         isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
+        profileImage: user.profileImage,
       },
       accessToken,
       refreshToken,

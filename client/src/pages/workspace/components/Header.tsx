@@ -70,9 +70,13 @@ export const Header = ({
             </div>
             <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="w-7 h-7 rounded-lg bg-[#19376D] text-[#A5D7E8] text-[10px] font-black flex items-center justify-center cursor-pointer border border-white/10"
+                className="w-7 h-7 rounded-lg bg-[#19376D] text-[#A5D7E8] text-[10px] font-black flex items-center justify-center cursor-pointer border border-white/10 overflow-hidden"
             >
-                {user?.fullName?.substring(0, 2).toUpperCase() || 'PF'}
+                {user?.profileImage ? (
+                    <img src={user.profileImage} alt={user.fullName || 'User'} className="w-full h-full object-cover" />
+                ) : (
+                    user?.fullName?.substring(0, 2).toUpperCase() || 'PF'
+                )}
             </motion.div>
             <motion.button
                 onClick={onLogout}

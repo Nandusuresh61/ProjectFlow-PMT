@@ -11,6 +11,7 @@ export class AuthResponseMapper {
         isBlocked: data.user.isBlocked,
         currentWorkspaceId: data.user.currentWorkspaceId,
         membershipCount: data.user.membershipCount,
+        profileImage: data.user.profileImage,
       },
     };
   }

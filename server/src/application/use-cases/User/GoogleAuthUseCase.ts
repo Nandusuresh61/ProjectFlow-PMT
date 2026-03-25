@@ -42,7 +42,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         undefined,
         false,
         false,
-        null,
+        payload.profileImage || null,
         now,
         now,
       );
@@ -86,6 +86,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
+        profileImage: user.profileImage,
       },
       accessToken,
       refreshToken,

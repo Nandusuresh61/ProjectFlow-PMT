@@ -6,4 +6,5 @@ export interface OAuthUserPayload {
   fullName: string;
   provider: AuthProvider;
   providerId: string;
+  profileImage?: string;
 }

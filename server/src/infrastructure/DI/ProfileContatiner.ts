@@ -7,7 +7,7 @@ const userRepo = new MongoUserRepository();
 const getUserProfileUseCase = new GetUserProfileUseCase(userRepo);
 const updatUserProfileUseCase = new UpdatUserProfileUseCase(userRepo);
 
-export const profileConroller = new ProfileController(
+export const profileController = new ProfileController(
   getUserProfileUseCase,
   updatUserProfileUseCase
 );

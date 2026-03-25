@@ -81,6 +81,7 @@ export class MongoUserRepository
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
         isBlocked: user.isBlocked,
+        profileImage: user.profileImage,
         updatedAt: new Date(),
       },
     );
@@ -144,6 +145,7 @@ export class MongoUserRepository
       fullName: user.fullName,
       email: user.email,
       isBlocked: user.isBlocked,
+      profileImage: user.profileImage,
       createdAt: user.createdAt,
       workspaces: user.memberships.map((membership: { workspaceId: string, role: string }) => {
         const workspace = user.workspacesData.find(
@@ -240,6 +242,7 @@ export class MongoUserRepository
           fullName: { $first: "$fullName" },
           email: { $first: "$email" },
           isBlocked: { $first: "$isBlocked" },
+          profileImage: { $first: "$profileImage" },
           createdAt: { $first: "$createdAt" },
           workspaces: {
             $push: {
@@ -266,6 +269,7 @@ export class MongoUserRepository
         fullName: user.fullName,
         email: user.email,
         isBlocked: user.isBlocked,
+        profileImage: user.profileImage,
         createdAt: user.createdAt,
         workspaces: [],
       };

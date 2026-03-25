@@ -6,6 +6,10 @@ import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { UpdateUserProfileSchema } from "@/shared/schema/profile/UpdateUserProfileSchema";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export class ProfileController {
   constructor(
@@ -23,12 +27,27 @@ export class ProfileController {
       .json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, result));
   });
 
-  updateProfile = asyncHandler(async(req: Request, res: Response) =>{
-    const {userId, data} = req.body;
+  updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.userId;
 
-    await this._updateUserProfileUseCase.execute(userId, data);
+  if (!userId) {
+    throw new AppError(
+      ErrorCode.AUTH,
+      AppMessages.UNAUTHORIZED_ACCESS,
+      HttpStatusCode.UNAUTHORIZED
+    );
+  }
 
+  const validatedData = UpdateUserProfileSchema.parse(req.body);
 
-    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS));
-  })
+  logger.info("log from proile controller", validatedData)
+
+  await this._updateUserProfileUseCase.execute(userId, validatedData);
+
+  res
+    .status(HttpStatusCode.OK)
+    .json(
+      ResponseHandler.success(AppMessages.USER_PROFILE_UPDATED)
+    );
+});
 }

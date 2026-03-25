@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { authenticatedUser } from "../middlewares/AuthMiddleware";
-import { profileConroller } from "@/infrastructure/DI/ProfileContatiner";
+import { profileController } from "@/infrastructure/DI/ProfileContatiner";
 
 const router = Router();
 
-router.get('/',authenticatedUser,profileConroller.getProfile);
-router.patch('/',authenticatedUser,profileConroller.updateProfile)
+router.get('/',authenticatedUser,profileController.getProfile);
+router.put('/',authenticatedUser,profileController.updateProfile)
 
 
 export default router;

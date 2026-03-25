@@ -41,6 +41,7 @@ interface User {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  profileImage?: string;
   createdAt: string;
   workspaces: Workspace[];
 }
@@ -151,9 +152,13 @@ export default function Workspaces() {
       render: (user) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border border-zinc-800">
-            <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
-              {getInitials(user.fullName)}
-            </AvatarFallback>
+            {user.profileImage ? (
+              <img src={user.profileImage} alt={user.fullName} className="w-full h-full object-cover" />
+            ) : (
+              <AvatarFallback className="bg-zinc-800 text-green-500 font-medium text-xs">
+                {getInitials(user.fullName)}
+              </AvatarFallback>
+            )}
           </Avatar>
           <span className="font-medium text-zinc-200">{user.fullName}</span>
           {user.isBlocked && (

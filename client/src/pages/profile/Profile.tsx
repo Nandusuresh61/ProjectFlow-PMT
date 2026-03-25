@@ -9,15 +9,25 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { getProfile } from "@/services/profile/profile.api";
+import { getProfile, updateProfile } from "@/services/profile/profile.api";
 import type { User } from "@/types/auth.types";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { toast } from "sonner";
+import { UpdateUserProfileSchema } from "@/shared/schema/profile/UpdateUserProfileSchema";
+import { useRef } from "react";
+import { AuthUserState } from "@/store/auth.store";
 
 export default function ProfileSettings() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<User | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,10 +49,75 @@ export default function ProfileSettings() {
     fetchProfile();
   }, []);
 
-  const handleSaveProfile = () => {
-    // Save logic here
-    setIsEditingProfile(false);
+  const handleSaveProfile = async () => {
+    try {
+      if (!profileData) return;
+
+      setIsSaving(true);
+
+      let imageUrl = profileData.profileImage;
+      if (selectedImage) {
+        toast.info("Uploading image...");
+        try {
+          imageUrl = await uploadToCloudinary(selectedImage);
+        } catch (error) {
+          toast.error("Failed to upload image. Please try again.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      const payload = {
+        fullName: profileData.fullName,
+        profileImage: imageUrl || undefined,
+      };
+
+      const validatedData = UpdateUserProfileSchema.parse(payload);
+
+      const response = await updateProfile(validatedData);
+
+      if (response.success) {
+        toast.success(response.message || "Profile updated successfully");
+        setProfileData((prev) => prev ? { ...prev, ...payload, profileImage: imageUrl } : null);
+        setIsEditingProfile(false);
+        setSelectedImage(null);
+        setImagePreview(null);
+        await checkAuth();
+      } else {
+        toast.error(response.message || "Failed to update profile");
+      }
+    } catch (error: any) {
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to update profile");
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
+
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setProfileData((prev) => prev ? { ...prev, profileImage: "" } : null);
+  };
+
 
   const handleSavePassword = () => {
     // Save password logic here
@@ -110,16 +185,25 @@ export default function ProfileSettings() {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setIsEditingProfile(false)}
+                onClick={() => {
+                  setIsEditingProfile(false);
+                  setSelectedImage(null);
+                  setImagePreview(null);
+                  // Reset any unsaved changes by reading from API response or keeping old state
+                  // For now simply cancelling keeps old unsaved data on next edit, 
+                  // ideally you fetch profile again or store original state and revert it.
+                }}
+                disabled={isSaving}
                 className="px-4 py-2 hover:bg-white/5 text-white/60 hover:text-white font-bold text-sm rounded-xl transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
+                disabled={isSaving}
+                className="px-4 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           )}
@@ -130,12 +214,20 @@ export default function ProfileSettings() {
           <div className="flex items-center gap-6">
             <div
               className={`relative ${isEditingProfile ? "group cursor-pointer" : ""}`}
+              onClick={() => isEditingProfile && fileInputRef.current?.click()}
             >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+                accept="image/jpeg, image/png, image/webp"
+              />
               <div className="h-20 w-20 rounded-full border-2 border-white/10 bg-[#0B2447] flex items-center justify-center overflow-hidden">
-                {profileData?.profileImage ? (
+                {imagePreview || profileData?.profileImage ? (
                   <img
-                    src={profileData.profileImage}
-                    alt={profileData.fullName}
+                    src={imagePreview || profileData?.profileImage || undefined}
+                    alt={profileData?.fullName}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -165,11 +257,17 @@ export default function ProfileSettings() {
                 </p>
                 <p className="text-xs text-[#576CBC]/60">JPEG, PNG under 5MB</p>
                 <div className="pt-2 flex gap-2">
-                  <button className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors"
+                  >
                     Upload new
                   </button>
                   <span className="text-white/20">•</span>
-                  <button className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">
+                  <button
+                    onClick={handleRemoveImage}
+                    className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                  >
                     Remove
                   </button>
                 </div>
