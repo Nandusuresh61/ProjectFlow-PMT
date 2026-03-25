@@ -8,7 +8,9 @@ export const UpdateUserProfileSchema = z.object({
     .optional(),
 
   profileImage: z
-    .string()
-    .url("Profile image must be a valid URL")
+    .union([
+      z.string().url("Profile image must be a valid URL"),
+      z.literal("")
+    ])
     .optional(),
 });
