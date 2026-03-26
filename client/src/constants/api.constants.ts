@@ -16,6 +16,9 @@ export const API_ROUTES = {
     GET: "/profile",
     UPDATE: "/profile",
   },
+  SECURITY: {
+    UPDATE: "/profile/change-password",
+  },
   WORKSPACE: {
     BASE: "/workspace",
     USER_WORKSPACES: "/workspace/user/workspaces",

@@ -1,13 +1,57 @@
 import { useState } from "react";
 import { Shield, Key } from "lucide-react";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { changePassword } from "@/services/profile/changePassword.api";
+import { toast } from "sonner";
+import { ChangePasswordSchema } from "@/shared/schema/auth/ChangePasswordSchema";
 
 export const SecuritySettings = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  const handleSavePassword = () => {
-    // Save password logic here
-    setIsChangingPassword(false);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  const handleSavePassword = async () => {
+    try {
+      if (form.newPassword !== form.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      const result = ChangePasswordSchema.safeParse({
+        currentPassword: form.currentPassword,
+        newPassword: form.newPassword,
+      });
+
+      if (!result.success) {
+        toast.error(result.error.issues[0]?.message);
+        return;
+      }
+
+      setLoading(true);
+
+      const response = await changePassword(result.data);
+
+      toast.success(response.message);
+
+      setForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      setIsChangingPassword(false);
+    } catch (error: any) {
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,7 +90,9 @@ export const SecuritySettings = () => {
                   Current Password
                 </label>
                 <PasswordInput
+                  name="currentPassword"
                   placeholder="Enter current password"
+                  onChange={handleChange}
                   className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
                 />
               </div>
@@ -56,6 +102,8 @@ export const SecuritySettings = () => {
                   New Password
                 </label>
                 <PasswordInput
+                  name="newPassword"
+                  onChange={handleChange}
                   placeholder="Enter new password"
                   className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
                 />
@@ -65,6 +113,8 @@ export const SecuritySettings = () => {
                   Confirm New Password
                 </label>
                 <PasswordInput
+                  name="confirmPassword"
+                  onChange={handleChange}
                   placeholder="Confirm new password"
                   className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
                 />
@@ -80,9 +130,10 @@ export const SecuritySettings = () => {
               </button>
               <button
                 onClick={handleSavePassword}
+                disabled={loading}
                 className="px-6 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
               >
-                Update Password
+                {loading ? "Updating..." : "Update Password"}
               </button>
             </div>
           </div>

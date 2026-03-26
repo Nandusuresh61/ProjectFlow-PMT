@@ -43,3 +43,8 @@ export interface ResetPasswordOtpPayload {
 export interface ResendOtpPayload {
   email: string;
 }
+
+export interface changePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}

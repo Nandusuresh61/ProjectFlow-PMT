@@ -102,6 +102,10 @@ export const AppMessages = {
 
   USER_BLOCK_STATUS_UPDATED: "User block status updated successfully.",
 
-  USER_PROFILE_UPDATED: "Profile Updated Successfull"
+  USER_PROFILE_UPDATED: "Profile Updated Successfull",
+
+  CURRENT_PASSWORD_IS_WRONG: "Current password is not matching to the exisiting password",
+
+  PASSWORD_CHANGED_SUCCESSFUL: "Password changed ",
 
 } as const;

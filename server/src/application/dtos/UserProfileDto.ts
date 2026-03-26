@@ -3,4 +3,7 @@ export interface UpdateUserProfileDto {
   profileImage?: string | null;
 }
 
-
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
