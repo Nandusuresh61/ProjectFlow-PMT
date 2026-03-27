@@ -4,7 +4,7 @@ import { Badge } from '../components/Badge';
 import { useEffect, useState } from 'react';
 import { getMembers } from '@/services/workspace/team.api';
 import { AuthUserState } from '@/store/auth.store';
-import { WorkspaceRoleEnum } from 'shared';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { getRoleLabel } from '@/lib/utils';
 
 interface Member {
@@ -13,6 +13,7 @@ interface Member {
     role: WorkspaceRoleEnum;
     status: 'active' | 'inactive';
     projects?: number;
+    profileImage?: string;
 }
 
 interface TeamViewProps {
@@ -72,8 +73,12 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
                 {members.map((member, i) => (
                     <Card key={i} delay={i * 0.05} className="!p-8 !rounded-[2.5rem] !bg-white/[0.03] !border-white/5 relative group">
                         <div className="flex items-center gap-5 mb-6">
-                            <div className="w-14 h-14 bg-[#19376D] rounded-full flex items-center justify-center text-sm font-black text-[#A5D7E8]">
-                                {member?.fullName?.substring(0, 2).toUpperCase() || "N/A"}
+                            <div className="w-14 h-14 bg-[#19376D] rounded-full flex items-center justify-center text-sm font-black text-[#A5D7E8] overflow-hidden shrink-0">
+                                {member?.profileImage ? (
+                                    <img src={member.profileImage} alt={member.fullName} className="w-full h-full object-cover" />
+                                ) : (
+                                    member?.fullName?.substring(0, 2).toUpperCase() || "N/A"
+                                )}
                             </div>
                             <div>
                                 <h4 className="text-lg font-bold text-white tracking-tight">{member.fullName}</h4>

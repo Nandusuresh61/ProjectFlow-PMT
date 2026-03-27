@@ -39,10 +39,14 @@ export function UserDetailsModal({
                     <div className="space-y-6">
                         {/* User Info Header */}
                         <div className="flex items-start gap-4 p-4 rounded-lg bg-zinc-800/50 border border-zinc-800">
-                            <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-                                <span className="text-lg font-bold text-indigo-400">
-                                    {user.fullName.substring(0, 2).toUpperCase()}
-                                </span>
+                            <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 overflow-hidden">
+                                {user.profileImage ? (
+                                    <img src={user.profileImage} alt={user.fullName} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-lg font-bold text-indigo-400">
+                                        {user.fullName.substring(0, 2).toUpperCase()}
+                                    </span>
+                                )}
                             </div>
                             <div className="space-y-1">
                                 <h3 className="font-medium text-lg text-zinc-100">

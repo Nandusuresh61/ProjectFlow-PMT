@@ -8,6 +8,7 @@ export interface IGetWorkspaceMembersUseCase {
       email: string;
       role: string;
       joinedAt: Date;
+      profileImage?: string;
     }[]
   >;
 }

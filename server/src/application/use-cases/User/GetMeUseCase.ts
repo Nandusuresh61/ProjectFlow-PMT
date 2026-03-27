@@ -20,6 +20,7 @@ export class GetMeUseCase implements IGetMeUseCase {
       isSuperAdmin: user.isSuperAdmin,
       currentWorkspaceId: user.currentWorkspaceId,
       membershipCount,
+      profileImage: user.profileImage,
     };
   }
 }

@@ -23,6 +23,7 @@ export class GetWorkspaceMembersUseCase implements IGetWorkspaceMembersUseCase {
             email: user.email,
             role: membership.role,
             joinedAt: membership.joinedAt,
+            profileImage: user.profileImage,
           };
         } catch (error) {
           console.error(`Error fetching user ${membership.userId}:`, error);

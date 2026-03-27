@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
-import { TokenPayloadType } from "shared";
+import { TokenPayloadType } from "@/shared/schema/TokenPayload";
 import { config } from "@/app.config";
 
 export class TokenService implements ITokenService {

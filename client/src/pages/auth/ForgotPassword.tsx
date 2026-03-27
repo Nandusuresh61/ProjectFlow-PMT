@@ -5,7 +5,7 @@ import { GridBackground } from "@/components/ui/gridBackground";
 import { toast } from "sonner";
 import { forgotPassoword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
-import { ForgotEmailSchema } from "shared";
+import { ForgotEmailSchema } from "@/shared/schema/auth/ForgotEmailSchema";
 import { Logo } from "@/components/common/Logo";
 import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";

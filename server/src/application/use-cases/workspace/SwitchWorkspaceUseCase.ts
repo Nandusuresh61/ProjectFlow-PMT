@@ -1,7 +1,10 @@
 import { ISwitchWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ISwitchWorkspaceUseCase";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
 export class SwitchWorkspaceUseCase implements ISwitchWorkspaceUseCase {
   constructor(

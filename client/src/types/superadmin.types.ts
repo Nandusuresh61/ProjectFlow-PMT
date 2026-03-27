@@ -43,6 +43,7 @@ export interface UserDetails {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  profileImage?: string;
   createdAt: string;
   workspaces: UserWorkspaceDetails[];
 }

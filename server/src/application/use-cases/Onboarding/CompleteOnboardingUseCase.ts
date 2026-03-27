@@ -8,13 +8,11 @@ import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Inv
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
 import { Membership } from "@/domain/entities/Membership";
 import { Workspace } from "@/domain/entities/Workspace";
-import {
-  AppError,
-  AppMessages,
-  ErrorCode,
-  HttpStatusCode,
-  WorkspaceRoleEnum,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
   constructor(

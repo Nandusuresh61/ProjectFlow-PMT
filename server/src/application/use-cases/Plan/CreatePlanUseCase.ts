@@ -3,9 +3,12 @@ import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepo
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICreatePlanUseCase } from "@/application/interfaces/use-cases/Plan/ICreatePlanUseCase";
 import { Plan } from "@/domain/entities/Plan";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
-import { PlanType } from "shared";
+import { PlanType } from "@/shared/enums/PlanType";
 
 export class CreatePlanUseCase implements ICreatePlanUseCase{
   constructor(

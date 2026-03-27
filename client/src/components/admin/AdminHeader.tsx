@@ -43,8 +43,12 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
                         <p className="text-sm font-medium text-white">{user?.fullName || "Super Admin"}</p>
                         <p className="text-xs text-zinc-500">Administrator</p>
                     </div>
-                    <div className="h-9 w-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold border border-green-500/20">
-                        {user?.fullName?.charAt(0).toUpperCase() || "SA"}
+                    <div className="h-9 w-9 rounded-full bg-green-500/10 flex items-center justify-center text-green-500 font-bold border border-green-500/20 overflow-hidden">
+                        {user?.profileImage ? (
+                            <img src={user.profileImage} alt={user.fullName || 'Admin'} className="w-full h-full object-cover" />
+                        ) : (
+                            user?.fullName?.charAt(0).toUpperCase() || "SA"
+                        )}
                     </div>
                 </div>
             </div>

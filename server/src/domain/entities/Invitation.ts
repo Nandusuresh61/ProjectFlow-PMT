@@ -1,4 +1,5 @@
-import { InvitationStatus, WorkspaceRoleEnum } from "shared";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class Invitation {
   constructor(

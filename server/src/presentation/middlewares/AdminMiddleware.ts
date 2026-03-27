@@ -1,6 +1,9 @@
 import { NextFunction, Response, Request } from "express";
-import { AppError, ErrorCode, HttpStatusCode, AppMessages } from "shared";
-import { TokenPayloadType } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { TokenPayloadType } from "@/shared/schema/TokenPayload";
 
 interface AuthRequest extends Request {
   user?: TokenPayloadType;

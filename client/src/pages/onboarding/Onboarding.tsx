@@ -34,7 +34,7 @@ const slideVariants = {
   exit: (d: number) => ({ x: d < 0 ? 50 : -50, opacity: 0 }),
 };
 
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);

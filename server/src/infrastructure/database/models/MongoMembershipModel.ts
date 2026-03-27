@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export interface MembershipDocument extends Document {
   membershipId: string;

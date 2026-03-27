@@ -10,15 +10,13 @@ import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHash
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { Invitation } from "@/domain/entities/Invitation";
-import {
-  AppError,
-  AppMessages,
-  EmailType,
-  ErrorCode,
-  HttpStatusCode,
-  InvitationStatus,
-  WorkspaceRoleEnum,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 import crypto from "crypto";
 
@@ -75,7 +73,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
      */
     const plan = await this._planRepo.findById(workspace.planId);
 
-    if (!plan || !plan.isActive) {
+    if (!plan) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.PLAN_NOT_FOUND,

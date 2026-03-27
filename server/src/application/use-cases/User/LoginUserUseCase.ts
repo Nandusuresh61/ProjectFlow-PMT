@@ -5,13 +5,11 @@ import {
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
-import {
-  AppError,
-  AppMessages,
-  ErrorCode,
-  HttpStatusCode,
-  TokenEnums,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 
 export class LoginUserUseCase {
@@ -78,6 +76,7 @@ export class LoginUserUseCase {
         isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
+        profileImage: user.profileImage,
       },
       accessToken,
       refreshToken,

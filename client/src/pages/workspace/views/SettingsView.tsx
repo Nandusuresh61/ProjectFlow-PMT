@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProfileSettings from '@/pages/profile/Profile';
+import { SecuritySettings } from './SecuritySettings';
 
 export const SettingsView = () => {
     // We start with "account" tab as active as per user request to show profile by default
@@ -89,6 +90,10 @@ export const SettingsView = () => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        ) : activeTab === 'security' ? (
+                            <div className="h-full p-4 lg:p-8">
+                                <SecuritySettings />
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center h-[500px]">

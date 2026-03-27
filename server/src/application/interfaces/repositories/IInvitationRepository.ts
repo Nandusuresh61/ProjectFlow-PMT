@@ -1,5 +1,5 @@
 import { Invitation } from "@/domain/entities/Invitation";
-import { InvitationStatus } from "shared";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
 
 export interface IInvitationRepository {
   create(invitation: Invitation): Promise<Invitation>;

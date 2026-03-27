@@ -1,42 +1,60 @@
 import {
     LayoutDashboard,
     Briefcase,
-    Users,
-    Activity,
+    MessageSquare,
+    Video,
     Settings,
+    FolderKanban,
+    ClipboardList,
+    Kanban,
+    Zap,
+    Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { SidebarMode } from '../types/sidebar.types';
 
-export interface MobileNavProps {
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
-}
-
-export interface MenuItem {
+interface MobileNavItem {
     id: string;
     icon: LucideIcon;
     label: string;
 }
 
-export const MobileNav = ({ activeTab, setActiveTab }: MobileNavProps) => {
-    const navItems: MenuItem[] = [
-        { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
-        { id: 'projects', icon: Briefcase, label: 'Projects' },
-        { id: 'team', icon: Users, label: 'Team' },
-        { id: 'activity', icon: Activity, label: 'Activity' },
-        { id: 'settings', icon: Settings, label: 'Settings' },
-    ];
+const WORKSPACE_NAV_ITEMS: MobileNavItem[] = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
+    { id: 'projects', icon: Briefcase, label: 'Projects' },
+    { id: 'chat', icon: MessageSquare, label: 'Inbox' },
+    { id: 'meetings', icon: Video, label: 'Meetings' },
+    { id: 'settings', icon: Settings, label: 'Settings' },
+];
+
+const PROJECT_NAV_ITEMS: MobileNavItem[] = [
+    { id: 'overview', icon: FolderKanban, label: 'Overview' },
+    { id: 'backlogs', icon: ClipboardList, label: 'Backlogs' },
+    { id: 'board', icon: Kanban, label: 'Board' },
+    { id: 'sprint', icon: Zap, label: 'Sprint' },
+    { id: 'project-team', icon: Users, label: 'Team' },
+];
+
+export interface MobileNavProps {
+    activeTab: string;
+    onTabChange: (tab: string) => void;
+    mode: SidebarMode;
+}
+
+export const MobileNav = ({ activeTab, onTabChange, mode }: MobileNavProps) => {
+    const items = mode === 'workspace' ? WORKSPACE_NAV_ITEMS : PROJECT_NAV_ITEMS;
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#060c16]/95 backdrop-blur-xl border-t border-white/5 flex items-center justify-around px-2 h-16">
-            {navItems.map((item) => (
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#060d1a]/95 backdrop-blur-xl flex items-center justify-around px-2 h-16 shadow-[0_-4px_24px_rgba(0,0,0,0.3)] border-t border-white/5 pb-safe">
+            {items.map(({ id, icon: Icon, label }) => (
                 <button
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className={`flex flex-col items-center gap-1 flex-1 py-1 transition-all ${activeTab === item.id ? 'text-[#A5D7E8]' : 'text-[#576CBC]/60'}`}
+                    key={id}
+                    onClick={() => onTabChange(id)}
+                    className={`flex flex-col items-center gap-1 flex-1 py-1 transition-all
+                        ${activeTab === id ? 'text-[#A5D7E8] scale-105' : 'text-[#576CBC]/50 hover:text-white/60'}`}
                 >
-                    <item.icon size={20} />
-                    <span className="text-[9px] font-bold uppercase tracking-wide">{item.label}</span>
+                    <Icon size={19} />
+                    <span className="text-[9px] font-bold uppercase tracking-wide">{label}</span>
                 </button>
             ))}
         </nav>

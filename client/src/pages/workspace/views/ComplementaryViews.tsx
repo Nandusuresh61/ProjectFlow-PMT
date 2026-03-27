@@ -1,8 +1,9 @@
 import { Zap, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { toast } from "sonner";
+import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
 import { InviteMember } from "@/services/Invitation/invitation.api";
 import { AuthUserState } from "@/store/auth.store";
 
@@ -42,14 +43,21 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
   );
 
   const handleInvite = async () => {
-    if (!email.trim()) {
-      toast.error("Email is required!");
+    // Zod validation
+    const validation = CreateInvitationSchema.safeParse({ email, role });
+
+    if (!validation.success) {
+      const message = 
+        validation.error.issues[0]?.message || "Invalid input";
+      toast.error(message);
       return;
     }
+
     if (!currentWorkspaceId) {
       toast.error("Workspace not found!");
       return;
     }
+
     try {
       setLoading(true);
 

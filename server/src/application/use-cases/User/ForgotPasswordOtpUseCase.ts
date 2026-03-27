@@ -5,13 +5,11 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IResetPasswordOtpStore } from "@/application/interfaces/use-cases/cache/IResetPasswordOtpStore";
 import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/User/IForgotPasswordOtpUseCase";
-import {
-  AppError,
-  AppMessages,
-  EmailType,
-  ErrorCode,
-  HttpStatusCode,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
 export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
   constructor(

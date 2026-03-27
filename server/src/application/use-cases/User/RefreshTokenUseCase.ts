@@ -1,6 +1,9 @@
 import { IRefreshTokenUseCase } from "../../interfaces/use-cases/User/IRefreshTokenUseCase";
 import { ITokenService } from "../../interfaces/services/ITokenService";
-import { AppError, HttpStatusCode, ErrorCode, AppMessages } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
   constructor(private readonly tokenService: ITokenService) {}
@@ -24,6 +27,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       fullName: payload.fullName,
       email: payload.email,
       isSuperAdmin: payload.isSuperAdmin,
+      isBlocked: payload.isBlocked,
       type: payload.type,
     });
 
@@ -32,6 +36,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       fullName: payload.fullName,
       email: payload.email,
       isSuperAdmin: payload.isSuperAdmin,
+      isBlocked: payload.isBlocked,
       type: payload.type,
     });
 

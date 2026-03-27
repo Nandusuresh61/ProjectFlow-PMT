@@ -1,6 +1,9 @@
 import { SendEmailDto } from "@/application/dtos/SendEmailDto";
 import { IEmailService } from "@/application/interfaces/services/IEmailService";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { emailTransporter } from "../config/EmailConfig";
 
 export class EmailService implements IEmailService {

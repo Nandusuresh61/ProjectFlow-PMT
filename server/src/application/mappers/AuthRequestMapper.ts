@@ -1,9 +1,7 @@
-import {
-  RegisterUserSchemaType,
-  LoginUserSchemaType,
-  ForgotEmailSchemaType,
-  ResetPasswordSchemaType,
-} from "shared";
+import { RegisterUserSchemaType } from "@/shared/schema/auth/RegisterUserSchema";
+import { LoginUserSchemaType } from "@/shared/schema/auth/LoginUserSchema";
+import { ForgotEmailSchemaType } from "@/shared/schema/auth/ForgotEmailSchema";
+import { ResetPasswordSchemaType } from "@/shared/schema/auth/ResetPasswordSchema";
 import {
   StartRegisterDto,
   LoginRequestDto,

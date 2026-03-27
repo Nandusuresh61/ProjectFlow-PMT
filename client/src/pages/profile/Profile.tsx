@@ -4,20 +4,27 @@ import {
   Shield,
   Camera,
   Edit2,
-  Key,
   Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/PasswordInput";
-import { getProfile } from "@/services/profile/profile.api";
+import { getProfile, updateProfile } from "@/services/profile/profile.api";
 import type { User } from "@/types/auth.types";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { toast } from "sonner";
+import { UpdateUserProfileSchema } from "@/shared/schema/profile/UpdateUserProfileSchema";
+import { useRef } from "react";
+import { AuthUserState } from "@/store/auth.store";
 
 export default function ProfileSettings() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<User | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const checkAuth = AuthUserState((state) => state.checkAuth);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,14 +46,73 @@ export default function ProfileSettings() {
     fetchProfile();
   }, []);
 
-  const handleSaveProfile = () => {
-    // Save logic here
-    setIsEditingProfile(false);
+  const handleSaveProfile = async () => {
+    try {
+      if (!profileData) return;
+
+      setIsSaving(true);
+
+      let imageUrl = profileData.profileImage;
+      if (selectedImage) {
+        toast.info("Uploading image...");
+        try {
+          imageUrl = await uploadToCloudinary(selectedImage);
+        } catch (error) {
+          toast.error("Failed to upload image. Please try again.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      const payload = {
+        fullName: profileData.fullName,
+        profileImage: imageUrl,
+      };
+
+      const validatedData = UpdateUserProfileSchema.parse(payload);
+
+      const response = await updateProfile(validatedData);
+
+      if (response.success) {
+        toast.success(response.message || "Profile updated successfully");
+        setProfileData((prev) => prev ? { ...prev, ...payload, profileImage: imageUrl } : null);
+        setIsEditingProfile(false);
+        setSelectedImage(null);
+        setImagePreview(null);
+        await checkAuth();
+      } else {
+        toast.error(response.message || "Failed to update profile");
+      }
+    } catch (error: any) {
+      if (error.errors) {
+        // Zod validation error
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.message || "Failed to update profile");
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSavePassword = () => {
-    // Save password logic here
-    setIsChangingPassword(false);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
+
+      setSelectedImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    setProfileData((prev) => prev ? { ...prev, profileImage: "" } : null);
   };
 
   if (loading) {
@@ -110,16 +176,25 @@ export default function ProfileSettings() {
           ) : (
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setIsEditingProfile(false)}
+                onClick={() => {
+                  setIsEditingProfile(false);
+                  setSelectedImage(null);
+                  setImagePreview(null);
+                  // Reset any unsaved changes by reading from API response or keeping old state
+                  // For now simply cancelling keeps old unsaved data on next edit, 
+                  // ideally you fetch profile again or store original state and revert it.
+                }}
+                disabled={isSaving}
                 className="px-4 py-2 hover:bg-white/5 text-white/60 hover:text-white font-bold text-sm rounded-xl transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
+                disabled={isSaving}
+                className="px-4 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </div>
           )}
@@ -130,12 +205,20 @@ export default function ProfileSettings() {
           <div className="flex items-center gap-6">
             <div
               className={`relative ${isEditingProfile ? "group cursor-pointer" : ""}`}
+              onClick={() => isEditingProfile && fileInputRef.current?.click()}
             >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                className="hidden"
+                accept="image/jpeg, image/png, image/webp"
+              />
               <div className="h-20 w-20 rounded-full border-2 border-white/10 bg-[#0B2447] flex items-center justify-center overflow-hidden">
-                {profileData?.profileImage ? (
+                {imagePreview || profileData?.profileImage ? (
                   <img
-                    src={profileData.profileImage}
-                    alt={profileData.fullName}
+                    src={imagePreview || profileData?.profileImage || undefined}
+                    alt={profileData?.fullName}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -165,11 +248,17 @@ export default function ProfileSettings() {
                 </p>
                 <p className="text-xs text-[#576CBC]/60">JPEG, PNG under 5MB</p>
                 <div className="pt-2 flex gap-2">
-                  <button className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors"
+                  >
                     Upload new
                   </button>
                   <span className="text-white/20">•</span>
-                  <button className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors">
+                  <button
+                    onClick={handleRemoveImage}
+                    className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                  >
                     Remove
                   </button>
                 </div>
@@ -209,83 +298,6 @@ export default function ProfileSettings() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Password Section */}
-      <div className="border border-white/5 bg-white/[0.02] rounded-2xl p-6 lg:p-8 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-[#A5D7E8]/10 rounded-xl flex items-center justify-center border border-[#A5D7E8]/20 text-[#A5D7E8]">
-              <Shield className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xl text-white">Security</h3>
-              <p className="text-[#576CBC]/60 text-sm mt-1">
-                Manage your password and security settings
-              </p>
-            </div>
-          </div>
-
-          {!isChangingPassword && (
-            <button
-              onClick={() => setIsChangingPassword(true)}
-              className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 border border-white/5"
-            >
-              <Key className="h-4 w-4" />
-              Change Password
-            </button>
-          )}
-        </div>
-
-        {isChangingPassword && (
-          <div className="animate-in slide-in-from-top-4 duration-300 fade-in pt-4 border-t border-white/5 space-y-6">
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div className="space-y-2.5">
-                <label className="text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">
-                  Current Password
-                </label>
-                <PasswordInput
-                  placeholder="Enter current password"
-                  className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
-                />
-              </div>
-              <div className="hidden sm:block"></div> {/* Grid spacer */}
-              <div className="space-y-2.5">
-                <label className="text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">
-                  New Password
-                </label>
-                <PasswordInput
-                  placeholder="Enter new password"
-                  className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
-                />
-              </div>
-              <div className="space-y-2.5">
-                <label className="text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">
-                  Confirm New Password
-                </label>
-                <PasswordInput
-                  placeholder="Confirm new password"
-                  className="bg-white/[0.03] border-white/5 rounded-xl h-12 text-white focus-visible:ring-1 focus-visible:ring-[#A5D7E8]/30 transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-4">
-              <button
-                onClick={() => setIsChangingPassword(false)}
-                className="px-4 py-2 hover:bg-white/5 text-white/60 hover:text-white font-bold text-sm rounded-xl transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSavePassword}
-                className="px-6 py-2 bg-[#A5D7E8] text-[#0B2447] font-bold text-sm rounded-xl hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"
-              >
-                Update Password
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

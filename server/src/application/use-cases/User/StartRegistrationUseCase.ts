@@ -5,7 +5,11 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
-import { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { logger } from "@/infrastructure/utils/Logger";
 
 export class StartRegistrationUseCase implements IStartRegisterUseCase {

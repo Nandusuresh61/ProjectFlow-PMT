@@ -1,4 +1,5 @@
-import { AppError, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
 

@@ -7,3 +7,14 @@ export const getProfile = async (): Promise<ApiResponse<User>> => {
 
   return response.data;
 };
+
+export const updateProfile = async (
+  data: Partial<User>
+): Promise<ApiResponse<User>> => {
+  const response = await API.put<ApiResponse<User>>(
+    API_ROUTES.PROFILE.UPDATE,
+    data
+  );
+
+  return response.data;
+};
