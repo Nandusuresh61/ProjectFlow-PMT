@@ -6,13 +6,13 @@ const envPath = path.resolve(__dirname, "../.env");
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.warn(`⚠️  Warning: Could not load .env file from ${envPath}. Using system environment variables if available.`);
+  console.warn(` Warning: Could not load .env file from ${envPath}. Using system environment variables if available.`);
 }
 
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  console.error("❌ Environment validation failed:");
+  console.error("Environment validation failed:");
   parsedEnv.error.issues.forEach((issue) => {
     const pathName = issue.path.join(".");
     console.error(`   - ${pathName}: ${issue.message} (${issue.code})`);
@@ -24,7 +24,7 @@ if (!parsedEnv.success) {
     .map(i => i.path.join("."));
   
   if (missingVars.length > 0) {
-    console.error(`\n💡 Missing variables: ${missingVars.join(", ")}`);
+    console.error(`\n Missing variables: ${missingVars.join(", ")}`);
     console.error(`Please check your .env file at ${envPath} and ensure these are defined.`);
   }
 
