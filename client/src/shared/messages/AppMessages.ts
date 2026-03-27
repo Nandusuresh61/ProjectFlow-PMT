@@ -100,6 +100,8 @@ export const AppMessages = {
 
   USER_BLOCKED: "Your account has been blocked. Please contact support.",
 
-  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully."
+  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully.",
+
+  INVALID_ENV_VARIABLE: "Invalid environment variables:"
 
 } as const;

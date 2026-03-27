@@ -107,5 +107,7 @@ export const AppMessages = {
   CURRENT_PASSWORD_IS_WRONG: "Current password is not matching to the exisiting password",
 
   PASSWORD_CHANGED_SUCCESSFUL: "Password changed ",
+  
+  NO_ACTIVE_PLANS: "No active pricing plans available to assign to the new workspace.",
 
 } as const;

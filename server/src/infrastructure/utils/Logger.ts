@@ -1,8 +1,7 @@
 import winston from "winston";
-import { config } from "@/app.config";
 const { combine, timestamp, printf, colorize, json } = winston.format;
 
-//log text format for dev mode
+// Log text format for dev mode
 const devFormat = combine(
   colorize(),
   timestamp(),
@@ -23,11 +22,13 @@ const devFormat = combine(
   })
 );
 
-//log text format for prod
-const prodFormat = combine(timestamp(), json());  
+// Log text format for prod
+const prodFormat = combine(timestamp(), json());
+
+const isProduction = process.env.NODE_ENV === "production";
 
 export const logger = winston.createLogger({
-  level: config.NODE_ENV === "production" ? "info" : "debug",
+  level: isProduction ? "info" : "debug",
   levels: {
     error: 0,
     warn: 1,
@@ -35,8 +36,6 @@ export const logger = winston.createLogger({
     http: 3,
     debug: 4,
   },
-  format: config.NODE_ENV === "production" ? prodFormat : devFormat,
-  transports: [
-    new winston.transports.Console(),
-  ],
+  format: isProduction ? prodFormat : devFormat,
+  transports: [new winston.transports.Console()],
 });

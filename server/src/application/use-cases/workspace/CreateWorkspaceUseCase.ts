@@ -46,7 +46,7 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
         } else {
              throw new AppError(
                 ErrorCode.PLAN,
-                "No active pricing plans available to assign to the new workspace.",
+                AppMessages.NO_ACTIVE_PLANS,
                 HttpStatusCode.INTERNAL_SERVER_ERROR
              );
         }
