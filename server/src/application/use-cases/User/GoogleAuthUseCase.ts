@@ -11,6 +11,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { User } from "@/domain/entities/User";
+import { UserAuthResponseDto } from "@/application/dtos/UserDtos";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -20,7 +21,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     private readonly _membershipRepo: IMembershipRepository
   ) { }
 
-  async execute(payload: OAuthUserPayload) {
+  async execute(payload: OAuthUserPayload) : Promise<UserAuthResponseDto>{
     if (payload.provider !== AuthProvider.GOOGLE) {
       throw new AppError(
         ErrorCode.AUTH,

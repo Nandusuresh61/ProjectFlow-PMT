@@ -6,13 +6,13 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
-  constructor(private readonly tokenService: ITokenService) {}
+  constructor(private readonly _tokenService: ITokenService) {}
 
   async execute(refreshToken: string): Promise<{
     accessToken: string;
     refreshToken: string;
   }> {
-    const payload = this.tokenService.verifyRefreshToken(refreshToken);
+    const payload = this._tokenService.verifyRefreshToken(refreshToken);
 
     if (!payload) {
       throw new AppError(
@@ -22,7 +22,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       );
     }
 
-    const newAccessToken = this.tokenService.createAccessToken({
+    const newAccessToken = this._tokenService.createAccessToken({
       userId: payload.userId,
       fullName: payload.fullName,
       email: payload.email,
@@ -31,7 +31,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       type: payload.type,
     });
 
-    const newRefreshToken = this.tokenService.createRefreshToken({
+    const newRefreshToken = this._tokenService.createRefreshToken({
       userId: payload.userId,
       fullName: payload.fullName,
       email: payload.email,

@@ -1,165 +1,105 @@
-PROJECT PROGRESS SUMMARY 
------------------------
- Architecture
+# <img src="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/layers.svg" width="32" height="32" align="center" /> ProjectFlow-PMT
 
-Chosen Clean Architecture
+<p align="center">
+  <img src="./assets/landing.png" alt="ProjectFlow Hero" width="800" />
+</p>
 
-Split project into:
+<p align="center">
+  <b>The most powerful project management tool for high-performance teams.</b><br>
+  <i>Minimal setup, maximum output. Ship faster, together.</i>
+</p>
 
-Presentation
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/version-1.0.0-blue?style=for-the-badge" alt="Version" />
+  
+</p>
 
-Application
+---
 
-Infrastructure
+## 🚀 About the Project
 
-Shared
+**ProjectFlow** is a next-generation project management platform designed to streamline workflows and enhance team collaboration. Built with a focus on speed, security, and scalability, it provides a seamless experience for managing tasks, tracking progress, and communicating with team members in real-time.
 
-Followed dependency flow inward
+Our mission is to eliminate the friction in project management, allowing teams to focus on what matters most: **building great products.**
 
-No framework code in business logic
+---
 
+## ✨ Important Features
 
-   Shared Package
-------------------------------
+| Feature | Description |
+| :--- | :--- |
+| **🔐 Secure Auth** | Multi-layer authentication with Google OAuth, JWT, and bcrypt hashing. |
+| **👥 Team Management** | Invite members, manage roles, and track individual contributions. |
+| **📊 Real-time Dashboard** | Live updates on project status, task completion, and team activity. |
+| **📧 Smart Notifications** | Automated email alerts for invitations, password resets, and updates. |
+| **📱 Responsive UI** | Optimized for all devices, from desktop monitor to mobile smartphone. |
+| **⚡ High Performance** | Powered by Redis caching and a optimized MongoDB backend. |
 
-Created a shared package for common things
+---
 
-Added:
+## 🛠 Tech Stack
 
-Error codes
+### Frontend
+- **Framework**: [React 19](https://reactjs.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **UI Components**: [Radix UI](https://www.radix-ui.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-HTTP status codes
+### Backend
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express 5](https://expressjs.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) (via Mongoose)
+- **Caching**: [Redis](https://redis.io/)
+- **Validation**: [Zod](https://zod.dev/)
+- **Authentication**: [JWT](https://jwt.io/) & [Google OAuth](https://developers.google.com/identity)
 
-AppError
+---
 
-Auth error messages
+## 🏗 Architecture
 
-Email messages & subjects
+The project follows a **Monorepo** structure with a **Clean Architecture** approach, ensuring separation of concerns and maintainability.
 
-Email enums (OTP, RESET, INVITE)
 
-Zod schemas
 
-No business logic in shared
+- **Presentation**: REST Controllers, Express Middlewares, and Routes.
+- **Application**: Business logic, Use Cases, and Repositories interfaces.
+- **Infrastructure**: Database implementations (Mongoose), External Services (Redis, SMTP).
+- **Shared**: Common types, Zod schemas, and utility functions shared between Client and Server.
 
+---
 
- Authentication (Core)
------------------------
+## 🖼 Preview
 
-Started with Auth module
+<p align="center">
+  <img src="./assets/dashboard.png" alt="ProjectFlow Dashboard Preview" width="800" />
+  <br>
+  <i>A glimpse into the internal team management dashboard.</i>
+</p>
 
-Designed OTP-based registration
+---
 
-Email + password + OTP verification
+## 📊 Summary of Progress
 
- Application Layer
+| Component | Status | Description |
+| :--- | :---: | :--- |
+| **Core API** | ✅ | Express backend with pnpm workspace. |
+| **Auth System** | ✅ | OTP-based registration and secure login. |
+| **Workspace** | 🚧 | Multi-tenant workspace management. |
+| **Profile** | ✅ | User profiles with Cloudinary image support. |
+| **Deployment** | 📝 | CI/CD pipeline and production configuration. |
 
-Created use cases:
+---
 
-Start register
+## 🏁 Conclusion
 
-Verify OTP
+**ProjectFlow-PMT** is more than just a tool; it's a foundation for high-performance teams. By combining a modern modular architecture with the latest web technologies, we've created a platform that is both robust for enterprises and delightful for developers.
 
-Register user
+As we continue to iterate, our focus remains on performance, user experience, and building the most vertical project management solution in the industry.
 
-Defined interfaces for:
+---
 
-User repository
 
-Password hasher
-
-OTP generator
-
-OTP store (Redis)
-
-Email service
-
-Business logic stays framework-free
-
- Infrastructure Layer
-
-Implemented:
-
-MongoDB user repository
-
-Redis OTP store
-
-Password hashing
-
-OTP generator
-
-Token & UID services
-
-Added Nodemailer email service
-
-Email config handled via .env
-
-OTP Email Flow
---------------------
-
-Generate OTP
-
-Hash OTP
-
-Store OTP in Redis with TTL
-
-Send OTP via email
-
-Removed OTP console logging
-
-Email logic is reusable
-
- Dependency Injection
--------------------------
-
-DI container placed in presentation layer
-
-Wired:
-
-Infrastructure → Use cases
-
-Use cases → Controllers
-
-Use cases depend only on interfaces
-
-
- Presentation Layer
----------------------------
-
-Auth controller implemented
-
-Zod validation used
-
-Async error handler added
-
-Controllers contain no business logic
-
- Security Handling
----------------------
-
-Password & OTP hashing
-
-OTP expiry (TTL)
-
-Max 3 OTP attempts
-
-OTP deleted on success or abuse
-
-Protection against brute-force attacks
-
- Current Status
------------------
-
-OTP-based registration is complete
-
-Email system is production-ready
-
-Architecture is clean & scalable
-
-Ready to add:
-
-Resend OTP
-
-Reset password
-
-Tests
