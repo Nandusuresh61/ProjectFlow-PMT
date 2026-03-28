@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/layers.svg" width="32" height="32" align="center" /> ProjectFlow-PMT
+# <img src="./assets/logo.svg" width="32" height="32" align="center" /> ProjectFlow-PMT
 
 <p align="center">
   <img src="./assets/landing.png" alt="ProjectFlow Hero" width="800" />
@@ -21,7 +21,71 @@
 
 **ProjectFlow** is a next-generation project management platform designed to streamline workflows and enhance team collaboration. Built with a focus on speed, security, and scalability, it provides a seamless experience for managing tasks, tracking progress, and communicating with team members in real-time.
 
-Our mission is to eliminate the friction in project management, allowing teams to focus on what matters most: **building great products.**
+---
+
+## 🚀 Quick Start
+
+Follow these steps to get the project up and running in your local development environment.
+
+### 🛠 Prerequisites
+
+Ensure you have the following installed:
+- **Node.js** (v18.x or higher)
+- **pnpm** (v10.x or higher)
+- **MongoDB** (Local or Atlas)
+- **Redis** (Local or Upstash)
+
+### 📦 Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd ProjectFlow-PMT
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+### ⚙️ Environment Setup
+
+You need to configure environment variables for both the client and server.
+
+#### Server
+1. Navigate to the `server` directory:
+   ```bash
+   cd server
+   ```
+2. Copy the `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Update the `.env` file with your credentials (MongoDB URI, Redis URL, Google OAuth, etc.).
+
+#### Client
+1. Navigate to the `client` directory:
+   ```bash
+   cd ../client
+   ```
+2. Copy the `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Update the `.env` file if necessary.
+
+### ⚡ Running the Project
+
+From the root directory, you can run both the client and server concurrently:
+
+```bash
+# Run both frontend and backend
+pnpm dev
+
+# Or run them individually
+pnpm dev:client  # Frontend only
+pnpm dev:server  # Backend only
+```
 
 ---
 
