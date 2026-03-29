@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthUserState } from '@/store/auth.store';
 import { logoutUser } from '@/services/auth/auth.api';
@@ -25,6 +25,9 @@ import { ProjectSprintPerformanceView } from './views/project/ProjectSprintPerfo
 import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
+
+const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
+const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-performance', 'project-team'] as const;
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
 
@@ -72,8 +75,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
 // ─── WorkspaceHome ────────────────────────────────────────────────────────────
 export default function WorkspaceHome() {
     const navigate = useNavigate();
-    const [sidebarMode, setSidebarMode] = useState<SidebarMode>('workspace');
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const location = useLocation();
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [projects, setProjects] = useState<Project[]>([]);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -89,7 +91,29 @@ export default function WorkspaceHome() {
     const clearUser = AuthUserState(state => state.clearUser);
     const { fetchWorkspaces, currentWorkspace } = useWorkspaceStore();
 
+    const homePath = location.pathname.replace(/^\/home\/?/, '');
+    const pathSegments = homePath ? homePath.split('/').filter(Boolean) : [];
+    const isProjectRoute = pathSegments[0] === 'project' && Boolean(pathSegments[1]);
+    const routeProjectId = isProjectRoute ? pathSegments[1] : null;
+    const projectTabSegment = isProjectRoute ? pathSegments[2] : null;
+    const workspaceTabSegment = !isProjectRoute ? pathSegments[0] : null;
+
+    const sidebarMode: SidebarMode = isProjectRoute ? 'project' : 'workspace';
+    const activeTab = isProjectRoute
+        ? (PROJECT_TABS.includes((projectTabSegment ?? 'overview') as typeof PROJECT_TABS[number])
+            ? (projectTabSegment ?? 'overview')
+            : 'overview')
+        : (WORKSPACE_TABS.includes((workspaceTabSegment ?? 'dashboard') as typeof WORKSPACE_TABS[number])
+            ? (workspaceTabSegment ?? 'dashboard')
+            : 'dashboard');
+
     useEffect(() => { fetchWorkspaces(); }, [fetchWorkspaces]);
+
+    useEffect(() => {
+        if (location.pathname === '/home' || location.pathname === '/home/') {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [location.pathname, navigate]);
 
     useEffect(() => {
         const loadCurrentWorkspaceRole = async () => {
@@ -123,8 +147,7 @@ export default function WorkspaceHome() {
             setProjects([]);
             setSelectedProject(null);
             if (sidebarMode === 'project') {
-                setSidebarMode('workspace');
-                setActiveTab('dashboard');
+                navigate('/home/dashboard', { replace: true });
             }
             return;
         }
@@ -144,11 +167,7 @@ export default function WorkspaceHome() {
                 createdAt: project.createdAt,
                 updatedAt: project.updatedAt,
             }));
-
             setProjects(mappedProjects);
-            setSelectedProject((prev) =>
-                prev ? mappedProjects.find((project) => project.id === prev.id) ?? null : null
-            );
         } catch (error) {
             console.error('Failed to fetch projects', error);
             setProjects([]);
@@ -159,16 +178,38 @@ export default function WorkspaceHome() {
         loadProjects();
     }, [currentWorkspace?.workspaceId, sidebarMode]);
 
+    useEffect(() => {
+        if (!routeProjectId) {
+            setSelectedProject(null);
+            return;
+        }
+
+        const matchedProject = projects.find((project) => project.id === routeProjectId) ?? null;
+        setSelectedProject(matchedProject);
+
+        if (routeProjectId && projects.length > 0 && !matchedProject) {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [routeProjectId, projects, navigate]);
+
+    useEffect(() => {
+        if (isProjectRoute && projectTabSegment && !PROJECT_TABS.includes(projectTabSegment as typeof PROJECT_TABS[number])) {
+            navigate(`/home/project/${routeProjectId}/overview`, { replace: true });
+        }
+
+        if (!isProjectRoute && workspaceTabSegment && !WORKSPACE_TABS.includes(workspaceTabSegment as typeof WORKSPACE_TABS[number])) {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [isProjectRoute, projectTabSegment, workspaceTabSegment, navigate, routeProjectId]);
+
     const handleSelectProject = (project: Project) => {
         setSelectedProject(project);
-        setSidebarMode('project');
-        setActiveTab('overview');
+        navigate(`/home/project/${project.id}/overview`);
     };
 
     const handleBackToWorkspace = () => {
-        setSidebarMode('workspace');
         setSelectedProject(null);
-        setActiveTab('dashboard');
+        navigate('/home/dashboard');
     };
 
     const handleTabChange = (tab: string) => {
@@ -177,7 +218,13 @@ export default function WorkspaceHome() {
             setIsMobileSidebarOpen(true);
             return;
         }
-        setActiveTab(tab);
+
+        if (sidebarMode === 'project' && selectedProject) {
+            navigate(`/home/project/${selectedProject.id}/${tab}`);
+            return;
+        }
+
+        navigate(`/home/${tab}`);
     };
 
     const handleLogout = async () => {

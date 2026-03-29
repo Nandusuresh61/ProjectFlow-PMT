@@ -53,7 +53,7 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (user && user.membershipCount > 0) {
-      navigate("/home");
+      navigate("/home/dashboard");
     }
   }, [user, navigate]);
 
@@ -131,7 +131,7 @@ export default function Onboarding() {
       await checkAuth();
 
       toast.success("Workspace created successfully 🎉");
-      navigate("/home");
+      navigate("/home/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Failed to complete onboarding");
     } finally {

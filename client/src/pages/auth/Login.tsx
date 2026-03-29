@@ -93,7 +93,7 @@ export default function Login() {
 
       await checkAuth();
       toast.success(response.message);
-      navigate("/home");
+      navigate("/home/dashboard");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
