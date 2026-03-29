@@ -1,3 +1,4 @@
+import { CreateProjectDto, UpdateProjectDto } from "@/application/dtos/ProjectDto";
 import { ICreateProjectUseCase } from "@/application/interfaces/use-cases/Project/ICreateProjectUseCase";
 import { IGetWorkspaceProjectsUseCase } from "@/application/interfaces/use-cases/Project/IGetWorkspaceProjectsUseCase";
 import { IUpdateProjectUseCase } from "@/application/interfaces/use-cases/Project/IUpdateProjectUseCase";
@@ -19,7 +20,7 @@ export class ProjectController {
 
   createProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
-    const validatedData = CreateProjectSchema.parse(req.body);
+    const validatedData = CreateProjectSchema.parse(req.body) as CreateProjectDto;
 
     const result = await this._createProjectUseCase.execute(
       tokenPayload.userId,
@@ -50,7 +51,7 @@ export class ProjectController {
   updateProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
     const { projectId } = req.params;
-    const validatedData = UpdateProjectSchema.parse(req.body);
+    const validatedData = UpdateProjectSchema.parse(req.body) as UpdateProjectDto;
 
     const result = await this._updateProjectUseCase.execute(
       tokenPayload.userId,

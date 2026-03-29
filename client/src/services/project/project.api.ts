@@ -3,6 +3,7 @@ import { API } from "@/services/api";
 
 export interface ProjectData {
   projectId: string;
+  projectKey: string;
   name: string;
   description: string | null;
   workspaceId: string;
@@ -21,12 +22,14 @@ export interface ProjectResponse<T = unknown> {
 
 export interface CreateProjectPayload {
   workspaceId: string;
+  projectKey: string;
   name: string;
   description?: string | null;
   memberIds?: string[];
 }
 
 export interface UpdateProjectPayload {
+  projectKey?: string;
   name?: string;
   description?: string | null;
   memberIds?: string[];

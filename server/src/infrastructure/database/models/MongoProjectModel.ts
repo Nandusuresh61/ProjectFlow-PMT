@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface ProjectDocument extends Document {
   projectId: string;
+  projectKey: string;
   name: string;
   description: string | null;
   workspaceId: string;
@@ -15,6 +16,7 @@ export interface ProjectDocument extends Document {
 const ProjectSchema = new Schema<ProjectDocument>(
   {
     projectId: { type: String, required: true, unique: true },
+    projectKey: { type: String, required: true, trim: true, uppercase: true },
     name: { type: String, required: true, trim: true },
     description: { type: String, default: null },
     workspaceId: { type: String, required: true, index: true },

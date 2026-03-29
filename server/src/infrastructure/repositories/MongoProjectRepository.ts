@@ -17,6 +17,7 @@ export class MongoProjectRepository
   protected mapToEntity(doc: ProjectDocument): Project {
     return new Project(
       doc.projectId,
+      doc.projectKey,
       doc.name,
       doc.description,
       doc.workspaceId,
@@ -31,6 +32,7 @@ export class MongoProjectRepository
   async create(project: Project): Promise<Project> {
     return super.create({
       projectId: project.projectId,
+      projectKey: project.projectKey,
       name: project.name,
       description: project.description,
       workspaceId: project.workspaceId,
@@ -56,6 +58,7 @@ export class MongoProjectRepository
     const updatedProject = await this.updateOne(
       { projectId: project.projectId },
       {
+        projectKey: project.projectKey,
         name: project.name,
         description: project.description,
         memberIds: project.memberIds,

@@ -94,6 +94,10 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
       project.name = data.name.trim();
     }
 
+    if (typeof data.projectKey === "string") {
+      project.projectKey = data.projectKey.trim().toUpperCase();
+    }
+
     if (data.description !== undefined) {
       project.description = data.description?.trim() || null;
     }

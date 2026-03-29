@@ -2,6 +2,11 @@ import { z } from "zod";
 
 export const CreateProjectSchema = z.object({
   workspaceId: z.string().trim().min(1, "Workspace ID is required"),
+  projectKey: z
+    .string()
+    .trim()
+    .regex(/^[A-Za-z]{2,3}$/, "Project key must be 2 to 3 letters")
+    .transform((value) => value.toUpperCase()),
   name: z
     .string()
     .trim()

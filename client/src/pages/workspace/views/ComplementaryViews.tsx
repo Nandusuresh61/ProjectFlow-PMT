@@ -508,6 +508,7 @@ export const CreateProjectModal = ({
   const currentWorkspaceId = user?.currentWorkspaceId;
 
   const [projectName, setProjectName] = useState("");
+  const [projectKey, setProjectKey] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
@@ -544,6 +545,7 @@ export const CreateProjectModal = ({
   useEffect(() => {
     if (!isOpen) {
       setProjectName("");
+      setProjectKey("");
       setDescription("");
       setSelectedMemberIds([]);
       setMembers([]);
@@ -571,6 +573,11 @@ export const CreateProjectModal = ({
       return;
     }
 
+    if (!/^[A-Za-z]{2,3}$/.test(projectKey.trim())) {
+      toast.error("Project key must be 2 to 3 letters");
+      return;
+    }
+
     if (!canCreateProject) {
       toast.error("Only workspace owner or admin can create projects");
       return;
@@ -582,6 +589,7 @@ export const CreateProjectModal = ({
 
       const response = await createProject({
         workspaceId: currentWorkspaceId,
+        projectKey: projectKey.trim().toUpperCase(),
         name: projectName.trim(),
         description: description.trim() || null,
         memberIds: selectedMemberIds,
@@ -625,6 +633,23 @@ export const CreateProjectModal = ({
         <div className="space-y-6">
           <div className="rounded-[1.75rem] border border-white/6 bg-white/[0.02] p-5 sm:p-6">
             <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Key
+                </label>
+                <input
+                  type="text"
+                  value={projectKey}
+                  onChange={(e) =>
+                    setProjectKey(
+                      e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3)
+                    )
+                  }
+                  placeholder="PF"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm uppercase tracking-[0.18em] text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
                   Project Name
@@ -676,6 +701,7 @@ interface EditProjectModalProps {
   onClose: () => void;
   project: {
     id: string;
+    key: string;
     name: string;
     description: string | null;
     memberIds: string[];
@@ -693,6 +719,7 @@ export const EditProjectModal = ({
   const currentWorkspaceId = user?.currentWorkspaceId;
 
   const [projectName, setProjectName] = useState("");
+  const [projectKey, setProjectKey] = useState("");
   const [description, setDescription] = useState("");
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
@@ -710,6 +737,7 @@ export const EditProjectModal = ({
     if (!isOpen || !project) return;
 
     setProjectName(project.name);
+    setProjectKey(project.key);
     setDescription(project.description ?? "");
     setSelectedMemberIds(project.memberIds);
   }, [isOpen, project]);
@@ -737,6 +765,7 @@ export const EditProjectModal = ({
   useEffect(() => {
     if (!isOpen) {
       setProjectName("");
+      setProjectKey("");
       setDescription("");
       setSelectedMemberIds([]);
       setMembers([]);
@@ -764,6 +793,11 @@ export const EditProjectModal = ({
       return;
     }
 
+    if (!/^[A-Za-z]{2,3}$/.test(projectKey.trim())) {
+      toast.error("Project key must be 2 to 3 letters");
+      return;
+    }
+
     if (!canEditProject) {
       toast.error("Only workspace owner or admin can edit projects");
       return;
@@ -774,6 +808,7 @@ export const EditProjectModal = ({
       const { updateProject } = await import("@/services/project/project.api");
 
       const response = await updateProject(project.id, {
+        projectKey: projectKey.trim().toUpperCase(),
         name: projectName.trim(),
         description: description.trim() || null,
         memberIds: selectedMemberIds,
@@ -817,6 +852,22 @@ export const EditProjectModal = ({
         <div className="space-y-6">
           <div className="rounded-[1.75rem] border border-white/6 bg-white/[0.02] p-5 sm:p-6">
             <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Key
+                </label>
+                <input
+                  type="text"
+                  value={projectKey}
+                  onChange={(e) =>
+                    setProjectKey(
+                      e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3)
+                    )
+                  }
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm uppercase tracking-[0.18em] text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
                   Project Name

@@ -104,6 +104,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
 
     const project = new Project(
       this._uidGenerator.createId(),
+      data.projectKey.trim().toUpperCase(),
       data.name.trim(),
       data.description?.trim() || null,
       data.workspaceId,

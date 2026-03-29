@@ -2,6 +2,12 @@ import { z } from "zod";
 
 export const UpdateProjectSchema = z
   .object({
+    projectKey: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z]{2,3}$/, "Project key must be 2 to 3 letters")
+      .transform((value) => value.toUpperCase())
+      .optional(),
     name: z
       .string()
       .trim()
@@ -20,6 +26,7 @@ export const UpdateProjectSchema = z
   })
   .refine(
     (data) =>
+      data.projectKey !== undefined ||
       data.name !== undefined ||
       data.description !== undefined ||
       data.memberIds !== undefined,

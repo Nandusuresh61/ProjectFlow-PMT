@@ -31,14 +31,6 @@ const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-perform
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
 
-const getProjectKey = (name: string) =>
-    name
-        .split(' ')
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? '')
-        .join('') || 'PR';
-
 // ─── Content Router ───────────────────────────────────────────────────────────
 interface ContentRouterProps {
     mode: SidebarMode;
@@ -158,7 +150,7 @@ export default function WorkspaceHome() {
                 id: project.projectId,
                 name: project.name,
                 color: PROJECT_COLORS[index % PROJECT_COLORS.length],
-                key: getProjectKey(project.name),
+                key: project.projectKey,
                 description: project.description,
                 workspaceId: project.workspaceId,
                 createdBy: project.createdBy,

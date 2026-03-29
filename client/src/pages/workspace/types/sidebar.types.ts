@@ -4,7 +4,7 @@ export interface Project {
     id: string;
     name: string;
     color: string;
-    key: string; // e.g. "PF", "MS"
+    key: string;
     description: string | null;
     workspaceId: string;
     createdBy: string;
