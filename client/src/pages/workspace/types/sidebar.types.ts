@@ -5,6 +5,13 @@ export interface Project {
     name: string;
     color: string;
     key: string; // e.g. "PF", "MS"
+    description: string | null;
+    workspaceId: string;
+    createdBy: string;
+    memberIds: string[];
+    status: 'ACTIVE' | 'ARCHIVED';
+    createdAt: string;
+    updatedAt: string;
 }
 
 export type WorkspaceTab =

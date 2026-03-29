@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthUserState } from '@/store/auth.store';
 import { logoutUser } from '@/services/auth/auth.api';
+import { getMembers } from '@/services/workspace/team.api';
 import { useWorkspaceStore } from '@/store/workspace.store';
+import { getWorkspaceProjects } from '@/services/project/project.api';
 import { BackgroundAtmosphere } from './components/BackgroundAtmosphere';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -14,7 +16,7 @@ import { TeamView } from './views/TeamView';
 import { SettingsView } from './views/SettingsView';
 import { ChatView } from './views/ChatView';
 import { MeetingsView } from './views/MeetingsView';
-import { InviteModal, CreateWorkspaceModal } from './views/ComplementaryViews';
+import { EditProjectModal, InviteModal, CreateProjectModal, CreateWorkspaceModal } from './views/ComplementaryViews';
 import { ProjectOverviewView } from './views/project/ProjectOverviewView';
 import { ProjectBacklogView } from './views/project/ProjectBacklogView';
 import { ProjectBoardView } from './views/project/ProjectBoardView';
@@ -22,13 +24,17 @@ import { ProjectSprintView } from './views/project/ProjectSprintView';
 import { ProjectSprintPerformanceView } from './views/project/ProjectSprintPerformanceView';
 import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 
-// ─── Mock Projects ─────────────────────────────────────────────────────────────
-const MOCK_PROJECTS: Project[] = [
-    { id: '1', name: 'ProjectFlow PMT', color: '#A5D7E8', key: 'PF' },
-    { id: '2', name: 'Marketing Site', color: '#7C9AC7', key: 'MS' },
-    { id: '3', name: 'Mobile App', color: '#576CBC', key: 'MA' },
-];
+const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
+
+const getProjectKey = (name: string) =>
+    name
+        .split(' ')
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('') || 'PR';
 
 // ─── Content Router ───────────────────────────────────────────────────────────
 interface ContentRouterProps {
@@ -36,18 +42,20 @@ interface ContentRouterProps {
     activeTab: string;
     selectedProject: Project | null;
     openInvite: () => void;
+    openEditProject: () => void;
+    canManageProjects: boolean;
 }
 
-const ContentRouter = ({ mode, activeTab, selectedProject, openInvite }: ContentRouterProps) => {
+const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManageProjects }: ContentRouterProps) => {
     if (mode === 'project' && selectedProject) {
         switch (activeTab) {
-            case 'overview': return <ProjectOverviewView project={selectedProject} />;
+            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
             case 'backlogs': return <ProjectBacklogView project={selectedProject} />;
             case 'board': return <ProjectBoardView project={selectedProject} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
             case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} />;
-            default: return <ProjectOverviewView project={selectedProject} />;
+            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
         }
     }
 
@@ -67,17 +75,89 @@ export default function WorkspaceHome() {
     const [sidebarMode, setSidebarMode] = useState<SidebarMode>('workspace');
     const [activeTab, setActiveTab] = useState('dashboard');
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+    const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
     const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [currentWorkspaceRole, setCurrentWorkspaceRole] = useState<WorkspaceRoleEnum | null>(null);
 
     const user = AuthUserState(state => state.user);
     const clearUser = AuthUserState(state => state.clearUser);
-    const { fetchWorkspaces } = useWorkspaceStore();
+    const { fetchWorkspaces, currentWorkspace } = useWorkspaceStore();
 
     useEffect(() => { fetchWorkspaces(); }, [fetchWorkspaces]);
+
+    useEffect(() => {
+        const loadCurrentWorkspaceRole = async () => {
+            if (!currentWorkspace?.workspaceId || !user?.userId) {
+                setCurrentWorkspaceRole(null);
+                return;
+            }
+
+            if (currentWorkspace.ownerId === user.userId) {
+                setCurrentWorkspaceRole(WorkspaceRoleEnum.WORKSPACE_OWNER);
+                return;
+            }
+
+            try {
+                const response = await getMembers(currentWorkspace.workspaceId);
+                const currentMember = (response.data ?? []).find(
+                    (member: { userId: string; role: WorkspaceRoleEnum }) => member.userId === user.userId
+                );
+                setCurrentWorkspaceRole(currentMember?.role ?? null);
+            } catch (error) {
+                console.error('Failed to fetch workspace role', error);
+                setCurrentWorkspaceRole(null);
+            }
+        };
+
+        loadCurrentWorkspaceRole();
+    }, [currentWorkspace?.workspaceId, currentWorkspace?.ownerId, user?.userId]);
+
+    const loadProjects = async () => {
+        if (!currentWorkspace?.workspaceId) {
+            setProjects([]);
+            setSelectedProject(null);
+            if (sidebarMode === 'project') {
+                setSidebarMode('workspace');
+                setActiveTab('dashboard');
+            }
+            return;
+        }
+
+        try {
+            const response = await getWorkspaceProjects(currentWorkspace.workspaceId);
+            const mappedProjects = (response.data ?? []).map((project, index) => ({
+                id: project.projectId,
+                name: project.name,
+                color: PROJECT_COLORS[index % PROJECT_COLORS.length],
+                key: getProjectKey(project.name),
+                description: project.description,
+                workspaceId: project.workspaceId,
+                createdBy: project.createdBy,
+                memberIds: project.memberIds,
+                status: project.status,
+                createdAt: project.createdAt,
+                updatedAt: project.updatedAt,
+            }));
+
+            setProjects(mappedProjects);
+            setSelectedProject((prev) =>
+                prev ? mappedProjects.find((project) => project.id === prev.id) ?? null : null
+            );
+        } catch (error) {
+            console.error('Failed to fetch projects', error);
+            setProjects([]);
+        }
+    };
+
+    useEffect(() => {
+        loadProjects();
+    }, [currentWorkspace?.workspaceId, sidebarMode]);
 
     const handleSelectProject = (project: Project) => {
         setSelectedProject(project);
@@ -112,6 +192,11 @@ export default function WorkspaceHome() {
         }
     };
 
+    const canManageProjects =
+        Boolean(user?.isSuperAdmin) ||
+        currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_OWNER ||
+        currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+
     return (
         <div className="flex h-screen w-full bg-[#060d1a] font-sans text-white selection:bg-[#A5D7E8]/30 selection:text-white overflow-hidden">
             <BackgroundAtmosphere />
@@ -125,9 +210,10 @@ export default function WorkspaceHome() {
                 isMobileOpen={isMobileSidebarOpen}
                 onCloseMobile={() => setIsMobileSidebarOpen(false)}
                 selectedProject={selectedProject}
-                projects={MOCK_PROJECTS}
+                projects={projects}
                 onSelectProject={handleSelectProject}
-                onCreateProject={() => toast.info('Create Project feature coming soon!')}
+                canCreateProject={canManageProjects}
+                onCreateProject={() => setIsCreateProjectModalOpen(true)}
                 onBackToWorkspace={handleBackToWorkspace}
             />
 
@@ -158,6 +244,8 @@ export default function WorkspaceHome() {
                                     activeTab={activeTab}
                                     selectedProject={selectedProject}
                                     openInvite={() => setIsInviteModalOpen(true)}
+                                    openEditProject={() => setIsEditProjectModalOpen(true)}
+                                    canManageProjects={canManageProjects}
                                 />
                             </motion.div>
                         </AnimatePresence>
@@ -168,6 +256,17 @@ export default function WorkspaceHome() {
             <MobileNav activeTab={activeTab} onTabChange={handleTabChange} mode={sidebarMode} />
 
             <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
+            <CreateProjectModal
+                isOpen={isCreateProjectModalOpen}
+                onClose={() => setIsCreateProjectModalOpen(false)}
+                onCreated={loadProjects}
+            />
+            <EditProjectModal
+                isOpen={isEditProjectModalOpen}
+                onClose={() => setIsEditProjectModalOpen(false)}
+                project={selectedProject}
+                onUpdated={loadProjects}
+            />
             <CreateWorkspaceModal isOpen={isCreateWorkspaceModalOpen} onClose={() => setIsCreateWorkspaceModalOpen(false)} />
         </div>
     );

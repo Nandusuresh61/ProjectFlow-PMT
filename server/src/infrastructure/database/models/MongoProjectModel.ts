@@ -1,0 +1,40 @@
+import mongoose, { Document, Schema } from "mongoose";
+
+export interface ProjectDocument extends Document {
+  projectId: string;
+  name: string;
+  description: string | null;
+  workspaceId: string;
+  createdBy: string;
+  memberIds: string[];
+  status: "ACTIVE" | "ARCHIVED";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ProjectSchema = new Schema<ProjectDocument>(
+  {
+    projectId: { type: String, required: true, unique: true },
+    name: { type: String, required: true, trim: true },
+    description: { type: String, default: null },
+    workspaceId: { type: String, required: true, index: true },
+    createdBy: { type: String, required: true },
+    memberIds: {
+      type: [String],
+      default: [],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "ARCHIVED"],
+      default: "ACTIVE",
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+
+export const ProjectModel = mongoose.model<ProjectDocument>(
+  "Project",
+  ProjectSchema
+);
