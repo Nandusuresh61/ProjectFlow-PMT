@@ -1,6 +1,6 @@
-import { Zap, X, ChevronDown } from "lucide-react";
+import { Check, Zap, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { toast } from "sonner";
 import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
@@ -309,5 +309,605 @@ export const CreateWorkspaceModal = ({ isOpen, onClose }: any) => {
         </>
       )}
     </AnimatePresence>
+  );
+};
+
+interface WorkspaceMember {
+  userId: string;
+  fullName: string;
+  email: string;
+  role: WorkspaceRoleEnum;
+  joinedAt: string;
+  profileImage?: string | null;
+}
+
+interface CreateProjectModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreated?: () => Promise<void> | void;
+}
+
+const PROJECT_MODAL_OVERLAY_CLASS =
+  "fixed inset-0 z-[120] bg-[#020817]/88 backdrop-blur-md";
+
+const PROJECT_MODAL_PANEL_CLASS =
+  "fixed z-[121] inset-x-3 top-3 bottom-3 sm:inset-x-6 sm:top-6 sm:bottom-6 xl:left-1/2 xl:top-1/2 xl:bottom-auto xl:w-full xl:max-w-5xl xl:-translate-x-1/2 xl:-translate-y-1/2 xl:max-h-[88vh] bg-[#050b16]/95 border border-white/10 rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_40px_120px_rgba(0,0,0,0.45)] overflow-hidden backdrop-blur-xl";
+
+interface ProjectModalShellProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  footer: ReactNode;
+}
+
+const ProjectModalShell = ({
+  isOpen,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+}: ProjectModalShellProps) => (
+  <AnimatePresence>
+    {isOpen && (
+      <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className={PROJECT_MODAL_OVERLAY_CLASS}
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.98, y: 20 }}
+          transition={{ duration: 0.2 }}
+          className={PROJECT_MODAL_PANEL_CLASS}
+        >
+          <div className="flex h-full flex-col">
+            <div className="flex items-start justify-between gap-4 border-b border-white/8 px-5 py-5 sm:px-8 sm:py-6">
+              <div className="min-w-0">
+                <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                  {title}
+                </h3>
+                <p className="text-[#8FA7D8]/65 font-medium text-sm mt-1 max-w-2xl">
+                  {subtitle}
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="shrink-0 p-2 hover:bg-white/5 rounded-xl text-white/40 transition-all"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-8 sm:py-6">
+              {children}
+            </div>
+
+            <div className="border-t border-white/8 bg-black/10 px-5 py-4 sm:px-8">
+              {footer}
+            </div>
+          </div>
+        </motion.div>
+      </>
+    )}
+  </AnimatePresence>
+);
+
+interface ProjectMemberPickerProps {
+  members: WorkspaceMember[];
+  selectedMemberIds: string[];
+  loadingMembers: boolean;
+  onToggleMember: (userId: string) => void;
+}
+
+const ProjectMemberPicker = ({
+  members,
+  selectedMemberIds,
+  loadingMembers,
+  onToggleMember,
+}: ProjectMemberPickerProps) => (
+  <div>
+    <div className="flex items-center justify-between mb-3 gap-4">
+      <label className="block text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">
+        Project Members
+      </label>
+      <span className="text-xs text-[#576CBC]/60 font-medium">
+        {selectedMemberIds.length} selected
+      </span>
+    </div>
+
+    <div className="rounded-[1.75rem] border border-white/5 bg-white/[0.02] p-3 max-h-[24rem] overflow-y-auto">
+      {loadingMembers ? (
+        <div className="px-4 py-10 text-sm text-center text-[#576CBC]/60">
+          Loading workspace members...
+        </div>
+      ) : members.length === 0 ? (
+        <div className="px-4 py-10 text-sm text-center text-[#576CBC]/60">
+          No workspace members found.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-2">
+          {members.map((member) => {
+            const isSelected = selectedMemberIds.includes(member.userId);
+
+            return (
+              <button
+                type="button"
+                key={member.userId}
+                onClick={() => onToggleMember(member.userId)}
+                className={`w-full flex items-center gap-3 sm:gap-4 rounded-2xl px-3 sm:px-4 py-3 text-left border transition-all ${
+                  isSelected
+                    ? "border-[#A5D7E8]/40 bg-[#A5D7E8]/10 shadow-[0_0_0_1px_rgba(165,215,232,0.08)]"
+                    : "border-white/5 bg-white/[0.02] hover:bg-white/[0.05]"
+                }`}
+              >
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#19376D] text-[#A5D7E8] flex items-center justify-center text-xs font-black overflow-hidden shrink-0">
+                  {member.profileImage ? (
+                    <img
+                      src={member.profileImage}
+                      alt={member.fullName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    member.fullName.substring(0, 2).toUpperCase()
+                  )}
+                </div>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p
+                    className="text-sm font-bold text-white leading-tight break-words line-clamp-2 sm:line-clamp-1"
+                    title={member.fullName}
+                  >
+                    {member.fullName}
+                  </p>
+                  <p
+                    className="text-xs text-[#576CBC]/60 truncate"
+                    title={member.email}
+                  >
+                    {member.email}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                  <span className="hidden md:inline text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#576CBC]/70 whitespace-nowrap">
+                    {member.role === WorkspaceRoleEnum.WORKSPACE_OWNER
+                      ? "Owner"
+                      : member.role === WorkspaceRoleEnum.WORKSPACE_ADMIN
+                        ? "Admin"
+                        : "Member"}
+                  </span>
+                  <div
+                    className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all shrink-0 ${
+                      isSelected
+                        ? "border-[#A5D7E8] bg-[#A5D7E8] text-[#06101d]"
+                        : "border-white/15 bg-transparent text-transparent"
+                    }`}
+                  >
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+export const CreateProjectModal = ({
+  isOpen,
+  onClose,
+  onCreated,
+}: CreateProjectModalProps) => {
+  const user = AuthUserState((state) => state.user);
+  const currentWorkspaceId = user?.currentWorkspaceId;
+
+  const [projectName, setProjectName] = useState("");
+  const [projectKey, setProjectKey] = useState("");
+  const [description, setDescription] = useState("");
+  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const currentUserRole = members.find(
+    (member) => member.userId === user?.userId
+  )?.role;
+  const canCreateProject =
+    currentUserRole === WorkspaceRoleEnum.WORKSPACE_OWNER ||
+    currentUserRole === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+
+  useEffect(() => {
+    if (!isOpen || !currentWorkspaceId) return;
+
+    const fetchMembers = async () => {
+      try {
+        setLoadingMembers(true);
+        const { getMembers } = await import("@/services/workspace/team.api");
+        const response = await getMembers(currentWorkspaceId);
+        setMembers(response.data ?? []);
+      } catch (error: any) {
+        toast.error(error.message || "Failed to load workspace members");
+        setMembers([]);
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, [isOpen, currentWorkspaceId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setProjectName("");
+      setProjectKey("");
+      setDescription("");
+      setSelectedMemberIds([]);
+      setMembers([]);
+      setLoadingMembers(false);
+      setSubmitting(false);
+    }
+  }, [isOpen]);
+
+  const toggleMember = (userId: string) => {
+    setSelectedMemberIds((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleCreateProject = async () => {
+    if (!currentWorkspaceId) {
+      toast.error("Workspace not found");
+      return;
+    }
+
+    if (!projectName.trim()) {
+      toast.error("Project name is required");
+      return;
+    }
+
+    if (!/^[A-Za-z]{2,3}$/.test(projectKey.trim())) {
+      toast.error("Project key must be 2 to 3 letters");
+      return;
+    }
+
+    if (!canCreateProject) {
+      toast.error("Only workspace owner or admin can create projects");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const { createProject } = await import("@/services/project/project.api");
+
+      const response = await createProject({
+        workspaceId: currentWorkspaceId,
+        projectKey: projectKey.trim().toUpperCase(),
+        name: projectName.trim(),
+        description: description.trim() || null,
+        memberIds: selectedMemberIds,
+      });
+
+      toast.success(response.message || "Project created successfully");
+      await onCreated?.();
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create project");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <ProjectModalShell
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Create Project"
+      subtitle="Define the project and assign workspace members from the start."
+      footer={
+        <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-5 py-3 text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-white/5"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreateProject}
+            disabled={submitting || loadingMembers || !canCreateProject}
+            className="w-full sm:w-auto px-5 py-3 text-sm font-bold bg-[#A5D7E8] text-[#0B2447] rounded-2xl shadow-[0_0_20px_rgba(165,215,232,0.2)] hover:shadow-[0_0_25px_rgba(165,215,232,0.3)] hover:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {submitting ? "Creating..." : "Create Project"}
+          </button>
+        </div>
+      }
+    >
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,1.1fr)] gap-6 xl:gap-8">
+        <div className="space-y-6">
+          <div className="rounded-[1.75rem] border border-white/6 bg-white/[0.02] p-5 sm:p-6">
+            <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Key
+                </label>
+                <input
+                  type="text"
+                  value={projectKey}
+                  onChange={(e) =>
+                    setProjectKey(
+                      e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3)
+                    )
+                  }
+                  placeholder="PF"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm uppercase tracking-[0.18em] text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="E.g. Product Revamp"
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="What is this project about?"
+                  rows={5}
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {!loadingMembers && !canCreateProject && members.length > 0 && (
+            <div className="rounded-2xl border border-amber-300/10 bg-amber-300/5 px-4 py-3 text-sm text-amber-100/80">
+              Only workspace owners and admins can create projects.
+            </div>
+          )}
+        </div>
+
+        <ProjectMemberPicker
+          members={members}
+          selectedMemberIds={selectedMemberIds}
+          loadingMembers={loadingMembers}
+          onToggleMember={toggleMember}
+        />
+      </div>
+    </ProjectModalShell>
+  );
+};
+
+interface EditProjectModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  project: {
+    id: string;
+    key: string;
+    name: string;
+    description: string | null;
+    memberIds: string[];
+  } | null;
+  onUpdated?: () => Promise<void> | void;
+}
+
+export const EditProjectModal = ({
+  isOpen,
+  onClose,
+  project,
+  onUpdated,
+}: EditProjectModalProps) => {
+  const user = AuthUserState((state) => state.user);
+  const currentWorkspaceId = user?.currentWorkspaceId;
+
+  const [projectName, setProjectName] = useState("");
+  const [projectKey, setProjectKey] = useState("");
+  const [description, setDescription] = useState("");
+  const [members, setMembers] = useState<WorkspaceMember[]>([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const currentUserRole = members.find(
+    (member) => member.userId === user?.userId
+  )?.role;
+  const canEditProject =
+    currentUserRole === WorkspaceRoleEnum.WORKSPACE_OWNER ||
+    currentUserRole === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+
+  useEffect(() => {
+    if (!isOpen || !project) return;
+
+    setProjectName(project.name);
+    setProjectKey(project.key);
+    setDescription(project.description ?? "");
+    setSelectedMemberIds(project.memberIds);
+  }, [isOpen, project]);
+
+  useEffect(() => {
+    if (!isOpen || !currentWorkspaceId) return;
+
+    const fetchMembers = async () => {
+      try {
+        setLoadingMembers(true);
+        const { getMembers } = await import("@/services/workspace/team.api");
+        const response = await getMembers(currentWorkspaceId);
+        setMembers(response.data ?? []);
+      } catch (error: any) {
+        toast.error(error.message || "Failed to load workspace members");
+        setMembers([]);
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, [isOpen, currentWorkspaceId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setProjectName("");
+      setProjectKey("");
+      setDescription("");
+      setSelectedMemberIds([]);
+      setMembers([]);
+      setLoadingMembers(false);
+      setSubmitting(false);
+    }
+  }, [isOpen]);
+
+  const toggleMember = (userId: string) => {
+    setSelectedMemberIds((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleUpdateProject = async () => {
+    if (!project) {
+      toast.error("Project not found");
+      return;
+    }
+
+    if (!projectName.trim()) {
+      toast.error("Project name is required");
+      return;
+    }
+
+    if (!/^[A-Za-z]{2,3}$/.test(projectKey.trim())) {
+      toast.error("Project key must be 2 to 3 letters");
+      return;
+    }
+
+    if (!canEditProject) {
+      toast.error("Only workspace owner or admin can edit projects");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const { updateProject } = await import("@/services/project/project.api");
+
+      const response = await updateProject(project.id, {
+        projectKey: projectKey.trim().toUpperCase(),
+        name: projectName.trim(),
+        description: description.trim() || null,
+        memberIds: selectedMemberIds,
+      });
+
+      toast.success(response.message || "Project updated successfully");
+      await onUpdated?.();
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update project");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <ProjectModalShell
+      isOpen={isOpen && Boolean(project)}
+      onClose={onClose}
+      title="Edit Project"
+      subtitle="Update project details and adjust assigned members."
+      footer={
+        <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-5 py-3 text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 rounded-2xl transition-all border border-white/5"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleUpdateProject}
+            disabled={submitting || loadingMembers || !canEditProject}
+            className="w-full sm:w-auto px-5 py-3 text-sm font-bold bg-[#A5D7E8] text-[#0B2447] rounded-2xl shadow-[0_0_20px_rgba(165,215,232,0.2)] hover:shadow-[0_0_25px_rgba(165,215,232,0.3)] hover:bg-white transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {submitting ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      }
+    >
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(24rem,1.1fr)] gap-6 xl:gap-8">
+        <div className="space-y-6">
+          <div className="rounded-[1.75rem] border border-white/6 bg-white/[0.02] p-5 sm:p-6">
+            <div className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Key
+                </label>
+                <input
+                  type="text"
+                  value={projectKey}
+                  onChange={(e) =>
+                    setProjectKey(
+                      e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3)
+                    )
+                  }
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm uppercase tracking-[0.18em] text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#576CBC]/80 mb-2 uppercase tracking-wider">
+                  Description
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={5}
+                  className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {!loadingMembers && !canEditProject && members.length > 0 && (
+            <div className="rounded-2xl border border-amber-300/10 bg-amber-300/5 px-4 py-3 text-sm text-amber-100/80">
+              Only workspace owners and admins can edit projects.
+            </div>
+          )}
+        </div>
+
+        <ProjectMemberPicker
+          members={members}
+          selectedMemberIds={selectedMemberIds}
+          loadingMembers={loadingMembers}
+          onToggleMember={toggleMember}
+        />
+      </div>
+    </ProjectModalShell>
   );
 };

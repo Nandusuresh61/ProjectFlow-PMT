@@ -7,6 +7,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
+import { UserAuthResponseDto } from "@/application/dtos/UserDtos";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(
@@ -15,7 +16,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     private readonly _registerUserUseCase: IRegisterUserUseCase
   ) {}
 
-  async execute(data: VerifyAuthDto) {
+  async execute(data: VerifyAuthDto) :Promise<UserAuthResponseDto>{
     const stored = await this._otpStore.get(data.email);
 
     if (!stored) {

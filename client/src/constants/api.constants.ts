@@ -28,6 +28,11 @@ export const API_ROUTES = {
     MEMBERS: (workspaceId: string) => `/workspace/${workspaceId}/members`,
     SWITCH: (workspaceId: string) => `/workspace/${workspaceId}/switch`,
   },
+  PROJECT: {
+    BASE: "/project",
+    LIST_BY_WORKSPACE: (workspaceId: string) => `/project/workspace/${workspaceId}`,
+    UPDATE: (projectId: string) => `/project/${projectId}`,
+  },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",
   },

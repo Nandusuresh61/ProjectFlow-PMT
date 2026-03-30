@@ -104,6 +104,16 @@ export const AppMessages = {
 
   USER_PROFILE_UPDATED: "Profile Updated Successfull",
 
+  PROJECT_CREATED: "Project created successfully",
+
+  PROJECT_UPDATED: "Project updated successfully",
+
+  PROJECT_NOT_FOUND: "Project not found",
+
+  PROJECT_LIMIT_EXCEEDED: "Projects limit already exceeded",
+
+  INVALID_PROJECT_MEMBERS: "One or more selected project members are not part of this workspace",
+
   CURRENT_PASSWORD_IS_WRONG: "Current password is not matching to the exisiting password",
 
   PASSWORD_CHANGED_SUCCESSFUL: "Password changed ",

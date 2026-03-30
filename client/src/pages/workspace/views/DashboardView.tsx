@@ -130,4 +130,3 @@ export const DashboardView = ({ openInvite }: DashboardViewProps) => {
         </div>
     );
 };
-

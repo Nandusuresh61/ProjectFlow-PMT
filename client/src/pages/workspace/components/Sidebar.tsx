@@ -38,6 +38,7 @@ export interface SidebarProps {
     projects: Project[];
     onSelectProject: (project: Project) => void;
     onCreateProject?: () => void;
+    canCreateProject?: boolean;
     onBackToWorkspace: () => void;
 }
 
@@ -53,6 +54,7 @@ export const Sidebar = ({
     projects,
     onSelectProject,
     onCreateProject,
+    canCreateProject,
     onBackToWorkspace,
 }: SidebarProps) => {
     const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
@@ -106,6 +108,7 @@ export const Sidebar = ({
                             onToggleProjects={() => setIsProjectsExpanded(v => !v)}
                             onSelectProject={onSelectProject}
                             onCreateProject={onCreateProject}
+                            canCreateProject={canCreateProject}
                         />
                     ) : (
                         <ProjectNav
@@ -135,6 +138,7 @@ interface WorkspaceNavProps {
     onToggleProjects: () => void;
     onSelectProject: (project: Project) => void;
     onCreateProject?: () => void;
+    canCreateProject?: boolean;
 }
 
 const WorkspaceNav = ({
@@ -146,6 +150,7 @@ const WorkspaceNav = ({
     onToggleProjects,
     onSelectProject,
     onCreateProject,
+    canCreateProject,
 }: WorkspaceNavProps) => (
     <motion.div
         initial={{ opacity: 0, x: -10 }}
@@ -185,13 +190,15 @@ const WorkspaceNav = ({
                             onClick={() => onSelectProject(project)}
                         />
                     ))}
-                    <button
-                        onClick={onCreateProject}
-                        className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all group text-left text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#A5D7E8]/10 mt-1"
-                    >
-                        <Plus size={14} className="opacity-70 group-hover:opacity-100 flex-shrink-0" />
-                        <span className="text-[13px] font-medium truncate flex-1">Create project</span>
-                    </button>
+                    {canCreateProject && (
+                        <button
+                            onClick={onCreateProject}
+                            className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all group text-left text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#A5D7E8]/10 mt-1"
+                        >
+                            <Plus size={14} className="opacity-70 group-hover:opacity-100 flex-shrink-0" />
+                            <span className="text-[13px] font-medium truncate flex-1">Create project</span>
+                        </button>
+                    )}
                 </CollapsibleProjectList>
             </ExpandableNavItem>
 

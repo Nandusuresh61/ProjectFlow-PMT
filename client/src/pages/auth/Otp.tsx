@@ -85,7 +85,7 @@ export default function Otp() {
       }
 
       await checkAuth();
-      navigate("/home");
+      navigate("/home/dashboard");
     } catch (error: any) {
       toast.error(error.message);
     }

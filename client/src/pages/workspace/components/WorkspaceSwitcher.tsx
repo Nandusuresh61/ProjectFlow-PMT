@@ -87,20 +87,24 @@ export const WorkspaceSwitcher = ({ onOpenCreate, isCollapsed = false }: Workspa
                                </button>
                            ))}
                            
-                           <div className="h-px bg-white/10 my-1 mx-2"></div>
-                           
-                           <button
-                               onClick={() => {
-                                   setIsOpen(false);
-                                   onOpenCreate();
-                               }}
-                               className="w-full flex items-center gap-2 p-2 rounded-lg text-sm text-[#A5D7E8] hover:bg-[#A5D7E8]/10 transition-colors font-medium"
-                           >
-                               <div className="w-6 h-6 rounded bg-[#A5D7E8]/20 flex items-center justify-center">
-                                   <Plus size={14} />
-                               </div>
-                               Create Workspace
-                           </button>
+                           {workspaces.length === 0 && (
+                               <>
+                                   <div className="h-px bg-white/10 my-1 mx-2"></div>
+                                   
+                                   <button
+                                       onClick={() => {
+                                           setIsOpen(false);
+                                           onOpenCreate();
+                                       }}
+                                       className="w-full flex items-center gap-2 p-2 rounded-lg text-sm text-[#A5D7E8] hover:bg-[#A5D7E8]/10 transition-colors font-medium"
+                                   >
+                                       <div className="w-6 h-6 rounded bg-[#A5D7E8]/20 flex items-center justify-center">
+                                           <Plus size={14} />
+                                       </div>
+                                       Create Workspace
+                                   </button>
+                               </>
+                           )}
                         </div>
                     </motion.div>
                 )}

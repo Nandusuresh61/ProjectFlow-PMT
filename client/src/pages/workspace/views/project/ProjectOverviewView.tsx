@@ -1,8 +1,10 @@
-import { FolderKanban, ListTodo, Users, BarChart2, Clock } from 'lucide-react';
+import { FolderKanban, ListTodo, Users, BarChart2, Clock, PencilLine } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 
 interface ProjectOverviewViewProps {
     project: Project;
+    onEditProject: () => void;
+    canEditProject: boolean;
 }
 
 const STATS = [
@@ -31,19 +33,32 @@ const statusStyle: Record<string, string> = {
     'Done': 'bg-emerald-400/10 text-emerald-400',
 };
 
-export const ProjectOverviewView = ({ project }: ProjectOverviewViewProps) => (
+export const ProjectOverviewView = ({ project, onEditProject, canEditProject }: ProjectOverviewViewProps) => (
     <div className="space-y-6">
         {/* Page heading */}
-        <div className="flex items-center gap-3">
-            <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-[#060d1a]"
-                style={{ backgroundColor: project.color }}
-            >
-                {project.key}
-            </div>
-            <div>
-                <h1 className="text-2xl font-black text-white tracking-tight">{project.name}</h1>
-                <p className="text-[#576CBC]/50 text-sm font-medium">Project overview</p>
+        <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+                <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-[#060d1a]"
+                    style={{ backgroundColor: project.color }}
+                >
+                    {project.key}
+                </div>
+                <div>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-black text-white tracking-tight">{project.name}</h1>
+                        {canEditProject && (
+                            <button
+                                onClick={onEditProject}
+                                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-bold uppercase tracking-wider text-[#A5D7E8] hover:bg-white/[0.07] transition-all"
+                            >
+                                <PencilLine size={14} />
+                                Edit Project
+                            </button>
+                        )}
+                    </div>
+                    <p className="text-[#576CBC]/50 text-sm font-medium">Project overview</p>
+                </div>
             </div>
         </div>
 
@@ -55,7 +70,9 @@ export const ProjectOverviewView = ({ project }: ProjectOverviewViewProps) => (
                         <p className="text-xs font-bold text-white/30 uppercase tracking-wider">{label}</p>
                         <Icon size={15} style={{ color }} className="opacity-60" />
                     </div>
-                    <p className="text-3xl font-black text-white">{value}</p>
+                    <p className="text-3xl font-black text-white">
+                        {label === 'Team Members' ? project.memberIds.length : value}
+                    </p>
                 </div>
             ))}
         </div>

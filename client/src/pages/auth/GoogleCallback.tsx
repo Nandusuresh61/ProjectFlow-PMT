@@ -40,7 +40,7 @@ export default function GoogleCallback() {
           await checkAuth();
 
           toast.success("Login successful");
-          navigate("/home");
+          navigate("/home/dashboard");
         } else {
           throw new Error("No user data received");
         }

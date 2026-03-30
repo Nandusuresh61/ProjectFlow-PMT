@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AuthUserState } from '@/store/auth.store';
 import { logoutUser } from '@/services/auth/auth.api';
+import { getMembers } from '@/services/workspace/team.api';
 import { useWorkspaceStore } from '@/store/workspace.store';
+import { getWorkspaceProjects } from '@/services/project/project.api';
 import { BackgroundAtmosphere } from './components/BackgroundAtmosphere';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
@@ -14,7 +16,7 @@ import { TeamView } from './views/TeamView';
 import { SettingsView } from './views/SettingsView';
 import { ChatView } from './views/ChatView';
 import { MeetingsView } from './views/MeetingsView';
-import { InviteModal, CreateWorkspaceModal } from './views/ComplementaryViews';
+import { EditProjectModal, InviteModal, CreateProjectModal, CreateWorkspaceModal } from './views/ComplementaryViews';
 import { ProjectOverviewView } from './views/project/ProjectOverviewView';
 import { ProjectBacklogView } from './views/project/ProjectBacklogView';
 import { ProjectBoardView } from './views/project/ProjectBoardView';
@@ -22,32 +24,32 @@ import { ProjectSprintView } from './views/project/ProjectSprintView';
 import { ProjectSprintPerformanceView } from './views/project/ProjectSprintPerformanceView';
 import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 
-// ─── Mock Projects ─────────────────────────────────────────────────────────────
-const MOCK_PROJECTS: Project[] = [
-    { id: '1', name: 'ProjectFlow PMT', color: '#A5D7E8', key: 'PF' },
-    { id: '2', name: 'Marketing Site', color: '#7C9AC7', key: 'MS' },
-    { id: '3', name: 'Mobile App', color: '#576CBC', key: 'MA' },
-];
+const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
+const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-performance', 'project-team'] as const;
 
-// ─── Content Router ───────────────────────────────────────────────────────────
+const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
+
 interface ContentRouterProps {
     mode: SidebarMode;
     activeTab: string;
     selectedProject: Project | null;
     openInvite: () => void;
+    openEditProject: () => void;
+    canManageProjects: boolean;
 }
 
-const ContentRouter = ({ mode, activeTab, selectedProject, openInvite }: ContentRouterProps) => {
+const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManageProjects }: ContentRouterProps) => {
     if (mode === 'project' && selectedProject) {
         switch (activeTab) {
-            case 'overview': return <ProjectOverviewView project={selectedProject} />;
+            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
             case 'backlogs': return <ProjectBacklogView project={selectedProject} />;
             case 'board': return <ProjectBoardView project={selectedProject} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
             case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} />;
-            default: return <ProjectOverviewView project={selectedProject} />;
+            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
         }
     }
 
@@ -61,34 +63,143 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite }: Content
     }
 };
 
-// ─── WorkspaceHome ────────────────────────────────────────────────────────────
 export default function WorkspaceHome() {
     const navigate = useNavigate();
-    const [sidebarMode, setSidebarMode] = useState<SidebarMode>('workspace');
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const location = useLocation();
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
+    const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
     const [isCreateWorkspaceModalOpen, setIsCreateWorkspaceModalOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [currentWorkspaceRole, setCurrentWorkspaceRole] = useState<WorkspaceRoleEnum | null>(null);
 
     const user = AuthUserState(state => state.user);
     const clearUser = AuthUserState(state => state.clearUser);
-    const { fetchWorkspaces } = useWorkspaceStore();
+    const { fetchWorkspaces, currentWorkspace, workspaces } = useWorkspaceStore();
+
+    const homePath = location.pathname.replace(/^\/home\/?/, '');
+    const pathSegments = homePath ? homePath.split('/').filter(Boolean) : [];
+    const isProjectRoute = pathSegments[0] === 'project' && Boolean(pathSegments[1]);
+    const routeProjectId = isProjectRoute ? pathSegments[1] : null;
+    const projectTabSegment = isProjectRoute ? pathSegments[2] : null;
+    const workspaceTabSegment = !isProjectRoute ? pathSegments[0] : null;
+
+    const sidebarMode: SidebarMode = isProjectRoute ? 'project' : 'workspace';
+    const activeTab = isProjectRoute
+        ? (PROJECT_TABS.includes((projectTabSegment ?? 'overview') as typeof PROJECT_TABS[number])
+            ? (projectTabSegment ?? 'overview')
+            : 'overview')
+        : (WORKSPACE_TABS.includes((workspaceTabSegment ?? 'dashboard') as typeof WORKSPACE_TABS[number])
+            ? (workspaceTabSegment ?? 'dashboard')
+            : 'dashboard');
 
     useEffect(() => { fetchWorkspaces(); }, [fetchWorkspaces]);
 
+    useEffect(() => {
+        if (location.pathname === '/home' || location.pathname === '/home/') {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [location.pathname, navigate]);
+
+    useEffect(() => {
+        const loadCurrentWorkspaceRole = async () => {
+            if (!currentWorkspace?.workspaceId || !user?.userId) {
+                setCurrentWorkspaceRole(null);
+                return;
+            }
+
+            if (currentWorkspace.ownerId === user.userId) {
+                setCurrentWorkspaceRole(WorkspaceRoleEnum.WORKSPACE_OWNER);
+                return;
+            }
+
+            try {
+                const response = await getMembers(currentWorkspace.workspaceId);
+                const currentMember = (response.data ?? []).find(
+                    (member: { userId: string; role: WorkspaceRoleEnum }) => member.userId === user.userId
+                );
+                setCurrentWorkspaceRole(currentMember?.role ?? null);
+            } catch (error) {
+                console.error('Failed to fetch workspace role', error);
+                setCurrentWorkspaceRole(null);
+            }
+        };
+
+        loadCurrentWorkspaceRole();
+    }, [currentWorkspace?.workspaceId, currentWorkspace?.ownerId, user?.userId]);
+
+    const loadProjects = async () => {
+        if (!currentWorkspace?.workspaceId) {
+            setProjects([]);
+            setSelectedProject(null);
+            if (sidebarMode === 'project') {
+                navigate('/home/dashboard', { replace: true });
+            }
+            return;
+        }
+
+        try {
+            const response = await getWorkspaceProjects(currentWorkspace.workspaceId);
+            const mappedProjects = (response.data ?? []).map((project, index) => ({
+                id: project.projectId,
+                name: project.name,
+                color: PROJECT_COLORS[index % PROJECT_COLORS.length],
+                key: project.projectKey,
+                description: project.description,
+                workspaceId: project.workspaceId,
+                createdBy: project.createdBy,
+                memberIds: project.memberIds,
+                status: project.status,
+                createdAt: project.createdAt,
+                updatedAt: project.updatedAt,
+            }));
+            setProjects(mappedProjects);
+        } catch (error) {
+            console.error('Failed to fetch projects', error);
+            setProjects([]);
+        }
+    };
+
+    useEffect(() => {
+        loadProjects();
+    }, [currentWorkspace?.workspaceId, sidebarMode]);
+
+    useEffect(() => {
+        if (!routeProjectId) {
+            setSelectedProject(null);
+            return;
+        }
+
+        const matchedProject = projects.find((project) => project.id === routeProjectId) ?? null;
+        setSelectedProject(matchedProject);
+
+        if (routeProjectId && projects.length > 0 && !matchedProject) {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [routeProjectId, projects, navigate]);
+
+    useEffect(() => {
+        if (isProjectRoute && projectTabSegment && !PROJECT_TABS.includes(projectTabSegment as typeof PROJECT_TABS[number])) {
+            navigate(`/home/project/${routeProjectId}/overview`, { replace: true });
+        }
+
+        if (!isProjectRoute && workspaceTabSegment && !WORKSPACE_TABS.includes(workspaceTabSegment as typeof WORKSPACE_TABS[number])) {
+            navigate('/home/dashboard', { replace: true });
+        }
+    }, [isProjectRoute, projectTabSegment, workspaceTabSegment, navigate, routeProjectId]);
+
     const handleSelectProject = (project: Project) => {
         setSelectedProject(project);
-        setSidebarMode('project');
-        setActiveTab('overview');
+        navigate(`/home/project/${project.id}/overview`);
     };
 
     const handleBackToWorkspace = () => {
-        setSidebarMode('workspace');
         setSelectedProject(null);
-        setActiveTab('dashboard');
+        navigate('/home/dashboard');
     };
 
     const handleTabChange = (tab: string) => {
@@ -97,7 +208,13 @@ export default function WorkspaceHome() {
             setIsMobileSidebarOpen(true);
             return;
         }
-        setActiveTab(tab);
+
+        if (sidebarMode === 'project' && selectedProject) {
+            navigate(`/home/project/${selectedProject.id}/${tab}`);
+            return;
+        }
+
+        navigate(`/home/${tab}`);
     };
 
     const handleLogout = async () => {
@@ -112,6 +229,11 @@ export default function WorkspaceHome() {
         }
     };
 
+    const canManageProjects =
+        Boolean(user?.isSuperAdmin) ||
+        currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_OWNER ||
+        currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+
     return (
         <div className="flex h-screen w-full bg-[#060d1a] font-sans text-white selection:bg-[#A5D7E8]/30 selection:text-white overflow-hidden">
             <BackgroundAtmosphere />
@@ -125,9 +247,10 @@ export default function WorkspaceHome() {
                 isMobileOpen={isMobileSidebarOpen}
                 onCloseMobile={() => setIsMobileSidebarOpen(false)}
                 selectedProject={selectedProject}
-                projects={MOCK_PROJECTS}
+                projects={projects}
                 onSelectProject={handleSelectProject}
-                onCreateProject={() => toast.info('Create Project feature coming soon!')}
+                canCreateProject={canManageProjects}
+                onCreateProject={() => setIsCreateProjectModalOpen(true)}
                 onBackToWorkspace={handleBackToWorkspace}
             />
 
@@ -138,7 +261,13 @@ export default function WorkspaceHome() {
                     selectedProject={selectedProject}
                     user={user}
                     onLogout={handleLogout}
-                    onOpenCreateWorkspace={() => setIsCreateWorkspaceModalOpen(true)}
+                    onOpenCreateWorkspace={() => {
+                        if (workspaces.length > 0) {
+                            toast.error("You already have a workspace. Creating multiple workspaces is disabled.");
+                            return;
+                        }
+                        setIsCreateWorkspaceModalOpen(true);
+                    }}
                     onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
                 />
                 {isLoggingOut && <div className="sr-only">Logging out…</div>}
@@ -158,6 +287,8 @@ export default function WorkspaceHome() {
                                     activeTab={activeTab}
                                     selectedProject={selectedProject}
                                     openInvite={() => setIsInviteModalOpen(true)}
+                                    openEditProject={() => setIsEditProjectModalOpen(true)}
+                                    canManageProjects={canManageProjects}
                                 />
                             </motion.div>
                         </AnimatePresence>
@@ -168,6 +299,17 @@ export default function WorkspaceHome() {
             <MobileNav activeTab={activeTab} onTabChange={handleTabChange} mode={sidebarMode} />
 
             <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
+            <CreateProjectModal
+                isOpen={isCreateProjectModalOpen}
+                onClose={() => setIsCreateProjectModalOpen(false)}
+                onCreated={loadProjects}
+            />
+            <EditProjectModal
+                isOpen={isEditProjectModalOpen}
+                onClose={() => setIsEditProjectModalOpen(false)}
+                project={selectedProject}
+                onUpdated={loadProjects}
+            />
             <CreateWorkspaceModal isOpen={isCreateWorkspaceModalOpen} onClose={() => setIsCreateWorkspaceModalOpen(false)} />
         </div>
     );

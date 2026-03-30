@@ -6,7 +6,9 @@ const envPath = path.resolve(__dirname, "../.env");
 const result = dotenv.config({ path: envPath });
 
 if (result.error) {
-  console.warn(` Warning: Could not load .env file from ${envPath}. Using system environment variables if available.`);
+  console.warn(
+    ` Warning: Could not load .env file from ${envPath}. Using system environment variables if available.`,
+  );
 }
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -17,15 +19,19 @@ if (!parsedEnv.success) {
     const pathName = issue.path.join(".");
     console.error(`   - ${pathName}: ${issue.message} (${issue.code})`);
   });
-  
+
   // Extra help for the user
   const missingVars = parsedEnv.error.issues
-    .filter(i => i.code === "invalid_type" && (i as any).received === "undefined")
-    .map(i => i.path.join("."));
-  
+    .filter(
+      (i) => i.code === "invalid_type" && (i as any).received === "undefined",
+    )
+    .map((i) => i.path.join("."));
+
   if (missingVars.length > 0) {
     console.error(`\n Missing variables: ${missingVars.join(", ")}`);
-    console.error(`Please check your .env file at ${envPath} and ensure these are defined.`);
+    console.error(
+      `Please check your .env file at ${envPath} and ensure these are defined.`,
+    );
   }
 
   process.exit(1);
@@ -39,7 +45,7 @@ export const config = {
 
   ACCESS_TOKEN_SECRET: env.ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET: env.REFRESH_TOKEN_SECRET,
-
+  REFRESH_TOKEN_PATH: env.REFRESH_TOKEN_PATH,
   PORT: Number(env.PORT) || 8080,
 
   ACCESS_TOKEN_EXPIRES_IN: env.ACCESS_TOKEN_EXPIRES_IN,
