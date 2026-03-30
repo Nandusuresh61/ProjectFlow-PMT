@@ -81,7 +81,7 @@ export default function WorkspaceHome() {
 
     const user = AuthUserState(state => state.user);
     const clearUser = AuthUserState(state => state.clearUser);
-    const { fetchWorkspaces, currentWorkspace } = useWorkspaceStore();
+    const { fetchWorkspaces, currentWorkspace, workspaces } = useWorkspaceStore();
 
     const homePath = location.pathname.replace(/^\/home\/?/, '');
     const pathSegments = homePath ? homePath.split('/').filter(Boolean) : [];
@@ -263,7 +263,13 @@ export default function WorkspaceHome() {
                     selectedProject={selectedProject}
                     user={user}
                     onLogout={handleLogout}
-                    onOpenCreateWorkspace={() => setIsCreateWorkspaceModalOpen(true)}
+                    onOpenCreateWorkspace={() => {
+                        if (workspaces.length > 0) {
+                            toast.error("You already have a workspace. Creating multiple workspaces is disabled.");
+                            return;
+                        }
+                        setIsCreateWorkspaceModalOpen(true);
+                    }}
                     onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
                 />
                 {isLoggingOut && <div className="sr-only">Logging out…</div>}
