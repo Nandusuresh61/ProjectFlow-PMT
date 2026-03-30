@@ -31,7 +31,6 @@ const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-perform
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
 
-// ─── Content Router ───────────────────────────────────────────────────────────
 interface ContentRouterProps {
     mode: SidebarMode;
     activeTab: string;
@@ -64,7 +63,6 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
     }
 };
 
-// ─── WorkspaceHome ────────────────────────────────────────────────────────────
 export default function WorkspaceHome() {
     const navigate = useNavigate();
     const location = useLocation();
