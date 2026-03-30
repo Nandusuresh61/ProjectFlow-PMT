@@ -120,4 +120,8 @@ export const AppMessages = {
   
   NO_ACTIVE_PLANS: "No active pricing plans available to assign to the new workspace.",
 
+  WORKSPACE_FETCHED_SUCCESSFULLY: "Workspaces fetched successfully",
+
+  WORKSPACE_STATUS_UPDATED: "Workspace status updated successfully",
+
 } as const;

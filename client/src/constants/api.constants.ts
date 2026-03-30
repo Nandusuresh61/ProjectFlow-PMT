@@ -44,5 +44,8 @@ export const API_ROUTES = {
     GET_USERS: "/super-admin/getusers",
     USER_DETAILS: (userId: string) => `/super-admin/user/${userId}`,
     TOGGLE_BLOCK: (userId: string) => `/super-admin/toggle-block/${userId}`,
+    GET_WORKSPACES: "/super-admin/workspaces",
+    WORKSPACE_DETAILS: (workspaceId: string) => `/super-admin/workspace/${workspaceId}`,
+    TOGGLE_SUSPEND: (workspaceId: string) => `/super-admin/workspace/${workspaceId}/toggle-suspend`,
   },
 } as const;

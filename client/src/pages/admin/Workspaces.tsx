@@ -5,11 +5,11 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
-  Mail,
-  Calendar,
+  Building2,
   ShieldAlert,
   ShieldCheck,
-  Users,
+  User,
+  CreditCard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,6 @@ import { Loader } from "@/components/ui/Loader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,47 +26,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { getAllUsers, getUserDetails, toggleBlockUser } from "@/services/superAdmin/superadmin.api";
-import { UserDetailsModal } from "@/components/admin/UserDetailsModal";
-import type { UserDetails } from "@/types/superadmin.types";
+import { getAllWorkspaces, getWorkspaceDetails, toggleSuspendWorkspace } from "@/services/superAdmin/superadmin.api";
+import { WorkspaceDetailsModal } from "@/components/admin/WorkspaceDetailsModal";
+import type { WorkspaceWithDetails, WorkspaceDetails } from "@/types/superadmin.types";
 import CustomTable, { type TableColumn } from "@/components/table/CustomTable";
-
-interface Workspace {
-  workspaceId: string;
-  name: string;
-  role: string;
-}
-
-interface User {
-  userId: string;
-  fullName: string;
-  email: string;
-  isBlocked: boolean;
-  isSuperAdmin: boolean;
-  profileImage?: string;
-  createdAt: string;
-  workspaces: Workspace[];
-}
-
-const getInitials = (name: string) =>
-  name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .substring(0, 2);
 
 export default function Workspaces() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [users, setUsers] = useState<User[]>([]);
+  const [workspaces, setWorkspaces] = useState<WorkspaceWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalWorkspaces, setTotalWorkspaces] = useState(0);
   const itemsPerPage = 7;
 
   // Modal State
-  const [selectedUserDetails, setSelectedUserDetails] = useState<UserDetails | null>(null);
+  const [selectedWorkspaceDetails, setSelectedWorkspaceDetails] = useState<WorkspaceDetails | null>(null);
   const [isDetailsLoading, setIsDetailsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -80,12 +54,12 @@ export default function Workspaces() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // Fetch users
+  // Fetch workspaces
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchWorkspaces = async () => {
       setLoading(true);
       try {
-        const response = await getAllUsers({
+        const response = await getAllWorkspaces({
           page: currentPage,
           limit: itemsPerPage,
           search: debouncedSearch,
@@ -95,58 +69,60 @@ export default function Workspaces() {
 
         const data = response?.data;
         if (data) {
-          setUsers(data.users || []);
-          setTotalUsers(data.total || 0);
+          setWorkspaces(data.workspaces || []);
+          setTotalWorkspaces(data.total || 0);
         }
       } catch (error) {
-        console.error("Failed to fetch users:", error);
+        console.error("Failed to fetch workspaces:", error);
+        toast.error("Failed to load workspaces");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
+    fetchWorkspaces();
   }, [currentPage, debouncedSearch, itemsPerPage]);
 
-  const totalPages = Math.ceil(totalUsers / itemsPerPage);
+  const totalPages = Math.ceil(totalWorkspaces / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
 
-  const handleViewDetails = async (userId: string) => {
+  const handleViewDetails = async (workspaceId: string) => {
     setIsModalOpen(true);
     setIsDetailsLoading(true);
-    setSelectedUserDetails(null);
+    setSelectedWorkspaceDetails(null);
     try {
-      const response = await getUserDetails(userId);
+      const response = await getWorkspaceDetails(workspaceId);
       if (response?.data) {
-        setSelectedUserDetails(response.data);
+        setSelectedWorkspaceDetails(response.data);
       }
     } catch (error) {
-      console.error("Failed to fetch user details:", error);
+      console.error("Failed to fetch workspace details:", error);
+      toast.error("Failed to load workspace details");
     } finally {
       setIsDetailsLoading(false);
     }
   };
 
-  const handleToggleBlock = async (userId: string) => {
+  const handleToggleSuspend = async (workspaceId: string) => {
     try {
-      const response = await toggleBlockUser(userId);
+      const response = await toggleSuspendWorkspace(workspaceId);
       if (response?.success) {
-        toast.success(response.message || "User block status updated");
+        toast.success(response.message || "Workspace status updated");
         // Update local state
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.userId === userId ? { ...u, isBlocked: !u.isBlocked } : u
+        setWorkspaces((prev) =>
+          prev.map((w) =>
+            w.workspaceId === workspaceId ? { ...w, isSuspended: !w.isSuspended } : w
           )
         );
       }
     } catch (error) {
-      console.error("Failed to toggle block status:", error);
-      toast.error("An error occurred while toggling block status");
+      console.error("Failed to toggle suspension status:", error);
+      toast.error("An error occurred while updating workspace status");
     }
   };
 
   // ── Column definitions ────────────────────────────────────────────────────
-  const columns: TableColumn<User>[] = [
+  const columns: TableColumn<WorkspaceWithDetails>[] = [
     {
       key: "sno",
       header: "S.No",
@@ -155,90 +131,81 @@ export default function Workspaces() {
       render: (_, index) => (currentPage - 1) * itemsPerPage + index + 1,
     },
     {
-      key: "fullName",
-      header: "User",
+      key: "name",
+      header: "Workspace",
       headerClassName: "w-[250px] text-zinc-400 font-semibold",
       cellClassName: "text-zinc-200",
-      render: (user) => (
+      render: (workspace) => (
         <div className="flex items-center gap-3 py-1">
-          <div className="relative group">
-            <Avatar className="h-10 w-10 border border-zinc-800 shadow-lg group-hover:border-green-500/50 transition-colors">
-              {user.profileImage ? (
-                <img src={user.profileImage} alt={user.fullName} className="w-full h-full object-cover" />
-              ) : (
-                <AvatarFallback className="bg-zinc-800 text-green-500 font-bold text-xs uppercase">
-                  {getInitials(user.fullName)}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            {user.isSuperAdmin && (
-              <div className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-zinc-950 flex items-center justify-center">
-                <ShieldCheck className="h-2 w-2 text-white" />
-              </div>
-            )}
+          <div className="h-10 w-10 rounded-xl bg-green-500/10 flex items-center justify-center border border-green-500/20 text-green-500 shadow-sm shadow-green-500/5 group-hover:scale-110 transition-transform">
+            <Building2 className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <span className="font-semibold text-zinc-100 group-hover:text-green-400 transition-colors tracking-tight">
-              {user.fullName}
+            <span className="font-semibold text-zinc-100 group-hover:text-green-400 transition-colors uppercase tracking-tight text-sm">
+              {workspace.name}
             </span>
-            <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-tighter">
-              UID: {user.userId.slice(-6).toUpperCase()}
+            <span className="text-[10px] text-zinc-500 font-medium px-1.5 py-0.5 rounded-full bg-zinc-800/50 w-fit mt-1">
+              ID: {workspace.workspaceId.slice(-6).toUpperCase()}
             </span>
           </div>
         </div>
       ),
     },
     {
-      key: "email",
-      header: "Email Address",
+      key: "ownerName",
+      header: "Owner",
       headerClassName: "text-zinc-400 font-semibold",
-      cellClassName: "text-zinc-400",
-      render: (user) => (
-        <div className="flex items-center gap-2.5 text-sm font-medium">
-          <div className="w-5 h-5 rounded-md bg-zinc-800/50 flex items-center justify-center border border-zinc-800">
-            <Mail className="h-3 w-3 text-zinc-500" />
+      cellClassName: "text-zinc-300",
+      render: (workspace) => (
+        <div className="flex flex-col gap-1 py-1">
+          <div className="flex items-center gap-2 text-sm font-medium text-zinc-200">
+            <div className="w-5 h-5 rounded-full bg-zinc-800 flex items-center justify-center">
+              <User className="h-3 w-3 text-zinc-400" />
+            </div>
+            {workspace.ownerName}
           </div>
-          <span className="hover:text-zinc-200 transition-colors cursor-pointer">{user.email}</span>
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500 ml-[26px]">
+            <span className="truncate max-w-[150px]">{workspace.ownerEmail}</span>
+          </div>
         </div>
       ),
     },
     {
-      key: "isBlocked",
-      header: "Account Status",
+      key: "planName",
+      header: "Plan",
       headerClassName: "text-zinc-400 font-semibold text-center",
       cellClassName: "text-center",
-      render: (user) => (
+      render: (workspace) => (
         <Badge
-          variant={user.isBlocked ? "destructive" : "default"}
-          className={cn(
-            "font-semibold px-2.5 py-1",
-            user.isBlocked
-              ? "bg-red-500/10 text-red-500 border-red-500/20 shadow-sm shadow-red-500/5"
-              : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-sm shadow-emerald-500/5"
-          )}
+          variant="outline"
+          className="font-semibold border-indigo-500/30 text-indigo-400 bg-indigo-500/5 px-2.5 py-1"
         >
-          {user.isBlocked ? (
-            <><ShieldAlert className="h-3 w-3 mr-1.5" /> Blocked</>
-          ) : (
-            <><ShieldCheck className="h-3 w-3 mr-1.5" /> Active Account</>
-          )}
+          <CreditCard className="h-3 w-3 mr-1.5" />
+          {workspace.planName}
         </Badge>
       ),
     },
     {
-      key: "createdAt",
-      header: "Join Date",
-      headerClassName: "text-zinc-400 font-semibold",
-      cellClassName: "text-zinc-500",
-      render: (user) => (
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Calendar className="h-3.5 w-3.5 text-zinc-600" />
-          {new Date(user.createdAt).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          })}
-        </div>
+      key: "isSuspended",
+      header: "Status",
+      headerClassName: "text-zinc-400 font-semibold text-center",
+      cellClassName: "text-center",
+      render: (workspace) => (
+        <Badge
+          variant={workspace.isSuspended ? "destructive" : "default"}
+          className={cn(
+            "font-semibold px-2.5 py-1",
+            workspace.isSuspended
+              ? "bg-red-500/10 text-red-500 border-red-500/20"
+              : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+          )}
+        >
+          {workspace.isSuspended ? (
+            <><ShieldAlert className="h-3 w-3 mr-1.5" /> Suspended</>
+          ) : (
+            <><ShieldCheck className="h-3 w-3 mr-1.5" /> Active</>
+          )}
+        </Badge>
       ),
     },
     {
@@ -246,7 +213,7 @@ export default function Workspaces() {
       header: "Actions",
       headerClassName: "text-right text-zinc-400",
       cellClassName: "text-right",
-      render: (user) => (
+      render: (workspace) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -263,23 +230,21 @@ export default function Workspaces() {
           >
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              className="focus:bg-zinc-800 focus:text-white"
+              className="focus:bg-zinc-800 focus:text-white cursor-pointer"
               onSelect={() => {
-                setTimeout(() => handleViewDetails(user.userId), 100);
+                setTimeout(() => handleViewDetails(workspace.workspaceId), 100);
               }}
             >
               View details
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-zinc-800" />
-            {!user.isSuperAdmin && (
-              <DropdownMenuItem
-                className={`${user.isBlocked ? "text-green-500 focus:bg-green-500/10 focus:text-green-400" : "text-red-500 focus:bg-red-500/10 focus:text-red-400"
-                  } cursor-pointer`}
-                onSelect={() => handleToggleBlock(user.userId)}
-              >
-                {user.isBlocked ? "Unblock user" : "Block user"}
-              </DropdownMenuItem>
-            )}
+            <DropdownMenuItem
+              className={`${workspace.isSuspended ? "text-emerald-500 focus:bg-emerald-500/10 focus:text-emerald-400" : "text-red-500 focus:bg-red-500/10 focus:text-red-400"
+                } cursor-pointer`}
+              onSelect={() => handleToggleSuspend(workspace.workspaceId)}
+            >
+              {workspace.isSuspended ? "Unsuspend Workspace" : "Suspend Workspace"}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -291,14 +256,14 @@ export default function Workspaces() {
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-2">
       <div className="space-y-1">
         <h1 className="text-3xl font-extrabold tracking-tight text-white bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">
-          User Management
+          Workspaces
         </h1>
-        <p className="text-zinc-500 text-sm font-medium">Overseeing {totalUsers} registered users and their activities.</p>
+        <p className="text-zinc-500 text-sm font-medium">Monitoring {totalWorkspaces} active organizations and workspaces.</p>
       </div>
       <div className="relative w-full sm:w-auto overflow-hidden rounded-xl shadow-2xl shadow-green-500/5">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
         <Input
-          placeholder="Search by name, email or ID..."
+          placeholder="Filter workspaces by name or owner..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-4 py-6 w-full sm:w-80 bg-zinc-900/50 border-zinc-800 text-zinc-200 focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 backdrop-blur-sm transition-all placeholder:text-zinc-600 font-medium"
@@ -313,13 +278,13 @@ export default function Workspaces() {
       <div className="text-sm text-zinc-500 font-medium">
         Showing{" "}
         <span className="text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded-md mx-0.5">
-          {totalUsers > 0 ? startIndex + 1 : 0}
+          {totalWorkspaces > 0 ? startIndex + 1 : 0}
         </span>{" "}
         to{" "}
         <span className="text-zinc-300 bg-zinc-800 px-2 py-0.5 rounded-md mx-0.5">
-          {Math.min(startIndex + itemsPerPage, totalUsers)}
+          {Math.min(startIndex + itemsPerPage, totalWorkspaces)}
         </span>{" "}
-        of <span className="text-zinc-200 font-bold ml-1">{totalUsers}</span> accounts
+        of <span className="text-zinc-200 font-bold ml-1">{totalWorkspaces}</span> records
       </div>
       <div className="flex items-center gap-3">
         <Button
@@ -356,20 +321,20 @@ export default function Workspaces() {
       transition={{ duration: 0.3 }}
       className="space-y-6 text-zinc-100"
     >
-      <CustomTable<User>
+      <CustomTable<WorkspaceWithDetails>
         columns={columns}
-        data={users}
-        rowKey={(user) => user.userId}
+        data={workspaces}
+        rowKey={(w) => w.workspaceId}
         isLoading={loading}
         skeletonRows={itemsPerPage}
         emptyState={
           <div className="h-48 flex flex-col items-center justify-center text-zinc-500 gap-4 bg-zinc-950/20 rounded-xl border border-dashed border-zinc-800">
             <div className="h-16 w-16 rounded-full bg-zinc-900 flex items-center justify-center border border-zinc-800 shadow-inner shadow-black/50">
-              <Users className="h-8 w-8 text-zinc-700" />
+              <Building2 className="h-8 w-8 text-zinc-700" />
             </div>
             <div className="text-center">
               <p className="text-zinc-400 font-semibold uppercase tracking-widest text-xs">No Results</p>
-              <p className="text-zinc-600 text-sm mt-1">No users found matching your search criteria.</p>
+              <p className="text-zinc-600 text-sm mt-1">No workspaces found matching your search criteria.</p>
             </div>
           </div>
         }
@@ -377,19 +342,17 @@ export default function Workspaces() {
         className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 shadow-2xl shadow-black/40 p-4 md:p-6 backdrop-blur-xl"
         toolbar={toolbar}
         footer={footer}
-        // Pagination is server-side — handled via the footer slot above
         paginate={false}
       />
 
-      <UserDetailsModal
+      <WorkspaceDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        user={selectedUserDetails}
+        workspace={selectedWorkspaceDetails}
         loading={isDetailsLoading}
       />
 
-      {/* Loading overlay kept for screen reader accessibility */}
-      {loading && <span className="sr-only"><Loader text="Loading users..." /></span>}
+      {loading && <span className="sr-only"><Loader text="Loading workspaces..." /></span>}
     </motion.div>
   );
 }

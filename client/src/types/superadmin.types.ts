@@ -9,6 +9,7 @@ export interface UserWithWorkspaces {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  isSuperAdmin: boolean;
   createdAt: string;
   workspaces: Workspace[];
 }
@@ -43,7 +44,37 @@ export interface UserDetails {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  isSuperAdmin: boolean;
   profileImage?: string;
   createdAt: string;
   workspaces: UserWorkspaceDetails[];
+}
+export interface WorkspaceDetails {
+  workspaceId: string;
+  name: string;
+  ownerName: string;
+  ownerEmail: string;
+  planName: string;
+  planExpireDate: string | null;
+  projectCount: number;
+  memberCount: number;
+  isSuspended: boolean;
+}
+
+export interface WorkspaceWithDetails {
+  workspaceId: string;
+  name: string;
+  ownerName: string;
+  ownerEmail: string;
+  planName: string;
+  isSuspended: boolean;
+  createdAt: string;
+}
+
+export interface PaginatedWorkspaces {
+  workspaces: WorkspaceWithDetails[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
