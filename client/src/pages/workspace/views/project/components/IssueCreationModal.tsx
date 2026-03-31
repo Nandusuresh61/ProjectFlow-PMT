@@ -1,62 +1,24 @@
 import React, { useCallback, useReducer, useEffect, useState } from "react";
-import { z } from "zod";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Plus, X, BookOpen, CheckSquare, Bug } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { issueFormSchema } from "@/shared/schema/issue/issue.schema";
+import type { FormState, FormAction, FormValues } from "@/shared/types/issue.types";
 
-// 1. Zod Schema
-const issueFormSchema = z.object({
-    title: z.string().min(1, "Title is required"),
-    description: z.string().optional(),
-    type: z.enum(["Story", "Task", "Bug"]),
-    status: z.enum(["BACKLOG", "TODO", "IN_PROGRESS", "DONE"]),
-    priority: z.enum(["Low", "Medium", "High"]),
-    size: z.enum(["XS", "S", "M", "L", "XL", ""]).optional(),
-    assignee: z.string().optional(),
-    sprint: z.string().optional(),
-    subtasks: z.array(z.object({
-        id: z.string(),
-        title: z.string().min(1, "Subtask title is required"),
-        completed: z.boolean().default(false)
-    })).optional()
-}).superRefine((data, ctx) => {
-    if (data.type === "Story" && !data.size) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Size is required for story type",
-            path: ["size"],
-        });
-    }
-});
-
-type FormValues = {
-    title: string;
-    description: string;
-    type: "Story" | "Task" | "Bug";
-    status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "DONE";
-    priority: "Low" | "Medium" | "High";
-    size: "XS" | "S" | "M" | "L" | "XL" | "";
-    assignee: string;
-    sprint: string;
-    subtasks: { id: string; title: string; completed: boolean }[];
+const initialValues: FormValues = {
+    title: "",
+    description: "",
+    type: "Story",
+    status: "BACKLOG",
+    priority: "Medium",
+    size: "",
+    assignee: "",
+    sprint: "Backlog",
+    subtasks: []
 };
-
-type FormState = {
-    values: FormValues;
-    errors: Partial<Record<keyof FormValues | string, string>>;
-    touched: Partial<Record<keyof FormValues | string, boolean>>;
-    isSubmitting: boolean;
-};
-
-type FormAction =
-    | { type: "SET_VALUE"; field: string; value: any }
-    | { type: "SET_ERRORS"; errors: Partial<Record<string, string>> }
-    | { type: "TOUCH"; field: string }
-    | { type: "SET_SUBMITTING"; isSubmitting: boolean }
-    | { type: "RESET"; values: FormValues };
 
 function formReducer(state: FormState, action: FormAction): FormState {
     switch (action.type) {
@@ -78,18 +40,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
             return state;
     }
 }
-
-const initialValues: FormValues = {
-    title: "",
-    description: "",
-    type: "Story",
-    status: "BACKLOG",
-    priority: "Medium",
-    size: "",
-    assignee: "",
-    sprint: "Backlog",
-    subtasks: []
-};
 
 // Map size to Tailwind classes styles
 const sizeColors = {
@@ -134,7 +84,7 @@ export function IssueCreationModal({
         errors: {},
         touched: {},
         isSubmitting: false,
-    });
+    } as FormState);
 
     // Reset or populate when opened
     useEffect(() => {
@@ -194,7 +144,7 @@ export function IssueCreationModal({
         const result = issueFormSchema.safeParse(state.values);
         if (!result.success) {
             const errorMap: Record<string, string> = {};
-            result.error.issues.forEach(issue => {
+            result.error.issues.forEach((issue: any) => {
                 const key = issue.path.join(".");
                 if (!errorMap[key]) {
                     errorMap[key] = issue.message;
