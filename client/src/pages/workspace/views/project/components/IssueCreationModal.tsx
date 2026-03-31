@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useEffect } from "react";
+import React, { useCallback, useReducer, useEffect, useState } from "react";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -97,7 +97,23 @@ const sizeColors = {
     "XL": "bg-red-100 text-red-800"
 };
 
-export function IssueCreationModal({ open, onOpenChange, projectKey = "PF-NEW" }: { open: boolean, onOpenChange: (open: boolean) => void, projectKey?: string }) {
+import { createIssue } from "@/services/issue/issue.api";
+import { toast } from "sonner";
+import { getMembers } from "@/services/workspace/team.api";
+
+export function IssueCreationModal({ open, onOpenChange, project }: { open: boolean, onOpenChange: (open: boolean) => void, project?: { key: string, id: string, workspaceId: string, memberIds: string[] } }) {
+    const [members, setMembers] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (open && project?.workspaceId) {
+            getMembers(project.workspaceId).then(res => {
+                if (res?.data) {
+                    setMembers(res.data.filter((m: any) => project.memberIds?.includes(m.userId)));
+                }
+            }).catch(err => console.error("Failed to load members", err));
+        }
+    }, [open, project]);
+
     const [state, dispatch] = useReducer(formReducer, {
         values: initialValues,
         errors: {},
@@ -161,11 +177,33 @@ export function IssueCreationModal({ open, onOpenChange, projectKey = "PF-NEW" }
 
         dispatch({ type: "SET_SUBMITTING", isSubmitting: true });
         
-        // Mock save
-        setTimeout(() => {
-            dispatch({ type: "SET_SUBMITTING", isSubmitting: false });
+        try {
+            if (!project) {
+                toast.error("Project context is missing");
+                return;
+            }
+
+            const response = await createIssue({
+                title: state.values.title,
+                description: state.values.description,
+                type: state.values.type.toUpperCase() as "STORY" | "TASK" | "BUG",
+                priority: state.values.priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH",
+                sizeLabel: state.values.size || null,
+                assigneeId: state.values.assignee || null,
+                sprintId: state.values.sprint === "Backlog" ? null : state.values.sprint,
+                projectId: project.id,
+                workspaceId: project.workspaceId,
+                subtasks: state.values.subtasks,
+            });
+
+            toast.success(response.message || "Issue created successfully");
             onOpenChange(false);
-        }, 1000);
+            dispatch({ type: "RESET", values: initialValues });
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create issue");
+        } finally {
+            dispatch({ type: "SET_SUBMITTING", isSubmitting: false });
+        }
     }, [state.values, onOpenChange]);
 
     // Keyboard shortcut (Cmd/Ctrl + Enter)
@@ -188,7 +226,7 @@ export function IssueCreationModal({ open, onOpenChange, projectKey = "PF-NEW" }
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-[#19376D] flex items-center justify-between bg-[#19376D]/10">
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono bg-[#19376D] text-[#A5D7E8] px-2 py-1 rounded">{projectKey}</span>
+                        <span className="text-xs font-mono bg-[#19376D] text-[#A5D7E8] px-2 py-1 rounded">{project?.key || "PF"}</span>
                         <DialogTitle className="text-lg font-bold">Create New Issue</DialogTitle>
                     </div>
                 </div>
@@ -332,9 +370,11 @@ export function IssueCreationModal({ open, onOpenChange, projectKey = "PF-NEW" }
                                 className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
                             >
                                 <option value="" className="bg-[#0b1b36] text-white">Unassigned</option>
-                                <option value="Alex" className="bg-[#0b1b36] text-white">Alex</option>
-                                <option value="Sarah" className="bg-[#0b1b36] text-white">Sarah</option>
-                                <option value="John" className="bg-[#0b1b36] text-white">John</option>
+                                {members.map((member: any) => (
+                                    <option key={member.userId} value={member.userId} className="bg-[#0b1b36] text-white">
+                                        {member.fullName}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 

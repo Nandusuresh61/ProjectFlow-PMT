@@ -93,11 +93,10 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 </div>
             </div>
 
-            {/* Add Issue Modal */}
             <IssueCreationModal 
                 open={isModalOpen} 
                 onOpenChange={setIsModalOpen} 
-                projectKey="PF-NEW" // Temporary mock key until server integration
+                project={project}
             />
         </div>
     );
