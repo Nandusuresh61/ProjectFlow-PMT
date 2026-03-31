@@ -78,6 +78,32 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       );
     }
 
+    const existingName = await this._projectRepo.findByNameAndWorkspace(
+      data.name.trim(),
+      data.workspaceId
+    );
+
+    if (existingName) {
+      throw new AppError(
+        ErrorCode.ALREADY_EXISTS,
+        AppMessages.PROJECT_NAME_ALREADY_EXISTS,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const existingKey = await this._projectRepo.findByKeyAndWorkspace(
+      data.projectKey.trim(),
+      data.workspaceId
+    );
+
+    if (existingKey) {
+      throw new AppError(
+        ErrorCode.ALREADY_EXISTS,
+        AppMessages.PROJECT_KEY_ALREADY_EXISTS,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
     const workspaceMembers = await this._membershipRepo.findByWorkspace(
       data.workspaceId
     );

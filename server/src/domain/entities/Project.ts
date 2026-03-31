@@ -10,6 +10,7 @@ export class Project {
     public createdBy: string,
     public memberIds: string[],
     public status: ProjectStatus,
+    public issueSequence: number,
     public createdAt: Date,
     public updatedAt: Date
   ) {}

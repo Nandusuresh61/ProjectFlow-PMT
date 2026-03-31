@@ -57,6 +57,7 @@ export interface UserWithWorkspacesDTO {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  isSuperAdmin: boolean;
   profileImage?: string;
   createdAt: Date;
   workspaces: {
@@ -96,6 +97,7 @@ export interface UserDetailsDto {
   fullName: string;
   email: string;
   isBlocked: boolean;
+  isSuperAdmin: boolean;
   profileImage?: string;
   createdAt: Date;
   workspaces: UserWorkspaceDetails[];

@@ -33,6 +33,11 @@ export const API_ROUTES = {
     LIST_BY_WORKSPACE: (workspaceId: string) => `/project/workspace/${workspaceId}`,
     UPDATE: (projectId: string) => `/project/${projectId}`,
   },
+  ISSUE: {
+    CREATE: "/issue",
+    LIST_BY_PROJECT: (projectId: string) => `/issue/project/${projectId}`,
+    UPDATE: (issueId: string) => `/issue/${issueId}`,
+  },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",
   },
@@ -44,5 +49,8 @@ export const API_ROUTES = {
     GET_USERS: "/super-admin/getusers",
     USER_DETAILS: (userId: string) => `/super-admin/user/${userId}`,
     TOGGLE_BLOCK: (userId: string) => `/super-admin/toggle-block/${userId}`,
+    GET_WORKSPACES: "/super-admin/workspaces",
+    WORKSPACE_DETAILS: (workspaceId: string) => `/super-admin/workspace/${workspaceId}`,
+    TOGGLE_SUSPEND: (workspaceId: string) => `/super-admin/workspace/${workspaceId}/toggle-suspend`,
   },
 } as const;

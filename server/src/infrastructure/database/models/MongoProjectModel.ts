@@ -9,6 +9,7 @@ export interface ProjectDocument extends Document {
   createdBy: string;
   memberIds: string[];
   status: "ACTIVE" | "ARCHIVED";
+  issueSequence: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +31,11 @@ const ProjectSchema = new Schema<ProjectDocument>(
       type: String,
       enum: ["ACTIVE", "ARCHIVED"],
       default: "ACTIVE",
+      required: true,
+    },
+    issueSequence: {
+      type: Number,
+      default: 1,
       required: true,
     },
   },

@@ -5,8 +5,10 @@ export const UpdateProjectSchema = z
     projectKey: z
       .string()
       .trim()
-      .regex(/^[A-Za-z]{2,3}$/, "Project key must be 2 to 3 letters")
-      .transform((value) => value.toUpperCase())
+      .min(2, "Project key must be at least 2 characters")
+      .max(5, "Project key cannot exceed 5 characters")
+      .regex(/^[A-Za-z0-9]+$/, "Project key must be alphanumeric")
+      .transform((val) => val.toUpperCase())
       .optional(),
     name: z
       .string()

@@ -19,8 +19,9 @@ export class WorkspaceController {
 
   getMembers = asyncHandler(async (req: Request, res: Response) => {
     const { workspaceId } = req.params;
+    const search = req.query.search as string || "";
 
-    const members = await this._getMembersUseCase.execute(workspaceId);
+    const members = await this._getMembersUseCase.execute(workspaceId, search);
     console.log(members)
 
     res

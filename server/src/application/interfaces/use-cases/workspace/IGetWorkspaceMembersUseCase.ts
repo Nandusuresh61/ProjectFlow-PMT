@@ -1,6 +1,7 @@
 export interface IGetWorkspaceMembersUseCase {
   execute(
     workspaceId: string,
+    search?: string,
   ): Promise<
     {
       userId: string;

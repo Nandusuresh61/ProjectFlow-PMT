@@ -145,6 +145,7 @@ export class MongoUserRepository
       fullName: user.fullName,
       email: user.email,
       isBlocked: user.isBlocked,
+      isSuperAdmin: user.isSuperAdmin,
       profileImage: user.profileImage,
       createdAt: user.createdAt,
       workspaces: user.memberships.map((membership: { workspaceId: string, role: string }) => {
@@ -242,6 +243,7 @@ export class MongoUserRepository
           fullName: { $first: "$fullName" },
           email: { $first: "$email" },
           isBlocked: { $first: "$isBlocked" },
+          isSuperAdmin: { $first: "$isSuperAdmin" },
           profileImage: { $first: "$profileImage" },
           createdAt: { $first: "$createdAt" },
           workspaces: {
@@ -269,6 +271,7 @@ export class MongoUserRepository
         fullName: user.fullName,
         email: user.email,
         isBlocked: user.isBlocked,
+        isSuperAdmin: user.isSuperAdmin,
         profileImage: user.profileImage,
         createdAt: user.createdAt,
         workspaces: [],

@@ -14,4 +14,5 @@ export interface ITokenPayload {
   email: string;
   isSuperAdmin: boolean;
   isBlocked: boolean;
+  currentWorkspaceId?: string;
 }

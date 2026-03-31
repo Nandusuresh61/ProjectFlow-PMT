@@ -120,4 +120,10 @@ export const AppMessages = {
   
   NO_ACTIVE_PLANS: "No active pricing plans available to assign to the new workspace.",
 
+  WORKSPACE_FETCHED_SUCCESSFULLY: "Workspaces fetched successfully",
+
+  WORKSPACE_STATUS_UPDATED: "Workspace status updated successfully",
+  PROJECT_NAME_ALREADY_EXISTS: "A project with this name already exists in the workspace",
+  PROJECT_KEY_ALREADY_EXISTS: "A project with this key already exists in the workspace",
+  ISSUE_CREATED_SUCCESS: "Issue Created",
 } as const;

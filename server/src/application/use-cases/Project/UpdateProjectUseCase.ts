@@ -91,11 +91,39 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
     }
 
     if (typeof data.name === "string") {
-      project.name = data.name.trim();
+      const trimmedName = data.name.trim();
+      if (trimmedName !== project.name) {
+        const existingName = await this._projectRepo.findByNameAndWorkspace(
+          trimmedName,
+          project.workspaceId
+        );
+        if (existingName && existingName.projectId !== project.projectId) {
+          throw new AppError(
+            ErrorCode.ALREADY_EXISTS,
+            AppMessages.PROJECT_NAME_ALREADY_EXISTS,
+            HttpStatusCode.BAD_REQUEST
+          );
+        }
+      }
+      project.name = trimmedName;
     }
 
     if (typeof data.projectKey === "string") {
-      project.projectKey = data.projectKey.trim().toUpperCase();
+      const normalizedKey = data.projectKey.trim().toUpperCase();
+      if (normalizedKey !== project.projectKey) {
+        const existingKey = await this._projectRepo.findByKeyAndWorkspace(
+          normalizedKey,
+          project.workspaceId
+        );
+        if (existingKey && existingKey.projectId !== project.projectId) {
+          throw new AppError(
+            ErrorCode.ALREADY_EXISTS,
+            AppMessages.PROJECT_KEY_ALREADY_EXISTS,
+            HttpStatusCode.BAD_REQUEST
+          );
+        }
+      }
+      project.projectKey = normalizedKey;
     }
 
     if (data.description !== undefined) {

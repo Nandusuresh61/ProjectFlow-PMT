@@ -8,7 +8,7 @@ export class GetWorkspaceMembersUseCase implements IGetWorkspaceMembersUseCase {
     private readonly _userRepo: IUserRepository,
   ) { }
 
-  async execute(workspaceId: string) {
+  async execute(workspaceId: string, search?: string) {
     const memberships = await this._membershipRepo.findByWorkspace(workspaceId);
 
     const members = await Promise.all(
@@ -31,6 +31,17 @@ export class GetWorkspaceMembersUseCase implements IGetWorkspaceMembersUseCase {
         }
       }),
     );
-    return members.filter((m): m is NonNullable<typeof m> => m !== null);
+    
+    let validMembers = members.filter((m): m is NonNullable<typeof m> => m !== null);
+    
+    if (search) {
+      const lowerSearch = search.toLowerCase();
+      validMembers = validMembers.filter(m => 
+        m.fullName.toLowerCase().includes(lowerSearch) || 
+        m.email.toLowerCase().includes(lowerSearch)
+      );
+    }
+    
+    return validMembers;
   }
 }

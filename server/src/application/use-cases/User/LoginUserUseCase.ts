@@ -57,6 +57,7 @@ export class LoginUserUseCase {
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
       isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -65,6 +66,7 @@ export class LoginUserUseCase {
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
       isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {
