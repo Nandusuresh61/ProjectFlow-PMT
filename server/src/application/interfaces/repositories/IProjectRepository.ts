@@ -5,5 +5,13 @@ export interface IProjectRepository {
   countByWorkspaceId(workspaceId: string): Promise<number>;
   findByWorkspaceId(workspaceId: string): Promise<Project[]>;
   findById(projectId: string): Promise<Project | null>;
+  findByNameAndWorkspace(
+    name: string,
+    workspaceId: string
+  ): Promise<Project | null>;
+  findByKeyAndWorkspace(
+    key: string,
+    workspaceId: string
+  ): Promise<Project | null>;
   update(project: Project): Promise<Project>;
 }

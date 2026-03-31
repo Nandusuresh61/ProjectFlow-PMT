@@ -123,5 +123,7 @@ export const AppMessages = {
   WORKSPACE_FETCHED_SUCCESSFULLY: "Workspaces fetched successfully",
 
   WORKSPACE_STATUS_UPDATED: "Workspace status updated successfully",
+  PROJECT_NAME_ALREADY_EXISTS: "A project with this name already exists in the workspace",
+  PROJECT_KEY_ALREADY_EXISTS: "A project with this key already exists in the workspace",
 
 } as const;

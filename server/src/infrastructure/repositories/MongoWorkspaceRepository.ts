@@ -15,10 +15,10 @@ export class WorkspaceRepository extends MongoBaseRepository<Workspace, Workspac
       doc.name,
       doc.ownerId,
       doc.planId,
-      doc.isSuspended,
-      doc.planExpireDate,
       doc.createdAt,
       doc.updatedAt,
+      doc.isSuspended,
+      doc.planExpireDate,
     );
   }
 

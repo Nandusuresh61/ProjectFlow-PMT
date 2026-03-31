@@ -53,6 +53,26 @@ export class MongoProjectRepository
   async findById(projectId: string): Promise<Project | null> {
     return this.findOne({ projectId });
   }
+  
+  async findByNameAndWorkspace(
+    name: string,
+    workspaceId: string
+  ): Promise<Project | null> {
+    return this.findOne({ 
+      name: { $regex: new RegExp(`^${name}$`, "i") }, 
+      workspaceId 
+    });
+  }
+
+  async findByKeyAndWorkspace(
+    projectKey: string,
+    workspaceId: string
+  ): Promise<Project | null> {
+    return this.findOne({ 
+      projectKey: projectKey.toUpperCase(), 
+      workspaceId 
+    });
+  }
 
   async update(project: Project): Promise<Project> {
     const updatedProject = await this.updateOne(

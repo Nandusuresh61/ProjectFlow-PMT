@@ -1,7 +1,8 @@
 export enum ErrorCode {
     AUTH = "Authentication Error",
     PLAN = "Plan Error",
-    CONFLICT = "Conflit",
+    CONFLICT = "Conflict",
+    ALREADY_EXISTS = "Already Exists",
     ONBOARDING = "Onboarding Error",
     EMAIL_SEND_FAILED = "Email send failed!",
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
