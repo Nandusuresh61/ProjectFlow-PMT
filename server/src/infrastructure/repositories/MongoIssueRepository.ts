@@ -48,6 +48,12 @@ export class MongoIssueRepository implements IIssueRepository {
     };
   }
 
+  async findById(issueId: string): Promise<Issue | null> {
+    const doc = await IssueModel.findOne({ issueId }).lean();
+    if (!doc) return null;
+    return this.toDomain(doc);
+  }
+
   async update(issueId: string, data: Partial<Issue>): Promise<Issue | null> {
     const updated = await IssueModel.findOneAndUpdate(
       { issueId },

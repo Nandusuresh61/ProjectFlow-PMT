@@ -52,6 +52,13 @@ export class MongoProjectRepository
     return this.find({ workspaceId });
   }
 
+  async findByWorkspaceIdAndMemberId(
+    workspaceId: string,
+    memberId: string
+  ): Promise<Project[]> {
+    return this.find({ workspaceId, memberIds: memberId });
+  }
+
   async findById(projectId: string): Promise<Project | null> {
     return this.findOne({ projectId });
   }

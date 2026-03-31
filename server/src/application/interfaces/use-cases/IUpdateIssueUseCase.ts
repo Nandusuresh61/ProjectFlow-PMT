@@ -2,5 +2,5 @@ import { UpdateIssueDto } from "@/application/dtos/IssueDto";
 import { Issue } from "@/domain/entities/Issue";
 
 export interface IUpdateIssueUseCase {
-  execute(issueId: string, data: UpdateIssueDto): Promise<Issue>;
+  execute(userId: string, issueId: string, data: UpdateIssueDto): Promise<Issue>;
 }
