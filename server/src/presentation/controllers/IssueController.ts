@@ -11,11 +11,14 @@ import { CreateIssueSchema } from "@/shared/schema/issue/CreateIssueSchema";
 import { CreateIssueDto } from "@/application/dtos/IssueDto";
 
 import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/IGetIssuesByProjectUseCase";
+import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/IUpdateIssueUseCase";
+import { UpdateIssueSchema } from "@/shared/schema/issue/UpdateIssueSchema";
 
 export class IssueController {
   constructor(
     private readonly _createIssueUseCase: ICreateIssueUseCase,
-    private readonly _getIssuesByProjectUseCase: IGetIssuesByProjectUseCase
+    private readonly _getIssuesByProjectUseCase: IGetIssuesByProjectUseCase,
+    private readonly _updateIssueUseCase: IUpdateIssueUseCase
   ) {}
 
   createIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -59,5 +62,33 @@ export class IssueController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success("Issues retrieved successfully", issues));
+  });
+
+  updateIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { issueId } = req.params;
+
+    if (!issueId) {
+      throw new AppError(
+        ErrorCode.INVALID_OPERATION,
+        "Issue ID is required",
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const result = UpdateIssueSchema.safeParse(req.body);
+
+    if (!result.success) {
+      throw new AppError(
+        ErrorCode.INVALID_OPERATION,
+        "Invalid issue data: " + result.error.issues.map(e => e.message).join(", "),
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const updatedIssue = await this._updateIssueUseCase.execute(issueId, result.data as any);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success("Issue updated successfully", updatedIssue));
   });
 }

@@ -12,6 +12,7 @@ const issueFormSchema = z.object({
     title: z.string().min(1, "Title is required"),
     description: z.string().optional(),
     type: z.enum(["Story", "Task", "Bug"]),
+    status: z.enum(["BACKLOG", "TODO", "IN_PROGRESS", "DONE"]),
     priority: z.enum(["Low", "Medium", "High"]),
     size: z.enum(["XS", "S", "M", "L", "XL", ""]).optional(),
     assignee: z.string().optional(),
@@ -35,6 +36,7 @@ type FormValues = {
     title: string;
     description: string;
     type: "Story" | "Task" | "Bug";
+    status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "DONE";
     priority: "Low" | "Medium" | "High";
     size: "XS" | "S" | "M" | "L" | "XL" | "";
     assignee: string;
@@ -81,6 +83,7 @@ const initialValues: FormValues = {
     title: "",
     description: "",
     type: "Story",
+    status: "BACKLOG",
     priority: "Medium",
     size: "",
     assignee: "",
@@ -97,11 +100,23 @@ const sizeColors = {
     "XL": "bg-red-100 text-red-800"
 };
 
-import { createIssue } from "@/services/issue/issue.api";
+import { createIssue, updateIssue } from "@/services/issue/issue.api";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
 
-export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: { open: boolean, onOpenChange: (open: boolean) => void, project?: { key: string, id: string, workspaceId: string, memberIds: string[] }, onSuccess?: () => void }) {
+export function IssueCreationModal({ 
+    open, 
+    onOpenChange, 
+    project, 
+    onSuccess,
+    editIssue 
+}: { 
+    open: boolean, 
+    onOpenChange: (open: boolean) => void, 
+    project?: { key: string, id: string, workspaceId: string, memberIds: string[] }, 
+    onSuccess?: () => void,
+    editIssue?: any 
+}) {
     const [members, setMembers] = useState<any[]>([]);
 
     useEffect(() => {
@@ -121,12 +136,26 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
         isSubmitting: false,
     });
 
-    // Reset when opened
+    // Reset or populate when opened
     useEffect(() => {
         if (open) {
-            dispatch({ type: "RESET", values: initialValues });
+            if (editIssue) {
+                dispatch({ type: "RESET", values: {
+                    title: editIssue.title || "",
+                    description: editIssue.description || "",
+                    type: editIssue.type === "STORY" ? "Story" : editIssue.type === "BUG" ? "Bug" : "Task",
+                    status: editIssue.status || "BACKLOG",
+                    priority: editIssue.priority === "HIGH" ? "High" : editIssue.priority === "LOW" ? "Low" : "Medium",
+                    size: editIssue.sizeLabel || "",
+                    assignee: editIssue.assigneeId || "",
+                    sprint: editIssue.sprintId || "Backlog",
+                    subtasks: editIssue.subtasks ? [...editIssue.subtasks] : []
+                } });
+            } else {
+                dispatch({ type: "RESET", values: initialValues });
+            }
         }
-    }, [open]);
+    }, [open, editIssue]);
 
     const handleChange = useCallback((field: string, value: any) => {
         dispatch({ type: "SET_VALUE", field, value });
@@ -159,7 +188,7 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
         if (e) e.preventDefault();
 
         // Touch all fields
-        const allFields = ["title", "description", "type", "priority", "size", "assignee", "sprint"];
+        const allFields = ["title", "description", "type", "status", "priority", "size", "assignee", "sprint"];
         allFields.forEach(f => dispatch({ type: "TOUCH", field: f }));
 
         const result = issueFormSchema.safeParse(state.values);
@@ -183,10 +212,11 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
                 return;
             }
 
-            const response = await createIssue({
+            const payload = {
                 title: state.values.title,
                 description: state.values.description,
                 type: state.values.type.toUpperCase() as "STORY" | "TASK" | "BUG",
+                status: state.values.status,
                 priority: state.values.priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH",
                 sizeLabel: state.values.size || null,
                 assigneeId: state.values.assignee || null,
@@ -194,18 +224,25 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
                 projectId: project.id,
                 workspaceId: project.workspaceId,
                 subtasks: state.values.subtasks,
-            });
+            };
 
-            toast.success(response.message || "Issue created successfully");
+            let response;
+            if (editIssue) {
+                response = await updateIssue(editIssue.issueId, payload);
+            } else {
+                response = await createIssue(payload);
+            }
+
+            toast.success(response.message || `Issue ${editIssue ? 'updated' : 'created'} successfully`);
             onOpenChange(false);
-            dispatch({ type: "RESET", values: initialValues });
+            if (!editIssue) dispatch({ type: "RESET", values: initialValues });
             if (onSuccess) onSuccess();
         } catch (error: any) {
-            toast.error(error.message || "Failed to create issue");
+            toast.error(error.message || `Failed to ${editIssue ? 'update' : 'create'} issue`);
         } finally {
             dispatch({ type: "SET_SUBMITTING", isSubmitting: false });
         }
-    }, [state.values, onOpenChange]);
+    }, [state.values, onOpenChange, editIssue, project, onSuccess]);
 
     // Keyboard shortcut (Cmd/Ctrl + Enter)
     useEffect(() => {
@@ -227,8 +264,8 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-[#19376D] flex items-center justify-between bg-[#19376D]/10">
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono bg-[#19376D] text-[#A5D7E8] px-2 py-1 rounded">{project?.key || "PF"}</span>
-                        <DialogTitle className="text-lg font-bold">Create New Issue</DialogTitle>
+                        <span className="text-xs font-mono bg-[#19376D] text-[#A5D7E8] px-2 py-1 rounded">{editIssue ? editIssue.issueKey : project?.key || "PF"}</span>
+                        <DialogTitle className="text-lg font-bold">{editIssue ? "Edit Issue" : "Create New Issue"}</DialogTitle>
                     </div>
                 </div>
 
@@ -320,6 +357,20 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
                         </div>
 
                         <div className="space-y-1.5">
+                            <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Status</Label>
+                            <select
+                                value={state.values.status}
+                                onChange={(e) => handleChange("status", e.target.value)}
+                                className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
+                            >
+                                <option value="BACKLOG" className="bg-[#0b1b36] text-white">Backlog</option>
+                                <option value="TODO" className="bg-[#0b1b36] text-white">To Do</option>
+                                <option value="IN_PROGRESS" className="bg-[#0b1b36] text-white">In Progress</option>
+                                <option value="DONE" className="bg-[#0b1b36] text-white">Done</option>
+                            </select>
+                        </div>
+
+                        <div className="space-y-1.5">
                             <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Priority</Label>
                             <select
                                 value={state.values.priority}
@@ -406,7 +457,7 @@ export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: {
                             disabled={state.isSubmitting}
                             className="font-bold bg-[#A5D7E8] text-[#0B2447] hover:bg-white transition-all shadow-[0_0_15px_rgba(165,215,232,0.2)] h-9 px-6"
                         >
-                            {state.isSubmitting ? "Saving..." : "Create Issue"}
+                            {state.isSubmitting ? "Saving..." : editIssue ? "Save Changes" : "Create Issue"}
                         </Button>
                     </div>
                 </div>

@@ -44,3 +44,15 @@ export const getProjectIssues = async (
 
   return data;
 };
+
+export const updateIssue = async (
+  issueId: string,
+  payload: any
+): Promise<IssueResponse> => {
+  const { data } = await API.patch<IssueResponse>(
+    API_ROUTES.ISSUE.UPDATE(issueId),
+    payload
+  );
+
+  return data;
+};

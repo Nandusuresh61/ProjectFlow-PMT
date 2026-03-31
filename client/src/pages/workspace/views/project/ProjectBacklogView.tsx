@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Filter, Search } from 'lucide-react';
+import { Plus, Filter, Search, Pencil } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueCreationModal } from './components/IssueCreationModal';
 import { IssueDetailModal } from './components/IssueDetailModal';
@@ -21,6 +21,11 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    
+    // Edit Modal State
+    const [editingIssue, setEditingIssue] = useState<any | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     const [issues, setIssues] = useState<any[]>([]);
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -51,12 +56,18 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                     });
                     setMembersMap(map);
                 }
-            }).catch(() => {});
+            }).catch(() => { });
         }
     }, [project.workspaceId]);
 
     const handleIssueCreated = () => {
         setIsModalOpen(false);
+        fetchIssues();
+    };
+
+    const handleIssueUpdated = () => {
+        setIsEditModalOpen(false);
+        setEditingIssue(null);
         fetchIssues();
     };
 
@@ -74,7 +85,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                     <h1 className="text-2xl font-black text-white tracking-tight">Backlogs</h1>
                     <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues</p>
                 </div>
-                <button 
+                <button
                     onClick={() => setIsModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all"
                 >
@@ -101,11 +112,12 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
 
             {/* Issue table */}
             <div className="bg-white/[0.025] rounded-2xl overflow-hidden">
-                <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/[0.05]">
+                <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/[0.05]">
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Issue</span>
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Priority</span>
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Assignee</span>
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Est.</span>
+                    <span className="w-8"></span>
                 </div>
                 <div className="divide-y divide-white/[0.03]">
                     {isLoading ? (
@@ -120,7 +132,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                     setSelectedIssue(issue);
                                     setIsDetailModalOpen(true);
                                 }}
-                                className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer"
+                                className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer"
                             >
                                 <div className="flex items-center gap-3 min-w-0">
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
@@ -134,6 +146,19 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                     {getAssigneeInitials(issue.assigneeId)}
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
+                                <div className="flex items-center justify-end w-8">
+                                    <button 
+                                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingIssue(issue);
+                                            setIsEditModalOpen(true);
+                                        }}
+                                        title="Edit Issue"
+                                    >
+                                        <Pencil size={13} />
+                                    </button>
+                                </div>
                             </div>
                         ))
                     )}
@@ -145,6 +170,17 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 onOpenChange={setIsModalOpen} 
                 project={project}
                 onSuccess={handleIssueCreated}
+            />
+
+            <IssueCreationModal 
+                open={isEditModalOpen} 
+                onOpenChange={(open) => {
+                    setIsEditModalOpen(open);
+                    if (!open) setTimeout(() => setEditingIssue(null), 300);
+                }} 
+                project={project}
+                onSuccess={handleIssueUpdated}
+                editIssue={editingIssue}
             />
 
             <IssueDetailModal

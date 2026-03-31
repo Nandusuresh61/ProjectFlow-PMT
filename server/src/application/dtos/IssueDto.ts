@@ -14,3 +14,19 @@ export interface CreateIssueDto {
     completed: boolean;
   }[];
 }
+
+export interface UpdateIssueDto {
+  title?: string;
+  description?: string;
+  type?: "STORY" | "TASK" | "BUG";
+  status?: "BACKLOG" | "TODO" | "IN_PROGRESS" | "DONE";
+  priority?: "LOW" | "MEDIUM" | "HIGH";
+  sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
+  assigneeId?: string | null;
+  sprintId?: string | null;
+  subtasks?: {
+    id: string;
+    title: string;
+    completed: boolean;
+  }[];
+}

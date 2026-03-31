@@ -30,6 +30,17 @@ export class MongoIssueRepository implements IIssueRepository {
     return issues.map((doc: any) => this.toDomain(doc));
   }
 
+  async update(issueId: string, data: Partial<Issue>): Promise<Issue | null> {
+    const updated = await IssueModel.findOneAndUpdate(
+      { issueId },
+      { $set: data },
+      { new: true }
+    ).lean();
+
+    if (!updated) return null;
+    return this.toDomain(updated);
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,
