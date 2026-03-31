@@ -35,6 +35,7 @@ export const API_ROUTES = {
   },
   ISSUE: {
     CREATE: "/issue",
+    LIST_BY_PROJECT: (projectId: string) => `/issue/project/${projectId}`,
   },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",

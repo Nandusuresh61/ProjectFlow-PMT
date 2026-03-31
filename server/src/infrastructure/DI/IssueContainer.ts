@@ -3,6 +3,7 @@ import { IssueController } from "@/presentation/controllers/IssueController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
 import { UidService } from "../services/UidService";
+import { GetIssuesByProjectUseCase } from "@/application/use-cases/Issue/GetIssuesByProjectUseCase";
 
 const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
@@ -13,4 +14,11 @@ const createissueUseCase = new CreateIssueUseCase(
   uidGenerator,
 );
 
-export const issueController = new IssueController(createissueUseCase);
+const getIssuesByProjectUseCase = new GetIssuesByProjectUseCase(
+  issueRepository
+);
+
+export const issueController = new IssueController(
+  createissueUseCase,
+  getIssuesByProjectUseCase
+);

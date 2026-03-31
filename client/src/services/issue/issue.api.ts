@@ -34,3 +34,13 @@ export const createIssue = async (
 
   return data;
 };
+
+export const getProjectIssues = async (
+  projectId: string
+): Promise<IssueResponse<any[]>> => {
+  const { data } = await API.get<IssueResponse<any[]>>(
+    API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId)
+  );
+
+  return data;
+};

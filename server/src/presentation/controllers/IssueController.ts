@@ -10,8 +10,13 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { CreateIssueSchema } from "@/shared/schema/issue/CreateIssueSchema";
 import { CreateIssueDto } from "@/application/dtos/IssueDto";
 
+import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/IGetIssuesByProjectUseCase";
+
 export class IssueController {
-  constructor(private readonly _createIssueUseCase: ICreateIssueUseCase) {}
+  constructor(
+    private readonly _createIssueUseCase: ICreateIssueUseCase,
+    private readonly _getIssuesByProjectUseCase: IGetIssuesByProjectUseCase
+  ) {}
 
   createIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
@@ -36,5 +41,23 @@ export class IssueController {
     res
       .status(HttpStatusCode.CREATED)
       .json(ResponseHandler.success(AppMessages.ISSUE_CREATED_SUCCESS, result));
+  });
+
+  getIssuesByProject = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      throw new AppError(
+        ErrorCode.INVALID_OPERATION,
+        "Project ID is required",
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const issues = await this._getIssuesByProjectUseCase.execute(projectId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success("Issues retrieved successfully", issues));
   });
 }

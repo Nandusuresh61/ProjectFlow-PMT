@@ -101,7 +101,7 @@ import { createIssue } from "@/services/issue/issue.api";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
 
-export function IssueCreationModal({ open, onOpenChange, project }: { open: boolean, onOpenChange: (open: boolean) => void, project?: { key: string, id: string, workspaceId: string, memberIds: string[] } }) {
+export function IssueCreationModal({ open, onOpenChange, project, onSuccess }: { open: boolean, onOpenChange: (open: boolean) => void, project?: { key: string, id: string, workspaceId: string, memberIds: string[] }, onSuccess?: () => void }) {
     const [members, setMembers] = useState<any[]>([]);
 
     useEffect(() => {
@@ -199,6 +199,7 @@ export function IssueCreationModal({ open, onOpenChange, project }: { open: bool
             toast.success(response.message || "Issue created successfully");
             onOpenChange(false);
             dispatch({ type: "RESET", values: initialValues });
+            if (onSuccess) onSuccess();
         } catch (error: any) {
             toast.error(error.message || "Failed to create issue");
         } finally {

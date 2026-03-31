@@ -25,6 +25,11 @@ export class MongoIssueRepository implements IIssueRepository {
     return this.toDomain(created);
   }
 
+  async findByProjectId(projectId: string): Promise<Issue[]> {
+    const issues = await IssueModel.find({ projectId }).sort({ createdAt: -1 }).lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,
