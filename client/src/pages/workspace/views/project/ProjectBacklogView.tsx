@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, Filter, Search } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueCreationModal } from './components/IssueCreationModal';
+import { IssueDetailModal } from './components/IssueDetailModal';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
@@ -18,6 +19,8 @@ const priorityDot: Record<string, string> = {
 
 export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [issues, setIssues] = useState<any[]>([]);
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
@@ -111,7 +114,14 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                         <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues found. Create one.</div>
                     ) : (
                         issues.map(issue => (
-                            <div key={issue.issueId} className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer">
+                            <div 
+                                key={issue.issueId} 
+                                onClick={() => {
+                                    setSelectedIssue(issue);
+                                    setIsDetailModalOpen(true);
+                                }}
+                                className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer"
+                            >
                                 <div className="flex items-center gap-3 min-w-0">
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
@@ -135,6 +145,16 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 onOpenChange={setIsModalOpen} 
                 project={project}
                 onSuccess={handleIssueCreated}
+            />
+
+            <IssueDetailModal
+                open={isDetailModalOpen}
+                onOpenChange={(open) => {
+                    setIsDetailModalOpen(open);
+                    if (!open) setTimeout(() => setSelectedIssue(null), 300);
+                }}
+                issue={selectedIssue}
+                membersMap={membersMap}
             />
         </div>
     );
