@@ -5,6 +5,7 @@ export interface IProjectRepository {
   countByWorkspaceId(workspaceId: string): Promise<number>;
   findByWorkspaceId(workspaceId: string): Promise<Project[]>;
   findById(projectId: string): Promise<Project | null>;
+  incrementIssueSequence(projectId: string): Promise<number>;
   findByNameAndWorkspace(
     name: string,
     workspaceId: string

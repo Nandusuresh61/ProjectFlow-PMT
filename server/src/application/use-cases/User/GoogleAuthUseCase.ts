@@ -67,6 +67,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
       isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -75,6 +76,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
       isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.REFRESH_TOKEN,
     });
 

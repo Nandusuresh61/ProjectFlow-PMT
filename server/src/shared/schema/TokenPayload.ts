@@ -7,6 +7,7 @@ export const TokenPayloadSchema = z.object({
   email: z.string(),
   isSuperAdmin: z.boolean(),
   isBlocked: z.boolean(),
+  currentWorkspaceId: z.string().optional(),
   type: z.nativeEnum(TokenEnums),
 });
 

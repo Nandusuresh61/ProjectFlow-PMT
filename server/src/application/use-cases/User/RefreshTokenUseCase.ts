@@ -28,6 +28,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       email: payload.email,
       isSuperAdmin: payload.isSuperAdmin,
       isBlocked: payload.isBlocked,
+      currentWorkspaceId: payload.currentWorkspaceId,
       type: payload.type,
     });
 
@@ -37,6 +38,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
       email: payload.email,
       isSuperAdmin: payload.isSuperAdmin,
       isBlocked: payload.isBlocked,
+      currentWorkspaceId: payload.currentWorkspaceId,
       type: payload.type,
     });
 

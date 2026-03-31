@@ -43,6 +43,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       email: newUser.email,
       isSuperAdmin: newUser.isSuperAdmin,
       isBlocked: newUser.isBlocked,
+      currentWorkspaceId: newUser.currentWorkspaceId,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -51,6 +52,7 @@ export class RegisterUserUseCase implements IRegisterUserUseCase {
       email: newUser.email,
       isSuperAdmin: newUser.isSuperAdmin,
       isBlocked: newUser.isBlocked,
+      currentWorkspaceId: newUser.currentWorkspaceId,
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {

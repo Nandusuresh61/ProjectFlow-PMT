@@ -12,6 +12,7 @@ import superAdminRoutes from "@/presentation/routes/superAdminRoutes";
 import workspaceRoutes from "@/presentation/routes/workspaceRoutes";
 import userProfile from "@/presentation/routes/ProfileRoutes";
 import projectRoutes from "@/presentation/routes/ProjectRoutes";
+import issueRoutes from "@/presentation/routes/IssueRoutes";
 import morgan from "morgan";
 
 const app = express();
@@ -34,8 +35,9 @@ app.use("/api/plan", planRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/super-admin", superAdminRoutes);
 app.use("/api/workspace", workspaceRoutes);
-app.use("/api/profile",userProfile);
+app.use("/api/profile", userProfile);
 app.use("/api/project", projectRoutes);
+app.use("/api/issue", issueRoutes);
 
 app.use(errorMiddleware);
 
