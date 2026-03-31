@@ -36,10 +36,12 @@ export const createIssue = async (
 };
 
 export const getProjectIssues = async (
-  projectId: string
-): Promise<IssueResponse<any[]>> => {
-  const { data } = await API.get<IssueResponse<any[]>>(
-    API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId)
+  projectId: string,
+  params?: { page?: number; limit?: number; search?: string }
+): Promise<IssueResponse<{ issues: any[], total: number }>> => {
+  const { data } = await API.get<IssueResponse<{ issues: any[], total: number }>>(
+    API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId),
+    { params }
   );
 
   return data;

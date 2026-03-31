@@ -25,9 +25,27 @@ export class MongoIssueRepository implements IIssueRepository {
     return this.toDomain(created);
   }
 
-  async findByProjectId(projectId: string): Promise<Issue[]> {
-    const issues = await IssueModel.find({ projectId }).sort({ createdAt: -1 }).lean();
-    return issues.map((doc: any) => this.toDomain(doc));
+  async findByProjectId(projectId: string, page: number, limit: number, search?: string): Promise<{ issues: Issue[], total: number }> {
+    const query: any = { projectId };
+    
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { issueKey: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [issues, total] = await Promise.all([
+      IssueModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      IssueModel.countDocuments(query)
+    ]);
+
+    return {
+      issues: issues.map((doc: any) => this.toDomain(doc)),
+      total
+    };
   }
 
   async update(issueId: string, data: Partial<Issue>): Promise<Issue | null> {

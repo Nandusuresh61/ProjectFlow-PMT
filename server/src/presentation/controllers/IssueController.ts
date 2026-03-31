@@ -48,6 +48,9 @@ export class IssueController {
 
   getIssuesByProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string || "";
 
     if (!projectId) {
       throw new AppError(
@@ -57,11 +60,11 @@ export class IssueController {
       );
     }
 
-    const issues = await this._getIssuesByProjectUseCase.execute(projectId);
+    const { issues, total } = await this._getIssuesByProjectUseCase.execute(projectId, page, limit, search);
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Issues retrieved successfully", issues));
+      .json(ResponseHandler.success("Issues retrieved successfully", { issues, total }));
   });
 
   updateIssue = asyncHandler(async (req: AuthRequest, res: Response) => {

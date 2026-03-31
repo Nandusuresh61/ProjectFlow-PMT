@@ -25,22 +25,27 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
     const user = AuthUserState((state) => state.user);
     const currentWorkspaceId = user?.currentWorkspaceId;
     const [members, setMembers] = useState<Member[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
 
     const currentUserRole = members.find(m => m.email === user?.email)?.role;
     const canInvite = currentUserRole === WorkspaceRoleEnum.WORKSPACE_ADMIN || currentUserRole === WorkspaceRoleEnum.WORKSPACE_OWNER;
 
     useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
+    useEffect(() => {
         if (!currentWorkspaceId) return;
         const fetchMembers = async () => {
-            const res = await getMembers(currentWorkspaceId);
+            const res = await getMembers(currentWorkspaceId, debouncedSearch);
             setMembers(res.data);
         };
         fetchMembers()
-    }, [currentWorkspaceId])
-
-    console.log(members)
-
-
+    }, [currentWorkspaceId, debouncedSearch])
 
     return (
         <div className="space-y-10">
@@ -65,6 +70,8 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
                 <input
                     type="text"
                     placeholder="Search members..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full bg-white/[0.03] border border-white/5 rounded-xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:bg-white/[0.08] transition-all focus:border-[#A5D7E8]/20"
                 />
             </div>

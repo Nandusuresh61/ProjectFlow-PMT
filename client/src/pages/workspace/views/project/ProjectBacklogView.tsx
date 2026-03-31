@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Filter, Search, Pencil } from 'lucide-react';
+import { Plus, Search, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueCreationModal } from './components/IssueCreationModal';
 import { IssueDetailModal } from './components/IssueDetailModal';
@@ -21,8 +21,8 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    
-    // Edit Modal State
+
+    // Edit Modal State 
     const [editingIssue, setEditingIssue] = useState<any | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -30,17 +30,43 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
 
+    // Pagination & Search State
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalIssues, setTotalIssues] = useState(0);
+    const itemsPerPage = 10;
+
+    // Debounce search term
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setCurrentPage(1);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
     const fetchIssues = useCallback(async () => {
         try {
             setIsLoading(true);
-            const res = await getProjectIssues(project.id);
-            setIssues(res.data || []);
+            const res = await getProjectIssues(project.id, {
+                page: currentPage,
+                limit: itemsPerPage,
+                search: debouncedSearch
+            });
+            if (res.data) {
+                setIssues(res.data.issues || []);
+                setTotalIssues(res.data.total || 0);
+            }
         } catch (error: any) {
             toast.error(error.message || "Failed to load issues");
         } finally {
             setIsLoading(false);
         }
-    }, [project.id]);
+    }, [project.id, currentPage, debouncedSearch, itemsPerPage]);
+
+    const totalPages = Math.ceil(totalIssues / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
 
     useEffect(() => {
         fetchIssues();
@@ -101,13 +127,12 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                     <input
                         type="text"
                         placeholder="Search issues..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white/[0.04] rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:bg-white/[0.07] transition-colors"
                     />
                 </div>
-                <button className="flex items-center gap-1.5 px-3 py-2 bg-white/[0.04] rounded-xl text-sm text-white/40 hover:text-white hover:bg-white/[0.07] transition-all">
-                    <Filter size={13} />
-                    Filter
-                </button>
+
             </div>
 
             {/* Issue table */}
@@ -126,8 +151,8 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                         <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues found. Create one.</div>
                     ) : (
                         issues.map(issue => (
-                            <div 
-                                key={issue.issueId} 
+                            <div
+                                key={issue.issueId}
                                 onClick={() => {
                                     setSelectedIssue(issue);
                                     setIsDetailModalOpen(true);
@@ -147,7 +172,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
                                 <div className="flex items-center justify-end w-8">
-                                    <button 
+                                    <button
                                         className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -163,21 +188,51 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                         ))
                     )}
                 </div>
+                
+                {/* Pagination Footer */}
+                {totalIssues > 0 && (
+                    <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05] bg-white/[0.01]">
+                        <div className="text-xs text-white/40">
+                            Showing <span className="text-white/80">{startIndex + 1}</span> to <span className="text-white/80">{Math.min(startIndex + itemsPerPage, totalIssues)}</span> of <span className="text-white/80 font-bold">{totalIssues}</span> issues
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.03] text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:pointer-events-none transition-all"
+                            >
+                                <ChevronLeft size={14} />
+                                Prev
+                            </button>
+                            <span className="text-xs font-bold text-[#A5D7E8] bg-[#19376D]/30 px-3 py-1.5 rounded-lg border border-[#A5D7E8]/20">
+                                {currentPage} / {totalPages || 1}
+                            </span>
+                            <button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/[0.03] text-xs font-medium text-white/60 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:pointer-events-none transition-all"
+                            >
+                                Next
+                                <ChevronRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            <IssueCreationModal 
-                open={isModalOpen} 
-                onOpenChange={setIsModalOpen} 
+            <IssueCreationModal
+                open={isModalOpen}
+                onOpenChange={setIsModalOpen}
                 project={project}
                 onSuccess={handleIssueCreated}
             />
 
-            <IssueCreationModal 
-                open={isEditModalOpen} 
+            <IssueCreationModal
+                open={isEditModalOpen}
                 onOpenChange={(open) => {
                     setIsEditModalOpen(open);
                     if (!open) setTimeout(() => setEditingIssue(null), 300);
-                }} 
+                }}
                 project={project}
                 onSuccess={handleIssueUpdated}
                 editIssue={editingIssue}
