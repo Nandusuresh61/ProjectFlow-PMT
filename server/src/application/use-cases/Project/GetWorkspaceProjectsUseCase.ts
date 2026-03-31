@@ -7,6 +7,7 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class GetWorkspaceProjectsUseCase
   implements IGetWorkspaceProjectsUseCase
@@ -28,21 +29,27 @@ export class GetWorkspaceProjectsUseCase
       );
     }
 
-    if (workspace.ownerId !== userId) {
-      const membership = await this._membershipRepo.findByUserAndWorkspace(
-        userId,
-        workspaceId
-      );
-
-      if (!membership) {
-        throw new AppError(
-          ErrorCode.AUTH,
-          AppMessages.UNAUTHORIZED_ACCESS,
-          HttpStatusCode.FORBIDDEN
-        );
-      }
+    if (workspace.ownerId === userId) {
+      return this._projectRepo.findByWorkspaceId(workspaceId);
     }
 
-    return this._projectRepo.findByWorkspaceId(workspaceId);
+    const membership = await this._membershipRepo.findByUserAndWorkspace(
+      userId,
+      workspaceId
+    );
+
+    if (!membership) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.FORBIDDEN
+      );
+    }
+
+    if (membership.role === WorkspaceRoleEnum.WORKSPACE_ADMIN) {
+      return this._projectRepo.findByWorkspaceId(workspaceId);
+    }
+
+    return this._projectRepo.findByWorkspaceIdAndMemberId(workspaceId, userId);
   }
 }

@@ -36,7 +36,7 @@ export class IssueController {
       );
     }
 
-    const result = await this._createIssueUseCase.execute({
+    const result = await this._createIssueUseCase.execute(user.userId, {
       ...validatedData,
       workspaceId,
     });
@@ -47,6 +47,7 @@ export class IssueController {
   });
 
   getIssuesByProject = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
     const { projectId } = req.params;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -60,7 +61,13 @@ export class IssueController {
       );
     }
 
-    const { issues, total } = await this._getIssuesByProjectUseCase.execute(projectId, page, limit, search);
+    const { issues, total } = await this._getIssuesByProjectUseCase.execute(
+      user.userId,
+      projectId,
+      page,
+      limit,
+      search
+    );
 
     res
       .status(HttpStatusCode.OK)
@@ -68,6 +75,7 @@ export class IssueController {
   });
 
   updateIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
     const { issueId } = req.params;
 
     if (!issueId) {
@@ -88,7 +96,11 @@ export class IssueController {
       );
     }
 
-    const updatedIssue = await this._updateIssueUseCase.execute(issueId, result.data as any);
+    const updatedIssue = await this._updateIssueUseCase.execute(
+      user.userId,
+      issueId,
+      result.data as any
+    );
 
     res
       .status(HttpStatusCode.OK)
