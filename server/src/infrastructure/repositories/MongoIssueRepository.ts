@@ -19,6 +19,7 @@ export class MongoIssueRepository implements IIssueRepository {
       sprintId: issue.sprintId,
       projectId: issue.projectId,
       workspaceId: issue.workspaceId,
+      parentId: issue.parentId,
       subtasks: issue.subtasks,
     });
 
@@ -80,6 +81,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.sprintId,
       doc.projectId,
       doc.workspaceId,
+      doc.parentId,
       doc.subtasks,
       doc.createdAt,
       doc.updatedAt

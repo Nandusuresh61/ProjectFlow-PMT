@@ -137,6 +137,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       userId,
       projectMemberIds,
       "ACTIVE",
+      0,
       now,
       now
     );

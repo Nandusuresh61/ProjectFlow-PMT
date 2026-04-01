@@ -16,6 +16,7 @@ export interface CreateIssuePayload {
     title: string;
     completed: boolean;
   }>;
+  parentId?: string | null;
 }
 
 export interface IssueResponse<T = unknown> {
