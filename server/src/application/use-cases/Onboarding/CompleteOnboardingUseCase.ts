@@ -47,6 +47,15 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       );
     }
 
+    const existingWorkspace = await this._workspaceRepo.findByName(workspaceName.trim());
+    if (existingWorkspace) {
+      throw new AppError(
+        ErrorCode.CONFLICT,
+        AppMessages.WORKSPACE_NAME_ALREADY_EXISTS,
+        HttpStatusCode.CONFLICT,
+      );
+    }
+
     const plan = await this._planRepo.findById(planId);
 
     if (!plan || !plan.isActive) {

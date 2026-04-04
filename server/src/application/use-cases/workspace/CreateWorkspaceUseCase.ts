@@ -35,6 +35,15 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
       );
     }
 
+    const existingWorkspace = await this._workspaceRepo.findByName(workspaceName.trim());
+    if (existingWorkspace) {
+      throw new AppError(
+        ErrorCode.CONFLICT,
+        AppMessages.WORKSPACE_NAME_ALREADY_EXISTS,
+        HttpStatusCode.CONFLICT
+      );
+    }
+
     let defaultPlanId = planId;
     if (!defaultPlanId) {
         const plans = await this._planRepo.findAll();

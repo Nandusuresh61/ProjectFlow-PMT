@@ -23,6 +23,7 @@ export const API_ROUTES = {
     BASE: "/workspace",
     USER_WORKSPACES: "/workspace/user/workspaces",
     CREATE: "/workspace/create",
+    CHECK_NAME: "/workspace/check-name",
     INVITE: (workspaceId: string) => `/workspace/${workspaceId}/invite`,
     ACCEPT_INVITATION: "/workspace/invite/accept",
     MEMBERS: (workspaceId: string) => `/workspace/${workspaceId}/members`,

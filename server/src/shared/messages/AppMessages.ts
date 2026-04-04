@@ -79,6 +79,7 @@ export const AppMessages = {
   USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
 
   WORKSPACE_NOT_FOUND: "Workspace not found",
+  WORKSPACE_NAME_ALREADY_EXISTS: "A workspace with this name already exists",
 
   WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
 

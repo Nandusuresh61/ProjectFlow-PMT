@@ -30,3 +30,8 @@ export const createWorkspace = async (payload: { workspaceName: string, planId?:
     const { data } = await API.post<WorkspaceResponse<{ workspaceId: string }>>(API_ROUTES.WORKSPACE.CREATE, payload);
     return data;
 };
+
+export const checkWorkspaceName = async (name: string): Promise<WorkspaceResponse<{ isAvailable: boolean }>> => {
+    const { data } = await API.get<WorkspaceResponse<{ isAvailable: boolean }>>(`${API_ROUTES.WORKSPACE.CHECK_NAME}?name=${encodeURIComponent(name)}`);
+    return data;
+};

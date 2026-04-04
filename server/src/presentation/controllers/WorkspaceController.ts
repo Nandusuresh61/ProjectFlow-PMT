@@ -8,13 +8,15 @@ import { IGetWorkspaceMembersUseCase } from "@/application/interfaces/use-cases/
 import { IGetUserWorkspacesUseCase } from "@/application/interfaces/use-cases/workspace/IGetUserWorkspacesUseCase";
 import { ISwitchWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ISwitchWorkspaceUseCase";
 import { ICreateWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ICreateWorkspaceUseCase";
+import { ICheckWorkspaceNameUseCase } from "@/application/interfaces/use-cases/workspace/ICheckWorkspaceNameUseCase";
 
 export class WorkspaceController {
   constructor(
     private readonly _getMembersUseCase: IGetWorkspaceMembersUseCase,
     private readonly _getUserWorkspacesUseCase: IGetUserWorkspacesUseCase,
     private readonly _switchWorkspaceUseCase: ISwitchWorkspaceUseCase,
-    private readonly _createWorkspaceUseCase: ICreateWorkspaceUseCase
+    private readonly _createWorkspaceUseCase: ICreateWorkspaceUseCase,
+    private readonly _checkNameUseCase: ICheckWorkspaceNameUseCase
   ) {}
 
   getMembers = asyncHandler(async (req: Request, res: Response) => {
@@ -53,5 +55,23 @@ export class WorkspaceController {
     const result = await this._createWorkspaceUseCase.execute(tokenPayload.userId, workspaceName, planId);
 
     res.status(HttpStatusCode.CREATED).json(ResponseHandler.success("Workspace created successfully", result));
+  });
+
+  checkNameAvailability = asyncHandler(async (req: Request, res: Response) => {
+    const { name } = req.query;
+
+    if (!name || typeof name !== "string") {
+      res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(AppMessages.VALIDATION_FAILED));
+      return;
+    }
+
+    const isAvailable = await this._checkNameUseCase.execute(name);
+
+    if (!isAvailable) {
+       res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.WORKSPACE_NAME_ALREADY_EXISTS, { isAvailable }));
+       return;
+    }
+
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success("Workspace name is available", { isAvailable }));
   });
 }

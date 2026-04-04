@@ -2,6 +2,7 @@ import { GetWorkspaceMembersUseCase } from "@/application/use-cases/workspace/Ge
 import { GetUserWorkspacesUseCase } from "@/application/use-cases/workspace/GetUserWorkspacesUseCase";
 import { SwitchWorkspaceUseCase } from "@/application/use-cases/workspace/SwitchWorkspaceUseCase";
 import { CreateWorkspaceUseCase } from "@/application/use-cases/workspace/CreateWorkspaceUseCase";
+import { CheckWorkspaceNameUseCase } from "@/application/use-cases/workspace/CheckWorkspaceNameUseCase";
 import { WorkspaceController } from "@/presentation/controllers/WorkspaceController";
 import { MembershipRepository } from "../repositories/MongoMembershipRepository";
 import { MongoUserRepository } from "../repositories/MongoUserRepository";
@@ -36,9 +37,12 @@ const createWorkspaceUseCase = new CreateWorkspaceUseCase(
   uidGenerator
 );
 
+const checkWorkspaceNameUseCase = new CheckWorkspaceNameUseCase(workspaceRepo);
+
 export const workspaceController = new WorkspaceController(
   getWorkspaceMembersUseCase,
   getUserWorkspacesUseCase,
   switchWorkspaceUseCase,
-  createWorkspaceUseCase
+  createWorkspaceUseCase,
+  checkWorkspaceNameUseCase
 );

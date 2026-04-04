@@ -8,6 +8,12 @@ import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 const router = Router();
 
 
+router.get(
+  "/check-name",
+  authenticatedUser,
+  workspaceController.checkNameAvailability
+);
+
 router.post(
   "/invite/accept",
   authenticatedUser,

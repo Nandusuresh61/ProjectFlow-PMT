@@ -26,7 +26,7 @@ const steps = [
   { id: 3, name: "Team" },
 ];
 
-const workspaceRegex = /^[a-zA-Z0-9][a-zA-Z0-9 _-]{1,48}[a-zA-Z0-9]$/;
+
 
 const slideVariants = {
   enter: (d: number) => ({ x: d > 0 ? 50 : -50, opacity: 0 }),
@@ -85,14 +85,7 @@ export default function Onboarding() {
   };
 
   const handleWorkspaceSubmit = async (values: WorkspaceValues) => {
-    const name = values.workspaceName.trim();
-    if (!workspaceRegex.test(name)) {
-      toast.error(
-        "Workspace must be 3-50 characters and contain only letters, numbers, spaces, - or _",
-      );
-      return;
-    }
-    updateData({ workspaceName: name });
+    updateData({ workspaceName: values.workspaceName.trim() });
     goNext();
   };
 
