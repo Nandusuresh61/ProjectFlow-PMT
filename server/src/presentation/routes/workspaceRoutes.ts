@@ -20,6 +20,11 @@ router.post(
   invitationController.acceptInvitation
 );
 
+router.get(
+  "/invite/details/:token",
+  invitationController.getInvitationDetails
+);
+
 // User Workspaces
 router.get(
   "/user/workspaces",

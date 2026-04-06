@@ -14,3 +14,8 @@ export const acceptInvitation = async (token: string) => {
   const response = await API.post(API_ROUTES.WORKSPACE.ACCEPT_INVITATION, { token });
   return response.data;
 };
+
+export const getInvitationDetails = async (token: string) => {
+  const response = await API.get(API_ROUTES.WORKSPACE.GET_INVITATION_DETAILS(token));
+  return response.data;
+};

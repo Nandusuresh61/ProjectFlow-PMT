@@ -15,4 +15,10 @@ router.post(
   authenticatedUser,
   invitationController.acceptInvitation,
 );
+
+router.get(
+  "/invite/details/:token",
+  invitationController.getInvitationDetails,
+);
+
 export default router;

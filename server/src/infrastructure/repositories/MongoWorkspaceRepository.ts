@@ -42,6 +42,10 @@ export class WorkspaceRepository extends MongoBaseRepository<Workspace, Workspac
     return this.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") } });
   }
 
+  async findByOwnerId(ownerId: string): Promise<Workspace | null> {
+    return this.findOne({ ownerId });
+  }
+
   async findAllWorkspaces(options: WorkspaceQueryOptions): Promise<PaginatedWorkspacesResult> {
     const { page = 1, limit = 10, search, sortBy = "createdAt", sortOrder = "desc" } = options;
     const skip = (page - 1) * limit;

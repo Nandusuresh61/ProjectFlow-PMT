@@ -63,7 +63,7 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
       );
     }
 
-    if (user.email !== invitation.email) {
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.UNAUTHORIZED_ACCESS,

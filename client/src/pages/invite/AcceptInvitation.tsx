@@ -1,5 +1,5 @@
 import { Loader } from "@/components/ui/Loader";
-import { acceptInvitation } from "@/services/Invitation/invitation.api";
+import { acceptInvitation, getInvitationDetails } from "@/services/Invitation/invitation.api";
 import { AuthUserState } from "@/store/auth.store";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -20,24 +20,32 @@ export default function AcceptInvitation() {
       return;
     }
 
-    if (!isAuthenticated) {
-      localStorage.setItem("invite_token", token);
-      toast.success("Invitation link captured. Please log in or sign up to continue.");
-      navigate("/login");
-      return;
-    }
-
     const processInvitation = async () => {
       try {
-        const response = await acceptInvitation(token);
-        toast.success(response.message);
-        localStorage.removeItem("invite_token");
-        navigate("/");
+        if (!isAuthenticated) {
+          const response = await getInvitationDetails(token);
+          localStorage.setItem("invite_token", token);
+          toast.success("Invitation link captured. Please log in or sign up to continue.");
+          
+          const { email, isRegistered } = response.data;
+          
+          if (isRegistered) {
+            navigate("/login", { state: { prefillEmail: email, isInvite: true } });
+          } else {
+            navigate("/signup", { state: { prefillEmail: email, isInvite: true } });
+          }
+        } else {
+          const response = await acceptInvitation(token);
+          toast.success(response.message);
+          localStorage.removeItem("invite_token");
+          navigate("/home/dashboard");
+        }
       } catch (error: any) {
-        toast.error(error.message);
+        toast.error(error.message || "Failed to process invitation");
         navigate("/");
       }
     };
+    
     processInvitation();
   }, [token, isAuthenticated, navigate]);
 

@@ -80,6 +80,7 @@ export const AppMessages = {
 
   WORKSPACE_NOT_FOUND: "Workspace not found",
   WORKSPACE_NAME_ALREADY_EXISTS: "A workspace with this name already exists",
+  WORKSPACE_ALREADY_OWNED: "You already own a workspace. Only one workspace is allowed per user.",
 
   WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
 

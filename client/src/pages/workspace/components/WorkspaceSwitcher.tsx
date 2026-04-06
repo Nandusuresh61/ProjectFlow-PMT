@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronsUpDown, Check, Plus, Building } from 'lucide-react';
 import { useWorkspaceStore } from '@/store/workspace.store';
+import { AuthUserState } from '@/store/auth.store';
 
 interface WorkspaceSwitcherProps {
     onOpenCreate: () => void;
@@ -10,8 +11,11 @@ interface WorkspaceSwitcherProps {
 
 export const WorkspaceSwitcher = ({ onOpenCreate, isCollapsed = false }: WorkspaceSwitcherProps) => {
     const { workspaces, currentWorkspace, switchActiveWorkspace, isLoading } = useWorkspaceStore();
+    const user = AuthUserState((state) => state.user);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    
+    const hasOwnedWorkspace = workspaces.some(ws => ws.ownerId === user?.userId);
 
     // Close on click outside
     useEffect(() => {
@@ -87,7 +91,7 @@ export const WorkspaceSwitcher = ({ onOpenCreate, isCollapsed = false }: Workspa
                                </button>
                            ))}
                            
-                           {workspaces.length === 0 && (
+                           {!hasOwnedWorkspace && (
                                <>
                                    <div className="h-px bg-white/10 my-1 mx-2"></div>
                                    

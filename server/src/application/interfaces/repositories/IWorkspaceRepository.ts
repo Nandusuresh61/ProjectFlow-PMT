@@ -5,6 +5,7 @@ export interface IWorkspaceRepository {
   create(workspace: Workspace): Promise<Workspace>;
   findById(workspaceId: string): Promise<Workspace | null>;
   findByName(name: string): Promise<Workspace | null>;
+  findByOwnerId(ownerId: string): Promise<Workspace | null>;
   findAllWorkspaces(options: WorkspaceQueryOptions): Promise<PaginatedWorkspacesResult>;
   getWorkspaceDetails(workspaceId: string): Promise<WorkspaceDetailsDto | null>;
   updateWorkspaceStatus(workspaceId: string, isSuspended: boolean): Promise<void>;

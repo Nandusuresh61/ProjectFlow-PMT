@@ -262,8 +262,9 @@ export default function WorkspaceHome() {
                     user={user}
                     onLogout={handleLogout}
                     onOpenCreateWorkspace={() => {
-                        if (workspaces.length > 0) {
-                            toast.error("You already have a workspace. Creating multiple workspaces is disabled.");
+                        const hasOwnedWorkspace = workspaces.some(ws => ws.ownerId === user?.userId);
+                        if (hasOwnedWorkspace) {
+                            toast.error("You already own a workspace. Creating multiple workspaces is disabled.");
                             return;
                         }
                         setIsCreateWorkspaceModalOpen(true);

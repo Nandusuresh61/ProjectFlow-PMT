@@ -26,6 +26,7 @@ export const API_ROUTES = {
     CHECK_NAME: "/workspace/check-name",
     INVITE: (workspaceId: string) => `/workspace/${workspaceId}/invite`,
     ACCEPT_INVITATION: "/workspace/invite/accept",
+    GET_INVITATION_DETAILS: (token: string) => `/workspace/invite/details/${token}`,
     MEMBERS: (workspaceId: string) => `/workspace/${workspaceId}/members`,
     SWITCH: (workspaceId: string) => `/workspace/${workspaceId}/switch`,
   },
