@@ -128,4 +128,5 @@ export const AppMessages = {
   PROJECT_NAME_ALREADY_EXISTS: "A project with this name already exists in the workspace",
   PROJECT_KEY_ALREADY_EXISTS: "A project with this key already exists in the workspace",
   ISSUE_CREATED_SUCCESS: "Issue Created",
+  ISSUE_NOT_FOUND: "Issue not found",
 } as const;

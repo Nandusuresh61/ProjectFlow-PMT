@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
 import { InviteMember } from "@/services/Invitation/invitation.api";
 import { AuthUserState } from "@/store/auth.store";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export const PlaceholderView = ({ activeTab, setActiveTab }: any) => (
   <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-8">
@@ -48,13 +49,13 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
 
     if (!validation.success) {
       const message = 
-        validation.error.issues[0]?.message || "Invalid input";
+        validation.error.issues[0]?.message || AppMessages.VALIDATION_FAILED;
       toast.error(message);
       return;
     }
 
     if (!currentWorkspaceId) {
-      toast.error("Workspace not found!");
+      toast.error(AppMessages.WORKSPACE_NOT_FOUND);
       return;
     }
 
@@ -69,11 +70,11 @@ export const InviteModal = ({ isOpen, onClose }: any) => {
           },
         ],
       });
-      toast.success(response.message || "Invitation Success");
+      toast.success(response.message || AppMessages.INVITATION_SENT_SUCCESS);
       setEmail("");
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed invitation");
+      toast.error(error.message || AppMessages.INVITATION_FAILED);
     } finally {
       setLoading(false);
     }
@@ -205,14 +206,14 @@ export const CreateWorkspaceModal = ({ isOpen, onClose }: any) => {
 
   const handleCreate = async () => {
     if (!workspaceName.trim()) {
-      toast.error("Workspace name is required!");
+      toast.error(AppMessages.WORKSPACE_NAME_REQUIRED);
       return;
     }
     try {
       setLoading(true);
       const { createWorkspace } = await import("@/services/workspace/workspace.api");
       const response = await createWorkspace({ workspaceName });
-      toast.success(response.message || "Workspace Created!");
+      toast.success(response.message || AppMessages.WORKSPACE_CREATED);
       
       setWorkspaceName("");
       onClose();
@@ -233,7 +234,7 @@ export const CreateWorkspaceModal = ({ isOpen, onClose }: any) => {
       workspaceStore.setCurrentWorkspaceFromAuth(response.data!.workspaceId);
       
     } catch (error: any) {
-      toast.error(error.message || "Failed to create workspace");
+      toast.error(error.message || AppMessages.WORKSPACE_CREATE_FAILED);
     } finally {
       setLoading(false);
     }
@@ -564,22 +565,22 @@ export const CreateProjectModal = ({
 
   const handleCreateProject = async () => {
     if (!currentWorkspaceId) {
-      toast.error("Workspace not found");
+      toast.error(AppMessages.WORKSPACE_NOT_FOUND);
       return;
     }
 
     if (!projectName.trim()) {
-      toast.error("Project name is required");
+      toast.error(AppMessages.PROJECT_NAME_REQUIRED);
       return;
     }
 
     if (!/^[A-Za-z]{2,3}$/.test(projectKey.trim())) {
-      toast.error("Project key must be 2 to 3 letters");
+      toast.error(AppMessages.PROJECT_KEY_INVALID);
       return;
     }
 
     if (!canCreateProject) {
-      toast.error("Only workspace owner or admin can create projects");
+      toast.error(AppMessages.UNAUTHORIZED_PROJECT_CREATION);
       return;
     }
 
@@ -595,11 +596,11 @@ export const CreateProjectModal = ({
         memberIds: selectedMemberIds,
       });
 
-      toast.success(response.message || "Project created successfully");
+      toast.success(response.message || AppMessages.PROJECT_CREATED);
       await onCreated?.();
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed to create project");
+      toast.error(error.message || AppMessages.PROJECT_CREATE_FAILED);
     } finally {
       setSubmitting(false);
     }
@@ -799,7 +800,7 @@ export const EditProjectModal = ({
     }
 
     if (!canEditProject) {
-      toast.error("Only workspace owner or admin can edit projects");
+      toast.error(AppMessages.UNAUTHORIZED_PROJECT_EDIT);
       return;
     }
 
@@ -814,11 +815,11 @@ export const EditProjectModal = ({
         memberIds: selectedMemberIds,
       });
 
-      toast.success(response.message || "Project updated successfully");
+      toast.success(response.message || AppMessages.PROJECT_UPDATED);
       await onUpdated?.();
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Failed to update project");
+      toast.error(error.message || AppMessages.PROJECT_UPDATE_FAILED);
     } finally {
       setSubmitting(false);
     }

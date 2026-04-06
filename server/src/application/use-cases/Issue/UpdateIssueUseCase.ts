@@ -29,7 +29,7 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
     if (!issue) {
       throw new AppError(
         ErrorCode.RESOURCE_NOT_FOUND,
-        "Issue not found",
+        AppMessages.ISSUE_NOT_FOUND,
         HttpStatusCode.NOT_FOUND
       );
     }
@@ -97,7 +97,7 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
     if (!updatedIssue) {
       throw new AppError(
         ErrorCode.RESOURCE_NOT_FOUND,
-        "Issue not found",
+        AppMessages.ISSUE_NOT_FOUND,
         HttpStatusCode.NOT_FOUND
       );
     }
