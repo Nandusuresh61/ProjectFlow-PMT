@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { toast } from "sonner";
@@ -14,31 +14,7 @@ import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphe
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
 import { useEffect } from "react";
 
-type LoginValues = { email: string; password: string };
 
-const fields: FormField<LoginValues>[] = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "m@example.com",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    labelSuffix: (
-      <Link
-        to="/forgot-password"
-        className="text-xs text-[#576CBC]/60 hover:text-[#A5D7E8] transition-colors underline-offset-4 hover:underline"
-      >
-        Forgot password?
-      </Link>
-    ),
-  },
-];
-
-const INITIAL_VALUES: LoginValues = { email: "", password: "" };
 
 const OAuthFooter = (
   <>
@@ -61,7 +37,41 @@ export default function Login() {
   const setLoading = AuthUserState((state) => state.setLoading);
   const checkAuth = AuthUserState((state) => state.checkAuth);
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  const prefillEmail = location.state?.prefillEmail || "";
+  const isInvite = location.state?.isInvite || false;
+
+  type LoginValues = { email: string; password: string };
+
+  const INITIAL_VALUES: LoginValues = { email: prefillEmail, password: "" };
+
+  const fields: FormField<LoginValues>[] = [
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "m@example.com",
+      inputProps: {
+        readOnly: isInvite,
+        disabled: isInvite,
+      },
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      labelSuffix: (
+        <Link
+          to="/forgot-password"
+          className="text-xs text-[#576CBC]/60 hover:text-[#A5D7E8] transition-colors underline-offset-4 hover:underline"
+        >
+          Forgot password?
+        </Link>
+      ),
+    },
+  ];
 
   useEffect(() => {
     const status = searchParams.get("status");

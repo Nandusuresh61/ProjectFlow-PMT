@@ -79,6 +79,8 @@ export const AppMessages = {
   USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
 
   WORKSPACE_NOT_FOUND: "Workspace not found",
+  WORKSPACE_NAME_ALREADY_EXISTS: "A workspace with this name already exists",
+  WORKSPACE_ALREADY_OWNED: "You already own a workspace. Only one workspace is allowed per user.",
 
   WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
 
@@ -126,4 +128,5 @@ export const AppMessages = {
   PROJECT_NAME_ALREADY_EXISTS: "A project with this name already exists in the workspace",
   PROJECT_KEY_ALREADY_EXISTS: "A project with this key already exists in the workspace",
   ISSUE_CREATED_SUCCESS: "Issue Created",
+  ISSUE_NOT_FOUND: "Issue not found",
 } as const;

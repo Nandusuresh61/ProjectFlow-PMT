@@ -9,6 +9,7 @@ export const issueFormSchema = z.object({
     size: z.enum(["XS", "S", "M", "L", "XL", ""]).optional(),
     assignee: z.string().optional(),
     sprint: z.string().optional(),
+    parentId: z.string().optional(),
     subtasks: z.array(z.object({
         id: z.string(),
         title: z.string().min(1, "Subtask title is required"),

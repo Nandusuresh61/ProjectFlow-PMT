@@ -16,7 +16,7 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _passwordHasher: IPasswordHasher,
-    private readonly _otpStore: IOtpStore,
+    private readonly _otpStore: IOtpStore,  
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _emailService: IEmailService
   ) { }

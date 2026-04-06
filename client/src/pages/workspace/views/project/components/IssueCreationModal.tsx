@@ -17,6 +17,7 @@ const initialValues: FormValues = {
     size: "",
     assignee: "",
     sprint: "Backlog",
+    parentId: "",
     subtasks: []
 };
 
@@ -50,24 +51,35 @@ const sizeColors = {
     "XL": "bg-red-100 text-red-800"
 };
 
-import { createIssue, updateIssue } from "@/services/issue/issue.api";
+import { createIssue, updateIssue, getProjectIssues } from "@/services/issue/issue.api";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
 
-export function IssueCreationModal({ 
-    open, 
-    onOpenChange, 
-    project, 
+export function IssueCreationModal({
+    open,
+    onOpenChange,
+    project,
     onSuccess,
-    editIssue 
-}: { 
-    open: boolean, 
-    onOpenChange: (open: boolean) => void, 
-    project?: { key: string, id: string, workspaceId: string, memberIds: string[] }, 
+    editIssue
+}: {
+    open: boolean,
+    onOpenChange: (open: boolean) => void,
+    project?: { key: string, id: string, workspaceId: string, memberIds: string[] },
     onSuccess?: () => void,
-    editIssue?: any 
+    editIssue?: any
 }) {
     const [members, setMembers] = useState<any[]>([]);
+    const [stories, setStories] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (open && project?.id) {
+            getProjectIssues(project.id, { limit: 100 }).then(res => {
+                if (res?.data?.issues) {
+                    setStories(res.data.issues.filter((i: any) => i.type === "STORY"));
+                }
+            }).catch(err => console.error("Failed to load stories", err));
+        }
+    }, [open, project?.id]);
 
     useEffect(() => {
         if (open && project?.workspaceId) {
@@ -90,17 +102,20 @@ export function IssueCreationModal({
     useEffect(() => {
         if (open) {
             if (editIssue) {
-                dispatch({ type: "RESET", values: {
-                    title: editIssue.title || "",
-                    description: editIssue.description || "",
-                    type: editIssue.type === "STORY" ? "Story" : editIssue.type === "BUG" ? "Bug" : "Task",
-                    status: editIssue.status || "BACKLOG",
-                    priority: editIssue.priority === "HIGH" ? "High" : editIssue.priority === "LOW" ? "Low" : "Medium",
-                    size: editIssue.sizeLabel || "",
-                    assignee: editIssue.assigneeId || "",
-                    sprint: editIssue.sprintId || "Backlog",
-                    subtasks: editIssue.subtasks ? [...editIssue.subtasks] : []
-                } });
+                dispatch({
+                    type: "RESET", values: {
+                        title: editIssue.title || "",
+                        description: editIssue.description || "",
+                        type: editIssue.type === "STORY" ? "Story" : editIssue.type === "BUG" ? "Bug" : "Task",
+                        status: editIssue.status || "BACKLOG",
+                        priority: editIssue.priority === "HIGH" ? "High" : editIssue.priority === "LOW" ? "Low" : "Medium",
+                        size: editIssue.sizeLabel || "",
+                        assignee: editIssue.assigneeId || "",
+                        sprint: editIssue.sprintId || "Backlog",
+                        parentId: editIssue.parentId || "",
+                        subtasks: editIssue.subtasks ? [...editIssue.subtasks] : []
+                    }
+                });
             } else {
                 dispatch({ type: "RESET", values: initialValues });
             }
@@ -155,7 +170,7 @@ export function IssueCreationModal({
         }
 
         dispatch({ type: "SET_SUBMITTING", isSubmitting: true });
-        
+
         try {
             if (!project) {
                 toast.error("Project context is missing");
@@ -171,6 +186,7 @@ export function IssueCreationModal({
                 sizeLabel: state.values.size || null,
                 assigneeId: state.values.assignee || null,
                 sprintId: state.values.sprint === "Backlog" ? null : state.values.sprint,
+                parentId: state.values.parentId || null,
                 projectId: project.id,
                 workspaceId: project.workspaceId,
                 subtasks: state.values.subtasks,
@@ -203,11 +219,11 @@ export function IssueCreationModal({
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [open, handleSubmit]); 
+    }, [open, handleSubmit]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent 
+            <DialogContent
                 className="max-w-4xl bg-[#060d1a] border-[#19376D] text-white p-0 overflow-hidden shadow-2xl gap-0"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
@@ -282,7 +298,7 @@ export function IssueCreationModal({
 
                     {/* Sidebar */}
                     <div className="w-72 bg-[#19376D]/5 border-l border-[#19376D] p-6 space-y-6 overflow-y-auto">
-                        
+
                         <div className="space-y-1.5">
                             <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Issue Type *</Label>
                             <div className="relative">
@@ -393,17 +409,34 @@ export function IssueCreationModal({
                             </select>
                         </div>
 
+                        {(state.values.type === "Task" || state.values.type === "Bug") && stories.length > 0 && (
+                            <div className="space-y-1.5">
+                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Parent Story</Label>
+                                <select
+                                    value={state.values.parentId}
+                                    onChange={(e) => handleChange("parentId", e.target.value)}
+                                    className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
+                                >
+                                    <option value="" className="bg-[#0b1b36] text-white">None</option>
+                                    {stories.map((story: any) => (
+                                        <option key={story.issueId} value={story.issueId} className="bg-[#0b1b36] text-white">
+                                            {story.issueKey}: {story.title}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* Footer */}
                 <div className="flex items-center justify-between p-4 border-t border-[#19376D] bg-[#19376D]/5">
-                    <span className="text-xs text-[#576CBC]/60 font-medium">Use <kbd className="font-mono bg-[#19376D]/40 px-1 py-0.5 rounded text-[#A5D7E8]">Cmd</kbd> + <kbd className="font-mono bg-[#19376D]/40 px-1 py-0.5 rounded text-[#A5D7E8]">Enter</kbd> to save</span>
+
                     <div className="flex gap-2">
                         <Button type="button" variant="ghost" className="text-[#576CBC] hover:text-white hover:bg-transparent" onClick={() => onOpenChange(false)}>Cancel</Button>
-                        <Button 
-                            type="button" 
-                            onClick={handleSubmit} 
+                        <Button
+                            type="button"
+                            onClick={handleSubmit}
                             disabled={state.isSubmitting}
                             className="font-bold bg-[#A5D7E8] text-[#0B2447] hover:bg-white transition-all shadow-[0_0_15px_rgba(165,215,232,0.2)] h-9 px-6"
                         >

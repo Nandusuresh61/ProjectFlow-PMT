@@ -13,6 +13,7 @@ export interface CreateIssueDto {
     title: string;
     completed: boolean;
   }[];
+  parentId?: string | null;
 }
 
 export interface UpdateIssueDto {
@@ -29,4 +30,5 @@ export interface UpdateIssueDto {
     title: string;
     completed: boolean;
   }[];
+  parentId?: string | null;
 }

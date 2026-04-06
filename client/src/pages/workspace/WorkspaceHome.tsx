@@ -25,6 +25,7 @@ import { ProjectSprintPerformanceView } from './views/project/ProjectSprintPerfo
 import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
+import { AppMessages } from '@/shared/messages/AppMessages';
 
 const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
 const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-performance', 'project-team'] as const;
@@ -262,8 +263,9 @@ export default function WorkspaceHome() {
                     user={user}
                     onLogout={handleLogout}
                     onOpenCreateWorkspace={() => {
-                        if (workspaces.length > 0) {
-                            toast.error("You already have a workspace. Creating multiple workspaces is disabled.");
+                        const hasOwnedWorkspace = workspaces.some(ws => ws.ownerId === user?.userId);
+                        if (hasOwnedWorkspace) {
+                            toast.error(AppMessages.WORKSPACE_ALREADY_OWNED);
                             return;
                         }
                         setIsCreateWorkspaceModalOpen(true);

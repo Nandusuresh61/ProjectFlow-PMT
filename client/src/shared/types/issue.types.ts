@@ -7,6 +7,7 @@ export type FormValues = {
     size: "XS" | "S" | "M" | "L" | "XL" | "";
     assignee: string;
     sprint: string;
+    parentId?: string;
     subtasks: { id: string; title: string; completed: boolean }[];
 };
 

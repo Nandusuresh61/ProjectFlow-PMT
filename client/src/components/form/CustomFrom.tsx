@@ -18,6 +18,10 @@ export interface FormField<T extends Record<string, string>> {
     inputClassName?: string;
     /** Anything rendered between the label and the input (e.g. a "Forgot password?" link) */
     labelSuffix?: React.ReactNode;
+    /** For real-time feedback (debouncing, etc.) */
+    onChange?: (value: string) => void;
+    /** Error message provider from outside the form logic */
+    customError?: string;
     /** Additional props forwarded to the underlying <input> */
     inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "name" | "type" | "value" | "onChange" | "className">;
 }
@@ -37,6 +41,8 @@ export interface CustomFormProps<T extends Record<string, string>> {
     loadingLabel?: string;
     /** Controlled from outside (e.g. global store loading state) */
     isLoading?: boolean;
+    /** Manually disable the submit button */
+    isDisabled?: boolean;
     /** Anything rendered below the submit button (e.g. Google OAuth, dividers) */
     footer?: React.ReactNode;
     /** Override submit button classes */
@@ -112,6 +118,7 @@ function CustomForm<T extends Record<string, string>>({
     submitLabel = "Submit",
     loadingLabel = "Loading...",
     isLoading = false,
+    isDisabled = false,
     footer,
     submitClassName,
     fieldsClassName,
@@ -133,9 +140,16 @@ function CustomForm<T extends Record<string, string>>({
     const handleChange = useCallback(
         (field: keyof T & string) =>
             (e: React.ChangeEvent<HTMLInputElement>) => {
-                dispatch({ type: "SET_VALUE", field, value: e.target.value });
+                const value = e.target.value;
+                dispatch({ type: "SET_VALUE", field, value });
+                
+                // Find the field config to call its onChange
+                const fieldConfig = fields.find((f) => f.name === field);
+                if (fieldConfig?.onChange) {
+                    fieldConfig.onChange(value);
+                }
             },
-        []
+        [fields]
     );
 
     const handleBlur = useCallback(
@@ -176,14 +190,20 @@ function CustomForm<T extends Record<string, string>>({
     };
 
     const loading = isLoading || state.isSubmitting;
+    const disabled = loading || isDisabled;
 
     return (
         <form onSubmit={handleSubmit} noValidate>
             <div className={cn("space-y-4", fieldsClassName)}>
                 {fields.map((field) => {
-                    const error = state.errors[field.name];
+                    // Internal error from zod/submit
+                    const internalError = state.errors[field.name];
+                    // Real-time or external error passed via props
+                    const externalError = field.customError;
+                    
+                    const error = externalError || internalError;
                     const touched = state.touched[field.name];
-                    const showError = touched && error;
+                    const showError = (touched && internalError) || externalError;
 
                     return (
                         <div key={field.name} className="space-y-1.5">
@@ -246,7 +266,7 @@ function CustomForm<T extends Record<string, string>>({
             {/* Submit button */}
             <Button
                 type="submit"
-                disabled={loading}
+                disabled={disabled}
                 className={cn(
                     "w-full font-bold h-12 bg-[#A5D7E8] text-[#0B2447] hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.3)] mt-6",
                     submitClassName

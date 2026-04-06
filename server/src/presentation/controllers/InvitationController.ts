@@ -7,12 +7,14 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
+import { IGetInvitationDetailsUseCase } from "@/application/interfaces/use-cases/Invitation/IGetInvitationDetailsUseCase";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 
 export class InvitationController {
   constructor(
     private readonly _createInvitationUseCase: ICreateInvitationUseCase,
-    private readonly _acceptInvitationUseCase: IAcceptInvitationUseCase
+    private readonly _acceptInvitationUseCase: IAcceptInvitationUseCase,
+    private readonly _getInvitationDetailsUseCase: IGetInvitationDetailsUseCase
   ) {}
 
   inviteUser = asyncHandler(
@@ -53,4 +55,18 @@ export class InvitationController {
     );
   }
 );
+
+  getInvitationDetails = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { token } = req.params;
+      const details = await this._getInvitationDetailsUseCase.execute(token);
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(
+          "Invitation details fetched successfully",
+          details
+        )
+      );
+    }
+  );
 }

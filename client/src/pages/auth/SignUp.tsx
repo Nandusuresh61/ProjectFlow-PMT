@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { registerUser } from "@/services/auth/auth.api";
@@ -12,36 +12,7 @@ import CustomForm, { type FormField } from "@/components/form/CustomFrom";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 
 
-type SignUpValues = {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
 
-const fields: FormField<SignUpValues>[] = [
-  {
-    name: "fullName",
-    label: "Full Name",
-    type: "text",
-    placeholder: "John Doe",
-  },
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "m@example.com",
-  },
-  { name: "password", label: "Password", type: "password" },
-  { name: "confirmPassword", label: "Confirm Password", type: "password" },
-];
-
-const INITIAL_VALUES: SignUpValues = {
-  fullName: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-};
 
 const OAuthFooter = (
   <>
@@ -64,6 +35,45 @@ export default function SignUp() {
   const setLoading = AuthUserState((state) => state.setLoading);
   const setPendingEmail = AuthUserState((state) => state.setPendingEmail);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const prefillEmail = location.state?.prefillEmail || "";
+  const isInvite = location.state?.isInvite || false;
+
+  type SignUpValues = {
+    fullName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  };
+
+  const INITIAL_VALUES: SignUpValues = {
+    fullName: "",
+    email: prefillEmail,
+    password: "",
+    confirmPassword: "",
+  };
+
+  const fields: FormField<SignUpValues>[] = [
+    {
+      name: "fullName",
+      label: "Full Name",
+      type: "text",
+      placeholder: "John Doe",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "m@example.com",
+      inputProps: {
+        readOnly: isInvite,
+        disabled: isInvite,
+      },
+    },
+    { name: "password", label: "Password", type: "password" },
+    { name: "confirmPassword", label: "Confirm Password", type: "password" },
+  ];
 
   const handleSubmit = async (values: SignUpValues) => {
     if (values.password !== values.confirmPassword) {

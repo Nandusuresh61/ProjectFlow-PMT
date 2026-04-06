@@ -25,8 +25,9 @@ export class Issue {
     public storyPoints: number | null, // 1 | 2 | 3 | 5 | 8
     public assigneeId: string | null,
     public sprintId: string | null,
-    public projectId: string,
-    public workspaceId: string,
+    public readonly projectId: string,
+    public readonly workspaceId: string,
+    public readonly parentId: string | null,
     public subtasks: SubTask[],
     public createdAt: Date,
     public updatedAt: Date,
