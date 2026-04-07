@@ -7,6 +7,7 @@ import { SprintSection } from './components/SprintSection';
 import { SprintCreationModal } from './components/SprintCreationModal';
 import { StartSprintModal } from './components/StartSprintModal';
 import { getProjectIssues } from '@/services/issue/issue.api';
+import { getProjectSprints } from '@/services/sprint/sprint.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -75,12 +76,24 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         }
     }, [project.id, currentPage, debouncedSearch, itemsPerPage]);
 
+    const fetchSprints = useCallback(async () => {
+        try {
+            const res = await getProjectSprints(project.id);
+            if (res.data) {
+                setSprints(res.data);
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch sprints:", error);
+        }
+    }, [project.id]);
+
     const totalPages = Math.ceil(totalIssues / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
 
     useEffect(() => {
         fetchIssues();
-    }, [fetchIssues]);
+        fetchSprints();
+    }, [fetchIssues, fetchSprints]);
 
     useEffect(() => {
         if (project.workspaceId) {

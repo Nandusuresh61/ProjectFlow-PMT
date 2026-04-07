@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Quote, Flag } from "lucide-react";
 import { toast } from "sonner";
+import { createSprint } from "@/services/sprint/sprint.api";
 
 interface SprintCreationModalProps {
     open: boolean;
@@ -44,26 +45,21 @@ export function SprintCreationModal({
         setIsSubmitting(true);
         
         try {
-            // Mocking the creation
-            const newSprint = {
-                sprintId: Math.random().toString(36).substring(2, 9),
+            const response = await createSprint({
                 projectId,
                 name,
-                goal,
-                status: "PLANNED",
-                issueIds: [],
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            };
+                goal: goal || undefined,
+            });
 
-            // Simulate delay
-            await new Promise(resolve => setTimeout(resolve, 800));
-            
-            toast.success("Sprint created successfully");
-            onSuccess(newSprint);
-            onOpenChange(false);
+            if (response.success && response.data) {
+                toast.success(response.message || "Sprint created successfully");
+                onSuccess(response.data);
+                onOpenChange(false);
+            } else {
+                toast.error(response.message || "Failed to create sprint");
+            }
         } catch (error: any) {
-            toast.error("Failed to create sprint");
+            toast.error(error.message || "Failed to create sprint");
         } finally {
             setIsSubmitting(false);
         }

@@ -1,8 +1,7 @@
 export interface CreateSprintDto {
     projectId: string,
     name: string;
-    goal?:string;
-     
+    goal?:string;  
 }
 
 

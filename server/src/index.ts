@@ -13,6 +13,7 @@ import workspaceRoutes from "@/presentation/routes/workspaceRoutes";
 import userProfile from "@/presentation/routes/ProfileRoutes";
 import projectRoutes from "@/presentation/routes/ProjectRoutes";
 import issueRoutes from "@/presentation/routes/IssueRoutes";
+import sprintRoutes from "@/presentation/routes/SprintRoutes";
 import morgan from "morgan";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api/workspace", workspaceRoutes);
 app.use("/api/profile", userProfile);
 app.use("/api/project", projectRoutes);
 app.use("/api/issue", issueRoutes);
+app.use("/api/sprint", sprintRoutes);
 
 app.use(errorMiddleware);
 
