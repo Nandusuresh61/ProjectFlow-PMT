@@ -16,6 +16,7 @@ interface SprintSectionProps {
     onIssueDrop: (issueId: string, targetSprintId: string) => void;
     onIssueClick: (issue: any) => void;
     onEditIssue: (issue: any) => void;
+    onStart?: (sprint: any) => void;
     membersMap: Record<string, any>;
 }
 
@@ -31,6 +32,7 @@ export const SprintSection = ({
     onIssueDrop,
     onIssueClick,
     onEditIssue,
+    onStart,
     membersMap
 }: SprintSectionProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -86,7 +88,12 @@ export const SprintSection = ({
                     <div>
                         <div className="flex items-center gap-3">
                             <h3 className="text-sm font-black text-white tracking-tight">{sprint.name}</h3>
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#19376D]/50 text-[#A5D7E8] uppercase tracking-wider border border-[#A5D7E8]/10">
+                            <span className={cn(
+                                "text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border",
+                                sprint.status === 'ACTIVE' 
+                                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                    : "bg-[#19376D]/50 text-[#A5D7E8] border-[#A5D7E8]/10"
+                            )}>
                                 {sprint.status}
                             </span>
                             <span className="text-xs text-white/20 font-medium">({issues.length} issues)</span>
@@ -109,6 +116,19 @@ export const SprintSection = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {sprint.status === 'PLANNED' && (
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-8 bg-[#A5D7E8]/10 border-[#A5D7E8]/20 text-[#A5D7E8] hover:bg-[#A5D7E8] hover:text-[#0B2447] font-bold transition-all text-[10px] uppercase tracking-wider"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onStart?.(sprint);
+                            }}
+                        >
+                            Start Sprint
+                        </Button>
+                    )}
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white hover:bg-white/5">
                         <MoreHorizontal size={14} />
                     </Button>

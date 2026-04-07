@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Calendar, Quote, Flag } from "lucide-react";
+import { Quote, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 interface SprintCreationModalProps {
@@ -21,8 +21,6 @@ export function SprintCreationModal({
 }: SprintCreationModalProps) {
     const [name, setName] = useState("");
     const [goal, setGoal] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Reset when opened
@@ -31,8 +29,6 @@ export function SprintCreationModal({
             // Default name based on something or just empty
             setName(`Sprint ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
             setGoal("");
-            setStartDate("");
-            setEndDate("");
             setIsSubmitting(false);
         }
     }, [open]);
@@ -56,8 +52,6 @@ export function SprintCreationModal({
                 goal,
                 status: "PLANNED",
                 issueIds: [],
-                startDate: startDate ? new Date(startDate) : undefined,
-                endDate: endDate ? new Date(endDate) : undefined,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
@@ -109,33 +103,6 @@ export function SprintCreationModal({
                                 placeholder="What are we aiming to achieve?"
                                 className="w-full min-h-[100px] bg-[#19376D]/10 border border-[#576CBC]/20 rounded-md py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-[#576CBC]/40 focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 focus:border-[#A5D7E8]/50 resize-none transition-all"
                             />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                            <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Start Date</Label>
-                            <div className="relative">
-                                <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#576CBC]/40" />
-                                <Input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className="bg-[#19376D]/10 border-[#576CBC]/20 text-white pl-9 text-sm focus-visible:ring-[#A5D7E8]/20"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">End Date</Label>
-                            <div className="relative">
-                                <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#576CBC]/40" />
-                                <Input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    className="bg-[#19376D]/10 border-[#576CBC]/20 text-white pl-9 text-sm focus-visible:ring-[#A5D7E8]/20"
-                                />
-                            </div>
                         </div>
                     </div>
 

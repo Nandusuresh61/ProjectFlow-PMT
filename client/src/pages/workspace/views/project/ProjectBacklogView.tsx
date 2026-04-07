@@ -5,6 +5,7 @@ import { IssueCreationModal } from './components/IssueCreationModal';
 import { IssueDetailModal } from './components/IssueDetailModal';
 import { SprintSection } from './components/SprintSection';
 import { SprintCreationModal } from './components/SprintCreationModal';
+import { StartSprintModal } from './components/StartSprintModal';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
@@ -32,6 +33,8 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [issues, setIssues] = useState<any[]>([]);
     const [sprints, setSprints] = useState<any[]>([]);
     const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+    const [isStartSprintModalOpen, setIsStartSprintModalOpen] = useState(false);
+    const [activeSprintToStart, setActiveSprintToStart] = useState<any | null>(null);
     const [backlogIsOver, setBacklogIsOver] = useState(false);
     
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
@@ -108,6 +111,10 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         setSprints(prev => [...prev, newSprint]);
     };
 
+    const handleSprintStarted = (updatedSprint: any) => {
+        setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
+    };
+
     const handleIssueDrop = (issueId: string, targetSprintId: string | null) => {
         setIssues(prev => prev.map(issue => {
             if (issue.issueId === issueId) {
@@ -173,12 +180,16 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 setSelectedIssue(issue);
                                 setIsDetailModalOpen(true);
                             }}
-                            onEditIssue={(issue) => {
-                                setEditingIssue(issue);
-                                setIsEditModalOpen(true);
-                            }}
-                            membersMap={membersMap}
-                        />
+                                onEditIssue={(issue) => {
+                                    setEditingIssue(issue);
+                                    setIsEditModalOpen(true);
+                                }}
+                                onStart={(s) => {
+                                    setActiveSprintToStart(s);
+                                    setIsStartSprintModalOpen(true);
+                                }}
+                                membersMap={membersMap}
+                            />
                     ))}
                 </div>
             )}
@@ -339,6 +350,13 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 onOpenChange={setIsSprintModalOpen}
                 projectId={project.id}
                 onSuccess={handleSprintCreated}
+            />
+
+            <StartSprintModal
+                open={isStartSprintModalOpen}
+                onOpenChange={setIsStartSprintModalOpen}
+                sprint={activeSprintToStart}
+                onSuccess={handleSprintStarted}
             />
         </div>
     );
