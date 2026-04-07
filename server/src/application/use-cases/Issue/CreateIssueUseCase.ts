@@ -11,7 +11,7 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
-import { ICreateIssueUseCase } from "@/application/interfaces/use-cases/ICreateIssueUseCase";
+import { ICreateIssueUseCase } from "@/application/interfaces/use-cases/Issue/ICreateIssueUseCase";
 
 export class CreateIssueUseCase implements ICreateIssueUseCase {
   constructor(

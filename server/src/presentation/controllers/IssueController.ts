@@ -1,4 +1,4 @@
-import { ICreateIssueUseCase } from "@/application/interfaces/use-cases/ICreateIssueUseCase";
+import { ICreateIssueUseCase } from "@/application/interfaces/use-cases/Issue/ICreateIssueUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
@@ -10,8 +10,8 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { CreateIssueSchema } from "@/shared/schema/issue/CreateIssueSchema";
 import { CreateIssueDto } from "@/application/dtos/IssueDto";
 
-import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/IGetIssuesByProjectUseCase";
-import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/IUpdateIssueUseCase";
+import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/Issue/IGetIssuesByProjectUseCase";
+import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/Issue/IUpdateIssueUseCase";
 import { UpdateIssueSchema } from "@/shared/schema/issue/UpdateIssueSchema";
 
 export class IssueController {

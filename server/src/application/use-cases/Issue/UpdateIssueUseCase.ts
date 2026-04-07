@@ -1,4 +1,4 @@
-import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/IUpdateIssueUseCase";
+import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/Issue/IUpdateIssueUseCase";
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { IProjectRepository } from "@/application/interfaces/repositories/IProjectRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";

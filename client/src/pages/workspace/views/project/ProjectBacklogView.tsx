@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueCreationModal } from './components/IssueCreationModal';
 import { IssueDetailModal } from './components/IssueDetailModal';
+import { SprintSection } from './components/SprintSection';
+import { SprintCreationModal } from './components/SprintCreationModal';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface ProjectBacklogViewProps {
     project: Project;
@@ -27,6 +30,10 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const [issues, setIssues] = useState<any[]>([]);
+    const [sprints, setSprints] = useState<any[]>([]);
+    const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+    const [backlogIsOver, setBacklogIsOver] = useState(false);
+    
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [isLoading, setIsLoading] = useState(true);
 
@@ -97,6 +104,26 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         fetchIssues();
     };
 
+    const handleSprintCreated = (newSprint: any) => {
+        setSprints(prev => [...prev, newSprint]);
+    };
+
+    const handleIssueDrop = (issueId: string, targetSprintId: string | null) => {
+        setIssues(prev => prev.map(issue => {
+            if (issue.issueId === issueId) {
+                return { ...issue, sprintId: targetSprintId };
+            }
+            return issue;
+        }));
+        
+        const targetName = targetSprintId 
+            ? sprints.find(s => s.sprintId === targetSprintId)?.name || 'Sprint'
+            : 'Backlog';
+            
+        toast.info(`Issue moved to ${targetName}`);
+        // Note: In real app, we would call an API here
+    };
+
     const getAssigneeInitials = (assigneeId: string) => {
         if (!assigneeId) return '--';
         const member = membersMap[assigneeId];
@@ -108,35 +135,89 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         <div className="space-y-5">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-black text-white tracking-tight">Backlogs</h1>
-                    <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues</p>
+                    <h1 className="text-2xl font-black text-white tracking-tight">Project Backlogs</h1>
+                    <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues total</p>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all"
-                >
-                    <Plus size={15} />
-                    Add Issue
-                </button>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsSprintModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/[0.05] border border-white/[0.1] text-white text-sm font-bold rounded-xl hover:bg-white/[0.1] transition-all"
+                    >
+                        <PackagePlus size={15} className="text-[#A5D7E8]" />
+                        Create Sprint
+                    </button>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.15)]"
+                    >
+                        <Plus size={15} />
+                        Add Issue
+                    </button>
+                </div>
             </div>
 
+            {/* Sprints Section */}
+            {sprints.length > 0 && (
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-1">
+                        <Trophy size={16} className="text-amber-400" />
+                        <h2 className="text-sm font-black text-white/40 uppercase tracking-widest">Planned Sprints</h2>
+                    </div>
+                    {sprints.map(sprint => (
+                        <SprintSection
+                            key={sprint.sprintId}
+                            sprint={sprint}
+                            issues={issues.filter(i => i.sprintId === sprint.sprintId)}
+                            onIssueDrop={handleIssueDrop}
+                            onIssueClick={(issue) => {
+                                setSelectedIssue(issue);
+                                setIsDetailModalOpen(true);
+                            }}
+                            onEditIssue={(issue) => {
+                                setEditingIssue(issue);
+                                setIsEditModalOpen(true);
+                            }}
+                            membersMap={membersMap}
+                        />
+                    ))}
+                </div>
+            )}
+
             {/* Filters */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 px-1">
+                    <h2 className="text-sm font-black text-white/40 uppercase tracking-widest">Backlog</h2>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/[0.05] text-white/40">
+                        {issues.filter(i => !i.sprintId).length}
+                    </span>
+                </div>
                 <div className="relative flex-1 max-w-xs">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
                     <input
                         type="text"
-                        placeholder="Search issues..."
+                        placeholder="Search backlog..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white/[0.04] rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:bg-white/[0.07] transition-colors"
                     />
                 </div>
-
             </div>
 
             {/* Issue table */}
-            <div className="bg-white/[0.025] rounded-2xl overflow-hidden">
+            <div 
+                className={cn(
+                    "bg-white/[0.025] rounded-2xl overflow-hidden border border-transparent transition-all",
+                    backlogIsOver && "border-[#A5D7E8]/30 bg-[#A5D7E8]/[0.02]"
+                )}
+                onDragOver={(e) => { e.preventDefault(); setBacklogIsOver(true); }}
+                onDragLeave={() => setBacklogIsOver(false)}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    setBacklogIsOver(false);
+                    const issueId = e.dataTransfer.getData('issueId');
+                    if (issueId) handleIssueDrop(issueId, null);
+                }}
+            >
                 <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/[0.05]">
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Issue</span>
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Priority</span>
@@ -147,12 +228,17 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 <div className="divide-y divide-white/[0.03]">
                     {isLoading ? (
                         <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">Loading issues...</div>
-                    ) : issues.length === 0 ? (
-                        <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues found. Create one.</div>
+                    ) : issues.filter(i => !i.sprintId).length === 0 ? (
+                        <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues in backlog.</div>
                     ) : (
-                        issues.map(issue => (
+                        issues.filter(i => !i.sprintId).map(issue => (
                             <div
                                 key={issue.issueId}
+                                draggable
+                                onDragStart={(e) => {
+                                    e.dataTransfer.setData('issueId', issue.issueId);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                }}
                                 onClick={() => {
                                     setSelectedIssue(issue);
                                     setIsDetailModalOpen(true);
@@ -246,6 +332,13 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 }}
                 issue={selectedIssue}
                 membersMap={membersMap}
+            />
+
+            <SprintCreationModal 
+                open={isSprintModalOpen}
+                onOpenChange={setIsSprintModalOpen}
+                projectId={project.id}
+                onSuccess={handleSprintCreated}
             />
         </div>
     );
