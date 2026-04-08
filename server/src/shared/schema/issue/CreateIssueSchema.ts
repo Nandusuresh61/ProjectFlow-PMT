@@ -24,4 +24,5 @@ export const CreateIssueSchema = z.object({
     )
     .optional()
     .default([]),
+  parentId: z.string().optional().nullable(),
 });

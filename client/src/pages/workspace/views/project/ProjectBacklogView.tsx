@@ -39,6 +39,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [backlogIsOver, setBacklogIsOver] = useState(false);
     
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
+    const [allStories, setAllStories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Pagination & Search State
@@ -87,13 +88,25 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         }
     }, [project.id]);
 
+    const fetchStories = useCallback(async () => {
+        try {
+            const res = await getProjectIssues(project.id, { limit: 100 });
+            if (res.data?.issues) {
+                setAllStories(res.data.issues.filter((i: any) => i.type === "STORY"));
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch stories for lookup:", error);
+        }
+    }, [project.id]);
+
     const totalPages = Math.ceil(totalIssues / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
 
     useEffect(() => {
         fetchIssues();
         fetchSprints();
-    }, [fetchIssues, fetchSprints]);
+        fetchStories();
+    }, [fetchIssues, fetchSprints, fetchStories]);
 
     useEffect(() => {
         if (project.workspaceId) {
@@ -112,12 +125,14 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const handleIssueCreated = () => {
         setIsModalOpen(false);
         fetchIssues();
+        fetchStories(); // Refresh stories map as well
     };
 
     const handleIssueUpdated = () => {
         setIsEditModalOpen(false);
         setEditingIssue(null);
         fetchIssues();
+        fetchStories(); // Refresh stories map as well
     };
 
     const handleSprintCreated = (newSprint: any) => {
@@ -370,6 +385,10 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 issue={selectedIssue}
                 membersMap={membersMap}
                 sprintsMap={Object.fromEntries(sprints.map(s => [s.sprintId, s]))}
+                issuesMap={{
+                    ...Object.fromEntries(allStories.map(i => [i.issueId, i])),
+                    ...Object.fromEntries(issues.map(i => [i.issueId, i]))
+                }}
             />
 
             <SprintCreationModal 

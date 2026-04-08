@@ -23,4 +23,5 @@ export const UpdateIssueSchema = z.object({
       })
     )
     .optional(),
+  parentId: z.string().optional().nullable(),
 });

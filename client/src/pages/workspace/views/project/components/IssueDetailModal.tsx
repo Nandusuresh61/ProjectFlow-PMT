@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, CheckSquare, Bug } from "lucide-react";
+import { BookOpen, CheckSquare, Bug, Link2 } from "lucide-react";
 
 const sizeColors: Record<string, string> = {
     "XS": "bg-slate-100 text-slate-800",
@@ -20,17 +20,20 @@ export function IssueDetailModal({
     onOpenChange, 
     issue,
     membersMap,
-    sprintsMap
+    sprintsMap,
+    issuesMap
 }: { 
     open: boolean, 
     onOpenChange: (open: boolean) => void, 
     issue: any,
     membersMap: Record<string, any>,
-    sprintsMap?: Record<string, any>
+    sprintsMap?: Record<string, any>,
+    issuesMap?: Record<string, any>
 }) {
     if (!issue) return null;
 
     const assignee = membersMap[issue.assigneeId];
+    const parentStory = issue.parentId ? issuesMap?.[issue.parentId] : null;
     
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,6 +145,26 @@ export function IssueDetailModal({
                                 )}
                             </div>
                         </div>
+
+                        {(issue.type === "TASK" || issue.type === "BUG") && (
+                            <div className="space-y-1.5">
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Parent Story</span>
+                                {parentStory ? (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2.5 flex items-start gap-2.5">
+                                        <BookOpen size={13} className="text-[#A5D7E8] flex-shrink-0 mt-0.5" />
+                                        <div className="min-w-0">
+                                            <span className="text-[10px] font-mono text-[#A5D7E8] block">{parentStory.issueKey}</span>
+                                            <span className="text-xs text-white/80 leading-tight block truncate" title={parentStory.title}>{parentStory.title}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center gap-2 text-sm">
+                                        <Link2 size={13} className="text-white/20" />
+                                        <span className="text-white/30 italic text-xs">No parent story</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {issue.sprintId && (
                             <div className="space-y-1.5">
