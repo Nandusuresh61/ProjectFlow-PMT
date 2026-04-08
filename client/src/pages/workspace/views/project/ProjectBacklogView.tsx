@@ -369,6 +369,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 }}
                 issue={selectedIssue}
                 membersMap={membersMap}
+                sprintsMap={Object.fromEntries(sprints.map(s => [s.sprintId, s]))}
             />
 
             <SprintCreationModal 

@@ -19,12 +19,14 @@ export function IssueDetailModal({
     open, 
     onOpenChange, 
     issue,
-    membersMap 
+    membersMap,
+    sprintsMap
 }: { 
     open: boolean, 
     onOpenChange: (open: boolean) => void, 
     issue: any,
-    membersMap: Record<string, any>
+    membersMap: Record<string, any>,
+    sprintsMap?: Record<string, any>
 }) {
     if (!issue) return null;
 
@@ -145,7 +147,7 @@ export function IssueDetailModal({
                             <div className="space-y-1.5">
                                 <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Sprint</span>
                                 <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center text-sm text-white">
-                                    {issue.sprintId}
+                                    {sprintsMap?.[issue.sprintId]?.name || issue.sprintId}
                                 </div>
                             </div>
                         )}
