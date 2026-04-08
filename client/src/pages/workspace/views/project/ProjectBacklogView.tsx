@@ -6,6 +6,7 @@ import { IssueDetailModal } from './components/IssueDetailModal';
 import { SprintSection } from './components/SprintSection';
 import { SprintCreationModal } from './components/SprintCreationModal';
 import { StartSprintModal } from './components/StartSprintModal';
+import { IssueTypeIcon } from './components/IssueTypeIcon';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getProjectSprints, assignIssueToSprint } from '@/services/sprint/sprint.api';
 import { getMembers } from '@/services/workspace/team.api';
@@ -298,6 +299,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer"
                             >
                                 <div className="flex items-center gap-3 min-w-0">
+                                    <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
                                 </div>

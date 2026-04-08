@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, CheckSquare, Bug, Link2 } from "lucide-react";
+import { Link2 } from "lucide-react";
+import { IssueTypeIcon } from "./IssueTypeIcon";
 
 const sizeColors: Record<string, string> = {
     "XS": "bg-slate-100 text-slate-800",
@@ -13,6 +14,19 @@ const priorityColors: Record<string, string> = {
     "HIGH": "text-rose-400 bg-rose-400/10",
     "MEDIUM": "text-amber-400 bg-amber-400/10",
     "LOW": "text-emerald-400 bg-emerald-400/10"
+};
+
+const statusLabels: Record<string, string> = {
+    "BACKLOG": "Backlog",
+    "TODO": "To Do",
+    "IN_PROGRESS": "In Progress",
+    "DONE": "Done"
+};
+
+const priorityLabels: Record<string, string> = {
+    "HIGH": "High",
+    "MEDIUM": "Medium",
+    "LOW": "Low"
 };
 
 export function IssueDetailModal({ 
@@ -98,26 +112,24 @@ export function IssueDetailModal({
                         <div className="space-y-1.5">
                             <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Status</span>
                             <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center text-sm font-bold text-white uppercase tracking-wider">
-                                {issue.status}
+                                {statusLabels[issue.status] || issue.status}
                             </div>
                         </div>
 
                         <div className="space-y-1.5">
                             <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Issue Type</span>
                             <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center gap-2 text-sm text-white capitalize">
-                                <span className="text-[#A5D7E8]">
-                                    {issue.type === "STORY" && <BookOpen size={14} />}
-                                    {issue.type === "TASK" && <CheckSquare size={14} />}
-                                    {issue.type === "BUG" && <Bug size={14} className="text-red-400" />}
+                                <span>
+                                    <IssueTypeIcon type={issue.type} size={14} />
                                 </span>
-                                {issue.type.toLowerCase()}
+                                {issue.type.charAt(0).toUpperCase() + issue.type.slice(1).toLowerCase()}
                             </div>
                         </div>
 
                         <div className="space-y-1.5">
                             <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Priority</span>
                             <div className={`w-full border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center text-sm font-bold capitalize ${priorityColors[issue.priority] || 'text-white bg-[#19376D]/20'}`}>
-                                {issue.priority.toLowerCase()}
+                                {priorityLabels[issue.priority] || issue.priority}
                             </div>
                         </div>
 
@@ -151,7 +163,7 @@ export function IssueDetailModal({
                                 <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Parent Story</span>
                                 {parentStory ? (
                                     <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2.5 flex items-start gap-2.5">
-                                        <BookOpen size={13} className="text-[#A5D7E8] flex-shrink-0 mt-0.5" />
+                                        <IssueTypeIcon type="STORY" size={13} className="flex-shrink-0 mt-0.5" />
                                         <div className="min-w-0">
                                             <span className="text-[10px] font-mono text-[#A5D7E8] block">{parentStory.issueKey}</span>
                                             <span className="text-xs text-white/80 leading-tight block truncate" title={parentStory.title}>{parentStory.title}</span>

@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Plus, X, BookOpen, CheckSquare, Bug } from "lucide-react";
+import { Plus, X } from "lucide-react";
+import { IssueTypeIcon } from "./IssueTypeIcon";
 import { cn } from "@/lib/utils";
 import { issueFormSchema } from "@/shared/schema/issue/issue.schema";
 import type { FormState, FormAction, FormValues } from "@/shared/types/issue.types";
@@ -314,10 +315,8 @@ export function IssueCreationModal({
                                     <option value="Task" className="bg-[#0b1b36] text-white">Task</option>
                                     <option value="Bug" className="bg-[#0b1b36] text-white">Bug</option>
                                 </select>
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#A5D7E8]">
-                                    {state.values.type === "Story" && <BookOpen size={14} />}
-                                    {state.values.type === "Task" && <CheckSquare size={14} />}
-                                    {state.values.type === "Bug" && <Bug size={14} className="text-red-400" />}
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <IssueTypeIcon type={state.values.type} size={14} />
                                 </div>
                             </div>
                         </div>
