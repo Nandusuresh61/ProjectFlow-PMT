@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
-import { IssueCreationModal } from './components/IssueCreationModal';
-import { IssueDetailModal } from './components/IssueDetailModal';
-import { SprintSection } from './components/SprintSection';
-import { SprintCreationModal } from './components/SprintCreationModal';
-import { StartSprintModal } from './components/StartSprintModal';
-import { IssueTypeIcon } from './components/IssueTypeIcon';
+import { IssueDetailModal } from './components/issue/IssueDetailModal';
+import { SprintSection } from './components/sprint/SprintSection';
+import { SprintCreationModal } from './components/sprint/SprintCreationModal';
+import { StartSprintModal } from './components/sprint/StartSprintModal';
+import { IssueTypeIcon } from './components/issue/IssueTypeIcon';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getProjectSprints, assignIssueToSprint } from '@/services/sprint/sprint.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import IssueCreationModal from './components/issue/IssueCreationModal';
 
 interface ProjectBacklogViewProps {
     project: Project;
@@ -38,7 +38,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isStartSprintModalOpen, setIsStartSprintModalOpen] = useState(false);
     const [activeSprintToStart, setActiveSprintToStart] = useState<any | null>(null);
     const [backlogIsOver, setBacklogIsOver] = useState(false);
-    
+
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [allStories, setAllStories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -153,11 +153,11 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
             }
             return issue;
         }));
-        
-        const targetName = targetSprintId 
+
+        const targetName = targetSprintId
             ? sprints.find(s => s.sprintId === targetSprintId)?.name || 'Sprint'
             : 'Backlog';
-            
+
         try {
             const res = await assignIssueToSprint(issueId, targetSprintId);
             if (res.success) {
@@ -222,16 +222,16 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 setSelectedIssue(issue);
                                 setIsDetailModalOpen(true);
                             }}
-                                onEditIssue={(issue) => {
-                                    setEditingIssue(issue);
-                                    setIsEditModalOpen(true);
-                                }}
-                                onStart={(s) => {
-                                    setActiveSprintToStart(s);
-                                    setIsStartSprintModalOpen(true);
-                                }}
-                                membersMap={membersMap}
-                            />
+                            onEditIssue={(issue) => {
+                                setEditingIssue(issue);
+                                setIsEditModalOpen(true);
+                            }}
+                            onStart={(s) => {
+                                setActiveSprintToStart(s);
+                                setIsStartSprintModalOpen(true);
+                            }}
+                            membersMap={membersMap}
+                        />
                     ))}
                 </div>
             )}
@@ -257,7 +257,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
             </div>
 
             {/* Issue table */}
-            <div 
+            <div
                 className={cn(
                     "bg-white/[0.025] rounded-2xl overflow-hidden border border-transparent transition-all",
                     backlogIsOver && "border-[#A5D7E8]/30 bg-[#A5D7E8]/[0.02]"
@@ -328,7 +328,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                         ))
                     )}
                 </div>
-                
+
                 {/* Pagination Footer */}
                 {totalIssues > 0 && (
                     <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05] bg-white/[0.01]">
@@ -393,7 +393,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 }}
             />
 
-            <SprintCreationModal 
+            <SprintCreationModal
                 open={isSprintModalOpen}
                 onOpenChange={setIsSprintModalOpen}
                 projectId={project.id}

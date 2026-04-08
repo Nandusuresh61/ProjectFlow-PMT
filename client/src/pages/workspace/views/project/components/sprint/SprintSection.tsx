@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { IssueTypeIcon } from './IssueTypeIcon';
+import { IssueTypeIcon } from '../issue/IssueTypeIcon';
 
 interface SprintSectionProps {
     sprint: {

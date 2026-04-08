@@ -43,7 +43,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
     }
 }
 
-// Map size to Tailwind classes styles
 const sizeColors = {
     "XS": "bg-slate-100 text-slate-800",
     "S": "bg-blue-100 text-blue-800",
@@ -99,7 +98,6 @@ export function IssueCreationModal({
         isSubmitting: false,
     } as FormState);
 
-    // Reset or populate when opened
     useEffect(() => {
         if (open) {
             if (editIssue) {
@@ -153,7 +151,6 @@ export function IssueCreationModal({
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        // Touch all fields
         const allFields = ["title", "description", "type", "status", "priority", "size", "assignee", "sprint"];
         allFields.forEach(f => dispatch({ type: "TOUCH", field: f }));
 
@@ -211,7 +208,6 @@ export function IssueCreationModal({
         }
     }, [state.values, onOpenChange, editIssue, project, onSuccess]);
 
-    // Keyboard shortcut (Cmd/Ctrl + Enter)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && open) {

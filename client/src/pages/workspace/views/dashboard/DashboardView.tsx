@@ -7,7 +7,7 @@ import {
     Zap
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Card } from '../components/Card';
+import { Card } from '../../components/Card';
 
 
 interface Stat {

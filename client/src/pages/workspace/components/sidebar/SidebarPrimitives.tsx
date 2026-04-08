@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-// ─── NavItem ────────────────────────────────────────────────────────────────
 
 export interface NavItemProps {
     id: string;
@@ -12,7 +11,6 @@ export interface NavItemProps {
     isCollapsed: boolean;
     onClick: () => void;
     badge?: number;
-    /** Render extra content below the button (e.g. dropdowns) */
     children?: React.ReactNode;
 }
 
@@ -65,7 +63,6 @@ export const NavItem = ({
     </div>
 );
 
-// ─── NavSection ──────────────────────────────────────────────────────────────
 
 export interface NavSectionProps {
     label: string;
@@ -89,7 +86,6 @@ export const NavSection = ({ label, isCollapsed, children }: NavSectionProps) =>
     </div>
 );
 
-// ─── ProjectChip ─────────────────────────────────────────────────────────────
 
 export interface ProjectChipProps {
     name: string;
@@ -114,7 +110,6 @@ export const ProjectChip = ({ name, color, keyCode, isActive, onClick }: Project
     </button>
 );
 
-// ─── CollapsibleProjectList ───────────────────────────────────────────────────
 
 export interface CollapsibleProjectListProps {
     isOpen: boolean;
@@ -138,7 +133,6 @@ export const CollapsibleProjectList = ({ isOpen, children }: CollapsibleProjectL
     </AnimatePresence>
 );
 
-// ─── ExpandableNavItem ────────────────────────────────────────────────────────
 
 export interface ExpandableNavItemProps {
     icon: LucideIcon;
@@ -183,7 +177,6 @@ export const ExpandableNavItem = ({
     </div>
 );
 
-// ─── SidebarDivider ───────────────────────────────────────────────────────────
 
 export const SidebarDivider = () => (
     <div className="h-px bg-white/[0.05] my-2 mx-3" />
