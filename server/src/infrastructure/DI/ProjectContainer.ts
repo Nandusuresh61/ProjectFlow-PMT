@@ -29,7 +29,8 @@ const getWorkspaceProjectsUseCase = new GetWorkspaceProjectsUseCase(
 const updateProjectUseCase = new UpdateProjectUseCase(
   projectRepo,
   workspaceRepo,
-  membershipRepo
+  membershipRepo,
+  planRepo
 );
 
 export const projectController = new ProjectController(

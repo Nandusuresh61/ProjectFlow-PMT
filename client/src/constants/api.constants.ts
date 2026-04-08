@@ -43,6 +43,7 @@ export const API_ROUTES = {
   SPRINT: {
     BASE: "/sprint",
     LIST_BY_PROJECT: (projectId: string) => `/sprint/project/${projectId}`,
+    ASSIGN_ISSUE: "/sprint/assign-issue",
   },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",

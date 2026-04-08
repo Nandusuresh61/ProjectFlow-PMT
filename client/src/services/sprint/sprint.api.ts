@@ -46,3 +46,15 @@ export const getProjectSprints = async (
 
   return data;
 };
+
+export const assignIssueToSprint = async (
+  issueId: string,
+  sprintId: string | null
+): Promise<SprintResponse<any>> => {
+  const { data } = await API.patch<SprintResponse<any>>(
+    API_ROUTES.SPRINT.ASSIGN_ISSUE,
+    { issueId, sprintId }
+  );
+
+  return data;
+};

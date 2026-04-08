@@ -36,6 +36,8 @@ const acceptInvitationUseCase = new AcceptInvitationUseCase(
   invitationRepo,
   membershipRepo,
   userRepo,
+  workspaceRepo,
+  planRepo,
   passwordHasher,
   uidGenerator
 );

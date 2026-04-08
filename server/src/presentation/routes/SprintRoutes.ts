@@ -6,5 +6,6 @@ const router = Router();
 
 router.post("/", authenticatedUser, sprintController.createSprint);
 router.get("/project/:projectId", authenticatedUser, sprintController.getSprintsByProject);
+router.patch("/assign-issue", authenticatedUser, sprintController.assignIssueToSprint);
 
 export default router;

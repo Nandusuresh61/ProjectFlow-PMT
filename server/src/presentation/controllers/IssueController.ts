@@ -56,7 +56,7 @@ export class IssueController {
     if (!projectId) {
       throw new AppError(
         ErrorCode.INVALID_OPERATION,
-        "Project ID is required",
+        AppMessages.PROJECT_ID_REQUIRED,
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -71,7 +71,7 @@ export class IssueController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Issues retrieved successfully", { issues, total }));
+      .json(ResponseHandler.success(AppMessages.ISSUES_RETRIEVED_SUCCESS, { issues, total }));
   });
 
   updateIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -81,7 +81,7 @@ export class IssueController {
     if (!issueId) {
       throw new AppError(
         ErrorCode.INVALID_OPERATION,
-        "Issue ID is required",
+        AppMessages.ISSUE_ID_REQUIRED,
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -91,7 +91,7 @@ export class IssueController {
     if (!result.success) {
       throw new AppError(
         ErrorCode.INVALID_OPERATION,
-        "Invalid issue data: " + result.error.issues.map(e => e.message).join(", "),
+        AppMessages.INVALID_ISSUE_DATA + ": " + result.error.issues.map(e => e.message).join(", "),
         HttpStatusCode.BAD_REQUEST
       );
     }
@@ -104,6 +104,6 @@ export class IssueController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Issue updated successfully", updatedIssue));
+      .json(ResponseHandler.success(AppMessages.ISSUE_UPDATED_SUCCESS, updatedIssue));
   });
 }

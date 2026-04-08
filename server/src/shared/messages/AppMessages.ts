@@ -130,5 +130,15 @@ export const AppMessages = {
   ISSUE_CREATED_SUCCESS: "Issue Created",
   ISSUE_NOT_FOUND: "Issue not found",
 
-  SPRINT_CREATED_SUCCESS: "Sprint Created Successful."
-} as const;
+  SPRINT_CREATED_SUCCESS: "Sprint Created Successful.",
+  PROJECT_ID_REQUIRED: "Project ID is required",
+  ISSUES_RETRIEVED_SUCCESS: "Issues retrieved successfully",
+  ISSUE_ID_REQUIRED: "Issue ID is required",
+  INVALID_ISSUE_DATA: "Invalid issue data",
+  ISSUE_UPDATED_SUCCESS: "Issue updated successfully",
+  SPRINTS_RETRIEVED_SUCCESS: "Sprints retrieved successfully",
+  ISSUE_ASSIGNED_TO_SPRINT_SUCCESS: "Issue assigned to sprint successfully",
+  TARGET_SPRINT_NOT_FOUND: "Sprint not found",
+  SPRINT_NOT_BELONG_TO_PROJECT: "Sprint does not belong to this project",
+  ISSUE_UPDATE_FAILED: "Failed to update issue"
+};

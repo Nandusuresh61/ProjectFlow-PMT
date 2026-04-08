@@ -126,6 +126,14 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       );
     }
 
+    if (projectMemberIds.length > plan.maxMembers) {
+      throw new AppError(
+        ErrorCode.PLAN,
+        AppMessages.MEMBER_LIMIT_EXCEEDED,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
     const now = new Date();
 
     const project = new Project(

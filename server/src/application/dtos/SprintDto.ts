@@ -4,9 +4,9 @@ export interface CreateSprintDto {
     goal?:string;  
 }
 
-
-
-export interface AddIssueToSprintDto {
-  sprintId: string;
-  issueId: string;
+export interface AssignIssueToSprintDto {
+    issueId: string;
+    sprintId: string | null;
 }
+
+

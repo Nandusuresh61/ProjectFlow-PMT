@@ -7,7 +7,7 @@ import { SprintSection } from './components/SprintSection';
 import { SprintCreationModal } from './components/SprintCreationModal';
 import { StartSprintModal } from './components/StartSprintModal';
 import { getProjectIssues } from '@/services/issue/issue.api';
-import { getProjectSprints } from '@/services/sprint/sprint.api';
+import { getProjectSprints, assignIssueToSprint } from '@/services/sprint/sprint.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -128,7 +128,9 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
     };
 
-    const handleIssueDrop = (issueId: string, targetSprintId: string | null) => {
+    const handleIssueDrop = async (issueId: string, targetSprintId: string | null) => {
+        // Optimistic update
+        const previousIssues = [...issues];
         setIssues(prev => prev.map(issue => {
             if (issue.issueId === issueId) {
                 return { ...issue, sprintId: targetSprintId };
@@ -140,8 +142,19 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
             ? sprints.find(s => s.sprintId === targetSprintId)?.name || 'Sprint'
             : 'Backlog';
             
-        toast.info(`Issue moved to ${targetName}`);
-        // Note: In real app, we would call an API here
+        try {
+            const res = await assignIssueToSprint(issueId, targetSprintId);
+            if (res.success) {
+                toast.success(`Issue moved to ${targetName}`);
+                fetchIssues(); // Refresh to get updated status and other fields
+            } else {
+                throw new Error(res.message);
+            }
+        } catch (error: any) {
+            // Rollback
+            setIssues(previousIssues);
+            toast.error(error.message || `Failed to move issue to ${targetName}`);
+        }
     };
 
     const getAssigneeInitials = (assigneeId: string) => {

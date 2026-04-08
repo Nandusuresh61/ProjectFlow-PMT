@@ -10,4 +10,5 @@ export enum ErrorCode {
     RESOURCE_NOT_FOUND = "Resource Not Found",
     INVALID_OPERATION = "Invalid Operation",
     VALIDATION_ERROR = "Validation Error",
+    INTERNAL_ERROR = "Internal Error",
 }
