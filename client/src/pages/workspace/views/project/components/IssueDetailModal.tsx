@@ -38,7 +38,7 @@ export function IssueDetailModal({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent 
-                className="max-w-4xl bg-[#060d1a] border-[#19376D] text-white p-0 overflow-hidden shadow-2xl gap-0"
+                className="w-[95vw] max-w-4xl max-h-[96vh] bg-[#060d1a] border-[#19376D] text-white p-0 overflow-hidden shadow-2xl gap-0 flex flex-col"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
                 {/* Header */}
@@ -51,9 +51,9 @@ export function IssueDetailModal({
                     </div>
                 </div>
 
-                <div className="flex h-[600px]">
+                <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden min-h-0">
                     {/* Main Body */}
-                    <div className="flex-1 p-6 overflow-y-auto space-y-6">
+                    <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6 min-h-0">
                         <div className="space-y-1.5 flex flex-col min-h-32">
                             <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Description</span>
                             <div className="flex-1 w-full bg-[#19376D]/10 border border-[#576CBC]/20 rounded-md p-4 text-white/90 whitespace-pre-wrap leading-relaxed shadow-inner">
@@ -93,7 +93,7 @@ export function IssueDetailModal({
                     </div>
 
                     {/* Sidebar */}
-                    <div className="w-72 bg-[#19376D]/5 border-l border-[#19376D] p-6 space-y-6 overflow-y-auto">
+                    <div className="w-full lg:w-80 bg-[#19376D]/5 border-t lg:border-t-0 lg:border-l border-[#19376D] p-4 sm:p-6 space-y-6 overflow-y-auto">
                         
                         <div className="space-y-1.5">
                             <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Status</span>
@@ -179,7 +179,7 @@ export function IssueDetailModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end p-4 border-t border-[#19376D] bg-[#19376D]/5">
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-4 border-t border-[#19376D] bg-[#19376D]/5">
                     <button 
                         type="button" 
                         onClick={() => onOpenChange(false)}
