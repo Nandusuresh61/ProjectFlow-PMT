@@ -27,7 +27,7 @@ export class StartSprintUseCase implements IStartSprintUseCase {
     }
 
     const sprint = await this._sprintRepo.findById(sprintId);
-
+    
     if (!sprint) {
       throw new AppError(
         ErrorCode.RESOURCE_NOT_FOUND,

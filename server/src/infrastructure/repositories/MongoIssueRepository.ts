@@ -66,6 +66,11 @@ export class MongoIssueRepository implements IIssueRepository {
     return this.toDomain(updated);
   }
 
+  async findBySprintId(sprintId: string): Promise<Issue[]> {
+    const issues = await IssueModel.find({ sprintId }).lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,

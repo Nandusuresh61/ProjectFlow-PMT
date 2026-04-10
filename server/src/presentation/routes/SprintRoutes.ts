@@ -14,6 +14,7 @@ router.post(
 );
 
 router.get("/project/:projectId", authenticatedUser, sprintController.getSprintsByProject);
+router.get("/project/:projectId/active", authenticatedUser, sprintController.getActiveSprint);
 
 router.patch("/assign-issue", authenticatedUser, sprintController.assignIssueToSprint);
 

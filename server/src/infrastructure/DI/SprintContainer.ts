@@ -2,6 +2,7 @@ import { CreateSprintUseCase } from "@/application/use-cases/Sprint/CreateSprint
 import { GetSprintsByProjectUseCase } from "@/application/use-cases/Sprint/GetSprintsByProjectUseCase";
 import { AssignIssueToSprintUseCase } from "@/application/use-cases/Sprint/AssignIssueToSprintUseCase";
 import { StartSprintUseCase } from "@/application/use-cases/Sprint/StartSprintUseCase";
+import { GetActiveSprintUseCase } from "@/application/use-cases/Sprint/GetActiveSprintUseCase";
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
@@ -38,9 +39,17 @@ const startSprintUseCase = new StartSprintUseCase(
   sprintRepository
 );
 
+const getActiveSprintUseCase = new GetActiveSprintUseCase(
+  projectRepository,
+  membershipRepository,
+  sprintRepository,
+  issueRepository
+);
+
 export const sprintController = new SprintController(
   createSprintUseCase,
   getSprintsByProjectUseCase,
   assignIssueToSprintUseCase,
-  startSprintUseCase
+  startSprintUseCase,
+  getActiveSprintUseCase
 );

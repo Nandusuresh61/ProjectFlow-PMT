@@ -3,6 +3,7 @@ import { ICreateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/
 import { IGetSprintsByProjectUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintsByProjectUseCase";
 import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IAssignIssueToSprintUseCase";
 import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
+import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IGetActiveSprintUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
@@ -22,6 +23,7 @@ export class SprintController {
     private readonly _getSprintsByProjectUseCase: IGetSprintsByProjectUseCase,
     private readonly _assignIssueToSprintUseCase: IAssignIssueToSprintUseCase,
     private readonly _startSprintUseCase: IStartSprintUseCase,
+    private readonly _getActiveSprintUseCase: IGetActiveSprintUseCase,
   ) { }
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -119,5 +121,29 @@ export class SprintController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.SPRINT_STARTED_SUCCESS, result));
+  });
+
+  getActiveSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getActiveSprintUseCase.execute(
+      userId,
+      projectId,
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.ACTIVE_SPRINT_RETRIEVED_SUCCESS, result),
+      );
   });
 }

@@ -74,3 +74,32 @@ export const startSprint = async (
   return data;
 };
 
+export interface IssueData {
+  issueId: string;
+  issueKey: string;
+  title: string;
+  description: string;
+  type: "STORY" | "TASK" | "BUG";
+  status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  assigneeId: string | null;
+  sprintId: string | null;
+  projectId: string;
+  workspaceId: string;
+}
+
+export interface ActiveSprintData {
+  sprint: SprintData | null;
+  issues: IssueData[];
+}
+
+export const getActiveSprint = async (
+  projectId: string
+): Promise<SprintResponse<ActiveSprintData>> => {
+  const { data } = await API.get<SprintResponse<ActiveSprintData>>(
+    API_ROUTES.SPRINT.GET_ACTIVE(projectId)
+  );
+
+  return data;
+};
+

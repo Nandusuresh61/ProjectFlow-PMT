@@ -145,4 +145,5 @@ export const AppMessages = {
   SPRINT_NOT_PLANNED: "Only planned sprints can be started",
   SPRINT_ALREADY_ACTIVE: "An active sprint already exists for this project",
   SPRINT_STARTED_SUCCESS: "Sprint started successfully",
+  ACTIVE_SPRINT_RETRIEVED_SUCCESS: "Active sprint retrieved successfully",
 };
