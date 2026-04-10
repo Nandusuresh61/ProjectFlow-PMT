@@ -11,7 +11,7 @@ interface ProjectBoardViewProps {
 }
 
 interface BoardCardData {
-    id: string; 
+    id: string;
     issueKey: string;
     title: string;
     tag: string;
@@ -47,13 +47,12 @@ const BoardCard = ({ card }: { card: BoardCardData }) => (
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         draggable
-        onDragStart={(e) => {
+        onDragStart={(e: any) => {
             e.dataTransfer.setData('issueId', card.id);
             e.dataTransfer.effectAllowed = 'move';
-            // Add a slight transparency to the original card while dragging
             (e.target as HTMLElement).style.opacity = '0.4';
         }}
-        onDragEnd={(e) => {
+        onDragEnd={(e: any) => {
             (e.target as HTMLElement).style.opacity = '1';
         }}
         className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-grab active:cursor-grabbing group border border-white/5"
@@ -111,18 +110,16 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;
 
-        // Find the issue to get its current status for potential rollback
         const issue = activeSprintData.issues.find(i => i.issueId === issueId);
         if (!issue || issue.status === newStatus) return;
 
         const oldStatus = issue.status;
 
-        // Optimistic update
         setActiveSprintData(prev => {
             if (!prev) return prev;
             return {
                 ...prev,
-                issues: prev.issues.map(i => 
+                issues: prev.issues.map(i =>
                     i.issueId === issueId ? { ...i, status: newStatus as any } : i
                 )
             };
@@ -137,13 +134,12 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
         } catch (error) {
             console.error('Error updating issue status:', error);
             toast.error('Failed to move issue. Reverting...');
-            
-            // Rollback on error
+
             setActiveSprintData(prev => {
                 if (!prev) return prev;
                 return {
                     ...prev,
-                    issues: prev.issues.map(i => 
+                    issues: prev.issues.map(i =>
                         i.issueId === issueId ? { ...i, status: oldStatus } : i
                     )
                 };
@@ -160,7 +156,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
         e.preventDefault();
         setDragOverColumn(null);
         const issueId = e.dataTransfer.getData('issueId');
-        
+
         const statusMap: Record<string, 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE'> = {
             'todo': 'TODO',
             'in-progress': 'IN_PROGRESS',
@@ -244,7 +240,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                 })),
             count: 0
         }
-    ].map(col => ({ ...col, count: col.cards.length }));
+    ].map(col => ({ ...col, count: col.cards.length } as Column));
 
     if (loading) {
         return (
@@ -295,8 +291,8 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start pb-8">
                 {columns.map(col => (
-                    <div 
-                        key={col.id} 
+                    <div
+                        key={col.id}
                         className={`bg-white/[0.025] rounded-3xl overflow-hidden flex flex-col min-h-[400px] transition-all duration-200 border border-white/5 ${dragOverColumn === col.id ? 'bg-white/[0.05] ring-2 ring-[#A5D7E8]/20 border-[#A5D7E8]/20' : ''}`}
                         onDragOver={(e) => handleDragOver(e, col.id)}
                         onDragLeave={() => setDragOverColumn(null)}
@@ -310,6 +306,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                                     {col.count}
                                 </span>
                             </div>
+
                         </div>
 
                         <div className="p-4 space-y-3 flex-1">
@@ -318,7 +315,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                                     <BoardCard key={card.id} card={card} />
                                 ))}
                             </AnimatePresence>
-                            
+
                             {col.cards.length === 0 && (
                                 <div className="h-32 flex flex-col items-center justify-center border-2 border-dashed border-white/[0.03] rounded-2xl bg-white/[0.01]">
                                     <div className="w-10 h-10 rounded-full bg-white/[0.02] flex items-center justify-center mb-2">
@@ -327,7 +324,8 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                                     <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.2em]">Drop here</span>
                                 </div>
                             )}
-                            
+
+
                         </div>
                     </div>
                 ))}
