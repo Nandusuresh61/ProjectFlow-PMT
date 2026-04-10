@@ -1,6 +1,7 @@
 import { CreateSprintUseCase } from "@/application/use-cases/Sprint/CreateSprintUseCase";
 import { GetSprintsByProjectUseCase } from "@/application/use-cases/Sprint/GetSprintsByProjectUseCase";
 import { AssignIssueToSprintUseCase } from "@/application/use-cases/Sprint/AssignIssueToSprintUseCase";
+import { StartSprintUseCase } from "@/application/use-cases/Sprint/StartSprintUseCase";
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
@@ -33,8 +34,13 @@ const assignIssueToSprintUseCase = new AssignIssueToSprintUseCase(
   membershipRepository,
 );
 
+const startSprintUseCase = new StartSprintUseCase(
+  sprintRepository
+);
+
 export const sprintController = new SprintController(
   createSprintUseCase,
   getSprintsByProjectUseCase,
   assignIssueToSprintUseCase,
+  startSprintUseCase
 );

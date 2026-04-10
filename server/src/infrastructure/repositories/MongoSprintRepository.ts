@@ -29,7 +29,10 @@ export class SprintRepository implements ISprintRepository {
     return this.toDomain(doc as any);
   }
 
-  async update(sprintId: string, data: Partial<Sprint>): Promise<Sprint | null> {
+  async update(
+    sprintId: string,
+    data: Partial<Sprint>,
+  ): Promise<Sprint | null> {
     const updated = await SprintModel.findOneAndUpdate(
       { sprintId },
       { $set: data },
@@ -38,6 +41,12 @@ export class SprintRepository implements ISprintRepository {
 
     if (!updated) return null;
     return this.toDomain(updated as any);
+  }
+
+  async findActiveProjectId(projectId: string): Promise<Sprint | null> {
+    const sprint = await SprintModel.findOne({ projectId, status: "ACTIVE" });
+
+    return sprint ? this.toDomain(sprint) : null;
   }
 
   private toDomain(doc: any): Sprint {

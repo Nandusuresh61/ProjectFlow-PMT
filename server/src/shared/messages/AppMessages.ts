@@ -140,5 +140,9 @@ export const AppMessages = {
   ISSUE_ASSIGNED_TO_SPRINT_SUCCESS: "Issue assigned to sprint successfully",
   TARGET_SPRINT_NOT_FOUND: "Sprint not found",
   SPRINT_NOT_BELONG_TO_PROJECT: "Sprint does not belong to this project",
-  ISSUE_UPDATE_FAILED: "Failed to update issue"
+  ISSUE_UPDATE_FAILED: "Failed to update issue",
+  INVALID_DATE_RANGE: "Start date cannot be after end date",
+  SPRINT_NOT_PLANNED: "Only planned sprints can be started",
+  SPRINT_ALREADY_ACTIVE: "An active sprint already exists for this project",
+  SPRINT_STARTED_SUCCESS: "Sprint started successfully",
 };

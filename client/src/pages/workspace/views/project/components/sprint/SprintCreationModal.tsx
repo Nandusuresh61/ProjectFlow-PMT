@@ -11,6 +11,7 @@ interface SprintCreationModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     projectId: string;
+    workspaceId: string;
     onSuccess: (sprint: any) => void;
 }
 
@@ -18,6 +19,7 @@ export function SprintCreationModal({
     open,
     onOpenChange,
     projectId,
+    workspaceId,
     onSuccess,
 }: SprintCreationModalProps) {
     const [name, setName] = useState("");
@@ -49,6 +51,7 @@ export function SprintCreationModal({
                 projectId,
                 name,
                 goal: goal || undefined,
+                workspaceId,
             });
 
             if (response.success && response.data) {

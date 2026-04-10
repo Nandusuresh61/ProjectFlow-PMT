@@ -397,6 +397,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 open={isSprintModalOpen}
                 onOpenChange={setIsSprintModalOpen}
                 projectId={project.id}
+                workspaceId={project.workspaceId}
                 onSuccess={handleSprintCreated}
             />
 
@@ -404,6 +405,7 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 open={isStartSprintModalOpen}
                 onOpenChange={setIsStartSprintModalOpen}
                 sprint={activeSprintToStart}
+                workspaceId={project.workspaceId}
                 onSuccess={handleSprintStarted}
             />
         </div>

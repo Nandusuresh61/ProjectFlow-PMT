@@ -5,4 +5,7 @@ export interface ISprintRepository {
   findByProjectId(projectId: string): Promise<Sprint[]>;
   findById(sprintId: string): Promise<Sprint | null>;
   update(sprintId: string, data: Partial<Sprint>): Promise<Sprint | null>;
+  findActiveProjectId(projectId: string): Promise<Sprint | null>;
 }
+
+

@@ -1,12 +1,14 @@
-import { CreateSprintDto, AssignIssueToSprintDto } from "@/application/dtos/SprintDto";
+import { CreateSprintDto, AssignIssueToSprintDto, StartSprintDto } from "@/application/dtos/SprintDto";
 import { ICreateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICreateSprintUseCase";
 import { IGetSprintsByProjectUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintsByProjectUseCase";
 import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IAssignIssueToSprintUseCase";
+import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { CreateSprintSchema } from "@/shared/schema/sprint/CreateSprintSchema";
 import { AssignIssueToSprintSchema } from "@/shared/schema/sprint/AssignIssueToSprintSchema";
+import { StartSprintSchema } from "@/shared/schema/sprint/StartSprintSchema";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
@@ -19,7 +21,8 @@ export class SprintController {
     private readonly _createSprintUseCase: ICreateSprintUseCase,
     private readonly _getSprintsByProjectUseCase: IGetSprintsByProjectUseCase,
     private readonly _assignIssueToSprintUseCase: IAssignIssueToSprintUseCase,
-  ) {}
+    private readonly _startSprintUseCase: IStartSprintUseCase,
+  ) { }
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
     const validatedData = CreateSprintSchema.parse(req.body) as CreateSprintDto;
@@ -89,5 +92,32 @@ export class SprintController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.ISSUE_ASSIGNED_TO_SPRINT_SUCCESS, result));
+  });
+
+  startSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const validatedData = StartSprintSchema.parse(req.body) as StartSprintDto;
+
+    if (req.params.sprintId) {
+      validatedData.sprintId = req.params.sprintId;
+    }
+
+    const result = await this._startSprintUseCase.execute(
+      userId,
+      validatedData,
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.SPRINT_STARTED_SUCCESS, result));
   });
 }

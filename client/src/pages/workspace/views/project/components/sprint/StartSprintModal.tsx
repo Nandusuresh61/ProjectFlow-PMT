@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Calendar, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
+import { startSprint } from "@/services/sprint/sprint.api";
 
 interface StartSprintModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     sprint: any;
+    workspaceId: string;
     onSuccess: (updatedSprint: any) => void;
 }
 
@@ -17,6 +19,7 @@ export function StartSprintModal({
     open,
     onOpenChange,
     sprint,
+    workspaceId,
     onSuccess,
 }: StartSprintModalProps) {
     const [startDate, setStartDate] = useState("");
@@ -59,23 +62,25 @@ export function StartSprintModal({
         setIsSubmitting(true);
         
         try {
-            // Mocking the update
-            const updatedSprint = {
-                ...sprint,
-                status: "ACTIVE",
-                startDate: new Date(startDate),
-                endDate: new Date(endDate),
-                updatedAt: new Date(),
-            };
+            const startDateISO = new Date(startDate).toISOString();
+            const endDateISO = new Date(endDate).toISOString();
 
-            // Simulate delay
-            await new Promise(resolve => setTimeout(resolve, 800));
-            
-            toast.success(`${sprint.name} has started!`);
-            onSuccess(updatedSprint);
-            onOpenChange(false);
+            const res = await startSprint(
+                sprint.sprintId,
+                startDateISO,
+                endDateISO,
+                workspaceId
+            );
+
+            if (res.success && res.data) {
+                toast.success(`${sprint.name} has started!`);
+                onSuccess(res.data);
+                onOpenChange(false);
+            } else {
+                 toast.error(res.message || "Failed to start sprint");
+            }
         } catch (error: any) {
-            toast.error("Failed to start sprint");
+            toast.error(error.message || "Failed to start sprint");
         } finally {
             setIsSubmitting(false);
         }

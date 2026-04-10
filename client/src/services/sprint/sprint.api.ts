@@ -24,6 +24,7 @@ export interface CreateSprintPayload {
   projectId: string;
   name: string;
   goal?: string;
+  workspaceId: string;
 }
 
 export const createSprint = async (
@@ -58,3 +59,18 @@ export const assignIssueToSprint = async (
 
   return data;
 };
+
+export const startSprint = async (
+  sprintId: string,
+  startDate: string,
+  endDate: string,
+  workspaceId: string
+): Promise<SprintResponse<SprintData>> => {
+  const { data } = await API.patch<SprintResponse<SprintData>>(
+    API_ROUTES.SPRINT.START,
+    { sprintId, startDate, endDate, workspaceId }
+  );
+
+  return data;
+};
+
