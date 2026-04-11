@@ -18,18 +18,16 @@ interface Member {
 
 interface TeamViewProps {
     openInvite: () => void;
+    canManage: boolean;
 }
 
-export const TeamView = ({ openInvite }: TeamViewProps) => {
+export const TeamView = ({ openInvite, canManage }: TeamViewProps) => {
 
     const user = AuthUserState((state) => state.user);
     const currentWorkspaceId = user?.currentWorkspaceId;
     const [members, setMembers] = useState<Member[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-
-    const currentUserRole = members.find(m => m.email === user?.email)?.role;
-    const canInvite = currentUserRole === WorkspaceRoleEnum.WORKSPACE_ADMIN || currentUserRole === WorkspaceRoleEnum.WORKSPACE_OWNER;
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -54,7 +52,7 @@ export const TeamView = ({ openInvite }: TeamViewProps) => {
                     <h1 className="text-4xl font-black text-white mb-2 tracking-tight">Team Members</h1>
                     <p className="text-[#576CBC]/60 font-medium tracking-tight">Manage team members and their roles</p>
                 </div>
-                {canInvite && (
+                {canManage && (
                     <button
                         onClick={openInvite}
                         className="flex items-center gap-2 bg-[#A5D7E8] text-[#0B2447] px-6 py-3 rounded-xl font-bold text-sm hover:shadow-[0_0_20px_rgba(165,215,232,0.3)] hover:bg-white transition-all"

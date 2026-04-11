@@ -47,27 +47,11 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
         data.workspaceId
       );
 
-      if (!membership) {
-        throw new AppError(
-          ErrorCode.AUTH,
-          AppMessages.UNAUTHORIZED_ACCESS,
-          HttpStatusCode.FORBIDDEN
-        );
-      }
-
-      const isRestrictedRole =
-        membership.role === WorkspaceRoleEnum.WORKSPACE_MEMBER ||
-        membership.role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
-
-      if (isRestrictedRole && !project.memberIds.includes(userId)) {
-        throw new AppError(
-          ErrorCode.AUTH,
-          AppMessages.UNAUTHORIZED_ACCESS,
-          HttpStatusCode.FORBIDDEN
-        );
-      }
-      
-      if (membership.role === WorkspaceRoleEnum.WORKSPACE_VIEWER) {
+      if (
+        !membership ||
+        (membership.role !== WorkspaceRoleEnum.WORKSPACE_OWNER &&
+          membership.role !== WorkspaceRoleEnum.WORKSPACE_ADMIN)
+      ) {
         throw new AppError(
           ErrorCode.AUTH,
           AppMessages.UNAUTHORIZED_ACCESS,

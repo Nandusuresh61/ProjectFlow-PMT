@@ -4,6 +4,7 @@ import type { Project } from '../../types/sidebar.types';
 interface ProjectTeamViewProps {
     project: Project;
     openInvite: () => void;
+    canManage: boolean;
 }
 
 interface TeamMember {
@@ -28,20 +29,22 @@ const statusDot: Record<string, string> = {
     offline: 'bg-white/20',
 };
 
-export const ProjectTeamView = ({ project, openInvite }: ProjectTeamViewProps) => (
+export const ProjectTeamView = ({ project, openInvite, canManage }: ProjectTeamViewProps) => (
     <div className="space-y-6">
         <div className="flex items-center justify-between">
             <div>
                 <h1 className="text-2xl font-black text-white tracking-tight">Team</h1>
                 <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {PROJECT_MEMBERS.length} members</p>
             </div>
-            <button
-                onClick={openInvite}
-                className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all"
-            >
-                <UserPlus size={15} />
-                Invite
-            </button>
+            {canManage && (
+                <button
+                    onClick={openInvite}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all"
+                >
+                    <UserPlus size={15} />
+                    Invite
+                </button>
+            )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

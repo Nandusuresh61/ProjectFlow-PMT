@@ -41,25 +41,25 @@ interface ContentRouterProps {
     selectedProject: Project | null;
     openInvite: () => void;
     openEditProject: () => void;
-    canManageProjects: boolean;
+    canManage: boolean;
 }
 
-const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManageProjects }: ContentRouterProps) => {
+const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManage }: ContentRouterProps) => {
     if (mode === 'project' && selectedProject) {
         switch (activeTab) {
-            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
-            case 'backlogs': return <ProjectBacklogView project={selectedProject} />;
+            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
+            case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
             case 'board': return <ProjectBoardView project={selectedProject} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
-            case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} />;
-            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
+            case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} canManage={canManage} />;
+            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
         }
     }
 
     switch (activeTab) {
-        case 'dashboard': return <DashboardView openInvite={openInvite} />;
-        case 'team': return <TeamView openInvite={openInvite} />;
+        case 'dashboard': return <DashboardView openInvite={openInvite} canManage={canManage} />;
+        case 'team': return <TeamView openInvite={openInvite} canManage={canManage} />;
         case 'chat': return <ChatView />;
         case 'meetings': return <MeetingsView />;
         case 'settings': return <SettingsView />;
@@ -292,7 +292,7 @@ export default function WorkspaceHome() {
                                     selectedProject={selectedProject}
                                     openInvite={() => setIsInviteModalOpen(true)}
                                     openEditProject={() => setIsEditProjectModalOpen(true)}
-                                    canManageProjects={canManageProjects}
+                                    canManage={canManageProjects}
                                 />
                             </motion.div>
                         </AnimatePresence>

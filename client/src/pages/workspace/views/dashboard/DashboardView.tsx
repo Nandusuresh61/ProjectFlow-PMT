@@ -31,9 +31,10 @@ interface Activity {
 
 interface DashboardViewProps {
     openInvite: () => void;
+    canManage: boolean;
 }
 
-export const DashboardView = ({ openInvite }: DashboardViewProps) => {
+export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => {
     const stats: Stat[] = [
         { label: 'Active Projects', value: '8', trend: '↑ 12%', trendColor: 'text-emerald-400', sub: '2 ending this week', icon: FolderOpen },
         { label: 'Open Issues', value: '134', trend: '↓ 8%', trendColor: 'text-rose-400', sub: '24 assigned to you', icon: ListTodo },
@@ -110,20 +111,26 @@ export const DashboardView = ({ openInvite }: DashboardViewProps) => {
                 <div className="space-y-6">
                     <div className="bg-white/[0.03] border border-white/5 rounded-[2.5rem] p-6 sm:p-10">
                         <h3 className="text-lg font-bold text-white mb-8 tracking-tight">Quick Actions</h3>
-                        <div className="space-y-4">
-                            <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
-                                <Plus size={18} className="text-[#A5D7E8]" />
-                                <span className="text-sm font-bold text-white/90">Create Project</span>
-                            </button>
-                            <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
-                                <Zap size={18} className="text-[#A5D7E8]" />
-                                <span className="text-sm font-bold text-white/90">New Sprint</span>
-                            </button>
-                            <button onClick={openInvite} className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
-                                <Users size={18} className="text-[#A5D7E8]" />
-                                <span className="text-sm font-bold text-white/90">Invite Member</span>
-                            </button>
-                        </div>
+                        {canManage ? (
+                            <div className="space-y-4">
+                                <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
+                                    <Plus size={18} className="text-[#A5D7E8]" />
+                                    <span className="text-sm font-bold text-white/90">Create Project</span>
+                                </button>
+                                <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
+                                    <Zap size={18} className="text-[#A5D7E8]" />
+                                    <span className="text-sm font-bold text-white/90">New Sprint</span>
+                                </button>
+                                <button onClick={openInvite} className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
+                                    <Users size={18} className="text-[#A5D7E8]" />
+                                    <span className="text-sm font-bold text-white/90">Invite Member</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 text-center">
+                                <p className="text-xs text-white/30 font-medium">Quick actions are restricted to workspace admins and owners.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

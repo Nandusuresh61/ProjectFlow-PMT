@@ -15,6 +15,7 @@ import IssueCreationModal from './components/issue/IssueCreationModal';
 
 interface ProjectBacklogViewProps {
     project: Project;
+    canManage: boolean;
 }
 
 const priorityDot: Record<string, string> = {
@@ -23,7 +24,7 @@ const priorityDot: Record<string, string> = {
     LOW: 'bg-emerald-400',
 };
 
-export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
+export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -187,22 +188,24 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                     <h1 className="text-2xl font-black text-white tracking-tight">Project Backlogs</h1>
                     <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues total</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setIsSprintModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/[0.05] border border-white/[0.1] text-white text-sm font-bold rounded-xl hover:bg-white/[0.1] transition-all"
-                    >
-                        <PackagePlus size={15} className="text-[#A5D7E8]" />
-                        Create Sprint
-                    </button>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.15)]"
-                    >
-                        <Plus size={15} />
-                        Add Issue
-                    </button>
-                </div>
+                {canManage && (
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSprintModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-white/[0.05] border border-white/[0.1] text-white text-sm font-bold rounded-xl hover:bg-white/[0.1] transition-all"
+                        >
+                            <PackagePlus size={15} className="text-[#A5D7E8]" />
+                            Create Sprint
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.15)]"
+                        >
+                            <Plus size={15} />
+                            Add Issue
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Sprints Section */}
@@ -226,11 +229,11 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 setEditingIssue(issue);
                                 setIsEditModalOpen(true);
                             }}
-                            onStart={(s) => {
-                                setActiveSprintToStart(s);
-                                setIsStartSprintModalOpen(true);
-                            }}
-                            membersMap={membersMap}
+                             onStart={canManage ? (s) => {
+                                 setActiveSprintToStart(s);
+                                 setIsStartSprintModalOpen(true);
+                             } : undefined}
+                             membersMap={membersMap}
                         />
                     ))}
                 </div>
@@ -318,17 +321,19 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
                                 <div className="flex items-center justify-end w-8">
-                                    <button
-                                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingIssue(issue);
-                                            setIsEditModalOpen(true);
-                                        }}
-                                        title="Edit Issue"
-                                    >
-                                        <Pencil size={13} />
-                                    </button>
+                                    {canManage && (
+                                        <button
+                                            className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingIssue(issue);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            title="Edit Issue"
+                                        >
+                                            <Pencil size={13} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))
