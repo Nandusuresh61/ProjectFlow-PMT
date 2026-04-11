@@ -87,3 +87,29 @@ export const getProjectMembers = async (
 
   return data;
 };
+
+export interface RecentIssue {
+  issueId: string;
+  issueKey: string;
+  title: string;
+  priority: string;
+  assigneeName: string | null;
+  assigneeInitials: string | null;
+  status: string;
+}
+
+export interface ProjectOverview {
+  openIssuesCount: number;
+  teamMembersCount: number;
+  recentIssues: RecentIssue[];
+}
+
+export const getProjectOverview = async (
+  projectId: string
+): Promise<ProjectResponse<ProjectOverview>> => {
+  const { data } = await API.get<ProjectResponse<ProjectOverview>>(
+    API_ROUTES.PROJECT.OVERVIEW(projectId)
+  );
+
+  return data;
+};

@@ -1,6 +1,7 @@
 import { CreateProjectUseCase } from "@/application/use-cases/Project/CreateProjectUseCase";
 import { GetWorkspaceProjectsUseCase } from "@/application/use-cases/Project/GetWorkspaceProjectsUseCase";
 import { GetProjectMembersUseCase } from "@/application/use-cases/Project/GetProjectMembersUseCase";
+import { GetProjectOverviewUseCase } from "@/application/use-cases/Project/GetProjectOverviewUseCase";
 import { UpdateProjectUseCase } from "@/application/use-cases/Project/UpdateProjectUseCase";
 import { ProjectController } from "@/presentation/controllers/ProjectController";
 import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
@@ -44,9 +45,17 @@ const getProjectMembersUseCase = new GetProjectMembersUseCase(
   issueRepo
 );
 
+const getProjectOverviewUseCase = new GetProjectOverviewUseCase(
+  projectRepo,
+  issueRepo,
+  userRepo,
+  membershipRepo
+);
+
 export const projectController = new ProjectController(
   createProjectUseCase,
   getWorkspaceProjectsUseCase,
   updateProjectUseCase,
-  getProjectMembersUseCase
+  getProjectMembersUseCase,
+  getProjectOverviewUseCase
 );

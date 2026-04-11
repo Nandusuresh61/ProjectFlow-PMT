@@ -80,6 +80,21 @@ export class MongoIssueRepository implements IIssueRepository {
     });
   }
 
+  async countByProjectIdAndStatus(projectId: string, statuses: string[]): Promise<number> {
+    return IssueModel.countDocuments({
+      projectId,
+      status: { $in: statuses }
+    });
+  }
+
+  async findRecentByProjectId(projectId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ projectId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,
