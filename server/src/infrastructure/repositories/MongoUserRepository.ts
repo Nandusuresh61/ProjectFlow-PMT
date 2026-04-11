@@ -42,6 +42,10 @@ export class MongoUserRepository
     return user;
   }
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    return this.find({ userId: { $in: ids } });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.findOne({ email });
   }

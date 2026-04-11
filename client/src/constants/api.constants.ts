@@ -34,6 +34,7 @@ export const API_ROUTES = {
     BASE: "/project",
     LIST_BY_WORKSPACE: (workspaceId: string) => `/project/workspace/${workspaceId}`,
     UPDATE: (projectId: string) => `/project/${projectId}`,
+    MEMBERS: (projectId: string) => `/project/${projectId}/members`,
   },
   ISSUE: {
     CREATE: "/issue",

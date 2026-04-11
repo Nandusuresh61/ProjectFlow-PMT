@@ -11,5 +11,6 @@ router.get(
   authenticatedUser,
   projectController.getWorkspaceProjects
 );
+router.get("/:projectId/members", authenticatedUser, projectController.getProjectMembers);
 
 export default router;

@@ -52,7 +52,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
             case 'board': return <ProjectBoardView project={selectedProject} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
-            case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} canManage={canManage} />;
+            case 'project-team': return <ProjectTeamView project={selectedProject} />;
             default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
         }
     }
@@ -63,7 +63,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
         case 'chat': return <ChatView />;
         case 'meetings': return <MeetingsView />;
         case 'settings': return <SettingsView />;
-        default: return <DashboardView openInvite={openInvite} />;
+        default: return <DashboardView openInvite={openInvite} canManage={canManage} />;
     }
 };
 

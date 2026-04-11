@@ -6,4 +6,5 @@ export interface IIssueRepository {
   findById(issueId: string): Promise<Issue | null>;
   update(issueId: string, data: Partial<Issue>): Promise<Issue | null>;
   findBySprintId(sprintId: string): Promise<Issue[]>;
+  countActiveByAssigneeAndProject(assigneeId: string, projectId: string): Promise<number>;
 }

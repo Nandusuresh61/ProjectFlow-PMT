@@ -72,6 +72,14 @@ export class MongoIssueRepository implements IIssueRepository {
     return issues.map((doc: any) => this.toDomain(doc));
   }
 
+  async countActiveByAssigneeAndProject(assigneeId: string, projectId: string): Promise<number> {
+    return IssueModel.countDocuments({
+      assigneeId,
+      projectId,
+      status: { $ne: 'DONE' }
+    });
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,
