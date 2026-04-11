@@ -3,8 +3,10 @@ import { Plus, MoreHorizontal, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
-import { getActiveSprint, type ActiveSprintData } from '@/services/sprint/sprint.api';
-import { updateIssue } from '@/services/issue/issue.api';
+import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/services/sprint/sprint.api';
+import { updateIssue, getProjectIssues } from '@/services/issue/issue.api';
+import { getMembers } from '@/services/workspace/team.api';
+import { IssueDetailModal } from './components/issue/IssueDetailModal';
 
 interface ProjectBoardViewProps {
     project: Project;
@@ -40,7 +42,7 @@ const tagColors: Record<string, string> = {
     BUG: '#E94560',
 };
 
-const BoardCard = ({ card }: { card: BoardCardData }) => (
+const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void }) => (
     <motion.div
         layout
         initial={{ opacity: 0, y: 10 }}
@@ -55,7 +57,8 @@ const BoardCard = ({ card }: { card: BoardCardData }) => (
         onDragEnd={(e: any) => {
             (e.target as HTMLElement).style.opacity = '1';
         }}
-        className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-grab active:cursor-grabbing group border border-white/5"
+        onClick={onClick}
+        className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer active:cursor-grabbing group border border-white/5"
     >
         <div className="flex items-start justify-between mb-3">
             <span
@@ -85,19 +88,64 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+    
+    // Modal State
+    const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+    // Supplemental Data for Modal
+    const [membersMap, setMembersMap] = useState<Record<string, any>>({});
+    const [sprintsMap, setSprintsMap] = useState<Record<string, any>>({});
+    const [issuesMap, setIssuesMap] = useState<Record<string, any>>({});
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await getActiveSprint(project.id);
-                if (response.success && response.data) {
-                    setActiveSprintData(response.data);
+                const [sprintRes, membersRes, allSprintsRes, storiesRes] = await Promise.all([
+                    getActiveSprint(project.id),
+                    getMembers(project.workspaceId).catch(() => ({ success: false, data: [] })),
+                    getProjectSprints(project.id).catch(() => ({ success: false, data: [] })),
+                    getProjectIssues(project.id, { limit: 100 }).catch(() => ({ success: false, data: { issues: [] } }))
+                ]);
+
+                if (sprintRes.success && sprintRes.data) {
+                    setActiveSprintData(sprintRes.data);
+                    
+                    // Build issues map starting with active sprint issues
+                    const iMap: Record<string, any> = {};
+                    sprintRes.data.issues.forEach(i => {
+                        iMap[i.issueId] = i;
+                    });
+                    
+                    // Add stories for parent lookup
+                    if (storiesRes.success && storiesRes.data?.issues) {
+                        storiesRes.data.issues.forEach((i: any) => {
+                            if (!iMap[i.issueId]) iMap[i.issueId] = i;
+                        });
+                    }
+                    setIssuesMap(iMap);
                 } else {
                     setActiveSprintData(null);
                 }
+
+                if (membersRes.success && membersRes.data) {
+                    const mMap: Record<string, any> = {};
+                    membersRes.data.forEach((m: any) => {
+                        mMap[m.userId] = m;
+                    });
+                    setMembersMap(mMap);
+                }
+
+                if (allSprintsRes.success && allSprintsRes.data) {
+                    const sMap: Record<string, any> = {};
+                    allSprintsRes.data.forEach((s: any) => {
+                        sMap[s.sprintId] = s;
+                    });
+                    setSprintsMap(sMap);
+                }
             } catch (error) {
-                console.error('Error fetching active sprint:', error);
+                console.error('Error fetching board data:', error);
                 setActiveSprintData(null);
             } finally {
                 setLoading(false);
@@ -105,7 +153,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
         };
 
         fetchData();
-    }, [project.id]);
+    }, [project.id, project.workspaceId]);
 
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;
@@ -166,6 +214,14 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
 
         if (issueId) {
             moveIssue(issueId, statusMap[columnId]);
+        }
+    };
+
+    const handleIssueClick = (issueId: string) => {
+        const issue = activeSprintData?.issues.find(i => i.issueId === issueId);
+        if (issue) {
+            setSelectedIssue(issue);
+            setIsDetailModalOpen(true);
         }
     };
 
@@ -312,7 +368,11 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                         <div className="p-4 space-y-3 flex-1">
                             <AnimatePresence mode="popLayout">
                                 {col.cards.map(card => (
-                                    <BoardCard key={card.id} card={card} />
+                                    <BoardCard 
+                                        key={card.id} 
+                                        card={card} 
+                                        onClick={() => handleIssueClick(card.id)}
+                                    />
                                 ))}
                             </AnimatePresence>
 
@@ -330,6 +390,18 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                     </div>
                 ))}
             </div>
+
+            <IssueDetailModal
+                open={isDetailModalOpen}
+                onOpenChange={(open) => {
+                    setIsDetailModalOpen(open);
+                    if (!open) setTimeout(() => setSelectedIssue(null), 300);
+                }}
+                issue={selectedIssue}
+                membersMap={membersMap}
+                sprintsMap={sprintsMap}
+                issuesMap={issuesMap}
+            />
         </div>
     );
 };
