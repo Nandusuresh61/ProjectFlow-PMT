@@ -106,6 +106,7 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.workspaceId,
       data.parentId || null,
       data.subtasks || [],
+      data.attachments || [],
       new Date(),
       new Date()
     );

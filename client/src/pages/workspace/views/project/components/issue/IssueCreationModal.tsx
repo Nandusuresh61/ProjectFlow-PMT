@@ -19,7 +19,8 @@ const initialValues: FormValues = {
     assignee: "",
     sprint: "Backlog",
     parentId: "",
-    subtasks: []
+    subtasks: [],
+    attachments: []
 };
 
 function formReducer(state: FormState, action: FormAction): FormState {
@@ -52,8 +53,10 @@ const sizeColors = {
 };
 
 import { createIssue, updateIssue, getProjectIssues } from "@/services/issue/issue.api";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
+import { FileText, Image as ImageIcon, Link as LinkIcon, Paperclip, Trash2, Loader2 } from "lucide-react";
 
 export function IssueCreationModal({
     open,
@@ -112,7 +115,8 @@ export function IssueCreationModal({
                         assignee: editIssue.assigneeId || "",
                         sprint: editIssue.sprintId || "Backlog",
                         parentId: editIssue.parentId || "",
-                        subtasks: editIssue.subtasks ? [...editIssue.subtasks] : []
+                        subtasks: editIssue.subtasks ? [...editIssue.subtasks] : [],
+                        attachments: editIssue.attachments ? [...editIssue.attachments] : []
                     }
                 });
             } else {
@@ -120,6 +124,9 @@ export function IssueCreationModal({
             }
         }
     }, [open, editIssue]);
+
+    const [linkUrl, setLinkUrl] = useState("");
+    const [pendingFiles, setPendingFiles] = useState<{ id: string; file: File }[]>([]);
 
     const handleChange = useCallback((field: string, value: any) => {
         dispatch({ type: "SET_VALUE", field, value });
@@ -146,6 +153,46 @@ export function IssueCreationModal({
         const newSubtasks = [...state.values.subtasks];
         newSubtasks.splice(index, 1);
         handleChange("subtasks", newSubtasks);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const id = Math.random().toString(36).substr(2, 9);
+        const type = file.type.startsWith("image/") ? "IMAGE" : "PDF";
+
+        setPendingFiles(prev => [...prev, { id, file }]);
+        handleChange("attachments", [
+            ...state.values.attachments,
+            { name: file.name, url: "", type, id } as any
+        ]);
+        
+        e.target.value = "";
+    };
+
+    const addLink = () => {
+        if (!linkUrl.trim()) return;
+        if (!linkUrl.startsWith("http")) {
+            toast.error("Please enter a valid URL (starting with http/https)");
+            return;
+        }
+
+        handleChange("attachments", [
+            ...state.values.attachments,
+            { name: linkUrl.replace(/^https?:\/\/(www\.)?/, ""), url: linkUrl, type: "LINK" }
+        ]);
+        setLinkUrl("");
+    };
+
+    const removeAttachment = (index: number) => {
+        const attachment = state.values.attachments[index];
+        if ((attachment as any).id) {
+            setPendingFiles(prev => prev.filter(f => f.id !== (attachment as any).id));
+        }
+        const newAttachments = [...state.values.attachments];
+        newAttachments.splice(index, 1);
+        handleChange("attachments", newAttachments);
     };
 
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
@@ -175,6 +222,37 @@ export function IssueCreationModal({
                 return;
             }
 
+            // Handle pending uploads
+            const finalAttachments = [...state.values.attachments];
+            if (pendingFiles.length > 0) {
+                const uploadPromises = pendingFiles.map(async (pending) => {
+                    try {
+                        const url = await uploadToCloudinary(pending.file);
+                        return { id: pending.id, url };
+                    } catch (err) {
+                        throw new Error(`Failed to upload ${pending.file.name}`);
+                    }
+                });
+
+                const uploadedResults = await Promise.all(uploadPromises);
+                
+                // Map URLs back to attachments
+                uploadedResults.forEach(result => {
+                    const idx = finalAttachments.findIndex(a => (a as any).id === result.id);
+                    if (idx !== -1) {
+                        finalAttachments[idx] = {
+                            ...finalAttachments[idx],
+                            url: result.url
+                        };
+                        // Remove the temporary ID before sending to backend
+                        delete (finalAttachments[idx] as any).id;
+                    }
+                });
+            }
+
+            // Cleanup any remaining temporary IDs from links or existing attachments
+            const cleanedAttachments = finalAttachments.map(({ name, url, type }) => ({ name, url, type }));
+
             const payload = {
                 title: state.values.title,
                 description: state.values.description,
@@ -188,6 +266,7 @@ export function IssueCreationModal({
                 projectId: project.id,
                 workspaceId: project.workspaceId,
                 subtasks: state.values.subtasks,
+                attachments: cleanedAttachments,
             };
 
             let response;
@@ -199,7 +278,10 @@ export function IssueCreationModal({
 
             toast.success(response.message || `Issue ${editIssue ? 'updated' : 'created'} successfully`);
             onOpenChange(false);
-            if (!editIssue) dispatch({ type: "RESET", values: initialValues });
+            if (!editIssue) {
+                dispatch({ type: "RESET", values: initialValues });
+                setPendingFiles([]);
+            }
             if (onSuccess) onSuccess();
         } catch (error: any) {
             toast.error(error.message || `Failed to ${editIssue ? 'update' : 'create'} issue`);
@@ -289,6 +371,100 @@ export function IssueCreationModal({
                             ))}
                             {state.values.subtasks.length === 0 && (
                                 <p className="text-xs text-[#576CBC]/50 italic">No subtasks added.</p>
+                            )}
+                        </div>
+
+                        {/* Attachments */}
+                        <div className="space-y-4 pt-4 border-t border-[#19376D]/50">
+                            <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Attachments</Label>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {/* Upload Button */}
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        id="file-upload"
+                                        className="hidden"
+                                        accept="image/*,application/pdf"
+                                        onChange={handleFileUpload}
+                                        disabled={state.isSubmitting}
+                                    />
+                                    <label
+                                        htmlFor="file-upload"
+                                        className={cn(
+                                            "flex flex-col items-center justify-center p-4 border-2 border-dashed border-[#576CBC]/20 rounded-lg hover:border-[#A5D7E8]/50 hover:bg-[#19376D]/5 cursor-pointer transition-all gap-2",
+                                            state.isSubmitting && "opacity-50 cursor-not-allowed"
+                                        )}
+                                    >
+                                        <Paperclip className="text-[#A5D7E8]" size={20} />
+                                        <span className="text-xs font-medium text-[#A5D7E8]">Upload Image or PDF</span>
+                                    </label>
+                                </div>
+
+                                {/* Link Input */}
+                                <div className="space-y-2">
+                                    <div className="flex gap-2">
+                                        <Input
+                                            value={linkUrl}
+                                            onChange={(e) => setLinkUrl(e.target.value)}
+                                            placeholder="Paste link here..."
+                                            className="h-10 bg-[#19376D]/10 border-[#576CBC]/20 text-sm"
+                                        />
+                                        <Button 
+                                            type="button" 
+                                            onClick={addLink} 
+                                            className="h-10 bg-[#19376D] hover:bg-[#19376D]/80 border border-[#576CBC]/20 px-3"
+                                        >
+                                            <Plus size={16} />
+                                        </Button>
+                                    </div>
+                                    <p className="text-[10px] text-[#576CBC]/60 pl-1">Attach external links (e.g. Figma, Docs)</p>
+                                </div>
+                            </div>
+
+                            {/* Attachment List */}
+                            {state.values.attachments.length > 0 && (
+                                <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                                    {state.values.attachments.map((file, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-2 bg-[#19376D]/10 border border-[#576CBC]/10 rounded group">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="p-1.5 bg-[#19376D]/20 rounded text-[#A5D7E8]">
+                                                    {file.type === "IMAGE" && <ImageIcon size={14} />}
+                                                    {file.type === "PDF" && <FileText size={14} />}
+                                                    {file.type === "LINK" && <LinkIcon size={14} />}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    {file.url ? (
+                                                        <a 
+                                                            href={file.url} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer" 
+                                                            className="text-sm font-medium hover:text-[#A5D7E8] transition-colors truncate"
+                                                        >
+                                                            {file.name}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-sm font-medium text-[#A5D7E8] truncate flex items-center gap-2">
+                                                            {file.name}
+                                                            <span className="text-[10px] bg-[#A5D7E8]/10 px-1 rounded border border-[#A5D7E8]/20">Pending</span>
+                                                        </span>
+                                                    )}
+                                                    <span className="text-[10px] text-[#576CBC]/60 uppercase tracking-tighter">{file.type}</span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => removeAttachment(idx)}
+                                                className="p-1.5 text-[#576CBC] hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {state.errors.attachments && (
+                                <p className="text-xs text-red-400 mt-1">{state.errors.attachments}</p>
                             )}
                         </div>
                     </div>

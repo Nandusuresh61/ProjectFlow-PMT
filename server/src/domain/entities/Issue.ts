@@ -6,6 +6,12 @@ export type IssuePriority = "LOW" | "MEDIUM" | "HIGH";
 
 export type TshirtSize = "XS" | "S" | "M" | "L" | "XL"; // 1 | 2 | 3 | 5 | 8
 
+export interface Attachment {
+  name: string;
+  url: string;
+  type: "IMAGE" | "PDF" | "LINK";
+}
+
 export interface SubTask {
   id: string;
   title: string;
@@ -29,6 +35,7 @@ export class Issue {
     public readonly workspaceId: string,
     public readonly parentId: string | null,
     public subtasks: SubTask[],
+    public attachments: Attachment[],
     public createdAt: Date,
     public updatedAt: Date,
   ) {}

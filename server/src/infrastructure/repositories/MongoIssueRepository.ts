@@ -21,6 +21,7 @@ export class MongoIssueRepository implements IIssueRepository {
       workspaceId: issue.workspaceId,
       parentId: issue.parentId,
       subtasks: issue.subtasks,
+      attachments: issue.attachments,
     });
 
     return this.toDomain(created);
@@ -88,6 +89,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.workspaceId,
       doc.parentId,
       doc.subtasks,
+      doc.attachments || [],
       doc.createdAt,
       doc.updatedAt
     );

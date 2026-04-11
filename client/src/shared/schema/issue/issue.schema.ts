@@ -14,6 +14,11 @@ export const issueFormSchema = z.object({
         id: z.string(),
         title: z.string().min(1, "Subtask title is required"),
         completed: z.boolean().default(false)
+    })).optional(),
+    attachments: z.array(z.object({
+        name: z.string(),
+        url: z.string(),
+        type: z.enum(["IMAGE", "PDF", "LINK"])
     })).optional()
 }).superRefine((data, ctx) => {
     if (data.type === "Story" && !data.size) {
@@ -24,5 +29,3 @@ export const issueFormSchema = z.object({
         });
     }
 });
-
-

@@ -23,5 +23,14 @@ export const UpdateIssueSchema = z.object({
       })
     )
     .optional(),
+  attachments: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().url(),
+        type: z.enum(["IMAGE", "PDF", "LINK"]),
+      })
+    )
+    .optional(),
   parentId: z.string().optional().nullable(),
 });

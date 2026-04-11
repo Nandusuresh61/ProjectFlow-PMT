@@ -24,5 +24,15 @@ export const CreateIssueSchema = z.object({
     )
     .optional()
     .default([]),
+  attachments: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().url(),
+        type: z.enum(["IMAGE", "PDF", "LINK"]),
+      })
+    )
+    .optional()
+    .default([]),
   parentId: z.string().optional().nullable(),
 });

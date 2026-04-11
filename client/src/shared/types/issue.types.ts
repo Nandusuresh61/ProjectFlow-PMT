@@ -9,6 +9,7 @@ export type FormValues = {
     sprint: string;
     parentId?: string;
     subtasks: { id: string; title: string; completed: boolean }[];
+    attachments: { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[];
 };
 
 export type FormState = {
