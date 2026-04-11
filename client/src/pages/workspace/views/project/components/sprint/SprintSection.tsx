@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical } from 'lucide-react';
+import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { IssueTypeIcon } from '../issue/IssueTypeIcon';
@@ -161,6 +161,12 @@ export const SprintSection = ({
                                     <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
+                                    {issue.attachments?.length > 0 && (
+                                        <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
+                                            <Paperclip size={10} className="text-[#A5D7E8]/60" />
+                                            <span>{issue.attachments.length}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <span className={`w-1.5 h-1.5 rounded-full ${priorityDot[issue.priority] || 'bg-gray-400'}`} />

@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Link2 } from "lucide-react";
+import { Link2, Paperclip, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
 
 const sizeColors: Record<string, string> = {
@@ -102,6 +102,49 @@ export function IssueDetailModal({
                                 </div>
                             ) : (
                                 <p className="text-xs text-[#576CBC]/50 italic">No subtasks added.</p>
+                            )}
+                        </div>
+
+                        {/* Attachments */}
+                        <div className="space-y-3 pt-6 border-t border-[#19376D]/50">
+                            <div className="flex items-center justify-between">
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest text-white/50">Attachments</span>
+                                <span className="text-xs font-bold text-[#A5D7E8]">
+                                    {issue.attachments?.length || 0} files
+                                </span>
+                            </div>
+
+                            {issue.attachments && issue.attachments.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {issue.attachments.map((file: any, idx: number) => (
+                                        <a 
+                                            key={idx}
+                                            href={file.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded-xl group hover:bg-white/[0.05] hover:border-[#A5D7E8]/30 transition-all cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="p-2 bg-[#19376D]/20 rounded-lg text-[#A5D7E8] group-hover:bg-[#A5D7E8] group-hover:text-[#0B2447] transition-colors">
+                                                    {file.type === "IMAGE" && <ImageIcon size={16} />}
+                                                    {file.type === "PDF" && <FileText size={16} />}
+                                                    {file.type === "LINK" && <LinkIcon size={16} />}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-sm font-bold text-white/90 group-hover:text-white truncate">
+                                                        {file.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-[#576CBC]/60 uppercase tracking-widest font-black">
+                                                        {file.type}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <ExternalLink size={14} className="text-[#576CBC]/40 group-hover:text-[#A5D7E8] transition-colors" />
+                                        </a>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-[#576CBC]/50 italic">No attachments uploaded.</p>
                             )}
                         </div>
                     </div>

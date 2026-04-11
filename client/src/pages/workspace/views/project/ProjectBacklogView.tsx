@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy } from 'lucide-react';
+import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy, Paperclip } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueDetailModal } from './components/issue/IssueDetailModal';
 import { SprintSection } from './components/sprint/SprintSection';
@@ -302,6 +302,12 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                     <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
+                                    {issue.attachments?.length > 0 && (
+                                        <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
+                                            <Paperclip size={10} className="text-[#A5D7E8]/60" />
+                                            <span>{issue.attachments.length}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <span className={`w-1.5 h-1.5 rounded-full ${priorityDot[issue.priority] || 'bg-gray-400'}`} />
