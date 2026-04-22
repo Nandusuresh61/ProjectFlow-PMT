@@ -3,6 +3,8 @@ import { GetSprintsByProjectUseCase } from "@/application/use-cases/Sprint/GetSp
 import { AssignIssueToSprintUseCase } from "@/application/use-cases/Sprint/AssignIssueToSprintUseCase";
 import { StartSprintUseCase } from "@/application/use-cases/Sprint/StartSprintUseCase";
 import { GetActiveSprintUseCase } from "@/application/use-cases/Sprint/GetActiveSprintUseCase";
+import { CompleteSprintUseCase } from "@/application/use-cases/Sprint/CompleteSprintUseCase";
+import { GetProjectPerformanceUseCase } from "@/application/use-cases/Sprint/GetProjectPerformanceUseCase";
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
@@ -15,6 +17,7 @@ const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
 const membershipRepository = new MembershipRepository();
 const uidGenarator = new UidService();
+
 const createSprintUseCase = new CreateSprintUseCase(
   projectRepository,
   uidGenarator,
@@ -47,10 +50,22 @@ const getActiveSprintUseCase = new GetActiveSprintUseCase(
   issueRepository
 );
 
+const completeSprintUseCase = new CompleteSprintUseCase(
+  sprintRepository,
+  issueRepository
+);
+
+const getProjectPerformanceUseCase = new GetProjectPerformanceUseCase(
+  sprintRepository,
+  issueRepository
+);
+
 export const sprintController = new SprintController(
   createSprintUseCase,
   getSprintsByProjectUseCase,
   assignIssueToSprintUseCase,
   startSprintUseCase,
-  getActiveSprintUseCase
+  getActiveSprintUseCase,
+  completeSprintUseCase,
+  getProjectPerformanceUseCase
 );

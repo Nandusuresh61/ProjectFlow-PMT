@@ -15,6 +15,7 @@ router.post(
 
 router.get("/project/:projectId", authenticatedUser, sprintController.getSprintsByProject);
 router.get("/project/:projectId/active", authenticatedUser, sprintController.getActiveSprint);
+router.get("/project/:projectId/performance", authenticatedUser, sprintController.getProjectPerformance);
 
 router.patch("/assign-issue", authenticatedUser, sprintController.assignIssueToSprint);
 
@@ -23,6 +24,13 @@ router.patch(
   authenticatedUser,
   workspaceRoleMiddleware.requireRoles([WorkspaceRoleEnum.WORKSPACE_ADMIN, WorkspaceRoleEnum.WORKSPACE_OWNER]),
   sprintController.startSprint
+);
+
+router.patch(
+  "/:sprintId/complete",
+  authenticatedUser,
+  workspaceRoleMiddleware.requireRoles([WorkspaceRoleEnum.WORKSPACE_ADMIN, WorkspaceRoleEnum.WORKSPACE_OWNER]),
+  sprintController.completeSprint
 );
 
 export default router;

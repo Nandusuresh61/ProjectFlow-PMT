@@ -4,8 +4,10 @@ import { IGetSprintsByProjectUseCase } from "@/application/interfaces/use-cases/
 import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IAssignIssueToSprintUseCase";
 import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
 import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IGetActiveSprintUseCase";
+import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
+import { IGetProjectPerformanceUseCase } from "@/application/interfaces/use-cases/Sprint/IGetProjectPerformanceUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { CreateSprintSchema } from "@/shared/schema/sprint/CreateSprintSchema";
 import { AssignIssueToSprintSchema } from "@/shared/schema/sprint/AssignIssueToSprintSchema";
@@ -24,6 +26,8 @@ export class SprintController {
     private readonly _assignIssueToSprintUseCase: IAssignIssueToSprintUseCase,
     private readonly _startSprintUseCase: IStartSprintUseCase,
     private readonly _getActiveSprintUseCase: IGetActiveSprintUseCase,
+    private readonly _completeSprintUseCase: ICompleteSprintUseCase,
+    private readonly _getProjectPerformanceUseCase: IGetProjectPerformanceUseCase,
   ) { }
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -144,6 +148,54 @@ export class SprintController {
       .status(HttpStatusCode.OK)
       .json(
         ResponseHandler.success(AppMessages.ACTIVE_SPRINT_RETRIEVED_SUCCESS, result),
+      );
+  });
+
+  completeSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._completeSprintUseCase.execute(
+      userId,
+      sprintId,
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.SPRINT_COMPLETED_SUCCESS, result),
+      );
+  });
+
+  getProjectPerformance = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getProjectPerformanceUseCase.execute(
+      userId,
+      projectId,
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.PERFORMANCE_RETRIEVED_SUCCESS, result),
       );
   });
 }

@@ -106,3 +106,41 @@ export const getActiveSprint = async (
   return data;
 };
 
+export interface VelocityBar {
+  sprint: string;
+  planned: number;
+  completed: number;
+}
+
+export interface MetricData {
+  label: string;
+  value: string;
+  trend: string;
+  up: boolean;
+}
+
+export interface PerformanceData {
+  velocityBars: VelocityBar[];
+  metrics: MetricData[];
+}
+
+export const getProjectPerformance = async (
+  projectId: string
+): Promise<SprintResponse<PerformanceData>> => {
+  const { data } = await API.get<SprintResponse<PerformanceData>>(
+    API_ROUTES.SPRINT.GET_PERFORMANCE(projectId)
+  );
+
+  return data;
+};
+
+export const completeSprint = async (
+  sprintId: string
+): Promise<SprintResponse<SprintData>> => {
+  const { data } = await API.patch<SprintResponse<SprintData>>(
+    API_ROUTES.SPRINT.COMPLETE(sprintId),
+    {}
+  );
+
+  return data;
+};
