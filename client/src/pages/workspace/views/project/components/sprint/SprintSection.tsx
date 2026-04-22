@@ -18,8 +18,18 @@ interface SprintSectionProps {
     onIssueClick: (issue: any) => void;
     onEditIssue: (issue: any) => void;
     onStart?: (sprint: any) => void;
+    onEdit?: (sprint: any) => void;
     membersMap: Record<string, any>;
+    canManage?: boolean;
 }
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Pencil } from 'lucide-react';
 
 const priorityDot: Record<string, string> = {
     HIGH: 'bg-rose-500',
@@ -34,7 +44,9 @@ export const SprintSection = ({
     onIssueClick,
     onEditIssue,
     onStart,
-    membersMap
+    onEdit,
+    membersMap,
+    canManage
 }: SprintSectionProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isOver, setIsOver] = useState(false);
@@ -135,9 +147,27 @@ export const SprintSection = ({
                             Start Sprint
                         </Button>
                     )}
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white hover:bg-white/5">
-                        <MoreHorizontal size={14} />
-                    </Button>
+                    {canManage && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white/20 hover:text-white hover:bg-white/5">
+                                    <MoreHorizontal size={14} />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-[#060d1a] border-[#19376D] text-white">
+                                <DropdownMenuItem 
+                                    className="gap-2 focus:bg-white/5 focus:text-[#A5D7E8] cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEdit?.(sprint);
+                                    }}
+                                >
+                                    <Pencil size={14} />
+                                    <span>Edit Sprint</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
             </div>
 

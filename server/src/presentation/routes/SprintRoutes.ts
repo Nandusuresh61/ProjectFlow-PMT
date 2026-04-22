@@ -33,4 +33,11 @@ router.patch(
   sprintController.completeSprint
 );
 
+router.patch(
+  "/:sprintId",
+  authenticatedUser,
+  workspaceRoleMiddleware.requireRoles([WorkspaceRoleEnum.WORKSPACE_ADMIN, WorkspaceRoleEnum.WORKSPACE_OWNER]),
+  sprintController.updateSprint
+);
+
 export default router;

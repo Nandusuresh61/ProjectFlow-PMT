@@ -5,6 +5,7 @@ import { IssueDetailModal } from './components/issue/IssueDetailModal';
 import { SprintSection } from './components/sprint/SprintSection';
 import { SprintCreationModal } from './components/sprint/SprintCreationModal';
 import { StartSprintModal } from './components/sprint/StartSprintModal';
+import { EditSprintModal } from './components/sprint/EditSprintModal';
 import { IssueTypeIcon } from './components/issue/IssueTypeIcon';
 import { getProjectIssues } from '@/services/issue/issue.api';
 import { getProjectSprints, assignIssueToSprint } from '@/services/sprint/sprint.api';
@@ -38,6 +39,8 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
     const [isStartSprintModalOpen, setIsStartSprintModalOpen] = useState(false);
     const [activeSprintToStart, setActiveSprintToStart] = useState<any | null>(null);
+    const [isEditSprintModalOpen, setIsEditSprintModalOpen] = useState(false);
+    const [editingSprint, setEditingSprint] = useState<any | null>(null);
     const [backlogIsOver, setBacklogIsOver] = useState(false);
 
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
@@ -145,6 +148,11 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
         setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
     };
 
+    const handleSprintUpdated = (updatedSprint: any) => {
+        setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
+        fetchIssues(); // Refresh issues as they might be linked to sprint dates/details if needed
+    };
+
     const handleIssueDrop = async (issueId: string, targetSprintId: string | null) => {
         const issue = issues.find(i => i.issueId === issueId);
         if (!issue) return;
@@ -250,7 +258,12 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                                  setActiveSprintToStart(s);
                                  setIsStartSprintModalOpen(true);
                              } : undefined}
+                             onEdit={canManage ? (s) => {
+                                 setEditingSprint(s);
+                                 setIsEditSprintModalOpen(true);
+                             } : undefined}
                              membersMap={membersMap}
+                             canManage={canManage}
                         />
                     ))}
                 </div>
@@ -435,6 +448,17 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                 sprint={activeSprintToStart}
                 workspaceId={project.workspaceId}
                 onSuccess={handleSprintStarted}
+            />
+
+            <EditSprintModal
+                open={isEditSprintModalOpen}
+                onOpenChange={(open) => {
+                    setIsEditSprintModalOpen(open);
+                    if (!open) setTimeout(() => setEditingSprint(null), 300);
+                }}
+                sprint={editingSprint}
+                workspaceId={project.workspaceId}
+                onSuccess={handleSprintUpdated}
             />
         </div>
     );

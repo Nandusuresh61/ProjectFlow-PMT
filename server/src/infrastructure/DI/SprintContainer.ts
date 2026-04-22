@@ -5,6 +5,7 @@ import { StartSprintUseCase } from "@/application/use-cases/Sprint/StartSprintUs
 import { GetActiveSprintUseCase } from "@/application/use-cases/Sprint/GetActiveSprintUseCase";
 import { CompleteSprintUseCase } from "@/application/use-cases/Sprint/CompleteSprintUseCase";
 import { GetProjectPerformanceUseCase } from "@/application/use-cases/Sprint/GetProjectPerformanceUseCase";
+import { UpdateSprintUseCase } from "@/application/use-cases/Sprint/UpdateSprintUseCase";
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
@@ -60,6 +61,11 @@ const getProjectPerformanceUseCase = new GetProjectPerformanceUseCase(
   issueRepository
 );
 
+const updateSprintUseCase = new UpdateSprintUseCase(
+  sprintRepository,
+  membershipRepository
+);
+
 export const sprintController = new SprintController(
   createSprintUseCase,
   getSprintsByProjectUseCase,
@@ -67,5 +73,6 @@ export const sprintController = new SprintController(
   startSprintUseCase,
   getActiveSprintUseCase,
   completeSprintUseCase,
-  getProjectPerformanceUseCase
+  getProjectPerformanceUseCase,
+  updateSprintUseCase
 );

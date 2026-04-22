@@ -146,3 +146,23 @@ export const completeSprint = async (
 
   return data;
 };
+
+export interface UpdateSprintPayload {
+  name?: string;
+  goal?: string;
+  startDate?: string;
+  endDate?: string;
+  workspaceId: string;
+}
+
+export const updateSprint = async (
+  sprintId: string,
+  payload: UpdateSprintPayload
+): Promise<SprintResponse<SprintData>> => {
+  const { data } = await API.patch<SprintResponse<SprintData>>(
+    `${API_ROUTES.SPRINT.BASE}/${sprintId}`,
+    payload
+  );
+
+  return data;
+};

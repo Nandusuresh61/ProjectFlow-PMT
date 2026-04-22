@@ -6,6 +6,7 @@ import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/I
 import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IGetActiveSprintUseCase";
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
 import { IGetProjectPerformanceUseCase } from "@/application/interfaces/use-cases/Sprint/IGetProjectPerformanceUseCase";
+import { IUpdateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IUpdateSprintUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
@@ -13,6 +14,7 @@ import { CreateSprintSchema } from "@/shared/schema/sprint/CreateSprintSchema";
 import { AssignIssueToSprintSchema } from "@/shared/schema/sprint/AssignIssueToSprintSchema";
 import { StartSprintSchema } from "@/shared/schema/sprint/StartSprintSchema";
 import { CompleteSprintSchema } from "@/shared/schema/sprint/CompleteSprintSchema";
+import { UpdateSprintSchema } from "@/shared/schema/sprint/UpdateSprintSchema";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
@@ -29,6 +31,7 @@ export class SprintController {
     private readonly _getActiveSprintUseCase: IGetActiveSprintUseCase,
     private readonly _completeSprintUseCase: ICompleteSprintUseCase,
     private readonly _getProjectPerformanceUseCase: IGetProjectPerformanceUseCase,
+    private readonly _updateSprintUseCase: IUpdateSprintUseCase,
   ) { }
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -205,5 +208,29 @@ export class SprintController {
       .json(
         ResponseHandler.success(AppMessages.PERFORMANCE_RETRIEVED_SUCCESS, result),
       );
+  });
+  
+  updateSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const validatedData = UpdateSprintSchema.parse({
+      ...req.body,
+      sprintId,
+    });
+    
+    const result = await this._updateSprintUseCase.execute(userId, validatedData);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.SPRINT_UPDATED_SUCCESS, result));
   });
 }

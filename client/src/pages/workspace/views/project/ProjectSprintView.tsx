@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
 import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/services/sprint/sprint.api';
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
+import { EditSprintModal } from './components/sprint/EditSprintModal';
+import { Button } from '@/components/ui/button';
 
 interface ProjectSprintViewProps {
     project: Project;
@@ -41,6 +43,7 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [allSprints, setAllSprints] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -138,13 +141,23 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     <h1 className="text-2xl font-black text-white tracking-tight">{sprint.name}</h1>
                     <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · Active sprint</p>
                 </div>
-                <button
-                    onClick={() => setIsCompleteModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
-                >
-                    <CheckCircle2 size={14} />
-                    Complete Sprint
-                </button>
+                <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="flex items-center gap-2 h-9 px-4 rounded-xl bg-white/[0.05] border-white/10 text-white text-xs font-black hover:bg-white/10 transition-all"
+                    >
+                        <Pencil size={14} />
+                        Edit Sprint
+                    </Button>
+                    <button
+                        onClick={() => setIsCompleteModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10 h-9"
+                    >
+                        <CheckCircle2 size={14} />
+                        Complete Sprint
+                    </button>
+                </div>
             </div>
 
             {/* Sprint meta */}
@@ -222,6 +235,18 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                         toast.success('Sprint completed and data updated');
                     }}
                     workspaceId={project.workspaceId}
+                />
+            )}
+
+            {sprint && (
+                <EditSprintModal
+                    open={isEditModalOpen}
+                    onOpenChange={setIsEditModalOpen}
+                    sprint={sprint}
+                    workspaceId={project.workspaceId}
+                    onSuccess={() => {
+                        fetchData();
+                    }}
                 />
             )}
         </div>
