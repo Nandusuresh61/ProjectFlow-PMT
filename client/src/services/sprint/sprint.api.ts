@@ -10,6 +10,8 @@ export interface SprintData {
   startDate?: string;
   endDate?: string;
   goal?: string;
+  plannedPoints?: number;
+  completedPoints?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -86,6 +88,7 @@ export interface IssueData {
   sprintId: string | null;
   projectId: string;
   workspaceId: string;
+  storyPoints: number | null;
 }
 
 export interface ActiveSprintData {

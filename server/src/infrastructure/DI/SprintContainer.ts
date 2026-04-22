@@ -36,7 +36,8 @@ const assignIssueToSprintUseCase = new AssignIssueToSprintUseCase(
 );
 
 const startSprintUseCase = new StartSprintUseCase(
-  sprintRepository
+  sprintRepository,
+  issueRepository
 );
 
 const getActiveSprintUseCase = new GetActiveSprintUseCase(

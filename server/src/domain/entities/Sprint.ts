@@ -13,6 +13,7 @@ export class Sprint {
     public goal?: string,
     public startDate?: Date,
     public endDate?: Date,
+    public plannedPoints?: number,
+    public completedPoints?: number,
   ) {}
 }
-

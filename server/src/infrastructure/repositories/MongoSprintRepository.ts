@@ -13,6 +13,8 @@ export class SprintRepository implements ISprintRepository {
       startDate: sprint.startDate,
       endDate: sprint.endDate,
       goal: sprint.goal,
+      plannedPoints: sprint.plannedPoints,
+      completedPoints: sprint.completedPoints,
       createdAt: sprint.createdAt,
       updatedAt: sprint.updatedAt,
     });
@@ -61,6 +63,8 @@ export class SprintRepository implements ISprintRepository {
       doc.goal,
       doc.startDate,
       doc.endDate,
+      doc.plannedPoints,
+      doc.completedPoints,
     );
   }
 }

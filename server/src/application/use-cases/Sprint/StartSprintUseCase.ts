@@ -1,5 +1,6 @@
 import { StartSprintDto } from "@/application/dtos/SprintDto";
 import { ISprintRepository } from "@/application/interfaces/repositories/ISprintRepository";
+import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
 import { Sprint } from "@/domain/entities/Sprint";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
@@ -10,6 +11,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 export class StartSprintUseCase implements IStartSprintUseCase {
   constructor(
     private readonly _sprintRepo: ISprintRepository,
+    private readonly _issueRepo: IIssueRepository,
   ) {}
 
   async execute(userId: string, data: StartSprintDto): Promise<Sprint> {
@@ -54,10 +56,14 @@ export class StartSprintUseCase implements IStartSprintUseCase {
       );
     }
 
+    const issues = await this._issueRepo.findBySprintId(sprintId);
+    const plannedPoints = issues.reduce((total, issue) => total + (issue.storyPoints || 0), 0);
+
     const updatedSprint = await this._sprintRepo.update(sprintId, {
       status: "ACTIVE",
       startDate: start,
       endDate: end,
+      plannedPoints: plannedPoints,
     });
 
     if (!updatedSprint) {

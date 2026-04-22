@@ -9,6 +9,8 @@ export interface ISprintDocument extends Document {
   startDate?: Date;
   endDate?: Date;
   goal?: string;
+  plannedPoints?: number;
+  completedPoints?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +29,8 @@ const SprintSchema = new Schema<ISprintDocument>(
     startDate: { type: Date },
     endDate: { type: Date },
     goal: { type: String },
+    plannedPoints: { type: Number, default: 0 },
+    completedPoints: { type: Number, default: 0 },
   },
   {
     timestamps: true,
