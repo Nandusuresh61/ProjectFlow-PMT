@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, MoreHorizontal, Loader2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
@@ -7,6 +7,7 @@ import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/ser
 import { updateIssue, getProjectIssues } from '@/services/issue/issue.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { IssueDetailModal } from './components/issue/IssueDetailModal';
+import { CompleteSprintModal } from './components/CompleteSprintModal';
 
 interface ProjectBoardViewProps {
     project: Project;
@@ -88,70 +89,73 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+    const [allSprints, setAllSprints] = useState<any[]>([]);
     
     // Modal State
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
     // Supplemental Data for Modal
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
     const [sprintsMap, setSprintsMap] = useState<Record<string, any>>({});
     const [issuesMap, setIssuesMap] = useState<Record<string, any>>({});
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const [sprintRes, membersRes, allSprintsRes, storiesRes] = await Promise.all([
-                    getActiveSprint(project.id),
-                    getMembers(project.workspaceId).catch(() => ({ success: false, data: [] })),
-                    getProjectSprints(project.id).catch(() => ({ success: false, data: [] })),
-                    getProjectIssues(project.id, { limit: 100 }).catch(() => ({ success: false, data: { issues: [] } }))
-                ]);
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [sprintRes, membersRes, allSprintsRes, storiesRes] = await Promise.all([
+                getActiveSprint(project.id),
+                getMembers(project.workspaceId).catch(() => ({ success: false, data: [] })),
+                getProjectSprints(project.id).catch(() => ({ success: false, data: [] })),
+                getProjectIssues(project.id, { limit: 100 }).catch(() => ({ success: false, data: { issues: [] } }))
+            ]);
 
-                if (sprintRes.success && sprintRes.data) {
-                    setActiveSprintData(sprintRes.data);
-                    
-                    // Build issues map starting with active sprint issues
-                    const iMap: Record<string, any> = {};
-                    sprintRes.data.issues.forEach(i => {
-                        iMap[i.issueId] = i;
+            if (sprintRes.success && sprintRes.data) {
+                setActiveSprintData(sprintRes.data);
+                
+                // Build issues map starting with active sprint issues
+                const iMap: Record<string, any> = {};
+                sprintRes.data.issues.forEach(i => {
+                    iMap[i.issueId] = i;
+                });
+                
+                // Add stories for parent lookup
+                if (storiesRes.success && storiesRes.data?.issues) {
+                    storiesRes.data.issues.forEach((i: any) => {
+                        if (!iMap[i.issueId]) iMap[i.issueId] = i;
                     });
-                    
-                    // Add stories for parent lookup
-                    if (storiesRes.success && storiesRes.data?.issues) {
-                        storiesRes.data.issues.forEach((i: any) => {
-                            if (!iMap[i.issueId]) iMap[i.issueId] = i;
-                        });
-                    }
-                    setIssuesMap(iMap);
-                } else {
-                    setActiveSprintData(null);
                 }
-
-                if (membersRes.success && membersRes.data) {
-                    const mMap: Record<string, any> = {};
-                    membersRes.data.forEach((m: any) => {
-                        mMap[m.userId] = m;
-                    });
-                    setMembersMap(mMap);
-                }
-
-                if (allSprintsRes.success && allSprintsRes.data) {
-                    const sMap: Record<string, any> = {};
-                    allSprintsRes.data.forEach((s: any) => {
-                        sMap[s.sprintId] = s;
-                    });
-                    setSprintsMap(sMap);
-                }
-            } catch (error) {
-                console.error('Error fetching board data:', error);
+                setIssuesMap(iMap);
+            } else {
                 setActiveSprintData(null);
-            } finally {
-                setLoading(false);
             }
-        };
 
+            if (membersRes.success && membersRes.data) {
+                const mMap: Record<string, any> = {};
+                membersRes.data.forEach((m: any) => {
+                    mMap[m.userId] = m;
+                });
+                setMembersMap(mMap);
+            }
+
+            if (allSprintsRes.success && allSprintsRes.data) {
+                setAllSprints(allSprintsRes.data);
+                const sMap: Record<string, any> = {};
+                allSprintsRes.data.forEach((s: any) => {
+                    sMap[s.sprintId] = s;
+                });
+                setSprintsMap(sMap);
+            }
+        } catch (error) {
+            console.error('Error fetching board data:', error);
+            setActiveSprintData(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, [project.id, project.workspaceId]);
 
@@ -226,6 +230,8 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
     };
 
     const issues = activeSprintData?.issues || [];
+    const incompleteIssues = issues.filter(i => i.status !== 'DONE');
+    const completedIssues = issues.filter(i => i.status === 'DONE');
 
     const columns: Column[] = [
         {
@@ -337,7 +343,14 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                             {project.name} · {activeSprintData.sprint.name}
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsCompleteModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
+                        >
+                            <CheckCircle2 size={14} />
+                            Complete Sprint
+                        </button>
                         <span className="text-[10px] font-bold text-[#A5D7E8] bg-[#A5D7E8]/10 px-2 py-1 rounded-full border border-[#A5D7E8]/20">
                             ACTIVE SPRINT
                         </span>
@@ -362,7 +375,6 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                                     {col.count}
                                 </span>
                             </div>
-
                         </div>
 
                         <div className="p-4 space-y-3 flex-1">
@@ -384,8 +396,6 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                                     <span className="text-[10px] font-black text-white/10 uppercase tracking-[0.2em]">Drop here</span>
                                 </div>
                             )}
-
-
                         </div>
                     </div>
                 ))}
@@ -402,6 +412,22 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                 sprintsMap={sprintsMap}
                 issuesMap={issuesMap}
             />
+
+            {activeSprintData.sprint && (
+                <CompleteSprintModal
+                    open={isCompleteModalOpen}
+                    onOpenChange={setIsCompleteModalOpen}
+                    sprint={activeSprintData.sprint}
+                    incompleteIssuesCount={incompleteIssues.length}
+                    completedIssuesCount={completedIssues.length}
+                    availableSprints={allSprints.filter(s => s.sprintId !== activeSprintData.sprint?.sprintId)}
+                    onSuccess={() => {
+                        fetchData();
+                        toast.success('Sprint completed and board updated');
+                    }}
+                    workspaceId={project.workspaceId}
+                />
+            )}
         </div>
     );
 };

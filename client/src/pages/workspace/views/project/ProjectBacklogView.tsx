@@ -146,17 +146,34 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     };
 
     const handleIssueDrop = async (issueId: string, targetSprintId: string | null) => {
+        const issue = issues.find(i => i.issueId === issueId);
+        if (!issue) return;
+
+        const sourceSprintId = issue.sprintId;
+        const sourceSprint = sourceSprintId ? sprints.find(s => s.sprintId === sourceSprintId) : null;
+        const targetSprint = targetSprintId ? sprints.find(s => s.sprintId === targetSprintId) : null;
+
+        if (sourceSprint?.status === 'COMPLETED') {
+            toast.error("Cannot move issues out of a completed sprint");
+            return;
+        }
+
+        if (targetSprint?.status === 'COMPLETED') {
+            toast.error("Cannot move issues into a completed sprint");
+            return;
+        }
+
         // Optimistic update
         const previousIssues = [...issues];
-        setIssues(prev => prev.map(issue => {
-            if (issue.issueId === issueId) {
-                return { ...issue, sprintId: targetSprintId };
+        setIssues(prev => prev.map(i => {
+            if (i.issueId === issueId) {
+                return { ...i, sprintId: targetSprintId };
             }
-            return issue;
+            return i;
         }));
 
         const targetName = targetSprintId
-            ? sprints.find(s => s.sprintId === targetSprintId)?.name || 'Sprint'
+            ? targetSprint?.name || 'Sprint'
             : 'Backlog';
 
         try {

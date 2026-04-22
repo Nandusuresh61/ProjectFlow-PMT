@@ -1,4 +1,4 @@
-import { CreateSprintDto, AssignIssueToSprintDto, StartSprintDto } from "@/application/dtos/SprintDto";
+import { CreateSprintDto, AssignIssueToSprintDto, StartSprintDto, CompleteSprintDto } from "@/application/dtos/SprintDto";
 import { ICreateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICreateSprintUseCase";
 import { IGetSprintsByProjectUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintsByProjectUseCase";
 import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IAssignIssueToSprintUseCase";
@@ -12,6 +12,7 @@ import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { CreateSprintSchema } from "@/shared/schema/sprint/CreateSprintSchema";
 import { AssignIssueToSprintSchema } from "@/shared/schema/sprint/AssignIssueToSprintSchema";
 import { StartSprintSchema } from "@/shared/schema/sprint/StartSprintSchema";
+import { CompleteSprintSchema } from "@/shared/schema/sprint/CompleteSprintSchema";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
@@ -163,9 +164,16 @@ export class SprintController {
       );
     }
 
+    const validatedData = CompleteSprintSchema.parse(req.body);
+
+    const payload: CompleteSprintDto = {
+        sprintId,
+        moveToSprintId: validatedData.moveToSprintId
+    };
+
     const result = await this._completeSprintUseCase.execute(
       userId,
-      sprintId,
+      payload,
     );
 
     res

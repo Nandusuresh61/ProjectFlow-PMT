@@ -2,6 +2,7 @@ import { ISprintRepository } from "@/application/interfaces/repositories/ISprint
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
 import { Sprint } from "@/domain/entities/Sprint";
+import { CompleteSprintDto } from "@/application/dtos/SprintDto";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
@@ -13,7 +14,9 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
     private readonly _issueRepo: IIssueRepository,
   ) { }
 
-  async execute(userId: string, sprintId: string): Promise<Sprint> {
+  async execute(userId: string, data: CompleteSprintDto): Promise<Sprint> {
+    const { sprintId, moveToSprintId } = data;
+
     const sprint = await this._sprintRepo.findById(sprintId);
 
     if (!sprint) {
@@ -34,13 +37,36 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
 
     const issues = await this._issueRepo.findBySprintId(sprintId);
 
+    const incompleteIssues = issues.filter(issue => issue.status !== "DONE");
     const completedPoints = issues
       .filter(issue => issue.status === "DONE")
       .reduce((total, issue) => total + (issue.storyPoints || 0), 0);
 
+    for (const issue of incompleteIssues) {
+      const newStatus = moveToSprintId ? "TODO" : "BACKLOG";
+      await this._issueRepo.update(issue.issueId, {
+        sprintId: moveToSprintId || null,
+        status: newStatus,
+      });
+    }
+
+    if (moveToSprintId) {
+      const targetSprint = await this._sprintRepo.findById(moveToSprintId);
+      if (targetSprint) {
+        const newIssueIds = [...targetSprint.issueIds, ...incompleteIssues.map(i => i.issueId)];
+        await this._sprintRepo.update(moveToSprintId, { issueIds: newIssueIds });
+      }
+    }
+
+    // Update old sprint
+    const remainingIssueIds = issues
+      .filter(i => i.status === "DONE")
+      .map(i => i.issueId);
+
     const updatedSprint = await this._sprintRepo.update(sprintId, {
       status: "COMPLETED",
       completedPoints: completedPoints,
+      issueIds: remainingIssueIds,
     });
 
     if (!updatedSprint) {

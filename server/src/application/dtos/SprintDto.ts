@@ -14,3 +14,8 @@ export interface StartSprintDto {
   startDate: Date;
   endDate: Date;
 }
+
+export interface CompleteSprintDto {
+  sprintId: string;
+  moveToSprintId?: string | null;
+}

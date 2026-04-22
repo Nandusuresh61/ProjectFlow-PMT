@@ -135,11 +135,13 @@ export const getProjectPerformance = async (
 };
 
 export const completeSprint = async (
-  sprintId: string
+  sprintId: string,
+  moveToSprintId: string | null,
+  workspaceId: string
 ): Promise<SprintResponse<SprintData>> => {
   const { data } = await API.patch<SprintResponse<SprintData>>(
     API_ROUTES.SPRINT.COMPLETE(sprintId),
-    {}
+    { moveToSprintId, workspaceId }
   );
 
   return data;

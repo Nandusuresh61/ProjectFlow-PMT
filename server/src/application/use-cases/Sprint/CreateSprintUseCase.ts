@@ -17,7 +17,7 @@ export class CreateSprintUseCase implements ICreateSprintUseCase {
     private readonly _uidGenerator: IUidGenerator,
     private readonly _sprintRepository: ISprintRepository,
     private readonly _membershipRepository: IMembershipRepository,
-  ) {}
+  ) { }
   async execute(userId: string, data: CreateSprintDto): Promise<Sprint> {
     const { projectId, name, goal } = data;
 

@@ -40,6 +40,7 @@ export const SprintSection = ({
     const [isOver, setIsOver] = useState(false);
 
     const handleDragOver = (e: React.DragEvent) => {
+        if (sprint.status === 'COMPLETED') return;
         e.preventDefault();
         setIsOver(true);
     };
@@ -49,6 +50,7 @@ export const SprintSection = ({
     };
 
     const handleDrop = (e: React.DragEvent) => {
+        if (sprint.status === 'COMPLETED') return;
         e.preventDefault();
         setIsOver(false);
         const issueId = e.dataTransfer.getData('issueId');
@@ -74,6 +76,7 @@ export const SprintSection = ({
             className={cn(
                 "group/sprint bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden transition-all mb-4",
                 isOver && "border-[#A5D7E8] bg-[#A5D7E8]/[0.02] shadow-[0_0_20px_rgba(165,215,232,0.05)]",
+                sprint.status === 'COMPLETED' && "opacity-60 grayscale-[0.2]",
                 isCollapsed && "pb-0"
             )}
             onDragOver={handleDragOver}
@@ -93,7 +96,9 @@ export const SprintSection = ({
                                 "text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border",
                                 sprint.status === 'ACTIVE' 
                                     ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                    : "bg-[#19376D]/50 text-[#A5D7E8] border-[#A5D7E8]/10"
+                                    : sprint.status === 'COMPLETED'
+                                        ? "bg-white/5 text-white/40 border-white/10"
+                                        : "bg-[#19376D]/50 text-[#A5D7E8] border-[#A5D7E8]/10"
                             )}>
                                 {sprint.status}
                             </span>
@@ -148,13 +153,20 @@ export const SprintSection = ({
                         issues.map(issue => (
                             <div 
                                 key={issue.issueId}
-                                draggable
+                                draggable={sprint.status !== 'COMPLETED'}
                                 onDragStart={(e) => {
+                                    if (sprint.status === 'COMPLETED') {
+                                        e.preventDefault();
+                                        return;
+                                    }
                                     e.dataTransfer.setData('issueId', issue.issueId);
                                     e.dataTransfer.effectAllowed = 'move';
                                 }}
                                 onClick={() => onIssueClick(issue)}
-                                className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-white/[0.03] transition-colors group cursor-grab active:cursor-grabbing"
+                                className={cn(
+                                    "grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3 hover:bg-white/[0.03] transition-colors group",
+                                    sprint.status === 'COMPLETED' ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+                                )}
                             >
                                 <div className="flex items-center gap-3 min-w-0">
                                     <MoveVertical size={12} className="text-white/10 group-hover:text-[#A5D7E8]/30 transition-colors flex-shrink-0" />

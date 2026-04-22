@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
-import { getActiveSprint, type ActiveSprintData } from '@/services/sprint/sprint.api';
+import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/services/sprint/sprint.api';
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
+import { CompleteSprintModal } from './components/CompleteSprintModal';
 
 interface ProjectSprintViewProps {
     project: Project;
@@ -36,34 +38,42 @@ const getInitials = (name: string) => {
 export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [data, setData] = useState<ActiveSprintData | null>(null);
     const [members, setMembers] = useState<ProjectMember[]>([]);
+    const [allSprints, setAllSprints] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const [sprintRes, membersRes, allSprintsRes] = await Promise.all([
+                getActiveSprint(project.id),
+                getProjectMembers(project.id),
+                getProjectSprints(project.id).catch(() => ({ success: false, data: [] }))
+            ]);
+
+            if (sprintRes.success && sprintRes.data) {
+                setData(sprintRes.data);
+            }
+            if (membersRes.success && membersRes.data) {
+                setMembers(membersRes.data);
+            }
+            if (allSprintsRes.success && allSprintsRes.data) {
+                setAllSprints(allSprintsRes.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch sprint data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const [sprintRes, membersRes] = await Promise.all([
-                    getActiveSprint(project.id),
-                    getProjectMembers(project.id)
-                ]);
-
-                if (sprintRes.success && sprintRes.data) {
-                    setData(sprintRes.data);
-                }
-                if (membersRes.success && membersRes.data) {
-                    setMembers(membersRes.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch sprint data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchData();
     }, [project.id]);
 
     const { sprint, issues } = data || { sprint: null, issues: [] };
+    const incompleteIssues = issues.filter(i => i.status !== 'DONE');
+    const completedIssues = issues.filter(i => i.status === 'DONE');
 
     const stats = useMemo(() => {
         const totalPoints = issues.reduce((s, i) => s + (i.storyPoints || 0), 0);
@@ -123,9 +133,18 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
 
     return (
         <div className="space-y-5">
-            <div>
-                <h1 className="text-2xl font-black text-white tracking-tight">{sprint.name}</h1>
-                <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · Active sprint</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-black text-white tracking-tight">{sprint.name}</h1>
+                    <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · Active sprint</p>
+                </div>
+                <button
+                    onClick={() => setIsCompleteModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
+                >
+                    <CheckCircle2 size={14} />
+                    Complete Sprint
+                </button>
             </div>
 
             {/* Sprint meta */}
@@ -189,6 +208,22 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     )}
                 </div>
             </div>
+
+            {sprint && (
+                <CompleteSprintModal
+                    open={isCompleteModalOpen}
+                    onOpenChange={setIsCompleteModalOpen}
+                    sprint={sprint}
+                    incompleteIssuesCount={incompleteIssues.length}
+                    completedIssuesCount={completedIssues.length}
+                    availableSprints={allSprints.filter(s => s.sprintId !== sprint.sprintId)}
+                    onSuccess={() => {
+                        fetchData();
+                        toast.success('Sprint completed and data updated');
+                    }}
+                    workspaceId={project.workspaceId}
+                />
+            )}
         </div>
     );
 };
