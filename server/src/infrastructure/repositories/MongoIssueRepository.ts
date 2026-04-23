@@ -95,6 +95,30 @@ export class MongoIssueRepository implements IIssueRepository {
     return issues.map((doc: any) => this.toDomain(doc));
   }
 
+  async countByWorkspaceId(workspaceId: string): Promise<number> {
+    return IssueModel.countDocuments({ workspaceId });
+  }
+
+  async countByWorkspaceIdAndAssignee(workspaceId: string, assigneeId: string): Promise<number> {
+    return IssueModel.countDocuments({ workspaceId, assigneeId });
+  }
+
+  async findRecentByWorkspaceId(workspaceId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ workspaceId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
+  async findRecentByWorkspaceIdAndAssignee(workspaceId: string, assigneeId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ workspaceId, assigneeId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,

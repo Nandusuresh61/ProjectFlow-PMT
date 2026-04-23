@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Link2, Paperclip, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { Link2, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
 
 const sizeColors: Record<string, string> = {

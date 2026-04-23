@@ -1,16 +1,20 @@
+import { useEffect, useState } from 'react';
 import {
     FolderOpen,
     ListTodo,
     Users,
     BarChart3,
     Plus,
-    Zap
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../../components/Card';
+import { getDashboardData } from '@/services/workspace/workspace.api';
+import type { DashboardData } from '@/services/workspace/workspace.api';
+import { useWorkspaceStore } from '@/store/workspace.store';
+import { AuthUserState } from '@/store/auth.store';
+import { toast } from 'sonner';
 
-
-interface Stat {
+interface StatItem {
     label: string;
     value: string;
     trend?: string;
@@ -19,41 +23,71 @@ interface Stat {
     icon: LucideIcon;
 }
 
-interface Activity {
-    id: string;
-    user: string;
-    name: string;
-    action: string;
-    obj: string;
-    time: string;
-    type: string;
-}
-
 interface DashboardViewProps {
     openInvite: () => void;
     canManage: boolean;
 }
 
-export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => {
-    const stats: Stat[] = [
-        { label: 'Active Projects', value: '8', trend: '↑ 12%', trendColor: 'text-emerald-400', sub: '2 ending this week', icon: FolderOpen },
-        { label: 'Open Issues', value: '134', trend: '↓ 8%', trendColor: 'text-rose-400', sub: '24 assigned to you', icon: ListTodo },
-        { label: 'Team Members', value: '42', sub: '5 online now', icon: Users },
-        { label: 'Sprint Progress', value: '68%', trend: 'On track', trendColor: 'text-emerald-400', sub: '3 days remaining', icon: BarChart3 },
-    ];
+const ICON_MAP: Record<string, LucideIcon> = {
+    'Active Projects': FolderOpen,
+    'Open Issues': ListTodo,
+    'Team Members': Users,
+    'Sprint Progress': BarChart3,
+};
 
-    const activities: Activity[] = [
-        { id: '1', user: 'JD', name: 'James Doe', action: 'Created Issue', obj: 'PF-245', time: '2 min ago', type: 'Create' },
-        { id: '2', user: 'SM', name: 'Sarah Miller', action: 'Completed', obj: 'PF-234', time: '15 min ago', type: 'Complete' },
-        { id: '3', user: 'AK', name: 'Alex Kumar', action: 'Commented on', obj: 'PF-228', time: '1 hour ago', type: 'Comment' },
-        { id: '4', user: 'LT', name: 'Lisa Thompson', action: 'Started Sprint', obj: 'Sprint 12', time: '2 hours ago', type: 'Sprint' },
-    ];
+export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => {
+    const [data, setData] = useState<DashboardData | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const { currentWorkspace } = useWorkspaceStore();
+    const user = AuthUserState(state => state.user);
+
+    useEffect(() => {
+        const loadDashboardData = async () => {
+            if (!currentWorkspace?.workspaceId) return;
+            
+            setIsLoading(true);
+            try {
+                const response = await getDashboardData(currentWorkspace.workspaceId);
+                if (response.success && response.data) {
+                    setData(response.data);
+                } else {
+                    toast.error(response.message || 'Failed to fetch dashboard data');
+                }
+            } catch (error) {
+                console.error('Dashboard fetch error:', error);
+                toast.error('An error occurred while fetching dashboard data');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadDashboardData();
+    }, [currentWorkspace?.workspaceId]);
+
+    const stats: StatItem[] = data?.stats.map(stat => ({
+        ...stat,
+        icon: ICON_MAP[stat.label] || BarChart3
+    })) || [];
+
+    const activities = data?.activities || [];
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#A5D7E8]"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-10">
             <div className="text-left py-2">
-                <h1 className="text-2xl sm:text-4xl font-black text-white mb-2">Welcome back, Admin</h1>
-                <p className="text-[#576CBC]/60 font-medium tracking-tight">Here's what's happening with your projects today.</p>
+                <h1 className="text-2xl sm:text-4xl font-black text-white mb-2">
+                    Welcome back, {user?.fullName?.split(' ')[0] || (canManage ? 'Admin' : 'Member')}
+                </h1>
+                <p className="text-[#576CBC]/60 font-medium tracking-tight">
+                    Here's what's happening with your {canManage ? 'workspace' : 'projects'} today.
+                </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -86,7 +120,7 @@ export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => 
                             <button className="text-xs font-bold text-[#A5D7E8] hover:underline">View all</button>
                         </div>
                         <div className="divide-y divide-white/5">
-                            {activities.map((act) => (
+                            {activities.length > 0 ? activities.map((act) => (
                                 <div key={act.id} className="px-4 sm:px-10 py-4 sm:py-6 flex items-center justify-between group hover:bg-white/[0.02] transition-colors cursor-pointer">
                                     <div className="flex items-center gap-6">
                                         <div className="w-10 h-10 bg-[#19376D] rounded-full flex items-center justify-center text-[10px] font-black text-[#A5D7E8]">
@@ -103,7 +137,11 @@ export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => 
                                         {act.type}
                                     </span>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="px-4 sm:px-10 py-12 text-center text-white/30 text-sm font-medium">
+                                    No recent activity found.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -116,10 +154,6 @@ export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => 
                                 <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
                                     <Plus size={18} className="text-[#A5D7E8]" />
                                     <span className="text-sm font-bold text-white/90">Create Project</span>
-                                </button>
-                                <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
-                                    <Zap size={18} className="text-[#A5D7E8]" />
-                                    <span className="text-sm font-bold text-white/90">New Sprint</span>
                                 </button>
                                 <button onClick={openInvite} className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/5 hover:border-[#A5D7E8]/30 hover:bg-white/[0.08] transition-all group">
                                     <Users size={18} className="text-[#A5D7E8]" />

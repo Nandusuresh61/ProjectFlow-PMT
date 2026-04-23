@@ -56,7 +56,7 @@ import { createIssue, updateIssue, getProjectIssues } from "@/services/issue/iss
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
-import { FileText, Image as ImageIcon, Link as LinkIcon, Paperclip, Trash2, Loader2 } from "lucide-react";
+import { FileText, Image as ImageIcon, Link as LinkIcon, Paperclip } from "lucide-react";
 
 export function IssueCreationModal({
     open,

@@ -16,6 +16,27 @@ export interface WorkspaceResponse<T = any> {
     data?: T;
 }
 
+export interface DashboardStat {
+    label: string;
+    value: string;
+    sub: string;
+}
+
+export interface DashboardActivity {
+    id: string;
+    user: string;
+    name: string;
+    action: string;
+    obj: string;
+    time: string;
+    type: string;
+}
+
+export interface DashboardData {
+    stats: DashboardStat[];
+    activities: DashboardActivity[];
+}
+
 export const getUserWorkspaces = async (): Promise<WorkspaceResponse<WorkspaceData[]>> => {
     const { data } = await API.get<WorkspaceResponse<WorkspaceData[]>>(API_ROUTES.WORKSPACE.USER_WORKSPACES);
     return data;
@@ -33,5 +54,10 @@ export const createWorkspace = async (payload: { workspaceName: string, planId?:
 
 export const checkWorkspaceName = async (name: string): Promise<WorkspaceResponse<{ isAvailable: boolean }>> => {
     const { data } = await API.get<WorkspaceResponse<{ isAvailable: boolean }>>(`${API_ROUTES.WORKSPACE.CHECK_NAME}?name=${encodeURIComponent(name)}`);
+    return data;
+};
+
+export const getDashboardData = async (workspaceId: string): Promise<WorkspaceResponse<DashboardData>> => {
+    const { data } = await API.get<WorkspaceResponse<DashboardData>>(API_ROUTES.WORKSPACE.DASHBOARD(workspaceId));
     return data;
 };
