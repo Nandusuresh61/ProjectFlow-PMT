@@ -1,6 +1,8 @@
 import { CreateProjectDto, UpdateProjectDto } from "@/application/dtos/ProjectDto";
 import { ICreateProjectUseCase } from "@/application/interfaces/use-cases/Project/ICreateProjectUseCase";
 import { IGetWorkspaceProjectsUseCase } from "@/application/interfaces/use-cases/Project/IGetWorkspaceProjectsUseCase";
+import { IGetProjectMembersUseCase } from "@/application/interfaces/use-cases/Project/IGetProjectMembersUseCase";
+import { IGetProjectOverviewUseCase } from "@/application/interfaces/use-cases/Project/IGetProjectOverviewUseCase";
 import { IUpdateProjectUseCase } from "@/application/interfaces/use-cases/Project/IUpdateProjectUseCase";
 import { CreateProjectSchema } from "@/shared/schema/project/CreateProjectSchema";
 import { UpdateProjectSchema } from "@/shared/schema/project/UpdateProjectSchema";
@@ -15,8 +17,24 @@ export class ProjectController {
   constructor(
     private readonly _createProjectUseCase: ICreateProjectUseCase,
     private readonly _getWorkspaceProjectsUseCase: IGetWorkspaceProjectsUseCase,
-    private readonly _updateProjectUseCase: IUpdateProjectUseCase
+    private readonly _updateProjectUseCase: IUpdateProjectUseCase,
+    private readonly _getProjectMembersUseCase: IGetProjectMembersUseCase,
+    private readonly _getProjectOverviewUseCase: IGetProjectOverviewUseCase
   ) {}
+
+  getProjectMembers = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
+    const { projectId } = req.params;
+
+    const result = await this._getProjectMembersUseCase.execute(
+      tokenPayload.userId,
+      projectId
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, result));
+  });
 
   createProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
@@ -62,5 +80,19 @@ export class ProjectController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.PROJECT_UPDATED, result));
+  });
+
+  getProjectOverview = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
+    const { projectId } = req.params;
+
+    const result = await this._getProjectOverviewUseCase.execute(
+      tokenPayload.userId,
+      projectId
+    );
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, result));
   });
 }

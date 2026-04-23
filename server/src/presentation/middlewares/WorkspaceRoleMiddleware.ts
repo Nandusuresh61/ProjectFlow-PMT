@@ -18,7 +18,15 @@ export class WorkspaceRoleMiddleware {
     return async (req: AuthRequest, res: Response, next: NextFunction) => {
       try {
         const userId = req.user?.userId;
-        const { workspaceId } = req.params;
+        const workspaceId = req.params.workspaceId || req.body.workspaceId || req.query.workspaceId;
+
+        if (!workspaceId) {
+          throw new AppError(
+            ErrorCode.VALIDATION_ERROR,
+            AppMessages.WORKSPACE_NOT_FOUND,
+            HttpStatusCode.BAD_REQUEST
+          );
+        }
 
         if (!userId) {
           throw new AppError(

@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProfileSettings from '@/pages/profile/Profile';
-import { SecuritySettings } from './SecuritySettings';
+import { SecuritySettings } from '../security/SecuritySettings';
 
 export const SettingsView = () => {
-    // We start with "account" tab as active as per user request to show profile by default
     const [activeTab, setActiveTab] = useState('account');
 
     const tabs = [
@@ -28,11 +27,10 @@ export const SettingsView = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                            activeTab === tab.id
+                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
                                 ? 'bg-[#A5D7E8] text-[#0B2447] shadow-[0_0_20px_rgba(165,215,232,0.2)]'
                                 : 'text-white/60 hover:text-white hover:bg-white/5'
-                        }`}
+                            }`}
                     >
                         {tab.label}
                     </button>
@@ -69,18 +67,18 @@ export const SettingsView = () => {
                                     <div className="space-y-6">
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">Workspace Name</label>
-                                            <input 
-                                                type="text" 
-                                                defaultValue="Acme Workspace" 
-                                                className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all" 
+                                            <input
+                                                type="text"
+                                                defaultValue="Acme Workspace"
+                                                className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all"
                                             />
                                         </div>
                                         <div className="space-y-2.5">
                                             <label className="text-xs font-bold text-[#576CBC]/80 uppercase tracking-wider">Description</label>
-                                            <textarea 
-                                                rows={4} 
-                                                defaultValue="A modern project management workspace" 
-                                                className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all resize-none" 
+                                            <textarea
+                                                rows={4}
+                                                defaultValue="A modern project management workspace"
+                                                className="w-full bg-white/[0.03] border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#A5D7E8]/30 focus:bg-white/[0.08] transition-all resize-none"
                                             />
                                         </div>
                                         <div className="flex justify-end pt-6">

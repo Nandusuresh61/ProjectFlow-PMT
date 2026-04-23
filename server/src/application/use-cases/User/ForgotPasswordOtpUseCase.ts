@@ -10,6 +10,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 import { EmailType } from "@/shared/enums/EmailEnums";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { EmailTemplates } from "@/infrastructure/utils/EmailTemplates";
 
 export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
   constructor(
@@ -41,15 +42,12 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
       { otpHash, attempt: 0, lastOtpAttemptAt: Date.now() },
       300,
     );
+    const { subject, body } = EmailTemplates.getResetPasswordTemplate(otp);
+
     await this._emailService.sendMail({
       to: email,
-      subject: "Reset your password - OTP",
-      body: `
-        <p>You requested to reset your password.</p>
-        <p>Your OTP is:</p>
-        <h2>${otp}</h2>
-        <p>This OTP will expire in 5 minutes.</p>
-      `,
+      subject,
+      body,
       type: EmailType.RESET_PASSWORD,
     });
   }

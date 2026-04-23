@@ -64,4 +64,11 @@ export class MongoInvitationRepository
       { status }
     );
   }
+
+  async countPendingByWorkspace(workspaceId: string): Promise<number> {
+    return InvitationModel.countDocuments({
+      workspaceId,
+      status: InvitationStatus.PENDING,
+    });
+  }
 }

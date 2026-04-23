@@ -21,6 +21,7 @@ export class MongoIssueRepository implements IIssueRepository {
       workspaceId: issue.workspaceId,
       parentId: issue.parentId,
       subtasks: issue.subtasks,
+      attachments: issue.attachments,
     });
 
     return this.toDomain(created);
@@ -66,6 +67,34 @@ export class MongoIssueRepository implements IIssueRepository {
     return this.toDomain(updated);
   }
 
+  async findBySprintId(sprintId: string): Promise<Issue[]> {
+    const issues = await IssueModel.find({ sprintId }).lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
+  async countActiveByAssigneeAndProject(assigneeId: string, projectId: string): Promise<number> {
+    return IssueModel.countDocuments({
+      assigneeId,
+      projectId,
+      status: { $ne: 'DONE' }
+    });
+  }
+
+  async countByProjectIdAndStatus(projectId: string, statuses: string[]): Promise<number> {
+    return IssueModel.countDocuments({
+      projectId,
+      status: { $in: statuses }
+    });
+  }
+
+  async findRecentByProjectId(projectId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ projectId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: any) => this.toDomain(doc));
+  }
+
   private toDomain(doc: any): Issue {
     return new Issue(
       doc.issueId,
@@ -83,6 +112,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.workspaceId,
       doc.parentId,
       doc.subtasks,
+      doc.attachments || [],
       doc.createdAt,
       doc.updatedAt
     );

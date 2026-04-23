@@ -6,11 +6,12 @@ export const uploadToCloudinary = async (file: File): Promise<string> => {
   const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
   formData.append("file", file);
-  formData.append("upload_preset", uploadPreset); 
-  formData.append("cloud_name", cloudName); 
+  formData.append("upload_preset", uploadPreset || ""); 
+  formData.append("cloud_name", cloudName || ""); 
+  formData.append("resource_type", "auto");
 
   const res = await fetch(
-    `${cloudinaryUrl}/${cloudName}/image/upload`,
+    `${cloudinaryUrl}/${cloudName}/auto/upload`,
     {
       method: "POST",
       body: formData,

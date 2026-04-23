@@ -13,6 +13,11 @@ export interface CreateIssueDto {
     title: string;
     completed: boolean;
   }[];
+  attachments?: {
+    name: string;
+    url: string;
+    type: "IMAGE" | "PDF" | "LINK";
+  }[];
   parentId?: string | null;
 }
 
@@ -29,6 +34,11 @@ export interface UpdateIssueDto {
     id: string;
     title: string;
     completed: boolean;
+  }[];
+  attachments?: {
+    name: string;
+    url: string;
+    type: "IMAGE" | "PDF" | "LINK";
   }[];
   parentId?: string | null;
 }

@@ -1,4 +1,4 @@
-import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/IGetIssuesByProjectUseCase";
+import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/Issue/IGetIssuesByProjectUseCase";
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { IProjectRepository } from "@/application/interfaces/repositories/IProjectRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";

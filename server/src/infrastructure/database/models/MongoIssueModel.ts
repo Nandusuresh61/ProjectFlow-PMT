@@ -20,9 +20,20 @@ export interface IssueDocument extends Document {
     title: string;
     completed: boolean;
   }[];
+  attachments: {
+    name: string;
+    url: string;
+    type: string;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+const AttachmentSchema = new Schema({
+  name: { type: String, required: true },
+  url: { type: String, required: true },
+  type: { type: String, enum: ["IMAGE", "PDF", "LINK"], required: true },
+}, { _id: false });
 
 const IssueSchema = new Schema<IssueDocument>(
   {
@@ -47,6 +58,7 @@ const IssueSchema = new Schema<IssueDocument>(
         completed: Boolean,
       },
     ],
+    attachments: [AttachmentSchema],
   },
   { timestamps: true }
 );

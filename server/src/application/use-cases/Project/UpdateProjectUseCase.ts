@@ -1,5 +1,6 @@
 import { UpdateProjectDto } from "@/application/dtos/ProjectDto";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IProjectRepository } from "@/application/interfaces/repositories/IProjectRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { IUpdateProjectUseCase } from "@/application/interfaces/use-cases/Project/IUpdateProjectUseCase";
@@ -14,7 +15,8 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
   constructor(
     private readonly _projectRepo: IProjectRepository,
     private readonly _workspaceRepo: IWorkspaceRepository,
-    private readonly _membershipRepo: IMembershipRepository
+    private readonly _membershipRepo: IMembershipRepository,
+    private readonly _planRepo: IPlanRepository
   ) {}
 
   async execute(
@@ -86,6 +88,23 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
       throw new AppError(
         ErrorCode.INVALID_OPERATION,
         AppMessages.INVALID_PROJECT_MEMBERS,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const plan = await this._planRepo.findById(workspace.planId);
+    if (!plan) {
+      throw new AppError(
+        ErrorCode.PLAN,
+        AppMessages.PLAN_NOT_FOUND,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    if (memberIds.length > plan.maxMembers) {
+      throw new AppError(
+        ErrorCode.PLAN,
+        AppMessages.MEMBER_LIMIT_EXCEEDED,
         HttpStatusCode.BAD_REQUEST
       );
     }

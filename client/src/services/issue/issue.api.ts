@@ -17,6 +17,11 @@ export interface CreateIssuePayload {
     completed: boolean;
   }>;
   parentId?: string | null;
+  attachments?: Array<{
+    name: string;
+    url: string;
+    type: "IMAGE" | "PDF" | "LINK";
+  }>;
 }
 
 export interface IssueResponse<T = unknown> {

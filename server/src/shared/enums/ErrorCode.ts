@@ -8,5 +8,7 @@ export enum ErrorCode {
     EMAIL_SERVICE_UNAVAILABLE = "Email Service Unavailable!",
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN",
     RESOURCE_NOT_FOUND = "Resource Not Found",
-    INVALID_OPERATION = "Invalid Operation"
+    INVALID_OPERATION = "Invalid Operation",
+    VALIDATION_ERROR = "Validation Error",
+    INTERNAL_ERROR = "Internal Error",
 }

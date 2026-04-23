@@ -15,4 +15,6 @@ export interface IInvitationRepository {
     invitationId: string,
     status: InvitationStatus
   ): Promise<void>;
+
+  countPendingByWorkspace(workspaceId: string): Promise<number>;
 }

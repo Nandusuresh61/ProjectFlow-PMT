@@ -11,12 +11,15 @@ import { BackgroundAtmosphere } from './components/BackgroundAtmosphere';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { MobileNav } from './components/MobileNav';
-import { DashboardView } from './views/DashboardView';
-import { TeamView } from './views/TeamView';
-import { SettingsView } from './views/SettingsView';
-import { ChatView } from './views/ChatView';
-import { MeetingsView } from './views/MeetingsView';
-import { EditProjectModal, InviteModal, CreateProjectModal, CreateWorkspaceModal } from './views/ComplementaryViews';
+import { DashboardView } from './views/dashboard/DashboardView';
+import { TeamView } from './views/team/TeamView';
+import { SettingsView } from './views/settings/SettingsView';
+import { ChatView } from './views/chat/ChatView';
+import { MeetingsView } from './views/meetings/MeetingsView';
+import { InviteModal } from './components/workspace/InviteModal';
+import { CreateWorkspaceModal } from './components/workspace/CreateWorkspaceModal';
+import { CreateProjectModal } from './views/project/components/project/CreateProjectModal';
+import { EditProjectModal } from './views/project/components/project/EditProjectModal';
 import { ProjectOverviewView } from './views/project/ProjectOverviewView';
 import { ProjectBacklogView } from './views/project/ProjectBacklogView';
 import { ProjectBoardView } from './views/project/ProjectBoardView';
@@ -38,29 +41,29 @@ interface ContentRouterProps {
     selectedProject: Project | null;
     openInvite: () => void;
     openEditProject: () => void;
-    canManageProjects: boolean;
+    canManage: boolean;
 }
 
-const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManageProjects }: ContentRouterProps) => {
+const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManage }: ContentRouterProps) => {
     if (mode === 'project' && selectedProject) {
         switch (activeTab) {
-            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
-            case 'backlogs': return <ProjectBacklogView project={selectedProject} />;
+            case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
+            case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
             case 'board': return <ProjectBoardView project={selectedProject} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
-            case 'project-team': return <ProjectTeamView project={selectedProject} openInvite={openInvite} />;
-            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManageProjects} />;
+            case 'project-team': return <ProjectTeamView project={selectedProject} />;
+            default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
         }
     }
 
     switch (activeTab) {
-        case 'dashboard': return <DashboardView openInvite={openInvite} />;
-        case 'team': return <TeamView openInvite={openInvite} />;
+        case 'dashboard': return <DashboardView openInvite={openInvite} canManage={canManage} />;
+        case 'team': return <TeamView openInvite={openInvite} canManage={canManage} />;
         case 'chat': return <ChatView />;
         case 'meetings': return <MeetingsView />;
         case 'settings': return <SettingsView />;
-        default: return <DashboardView openInvite={openInvite} />;
+        default: return <DashboardView openInvite={openInvite} canManage={canManage} />;
     }
 };
 
@@ -205,7 +208,6 @@ export default function WorkspaceHome() {
 
     const handleTabChange = (tab: string) => {
         if (tab === 'projects' && sidebarMode === 'workspace') {
-            // On mobile, the "Projects" tab should open the sidebar drawer to select a project
             setIsMobileSidebarOpen(true);
             return;
         }
@@ -290,7 +292,7 @@ export default function WorkspaceHome() {
                                     selectedProject={selectedProject}
                                     openInvite={() => setIsInviteModalOpen(true)}
                                     openEditProject={() => setIsEditProjectModalOpen(true)}
-                                    canManageProjects={canManageProjects}
+                                    canManage={canManageProjects}
                                 />
                             </motion.div>
                         </AnimatePresence>

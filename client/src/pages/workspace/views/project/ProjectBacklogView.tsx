@@ -1,14 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy, Paperclip } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
-import { IssueCreationModal } from './components/IssueCreationModal';
-import { IssueDetailModal } from './components/IssueDetailModal';
+import { IssueDetailModal } from './components/issue/IssueDetailModal';
+import { SprintSection } from './components/sprint/SprintSection';
+import { SprintCreationModal } from './components/sprint/SprintCreationModal';
+import { StartSprintModal } from './components/sprint/StartSprintModal';
+import { EditSprintModal } from './components/sprint/EditSprintModal';
+import { IssueTypeIcon } from './components/issue/IssueTypeIcon';
 import { getProjectIssues } from '@/services/issue/issue.api';
+import { getProjectSprints, assignIssueToSprint } from '@/services/sprint/sprint.api';
 import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import IssueCreationModal from './components/issue/IssueCreationModal';
 
 interface ProjectBacklogViewProps {
     project: Project;
+    canManage: boolean;
 }
 
 const priorityDot: Record<string, string> = {
@@ -17,7 +25,7 @@ const priorityDot: Record<string, string> = {
     LOW: 'bg-emerald-400',
 };
 
-export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
+export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -27,7 +35,16 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const [issues, setIssues] = useState<any[]>([]);
+    const [sprints, setSprints] = useState<any[]>([]);
+    const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+    const [isStartSprintModalOpen, setIsStartSprintModalOpen] = useState(false);
+    const [activeSprintToStart, setActiveSprintToStart] = useState<any | null>(null);
+    const [isEditSprintModalOpen, setIsEditSprintModalOpen] = useState(false);
+    const [editingSprint, setEditingSprint] = useState<any | null>(null);
+    const [backlogIsOver, setBacklogIsOver] = useState(false);
+
     const [membersMap, setMembersMap] = useState<Record<string, any>>({});
+    const [allStories, setAllStories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Pagination & Search State
@@ -65,12 +82,36 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         }
     }, [project.id, currentPage, debouncedSearch, itemsPerPage]);
 
+    const fetchSprints = useCallback(async () => {
+        try {
+            const res = await getProjectSprints(project.id);
+            if (res.data) {
+                setSprints(res.data);
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch sprints:", error);
+        }
+    }, [project.id]);
+
+    const fetchStories = useCallback(async () => {
+        try {
+            const res = await getProjectIssues(project.id, { limit: 100 });
+            if (res.data?.issues) {
+                setAllStories(res.data.issues.filter((i: any) => i.type === "STORY"));
+            }
+        } catch (error: any) {
+            console.error("Failed to fetch stories for lookup:", error);
+        }
+    }, [project.id]);
+
     const totalPages = Math.ceil(totalIssues / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
 
     useEffect(() => {
         fetchIssues();
-    }, [fetchIssues]);
+        fetchSprints();
+        fetchStories();
+    }, [fetchIssues, fetchSprints, fetchStories]);
 
     useEffect(() => {
         if (project.workspaceId) {
@@ -89,12 +130,73 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
     const handleIssueCreated = () => {
         setIsModalOpen(false);
         fetchIssues();
+        fetchStories(); // Refresh stories map as well
     };
 
     const handleIssueUpdated = () => {
         setIsEditModalOpen(false);
         setEditingIssue(null);
         fetchIssues();
+        fetchStories(); // Refresh stories map as well
+    };
+
+    const handleSprintCreated = (newSprint: any) => {
+        setSprints(prev => [...prev, newSprint]);
+    };
+
+    const handleSprintStarted = (updatedSprint: any) => {
+        setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
+    };
+
+    const handleSprintUpdated = (updatedSprint: any) => {
+        setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
+        fetchIssues(); // Refresh issues as they might be linked to sprint dates/details if needed
+    };
+
+    const handleIssueDrop = async (issueId: string, targetSprintId: string | null) => {
+        const issue = issues.find(i => i.issueId === issueId);
+        if (!issue) return;
+
+        const sourceSprintId = issue.sprintId;
+        const sourceSprint = sourceSprintId ? sprints.find(s => s.sprintId === sourceSprintId) : null;
+        const targetSprint = targetSprintId ? sprints.find(s => s.sprintId === targetSprintId) : null;
+
+        if (sourceSprint?.status === 'COMPLETED') {
+            toast.error("Cannot move issues out of a completed sprint");
+            return;
+        }
+
+        if (targetSprint?.status === 'COMPLETED') {
+            toast.error("Cannot move issues into a completed sprint");
+            return;
+        }
+
+        // Optimistic update
+        const previousIssues = [...issues];
+        setIssues(prev => prev.map(i => {
+            if (i.issueId === issueId) {
+                return { ...i, sprintId: targetSprintId };
+            }
+            return i;
+        }));
+
+        const targetName = targetSprintId
+            ? targetSprint?.name || 'Sprint'
+            : 'Backlog';
+
+        try {
+            const res = await assignIssueToSprint(issueId, targetSprintId);
+            if (res.success) {
+                toast.success(`Issue moved to ${targetName}`);
+                fetchIssues(); // Refresh to get updated status and other fields
+            } else {
+                throw new Error(res.message);
+            }
+        } catch (error: any) {
+            // Rollback
+            setIssues(previousIssues);
+            toast.error(error.message || `Failed to move issue to ${targetName}`);
+        }
     };
 
     const getAssigneeInitials = (assigneeId: string) => {
@@ -108,35 +210,100 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
         <div className="space-y-5">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-black text-white tracking-tight">Backlogs</h1>
-                    <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues</p>
+                    <h1 className="text-2xl font-black text-white tracking-tight">Project Backlogs</h1>
+                    <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · {issues.length} issues total</p>
                 </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all"
-                >
-                    <Plus size={15} />
-                    Add Issue
-                </button>
+                {canManage && (
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSprintModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-white/[0.05] border border-white/[0.1] text-white text-sm font-bold rounded-xl hover:bg-white/[0.1] transition-all"
+                        >
+                            <PackagePlus size={15} className="text-[#A5D7E8]" />
+                            Create Sprint
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 bg-[#A5D7E8] text-[#060d1a] text-sm font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_20px_rgba(165,215,232,0.15)]"
+                        >
+                            <Plus size={15} />
+                            Add Issue
+                        </button>
+                    </div>
+                )}
             </div>
 
+            {/* Sprints Section */}
+            {sprints.length > 0 && (
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 px-1">
+                        <Trophy size={16} className="text-amber-400" />
+                        <h2 className="text-sm font-black text-white/40 uppercase tracking-widest">Planned Sprints</h2>
+                    </div>
+                    {sprints.map(sprint => (
+                        <SprintSection
+                            key={sprint.sprintId}
+                            sprint={sprint}
+                            issues={issues.filter(i => i.sprintId === sprint.sprintId)}
+                            onIssueDrop={handleIssueDrop}
+                            onIssueClick={(issue) => {
+                                setSelectedIssue(issue);
+                                setIsDetailModalOpen(true);
+                            }}
+                            onEditIssue={(issue) => {
+                                setEditingIssue(issue);
+                                setIsEditModalOpen(true);
+                            }}
+                             onStart={canManage ? (s) => {
+                                 setActiveSprintToStart(s);
+                                 setIsStartSprintModalOpen(true);
+                             } : undefined}
+                             onEdit={canManage ? (s) => {
+                                 setEditingSprint(s);
+                                 setIsEditSprintModalOpen(true);
+                             } : undefined}
+                             membersMap={membersMap}
+                             canManage={canManage}
+                        />
+                    ))}
+                </div>
+            )}
+
             {/* Filters */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 px-1">
+                    <h2 className="text-sm font-black text-white/40 uppercase tracking-widest">Backlog</h2>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/[0.05] text-white/40">
+                        {issues.filter(i => !i.sprintId).length}
+                    </span>
+                </div>
                 <div className="relative flex-1 max-w-xs">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
                     <input
                         type="text"
-                        placeholder="Search issues..."
+                        placeholder="Search backlog..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-white/[0.04] rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder:text-white/20 focus:outline-none focus:bg-white/[0.07] transition-colors"
                     />
                 </div>
-
             </div>
 
             {/* Issue table */}
-            <div className="bg-white/[0.025] rounded-2xl overflow-hidden">
+            <div
+                className={cn(
+                    "bg-white/[0.025] rounded-2xl overflow-hidden border border-transparent transition-all",
+                    backlogIsOver && "border-[#A5D7E8]/30 bg-[#A5D7E8]/[0.02]"
+                )}
+                onDragOver={(e) => { e.preventDefault(); setBacklogIsOver(true); }}
+                onDragLeave={() => setBacklogIsOver(false)}
+                onDrop={(e) => {
+                    e.preventDefault();
+                    setBacklogIsOver(false);
+                    const issueId = e.dataTransfer.getData('issueId');
+                    if (issueId) handleIssueDrop(issueId, null);
+                }}
+            >
                 <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/[0.05]">
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Issue</span>
                     <span className="text-xs font-bold text-white/25 uppercase tracking-wider">Priority</span>
@@ -147,12 +314,17 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 <div className="divide-y divide-white/[0.03]">
                     {isLoading ? (
                         <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">Loading issues...</div>
-                    ) : issues.length === 0 ? (
-                        <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues found. Create one.</div>
+                    ) : issues.filter(i => !i.sprintId).length === 0 ? (
+                        <div className="px-5 py-8 text-center text-[#576CBC]/60 text-sm">No issues in backlog.</div>
                     ) : (
-                        issues.map(issue => (
+                        issues.filter(i => !i.sprintId).map(issue => (
                             <div
                                 key={issue.issueId}
+                                draggable
+                                onDragStart={(e) => {
+                                    e.dataTransfer.setData('issueId', issue.issueId);
+                                    e.dataTransfer.effectAllowed = 'move';
+                                }}
                                 onClick={() => {
                                     setSelectedIssue(issue);
                                     setIsDetailModalOpen(true);
@@ -160,8 +332,15 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center px-5 py-3.5 hover:bg-white/[0.025] transition-colors group cursor-pointer"
                             >
                                 <div className="flex items-center gap-3 min-w-0">
+                                    <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
+                                    {issue.attachments?.length > 0 && (
+                                        <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
+                                            <Paperclip size={10} className="text-[#A5D7E8]/60" />
+                                            <span>{issue.attachments.length}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                     <span className={`w-1.5 h-1.5 rounded-full ${priorityDot[issue.priority] || 'bg-gray-400'}`} />
@@ -172,23 +351,25 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
                                 <div className="flex items-center justify-end w-8">
-                                    <button
-                                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingIssue(issue);
-                                            setIsEditModalOpen(true);
-                                        }}
-                                        title="Edit Issue"
-                                    >
-                                        <Pencil size={13} />
-                                    </button>
+                                    {canManage && (
+                                        <button
+                                            className="opacity-0 group-hover:opacity-100 p-1.5 text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#19376D]/30 transition-all rounded-md"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingIssue(issue);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            title="Edit Issue"
+                                        >
+                                            <Pencil size={13} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
-                
+
                 {/* Pagination Footer */}
                 {totalIssues > 0 && (
                     <div className="flex items-center justify-between px-5 py-3 border-t border-white/[0.05] bg-white/[0.01]">
@@ -246,6 +427,38 @@ export const ProjectBacklogView = ({ project }: ProjectBacklogViewProps) => {
                 }}
                 issue={selectedIssue}
                 membersMap={membersMap}
+                sprintsMap={Object.fromEntries(sprints.map(s => [s.sprintId, s]))}
+                issuesMap={{
+                    ...Object.fromEntries(allStories.map(i => [i.issueId, i])),
+                    ...Object.fromEntries(issues.map(i => [i.issueId, i]))
+                }}
+            />
+
+            <SprintCreationModal
+                open={isSprintModalOpen}
+                onOpenChange={setIsSprintModalOpen}
+                projectId={project.id}
+                workspaceId={project.workspaceId}
+                onSuccess={handleSprintCreated}
+            />
+
+            <StartSprintModal
+                open={isStartSprintModalOpen}
+                onOpenChange={setIsStartSprintModalOpen}
+                sprint={activeSprintToStart}
+                workspaceId={project.workspaceId}
+                onSuccess={handleSprintStarted}
+            />
+
+            <EditSprintModal
+                open={isEditSprintModalOpen}
+                onOpenChange={(open) => {
+                    setIsEditSprintModalOpen(open);
+                    if (!open) setTimeout(() => setEditingSprint(null), 300);
+                }}
+                sprint={editingSprint}
+                workspaceId={project.workspaceId}
+                onSuccess={handleSprintUpdated}
             />
         </div>
     );
