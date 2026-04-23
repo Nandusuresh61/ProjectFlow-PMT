@@ -11,6 +11,7 @@ import { CompleteSprintModal } from './components/CompleteSprintModal';
 
 interface ProjectBoardViewProps {
     project: Project;
+    canManage: boolean;
 }
 
 interface BoardCardData {
@@ -85,7 +86,7 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
     </motion.div>
 );
 
-export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
+export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) => {
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
@@ -343,18 +344,20 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                             {project.name} · {activeSprintData.sprint.name}
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setIsCompleteModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
-                        >
-                            <CheckCircle2 size={14} />
-                            Complete Sprint
-                        </button>
-                        <span className="text-[10px] font-bold text-[#A5D7E8] bg-[#A5D7E8]/10 px-2 py-1 rounded-full border border-[#A5D7E8]/20">
-                            ACTIVE SPRINT
-                        </span>
-                    </div>
+                    {canManage && (
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsCompleteModalOpen(true)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
+                            >
+                                <CheckCircle2 size={14} />
+                                Complete Sprint
+                            </button>
+                            <span className="text-[10px] font-bold text-[#A5D7E8] bg-[#A5D7E8]/10 px-2 py-1 rounded-full border border-[#A5D7E8]/20">
+                                ACTIVE SPRINT
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 

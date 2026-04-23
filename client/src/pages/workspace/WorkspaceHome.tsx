@@ -49,7 +49,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
         switch (activeTab) {
             case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
             case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
-            case 'board': return <ProjectBoardView project={selectedProject} />;
+            case 'board': return <ProjectBoardView project={selectedProject} canManage={canManage} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
             case 'project-team': return <ProjectTeamView project={selectedProject} />;

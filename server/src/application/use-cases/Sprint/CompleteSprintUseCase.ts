@@ -1,5 +1,7 @@
 import { ISprintRepository } from "@/application/interfaces/repositories/ISprintRepository";
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
+import { IProjectRepository } from "@/application/interfaces/repositories/IProjectRepository";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
 import { Sprint } from "@/domain/entities/Sprint";
 import { CompleteSprintDto } from "@/application/dtos/SprintDto";
@@ -7,11 +9,14 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class CompleteSprintUseCase implements ICompleteSprintUseCase {
   constructor(
     private readonly _sprintRepo: ISprintRepository,
     private readonly _issueRepo: IIssueRepository,
+    private readonly _projectRepo: IProjectRepository,
+    private readonly _membershipRepo: IMembershipRepository,
   ) { }
 
   async execute(userId: string, data: CompleteSprintDto): Promise<Sprint> {
@@ -24,6 +29,32 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         ErrorCode.RESOURCE_NOT_FOUND,
         AppMessages.TARGET_SPRINT_NOT_FOUND,
         HttpStatusCode.NOT_FOUND,
+      );
+    }
+
+    const project = await this._projectRepo.findById(sprint.projectId);
+    if (!project) {
+       throw new AppError(
+        ErrorCode.RESOURCE_NOT_FOUND,
+        AppMessages.PROJECT_NOT_FOUND,
+        HttpStatusCode.NOT_FOUND,
+      );
+    }
+
+    const membership = await this._membershipRepo.findByUserAndWorkspace(
+      userId,
+      project.workspaceId,
+    );
+
+    if (
+      !membership ||
+      (membership.role !== WorkspaceRoleEnum.WORKSPACE_OWNER &&
+        membership.role !== WorkspaceRoleEnum.WORKSPACE_ADMIN)
+    ) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.FORBIDDEN,
       );
     }
 

@@ -134,7 +134,7 @@ export const SprintSection = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {sprint.status === 'PLANNED' && (
+                    {canManage && sprint.status === 'PLANNED' && (
                         <Button 
                             variant="outline" 
                             size="sm" 
