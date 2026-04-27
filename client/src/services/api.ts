@@ -1,5 +1,7 @@
 import axios, { HttpStatusCode } from "axios";
 import { API_ROUTES } from "@/constants/api.constants";
+import { AuthUserState } from "@/store/auth.store";
+import { toast } from "sonner";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -26,8 +28,7 @@ API.interceptors.response.use(
         (message === "Your account has been blocked. Please contact support." || 
          message?.toLowerCase().includes("blocked"))) {
       
-      const { AuthUserState } = await import("@/store/auth.store");
-      const { toast } = await import("sonner");
+      
       
       AuthUserState.getState().clearUser();
       toast.error("Your account has been blocked. Please contact support.");
