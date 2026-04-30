@@ -9,10 +9,11 @@ import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { LoginUserSchema } from "@/shared/schema/auth/LoginUserSchema";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
 import { useEffect } from "react";
+import { getErrorMessage } from "@/shared/utils/error";
 
 
 
@@ -104,8 +105,8 @@ export default function Login() {
       await checkAuth();
       toast.success(response.message);
       navigate("/home/dashboard");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

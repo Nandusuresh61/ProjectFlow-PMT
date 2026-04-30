@@ -1,3 +1,4 @@
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { useState, useEffect } from 'react';
 import { Plus, MoreHorizontal, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -51,12 +52,12 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         draggable
-        onDragStart={(e: any) => {
+        onDragStartCapture={(e: React.DragEvent<HTMLDivElement>) => {
             e.dataTransfer.setData('issueId', card.id);
             e.dataTransfer.effectAllowed = 'move';
             (e.target as HTMLElement).style.opacity = '0.4';
         }}
-        onDragEnd={(e: any) => {
+        onDragEndCapture={(e: React.DragEvent<HTMLDivElement>) => {
             (e.target as HTMLElement).style.opacity = '1';
         }}
         onClick={onClick}
@@ -90,7 +91,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
-    const [allSprints, setAllSprints] = useState<any[]>([]);
+    const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     
     // Modal State
     const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
@@ -123,7 +124,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                 
                 // Add stories for parent lookup
                 if (storiesRes.success && storiesRes.data?.issues) {
-                    storiesRes.data.issues.forEach((i: any) => {
+                    storiesRes.data.issues.forEach((i: IssueData) => {
                         if (!iMap[i.issueId]) iMap[i.issueId] = i;
                     });
                 }
@@ -143,7 +144,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             if (allSprintsRes.success && allSprintsRes.data) {
                 setAllSprints(allSprintsRes.data);
                 const sMap: Record<string, any> = {};
-                allSprintsRes.data.forEach((s: any) => {
+                allSprintsRes.data.forEach((s: SprintData) => {
                     sMap[s.sprintId] = s;
                 });
                 setSprintsMap(sMap);
@@ -173,13 +174,13 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             return {
                 ...prev,
                 issues: prev.issues.map(i =>
-                    i.issueId === issueId ? { ...i, status: newStatus as any } : i
+                    i.issueId === issueId ? { ...i, status: newStatus as IssueData["status"] } : i
                 )
             };
         });
 
         try {
-            const response = await updateIssue(issueId, { status: newStatus });
+            const response = await updateIssue(issueId, { status: newStatus as IssueData["status"] });
             if (!response.success) {
                 throw new Error(response.message || 'Failed to update status');
             }
@@ -248,7 +249,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -265,7 +266,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -282,7 +283,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -299,7 +300,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as IssueData["priority"],
                 })),
             count: 0
         }

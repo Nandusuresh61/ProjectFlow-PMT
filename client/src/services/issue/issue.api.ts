@@ -1,5 +1,6 @@
 import { API_ROUTES } from "@/constants/api.constants";
 import { API } from "@/services/api";
+import type { IssueData } from "@/services/sprint/sprint.api";
 
 export interface CreateIssuePayload {
   title: string;
@@ -44,8 +45,8 @@ export const createIssue = async (
 export const getProjectIssues = async (
   projectId: string,
   params?: { page?: number; limit?: number; search?: string }
-): Promise<IssueResponse<{ issues: any[], total: number }>> => {
-  const { data } = await API.get<IssueResponse<{ issues: any[], total: number }>>(
+): Promise<IssueResponse<{ issues: IssueData[], total: number }>> => {
+  const { data } = await API.get<IssueResponse<{ issues: IssueData[], total: number }>>(
     API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId),
     { params }
   );
@@ -55,7 +56,7 @@ export const getProjectIssues = async (
 
 export const updateIssue = async (
   issueId: string,
-  payload: any
+  payload: Partial<IssueData>
 ): Promise<IssueResponse> => {
   const { data } = await API.patch<IssueResponse>(
     API_ROUTES.ISSUE.UPDATE(issueId),

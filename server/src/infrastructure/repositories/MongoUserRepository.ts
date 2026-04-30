@@ -144,7 +144,7 @@ export class MongoUserRepository
       },
     ]);
 
-    const users = result[0].users.map((user: UserDoc & { memberships: any[], workspacesData: any[] }) => ({
+    const users = result[0].users.map((user: UserDoc & { memberships: { workspaceId: string, role: string }[], workspacesData: { workspaceId: string, name: string }[] }) => ({
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,

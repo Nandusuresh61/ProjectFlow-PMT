@@ -1,3 +1,4 @@
+import type { SprintData } from "@/services/sprint/sprint.api";
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -6,13 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Calendar, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 import { startSprint } from "@/services/sprint/sprint.api";
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface StartSprintModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    sprint: any;
+    sprint: SprintData;
     workspaceId: string;
-    onSuccess: (updatedSprint: any) => void;
+    onSuccess: (updatedSprint: SprintData) => void;
 }
 
 export function StartSprintModal({
@@ -79,8 +81,8 @@ export function StartSprintModal({
             } else {
                  toast.error(res.message || "Failed to start sprint");
             }
-        } catch (error: any) {
-            toast.error(error.message || "Failed to start sprint");
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || "Failed to start sprint");
         } finally {
             setIsSubmitting(false);
         }

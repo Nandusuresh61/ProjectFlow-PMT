@@ -35,6 +35,7 @@ const slideVariants = {
 };
 
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -125,8 +126,8 @@ export default function Onboarding() {
 
       toast.success("Workspace created successfully 🎉");
       navigate("/home/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to complete onboarding");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Failed to complete onboarding");
     } finally {
       setFinishLoading(false);
     }

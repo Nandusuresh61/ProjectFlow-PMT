@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export const CreateWorkspaceModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const [workspaceName, setWorkspaceName] = useState("");
@@ -37,8 +38,8 @@ export const CreateWorkspaceModal = ({ isOpen, onClose }: { isOpen: boolean, onC
           workspaceStore.setCurrentWorkspaceFromAuth(response.data.workspaceId);
       }
       
-    } catch (error: any) {
-      toast.error(error.message || AppMessages.WORKSPACE_CREATE_FAILED);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || AppMessages.WORKSPACE_CREATE_FAILED);
     } finally {
       setLoading(false);
     }

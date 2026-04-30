@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
 import type { StepWorkspaceProps, WorkspaceValues } from "@/types/onboarding.types";
 import { checkWorkspaceName } from "@/services/workspace/workspace.api";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+
 
 export function StepWorkspace({ initialName, onSubmit }: StepWorkspaceProps) {
     const [name, setName] = useState(initialName);
@@ -41,7 +42,7 @@ export function StepWorkspace({ initialName, onSubmit }: StepWorkspaceProps) {
                     setAvailabilityError(undefined);
                     setIsAvailable(true);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setAvailabilityError("Failed to verify name availability");
             } finally {
                 setIsChecking(false);

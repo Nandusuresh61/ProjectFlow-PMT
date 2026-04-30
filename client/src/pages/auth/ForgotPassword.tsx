@@ -7,8 +7,9 @@ import { forgotPassoword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { ForgotEmailSchema } from "@/shared/schema/auth/ForgotEmailSchema";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
+import { getErrorMessage } from "@/shared/utils/error";
 
 type ForgotPasswordValues = { email: string };
 
@@ -42,8 +43,8 @@ export default function ForgotPassword() {
       setPendingEmail(values.email);
       toast.success(response.message);
       navigate("/reset-password");
-    } catch (error: any) {
-      toast.error(error?.message || "Reset OTP error");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Reset OTP error");
     }
   };
 

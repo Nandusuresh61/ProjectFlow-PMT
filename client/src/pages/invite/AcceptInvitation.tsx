@@ -4,6 +4,7 @@ import { AuthUserState } from "@/store/auth.store";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export default function AcceptInvitation() {
   const [searchParams] = useSearchParams();
@@ -40,8 +41,8 @@ export default function AcceptInvitation() {
           localStorage.removeItem("invite_token");
           navigate("/home/dashboard");
         }
-      } catch (error: any) {
-        toast.error(error.message || "Failed to process invitation");
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error) || "Failed to process invitation");
         navigate("/");
       }
     };

@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { createPlan, getPlans, togglePlanStatus } from "@/services/plan/plan.api";
 import { PlanType } from "@/shared/enums/PlanType";
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface Plan {
   planId: string;
@@ -133,8 +134,8 @@ export default function Plans() {
         maxMembers: "",
       });
       setFeaturesList([""]);
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || error.message || "Failed to create plan");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Failed to create plan");
     } finally {
       setLoading(false);
     }

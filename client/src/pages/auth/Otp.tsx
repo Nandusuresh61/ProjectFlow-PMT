@@ -7,9 +7,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { resendOtp, verifyUserOtp } from "@/services/auth/auth.api";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
+import { getErrorMessage } from "@/shared/utils/error";
 
 type OtpValues = { otp: string };
 
@@ -52,8 +53,8 @@ export default function Otp() {
       const response = await resendOtp({ email: pendingEmail });
       toast.success(response.message);
       setTimer(60);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send OTP!");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Failed to send OTP!");
     }
   };
 
@@ -86,8 +87,8 @@ export default function Otp() {
 
       await checkAuth();
       navigate("/home/dashboard");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     }
   };
 

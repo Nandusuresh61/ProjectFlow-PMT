@@ -23,7 +23,7 @@ export class ProfileController {
   getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { userId } = req.user!;
 
-    let result = await this._getUserProfileUseCase.execute(userId);
+    const result = await this._getUserProfileUseCase.execute(userId);
 
     res
       .status(HttpStatusCode.OK)

@@ -2,6 +2,7 @@ import axios, { HttpStatusCode } from "axios";
 import { API_ROUTES } from "@/constants/api.constants";
 import { AuthUserState } from "@/store/auth.store";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -56,21 +57,21 @@ API.interceptors.response.use(
       try {
         await API.post(import.meta.env.VITE_REFRESH_TOKEN_PATH);
         return API(originalRequest);
-      } catch (refreshError: any) {
+      } catch (refreshError: unknown) {
         AuthUserState.getState().clearUser();
         toast.error("Session expired. Please login again.");
         window.location.href = "/login";
         return Promise.reject({
           message:
-            refreshError?.response?.data?.message ||
+            getErrorMessage(refreshError) ||
             "Session expired. Please login again.",
-          status: refreshError?.response?.status,
+          status: axios.isAxiosError(refreshError) ? refreshError.response?.status : undefined,
         });
       }
     }
 
     return Promise.reject({
-      message: message || error?.message || "Something went wrong",
+      message: message || getErrorMessage(error) || "Something went wrong",
       status: status || error?.response?.status,
     });
   },

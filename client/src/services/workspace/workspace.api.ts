@@ -10,7 +10,7 @@ export interface WorkspaceData {
     updatedAt: string;
 }
 
-export interface WorkspaceResponse<T = any> {
+export interface WorkspaceResponse<T = unknown> {
     success: boolean;
     message: string;
     data?: T;

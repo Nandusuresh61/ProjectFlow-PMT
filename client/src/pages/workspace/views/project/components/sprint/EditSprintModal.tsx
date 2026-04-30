@@ -1,3 +1,4 @@
+import type { SprintData } from "@/services/sprint/sprint.api";
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -6,13 +7,14 @@ import { Label } from "@/components/ui/label";
 import { Quote, Flag, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { updateSprint } from "@/services/sprint/sprint.api";
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface EditSprintModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    sprint: any;
+    sprint: SprintData;
     workspaceId: string;
-    onSuccess: (sprint: any) => void;
+    onSuccess: (sprint: SprintData) => void;
 }
 
 export function EditSprintModal({
@@ -64,8 +66,8 @@ export function EditSprintModal({
             } else {
                 toast.error(response.message || "Failed to update sprint");
             }
-        } catch (error: any) {
-            toast.error(error.message || "Failed to update sprint");
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || "Failed to update sprint");
         } finally {
             setIsSubmitting(false);
         }
