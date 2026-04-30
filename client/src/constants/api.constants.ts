@@ -42,6 +42,7 @@ export const API_ROUTES = {
     CREATE: "/issue",
     LIST_BY_PROJECT: (projectId: string) => `/issue/project/${projectId}`,
     UPDATE: (issueId: string) => `/issue/${issueId}`,
+    COMMENTS: (issueId: string) => `/issue/${issueId}/comments`,
   },
   SPRINT: {
     BASE: "/sprint",

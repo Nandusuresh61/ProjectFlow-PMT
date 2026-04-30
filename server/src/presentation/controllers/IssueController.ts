@@ -9,6 +9,10 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { CreateIssueSchema } from "@/shared/schema/issue/CreateIssueSchema";
 import { CreateIssueDto, UpdateIssueDto } from "@/application/dtos/IssueDto";
+import { AddCommentDto } from "@/application/dtos/CommentDto";
+import { IAddCommentUseCase } from "@/application/interfaces/use-cases/Issue/IAddCommentUseCase";
+import { IGetIssueCommentsUseCase } from "@/application/interfaces/use-cases/Issue/IGetIssueCommentsUseCase";
+import { AddCommentSchema } from "@/shared/schema/issue/AddCommentSchema";
 
 import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/Issue/IGetIssuesByProjectUseCase";
 import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/Issue/IUpdateIssueUseCase";
@@ -18,7 +22,9 @@ export class IssueController {
   constructor(
     private readonly _createIssueUseCase: ICreateIssueUseCase,
     private readonly _getIssuesByProjectUseCase: IGetIssuesByProjectUseCase,
-    private readonly _updateIssueUseCase: IUpdateIssueUseCase
+    private readonly _updateIssueUseCase: IUpdateIssueUseCase,
+    private readonly _addCommentUseCase: IAddCommentUseCase,
+    private readonly _getIssueCommentsUseCase: IGetIssueCommentsUseCase
   ) {}
 
   createIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -105,5 +111,48 @@ export class IssueController {
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.ISSUE_UPDATED_SUCCESS, updatedIssue));
+  });
+
+  addComment = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = req.user!;
+    const { issueId } = req.params;
+
+    if (!issueId) {
+      throw new AppError(
+        ErrorCode.INVALID_OPERATION,
+        AppMessages.ISSUE_ID_REQUIRED,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const validatedData = AddCommentSchema.parse(req.body) as AddCommentDto;
+
+    const result = await this._addCommentUseCase.execute(
+      user.userId,
+      issueId,
+      validatedData.content
+    );
+
+    res
+      .status(HttpStatusCode.CREATED)
+      .json(ResponseHandler.success(AppMessages.COMMENT_ADDED_SUCCESS, result));
+  });
+
+  getCommentsByIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { issueId } = req.params;
+
+    if (!issueId) {
+      throw new AppError(
+        ErrorCode.INVALID_OPERATION,
+        AppMessages.ISSUE_ID_REQUIRED,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const comments = await this._getIssueCommentsUseCase.execute(issueId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(ResponseHandler.success(AppMessages.COMMENTS_RETRIEVED_SUCCESS, comments));
   });
 }

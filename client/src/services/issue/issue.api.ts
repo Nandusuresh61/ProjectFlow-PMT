@@ -25,6 +25,15 @@ export interface CreateIssuePayload {
   }>;
 }
 
+export interface CommentData {
+  commentId: string;
+  issueId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IssueResponse<T = unknown> {
   success: boolean;
   message: string;
@@ -61,6 +70,28 @@ export const updateIssue = async (
   const { data } = await API.patch<IssueResponse>(
     API_ROUTES.ISSUE.UPDATE(issueId),
     payload
+  );
+
+  return data;
+};
+
+export const getIssueComments = async (
+  issueId: string
+): Promise<IssueResponse<CommentData[]>> => {
+  const { data } = await API.get<IssueResponse<CommentData[]>>(
+    API_ROUTES.ISSUE.COMMENTS(issueId)
+  );
+
+  return data;
+};
+
+export const addComment = async (
+  issueId: string,
+  content: string
+): Promise<IssueResponse<CommentData>> => {
+  const { data } = await API.post<IssueResponse<CommentData>>(
+    API_ROUTES.ISSUE.COMMENTS(issueId),
+    { content }
   );
 
   return data;

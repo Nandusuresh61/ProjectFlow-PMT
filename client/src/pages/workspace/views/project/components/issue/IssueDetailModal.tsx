@@ -2,6 +2,7 @@ import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Link2, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
+import { CommentSection } from "./CommentSection";
 
 const sizeColors: Record<string, string> = {
     "XS": "bg-slate-100 text-slate-800",
@@ -147,6 +148,11 @@ export function IssueDetailModal({
                             ) : (
                                 <p className="text-xs text-[#576CBC]/50 italic">No attachments uploaded.</p>
                             )}
+                        </div>
+
+                        {/* Comments Section */}
+                        <div className="pt-6 border-t border-[#19376D]/50">
+                            <CommentSection issueId={issue.issueId} membersMap={membersMap} />
                         </div>
                     </div>
 

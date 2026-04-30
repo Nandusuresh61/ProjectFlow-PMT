@@ -150,4 +150,10 @@ export const AppMessages = {
   PERFORMANCE_RETRIEVED_SUCCESS: "Performance metrics retrieved successfully",
   SPRINT_NOT_ACTIVE: "Only active sprints can be completed",
   SPRINT_UPDATED_SUCCESS: "Sprint updated successfully",
+  COMMENT_ADDED_SUCCESS: "Comment added successfully",
+  COMMENTS_RETRIEVED_SUCCESS: "Comments retrieved successfully",
+  COMMENT_ID_REQUIRED: "Comment ID is required",
+  COMMENT_NOT_FOUND: "Comment not found",
+  COMMENT_DELETED_SUCCESS: "Comment deleted successfully",
+  COMMENT_UPDATED_SUCCESS: "Comment updated successfully",
 };
