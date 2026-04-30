@@ -8,7 +8,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { CreateIssueSchema } from "@/shared/schema/issue/CreateIssueSchema";
-import { CreateIssueDto } from "@/application/dtos/IssueDto";
+import { CreateIssueDto, UpdateIssueDto } from "@/application/dtos/IssueDto";
 
 import { IGetIssuesByProjectUseCase } from "@/application/interfaces/use-cases/Issue/IGetIssuesByProjectUseCase";
 import { IUpdateIssueUseCase } from "@/application/interfaces/use-cases/Issue/IUpdateIssueUseCase";
@@ -99,7 +99,7 @@ export class IssueController {
     const updatedIssue = await this._updateIssueUseCase.execute(
       user.userId,
       issueId,
-      result.data as any
+      result.data as UpdateIssueDto
     );
 
     res

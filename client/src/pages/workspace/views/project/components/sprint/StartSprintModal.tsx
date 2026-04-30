@@ -12,7 +12,7 @@ import { getErrorMessage } from "@/shared/utils/error";
 interface StartSprintModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    sprint: SprintData;
+    sprint: SprintData | null;
     workspaceId: string;
     onSuccess: (updatedSprint: SprintData) => void;
 }
@@ -36,14 +36,14 @@ export function StartSprintModal({
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             setStartDate(`${year}-${month}-${day}`);
-            
+
             const future = new Date();
             future.setDate(future.getDate() + 14);
             const fYear = future.getFullYear();
             const fMonth = String(future.getMonth() + 1).padStart(2, '0');
             const fDay = String(future.getDate()).padStart(2, '0');
             setEndDate(`${fYear}-${fMonth}-${fDay}`); // Default 2 week sprint
-            
+
             setIsSubmitting(false);
         }
     }, [open]);
@@ -62,11 +62,12 @@ export function StartSprintModal({
         }
 
         setIsSubmitting(true);
-        
+
         try {
             const startDateISO = new Date(startDate).toISOString();
             const endDateISO = new Date(endDate).toISOString();
 
+            if (!sprint) return;
             const res = await startSprint(
                 sprint.sprintId,
                 startDateISO,
@@ -79,7 +80,7 @@ export function StartSprintModal({
                 onSuccess(res.data);
                 onOpenChange(false);
             } else {
-                 toast.error(res.message || "Failed to start sprint");
+                toast.error(res.message || "Failed to start sprint");
             }
         } catch (error: unknown) {
             toast.error(getErrorMessage(error) || "Failed to start sprint");

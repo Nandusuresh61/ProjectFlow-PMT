@@ -83,7 +83,7 @@ export default function ForgotPassword() {
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
-              schema={ForgotEmailSchema as any}
+              schema={ForgotEmailSchema}
               onSubmit={handleSubmit}
               submitLabel="Send Verification Code"
               loadingLabel="Sending..."

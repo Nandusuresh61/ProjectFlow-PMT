@@ -60,7 +60,7 @@ export default function Plans() {
       try {
         const res = await getPlans();
         setPlans(res.data);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load plans");
       }
     };

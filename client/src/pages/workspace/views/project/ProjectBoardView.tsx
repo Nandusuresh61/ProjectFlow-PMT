@@ -1,5 +1,5 @@
 import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, MoreHorizontal, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -94,16 +94,16 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     
     // Modal State
-    const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
+    const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
     // Supplemental Data for Modal
-    const [membersMap, setMembersMap] = useState<Record<string, any>>({});
-    const [sprintsMap, setSprintsMap] = useState<Record<string, any>>({});
-    const [issuesMap, setIssuesMap] = useState<Record<string, any>>({});
+    const [membersMap, setMembersMap] = useState<Record<string, { userId: string, fullName: string, profileImage: string, role: string }>>({});
+    const [sprintsMap, setSprintsMap] = useState<Record<string, SprintData>>({});
+    const [issuesMap, setIssuesMap] = useState<Record<string, IssueData>>({});
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             const [sprintRes, membersRes, allSprintsRes, storiesRes] = await Promise.all([
@@ -117,7 +117,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                 setActiveSprintData(sprintRes.data);
                 
                 // Build issues map starting with active sprint issues
-                const iMap: Record<string, any> = {};
+                const iMap: Record<string, IssueData> = {};
                 sprintRes.data.issues.forEach(i => {
                     iMap[i.issueId] = i;
                 });
@@ -134,8 +134,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             }
 
             if (membersRes.success && membersRes.data) {
-                const mMap: Record<string, any> = {};
-                membersRes.data.forEach((m: any) => {
+                const mMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }> = {};
+                membersRes.data.forEach((m: { userId: string, fullName: string, profileImage: string, role: string }) => {
                     mMap[m.userId] = m;
                 });
                 setMembersMap(mMap);
@@ -143,7 +143,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
 
             if (allSprintsRes.success && allSprintsRes.data) {
                 setAllSprints(allSprintsRes.data);
-                const sMap: Record<string, any> = {};
+                const sMap: Record<string, SprintData> = {};
                 allSprintsRes.data.forEach((s: SprintData) => {
                     sMap[s.sprintId] = s;
                 });
@@ -155,11 +155,11 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
         } finally {
             setLoading(false);
         }
-    };
+    }, [project.id, project.workspaceId]);
 
     useEffect(() => {
         fetchData();
-    }, [project.id, project.workspaceId]);
+    }, [fetchData]);
 
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;

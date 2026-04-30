@@ -5,7 +5,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
-import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
 import { IGetInvitationDetailsUseCase } from "@/application/interfaces/use-cases/Invitation/IGetInvitationDetailsUseCase";
 import { AuthRequest } from "../middlewares/AuthMiddleware";

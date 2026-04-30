@@ -70,14 +70,14 @@ export class EmailTemplates {
     return { subject, body };
   }
 
-  static getTemplate(type: EmailType, data: any) {
+  static getTemplate(type: EmailType, data: { otp?: string; fullName?: string; inviteLink?: string }) {
     switch (type) {
       case EmailType.OTP:
-        return this.getOtpTemplate(data.otp, data.fullName);
+        return this.getOtpTemplate(data.otp!, data.fullName);
       case EmailType.RESET_PASSWORD:
-        return this.getResetPasswordTemplate(data.otp);
+        return this.getResetPasswordTemplate(data.otp!);
       case EmailType.INVITE_USER:
-        return this.getInviteTemplate(data.inviteLink);
+        return this.getInviteTemplate(data.inviteLink!);
       default:
         throw new Error(`Email template not found for type: ${type}`);
     }

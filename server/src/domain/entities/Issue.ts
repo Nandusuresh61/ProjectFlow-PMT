@@ -1,6 +1,6 @@
 export type IssueType = "STORY" | "TASK" | "BUG";
 
-export type IssueStatus = "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
+export type IssueStatus = "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE" | "TESTING" | "READY";
 
 export type IssuePriority = "LOW" | "MEDIUM" | "HIGH";
 

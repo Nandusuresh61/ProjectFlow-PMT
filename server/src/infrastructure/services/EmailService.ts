@@ -15,7 +15,7 @@ export class EmailService implements IEmailService {
         subject: data.subject,
         html: data.body,
       });
-    } catch (error) {
+    } catch {
       throw new AppError(
           ErrorCode.EMAIL_SEND_FAILED,
           AppMessages.EMAIL_SENT_FAILED,

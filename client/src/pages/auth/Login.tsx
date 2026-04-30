@@ -154,7 +154,7 @@ export default function Login() {
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
-              schema={LoginUserSchema as any}
+              schema={LoginUserSchema}
               onSubmit={handleLogin}
               submitLabel="Sign In"
               loadingLabel="Signing in..."

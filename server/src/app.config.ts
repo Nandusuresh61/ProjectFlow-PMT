@@ -20,10 +20,9 @@ if (!parsedEnv.success) {
     console.error(`   - ${pathName}: ${issue.message} (${issue.code})`);
   });
 
-  // Extra help for the user
   const missingVars = parsedEnv.error.issues
     .filter(
-      (i) => i.code === "invalid_type" && (i as any).received === "undefined",
+      (i) => i.code === "invalid_type" && (i as { received?: string }).received === "undefined",
     )
     .map((i) => i.path.join("."));
 

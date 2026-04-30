@@ -12,7 +12,7 @@ import { getErrorMessage } from "@/shared/utils/error";
 interface EditSprintModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    sprint: SprintData;
+    sprint: SprintData | null;
     workspaceId: string;
     onSuccess: (sprint: SprintData) => void;
 }
@@ -48,6 +48,7 @@ export function EditSprintModal({
             return;
         }
 
+        if (!sprint) return;
         setIsSubmitting(true);
         
         try {

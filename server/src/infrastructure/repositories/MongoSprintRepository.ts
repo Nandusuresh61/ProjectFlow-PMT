@@ -42,7 +42,7 @@ export class SprintRepository implements ISprintRepository {
     ).lean();
 
     if (!updated) return null;
-    return this.toDomain(updated as any);
+    return this.toDomain(updated as unknown as ISprintDocument);
   }
 
   async findActiveProjectId(projectId: string): Promise<Sprint | null> {

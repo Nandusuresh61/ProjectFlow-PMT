@@ -44,4 +44,5 @@ app.use("/api/sprint", sprintRoutes);
 app.use(errorMiddleware);
 
 const port = config.PORT || 3000;
-app.listen(port, () => console.log(`http:localhost:${port}`));
+app.listen(port, () =>
+  console.log(`Server is running on http://localhost:${config.PORT}`));

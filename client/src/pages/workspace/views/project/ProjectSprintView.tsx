@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
-import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/services/sprint/sprint.api';
+import { getActiveSprint, type ActiveSprintData, getProjectSprints, type SprintData } from '@/services/sprint/sprint.api';
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
 import { EditSprintModal } from './components/sprint/EditSprintModal';
@@ -40,12 +40,12 @@ const getInitials = (name: string) => {
 export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [data, setData] = useState<ActiveSprintData | null>(null);
     const [members, setMembers] = useState<ProjectMember[]>([]);
-    const [allSprints, setAllSprints] = useState<any[]>([]);
+    const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             const [sprintRes, membersRes, allSprintsRes] = await Promise.all([
@@ -68,11 +68,11 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [project.id]);
 
     useEffect(() => {
         fetchData();
-    }, [project.id]);
+    }, [fetchData]);
 
     const { sprint, issues } = data || { sprint: null, issues: [] };
     const incompleteIssues = issues.filter(i => i.status !== 'DONE');

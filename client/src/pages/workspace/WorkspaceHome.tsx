@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -136,7 +136,7 @@ export default function WorkspaceHome() {
         loadCurrentWorkspaceRole();
     }, [currentWorkspace?.workspaceId, currentWorkspace?.ownerId, user?.userId]);
 
-    const loadProjects = async () => {
+    const loadProjects = useCallback(async () => {
         if (!currentWorkspace?.workspaceId) {
             setProjects([]);
             setSelectedProject(null);
@@ -166,11 +166,11 @@ export default function WorkspaceHome() {
             console.error('Failed to fetch projects', error);
             setProjects([]);
         }
-    };
+    }, [currentWorkspace?.workspaceId, sidebarMode, navigate]);
 
     useEffect(() => {
         loadProjects();
-    }, [currentWorkspace?.workspaceId, sidebarMode]);
+    }, [loadProjects]);
 
     useEffect(() => {
         if (!routeProjectId) {

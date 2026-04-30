@@ -19,7 +19,7 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
     private readonly _emailService: IEmailService,
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _passwordHash: IPasswordHasher,
-  ) {}
+  ) { }
   async execute(dto: ForgotRequestDto): Promise<void> {
     const { email } = dto;
     const user = await this._userRepo.findByEmail(email);
@@ -32,8 +32,8 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
       );
 
     const otp = this._otpGenerator.generateOtp();
-    
-    console.log("ForgotPasswordOtp : ", otp);
+
+    console.log(`OTP for forgot password: ${otp}`);
 
     const otpHash = await this._passwordHash.createHashPassword(otp);
 

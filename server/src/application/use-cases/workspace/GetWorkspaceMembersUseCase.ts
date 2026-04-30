@@ -26,22 +26,23 @@ export class GetWorkspaceMembersUseCase implements IGetWorkspaceMembersUseCase {
             profileImage: user.profileImage,
           };
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error(`Error fetching user ${membership.userId}:`, error);
           return null;
         }
       }),
     );
-    
+
     let validMembers = members.filter((m): m is NonNullable<typeof m> => m !== null);
-    
+
     if (search) {
       const lowerSearch = search.toLowerCase();
-      validMembers = validMembers.filter(m => 
-        m.fullName.toLowerCase().includes(lowerSearch) || 
+      validMembers = validMembers.filter(m =>
+        m.fullName.toLowerCase().includes(lowerSearch) ||
         m.email.toLowerCase().includes(lowerSearch)
       );
     }
-    
+
     return validMembers;
   }
 }

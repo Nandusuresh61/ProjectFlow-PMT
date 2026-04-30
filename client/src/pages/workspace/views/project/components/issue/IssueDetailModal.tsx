@@ -1,4 +1,4 @@
-import type { IssueData } from "@/services/sprint/sprint.api";
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Link2, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
@@ -40,10 +40,10 @@ export function IssueDetailModal({
 }: { 
     open: boolean, 
     onOpenChange: (open: boolean) => void, 
-    issue: IssueData,
-    membersMap: Record<string, any>,
-    sprintsMap?: Record<string, any>,
-    issuesMap?: Record<string, any>
+    issue: IssueData | null,
+    membersMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }>,
+    sprintsMap?: Record<string, SprintData>,
+    issuesMap?: Record<string, IssueData>
 }) {
     if (!issue) return null;
 

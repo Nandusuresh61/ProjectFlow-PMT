@@ -1,7 +1,7 @@
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { Issue } from "@/domain/entities/Issue";
 import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
-import mongoose from "mongoose";
+
 
 export class MongoIssueRepository implements IIssueRepository {
   
@@ -130,7 +130,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.title,
       doc.description,
       doc.type as "STORY" | "TASK" | "BUG",
-      doc.status as "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE",
+      doc.status as "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE" | "TESTING" | "READY",
       doc.priority as "LOW" | "MEDIUM" | "HIGH",
       doc.sizeLabel as "XS" | "S" | "M" | "L" | "XL" | null,
       doc.storyPoints,

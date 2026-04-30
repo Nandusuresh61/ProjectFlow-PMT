@@ -1,4 +1,4 @@
-import z, { email } from "zod";
+import z from "zod";
 import { TokenEnums } from "../enums/TokenEnums";
 
 export const TokenPayloadSchema = z.object({

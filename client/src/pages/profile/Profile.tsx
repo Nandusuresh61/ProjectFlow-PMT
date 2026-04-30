@@ -58,7 +58,7 @@ export default function ProfileSettings() {
         toast.info("Uploading image...");
         try {
           imageUrl = await uploadToCloudinary(selectedImage);
-        } catch (error) {
+        } catch {
           toast.error("Failed to upload image. Please try again.");
           setIsSaving(false);
           return;

@@ -72,9 +72,9 @@ export function IssueCreationModal({
     onOpenChange: (open: boolean) => void,
     project?: { key: string, id: string, workspaceId: string, memberIds: string[] },
     onSuccess?: () => void,
-    editIssue?: IssueData
+    editIssue?: IssueData | null
 }) {
-    const [members, setMembers] = useState<any[]>([]);
+    const [members, setMembers] = useState<{ userId: string, fullName: string, profileImage: string }[]>([]);
     const [stories, setStories] = useState<IssueData[]>([]);
 
     useEffect(() => {
@@ -91,11 +91,11 @@ export function IssueCreationModal({
         if (open && project?.workspaceId) {
             getMembers(project.workspaceId).then(res => {
                 if (res?.data) {
-                    setMembers(res.data.filter((m: any) => project.memberIds?.includes(m.userId)));
+                    setMembers(res.data.filter((m: { userId: string }) => project.memberIds?.includes(m.userId)));
                 }
             }).catch(err => console.error("Failed to load members", err));
         }
-    }, [open, project]);
+    }, [open, project?.workspaceId, project?.memberIds]);
 
     const [state, dispatch] = useReducer(formReducer, {
         values: initialValues,
@@ -132,11 +132,12 @@ export function IssueCreationModal({
     const [pendingFiles, setPendingFiles] = useState<{ id: string; file: File }[]>([]);
 
     const handleChange = useCallback((field: string, value: unknown) => {
-        dispatch({ type: "SET_VALUE", field, value: value as any }); // Temporarily using any here because the dynamic field name makes it impossible for TS to verify the exact value type
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch({ type: "SET_VALUE", field: field as "title", value: value as any }); 
     }, []);
 
     const handleBlur = useCallback((field: string) => {
-        dispatch({ type: "TOUCH", field });
+        dispatch({ type: "TOUCH", field: field as "title" });
     }, []);
 
     const addSubtask = () => {
@@ -190,8 +191,8 @@ export function IssueCreationModal({
 
     const removeAttachment = (index: number) => {
         const attachment = state.values.attachments[index];
-        if ((attachment as any).id) {
-            setPendingFiles(prev => prev.filter(f => f.id !== (attachment as any).id));
+        if ((attachment as { id?: string }).id) {
+            setPendingFiles(prev => prev.filter(f => f.id !== (attachment as { id?: string }).id));
         }
         const newAttachments = [...state.values.attachments];
         newAttachments.splice(index, 1);
@@ -232,7 +233,7 @@ export function IssueCreationModal({
                     try {
                         const url = await uploadToCloudinary(pending.file);
                         return { id: pending.id, url };
-                    } catch (err) {
+                    } catch {
                         throw new Error(`Failed to upload ${pending.file.name}`);
                     }
                 });
@@ -241,14 +242,14 @@ export function IssueCreationModal({
                 
                 // Map URLs back to attachments
                 uploadedResults.forEach(result => {
-                    const idx = finalAttachments.findIndex(a => (a as any).id === result.id);
+                    const idx = finalAttachments.findIndex(a => (a as { id?: string }).id === result.id);
                     if (idx !== -1) {
                         finalAttachments[idx] = {
                             ...finalAttachments[idx],
                             url: result.url
                         };
                         // Remove the temporary ID before sending to backend
-                        delete (finalAttachments[idx] as any).id;
+                        delete (finalAttachments[idx] as { id?: string }).id;
                     }
                 });
             }
@@ -291,7 +292,7 @@ export function IssueCreationModal({
         } finally {
             dispatch({ type: "SET_SUBMITTING", isSubmitting: false });
         }
-    }, [state.values, onOpenChange, editIssue, project, onSuccess]);
+    }, [state.values, onOpenChange, editIssue, project, onSuccess, pendingFiles]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

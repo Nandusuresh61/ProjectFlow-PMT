@@ -14,7 +14,7 @@ export default function ProtectedRoutes() {
 
   useEffect(() => {
     checkAuth().finally(() => setAuthChecked(true));
-  }, []); 
+  }, [checkAuth]); 
 
   if (!authChecked) {
     return <Loader fullScreen />;

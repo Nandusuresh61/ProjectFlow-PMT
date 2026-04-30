@@ -50,7 +50,7 @@ export class WorkspaceRepository extends MongoBaseRepository<Workspace, Workspac
     const { page = 1, limit = 10, search, sortBy = "createdAt", sortOrder = "desc" } = options;
     const skip = (page - 1) * limit;
 
-    const matchStage: Record<string, any> = {};
+    const matchStage: Record<string, unknown> = {};
     if (search) {
       matchStage.name = { $regex: search, $options: "i" };
     }

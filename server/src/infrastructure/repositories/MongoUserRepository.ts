@@ -103,7 +103,7 @@ export class MongoUserRepository
     } = options;
     const skip = (page - 1) * limit;
 
-    const matchStage: Record<string, any> = {};
+    const matchStage: Record<string, unknown> = {};
     if (search) {
       matchStage.$or = [
         { fullName: { $regex: search, $options: "i" } },
@@ -265,8 +265,6 @@ export class MongoUserRepository
     ]);
 
     if (!result || result.length === 0) {
-      // If user has no workspaces, they won't appear in the aggregation because of $unwind "$memberships"
-      // Fallback: fetch user basic details
       const user = await this.model.findOne({ userId });
       if (!user) return null;
 

@@ -13,7 +13,7 @@ interface SprintSectionProps {
     onEditIssue: (issue: IssueData) => void;
     onStart?: (sprint: SprintData) => void;
     onEdit?: (sprint: SprintData) => void;
-    membersMap: Record<string, any>;
+    membersMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }>;
     canManage?: boolean;
 }
 
