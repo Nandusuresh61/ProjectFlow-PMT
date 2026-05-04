@@ -113,8 +113,14 @@ export default function Plans() {
         type: formData.type,
         priceMonthly: formData.type === PlanType.FREE ? 0 : Number(formData.price),
         description: formData.description,
-        maxProjects: Number(formData.maxProjects),
-        maxMembers: Number(formData.maxMembers),
+        maxProjects:
+          formData.type === PlanType.ENTERPRISE
+            ? -1
+            : Number(formData.maxProjects),
+        maxMembers:
+          formData.type === PlanType.ENTERPRISE
+            ? -1
+            : Number(formData.maxMembers),
         features: validFeatures,
       };
 
@@ -233,36 +239,38 @@ export default function Plans() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="maxProjects" className="text-zinc-300">
-                    Max Projects
-                  </Label>
-                  <Input
-                    id="maxProjects"
-                    name="maxProjects"
-                    type="number"
-                    placeholder="e.g. 5"
-                    value={formData.maxProjects}
-                    onChange={handleInputChange}
-                    className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
-                  />
+              {formData.type !== PlanType.ENTERPRISE && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="maxProjects" className="text-zinc-300">
+                      Max Projects
+                    </Label>
+                    <Input
+                      id="maxProjects"
+                      name="maxProjects"
+                      type="number"
+                      placeholder="e.g. 5"
+                      value={formData.maxProjects}
+                      onChange={handleInputChange}
+                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="maxMembers" className="text-zinc-300">
+                      Max Members
+                    </Label>
+                    <Input
+                      id="maxMembers"
+                      name="maxMembers"
+                      type="number"
+                      placeholder="e.g. 10"
+                      value={formData.maxMembers}
+                      onChange={handleInputChange}
+                      className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="maxMembers" className="text-zinc-300">
-                    Max Members
-                  </Label>
-                  <Input
-                    id="maxMembers"
-                    name="maxMembers"
-                    type="number"
-                    placeholder="e.g. 10"
-                    value={formData.maxMembers}
-                    onChange={handleInputChange}
-                    className="bg-zinc-950 border-zinc-800 text-zinc-100 focus:ring-green-500 focus:border-green-500"
-                  />
-                </div>
-              </div>
+              )}
 
               <div className="grid gap-2">
                 <Label className="text-zinc-300">Features</Label>

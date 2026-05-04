@@ -24,14 +24,18 @@ export class CreatePlanUseCase implements ICreatePlanUseCase{
     // 2. Determine price
     const priceMonthly = data.type === PlanType.FREE ? 0 : data.priceMonthly;
 
+    // 3. Determine limits
+    const maxProjects = data.type === PlanType.ENTERPRISE ? -1 : (data.maxProjects ?? 0);
+    const maxMembers = data.type === PlanType.ENTERPRISE ? -1 : (data.maxMembers ?? 0);
+
     const now = new Date();
     const plan = new Plan(
       this._uidGenerator.createId(),
       data.type,
       priceMonthly,
       data.description,
-      data.maxProjects,
-      data.maxMembers,
+      maxProjects,
+      maxMembers,
       data.features,
       true,
       now,
