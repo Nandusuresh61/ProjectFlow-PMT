@@ -30,10 +30,9 @@ export const authenticatedUser = async (
 
     try {
       const decoded = jwt.verify(token, config.ACCESS_TOKEN_SECRET) as unknown as ITokenPayload;
-      
-      // Real-time check against database to catch sudden blocks
+
       const user = await UserModel.findOne({ userId: decoded.userId }).select('isBlocked');
-      
+
       if (!user || user.isBlocked) {
         throw new AppError(
           ErrorCode.AUTH,
