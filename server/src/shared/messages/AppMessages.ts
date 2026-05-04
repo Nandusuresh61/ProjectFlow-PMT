@@ -156,4 +156,7 @@ export const AppMessages = {
   COMMENT_NOT_FOUND: "Comment not found",
   COMMENT_DELETED_SUCCESS: "Comment deleted successfully",
   COMMENT_UPDATED_SUCCESS: "Comment updated successfully",
+  WORKSPACE_ID_REQUIRED: "Workspace ID is required in headers (x-workspace-id) or params",
+  SUBSCRIPTION_NOT_FOUND: "Subscription not found for this workspace",
+  SUBSCRIPTION_EXPIRED: "Subscription expired or inactive. Please upgrade to continue.",
 };

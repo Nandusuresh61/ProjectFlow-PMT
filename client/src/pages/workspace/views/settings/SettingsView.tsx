@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProfileSettings from '@/pages/profile/Profile';
 import { SecuritySettings } from '../security/SecuritySettings';
+import { BillingSettings } from '../billing/BillingSettings';
 
 export const SettingsView = () => {
     const [activeTab, setActiveTab] = useState('account');
@@ -50,6 +51,10 @@ export const SettingsView = () => {
                         {activeTab === 'account' ? (
                             <div className="h-full p-4 lg:p-8">
                                 <ProfileSettings />
+                            </div>
+                        ) : activeTab === 'billing' ? (
+                            <div className="h-full">
+                                <BillingSettings />
                             </div>
                         ) : activeTab === 'general' ? (
                             <div className="p-8">

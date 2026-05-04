@@ -8,9 +8,9 @@ export const CreatePlanSchema = z.object({
 
   description: z.string({ message: "Description is required" }).min(1, "Description is required"),
 
-  maxProjects: z.number({ message: "Max projects count is required" }).min(0, "Max projects cannot be negative"),
+  maxProjects: z.number({ message: "Max projects count is required" }).min(-1, "Max projects cannot be less than -1"),
 
-  maxMembers: z.number({ message: "Max members count is required" }).min(0, "Max members cannot be negative"),
+  maxMembers: z.number({ message: "Max members count is required" }).min(-1, "Max members cannot be less than -1"),
 
   features: z
     .array(z.string().min(1), { message: "Features are required" })

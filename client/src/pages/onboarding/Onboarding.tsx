@@ -6,8 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { AuthUserState } from "@/store/auth.store";
 import { completeOnboarding } from "@/services/onboarding/onboarding.api";
 import { toast } from "sonner";
-import { getPlans } from "@/services/plan/plan.api";
-import type { Plan } from "@/types/plan.types";
 import { Logo } from "@/components/common/Logo";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
@@ -17,13 +15,11 @@ import type {
 } from "@/types/onboarding.types";
 
 import { StepWorkspace } from "./StepWorkspace";
-import { StepPlan } from "./StepPlan";
 import { StepTeam } from "./StepTeam";
 
 const steps = [
   { id: 1, name: "Workspace" },
-  { id: 2, name: "Plan" },
-  { id: 3, name: "Team" },
+  { id: 2, name: "Team" },
 ];
 
 
@@ -40,12 +36,9 @@ import { getErrorMessage } from "@/shared/utils/error";
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [plansLoading, setPlansLoading] = useState(true);
   const [finishLoading, setFinishLoading] = useState(false);
   const [formData, setFormData] = useState<OnboardingState>({
     workspaceName: "",
-    planId: "",
     teamMembers: [{ email: "", role: WorkspaceRoleEnum.WORKSPACE_MEMBER }],
   });
 
@@ -58,19 +51,6 @@ export default function Onboarding() {
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await getPlans();
-        setPlans(response.data);
-      } catch {
-        toast.error("Failed to load plans");
-      } finally {
-        setPlansLoading(false);
-      }
-    };
-    fetchPlans();
-  }, []);
 
   const updateData = (data: Partial<OnboardingState>) =>
     setFormData((prev) => ({ ...prev, ...data }));
@@ -96,11 +76,6 @@ export default function Onboarding() {
       return;
     }
 
-    if (!formData.planId) {
-      toast.error("Please select a plan");
-      return;
-    }
-
     const validInvites = formData.teamMembers
       .filter((m) => m.email.trim() !== "")
       .map((m) => ({
@@ -112,7 +87,6 @@ export default function Onboarding() {
     try {
       const response = await completeOnboarding({
         workspaceName: formData.workspaceName,
-        planId: formData.planId,
         invites: validInvites.length > 0 ? validInvites : undefined,
       });
 
@@ -218,16 +192,6 @@ export default function Onboarding() {
                   />
                 )}
                 {currentStep === 2 && (
-                  <StepPlan
-                    data={formData}
-                    plans={plans}
-                    loading={plansLoading}
-                    updateData={updateData}
-                    onNext={goNext}
-                    onBack={goBack}
-                  />
-                )}
-                {currentStep === 3 && (
                   <StepTeam
                     data={formData}
                     updateData={updateData}

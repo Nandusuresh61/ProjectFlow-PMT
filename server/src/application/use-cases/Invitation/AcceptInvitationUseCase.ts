@@ -99,7 +99,7 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
       invitation.workspaceId
     );
 
-    if (currentMemberCount >= plan.maxMembers) {
+    if (plan.maxMembers !== -1 && currentMemberCount >= plan.maxMembers) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.MEMBER_LIMIT_EXCEEDED,

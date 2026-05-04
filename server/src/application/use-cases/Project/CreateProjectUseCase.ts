@@ -70,7 +70,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       data.workspaceId
     );
 
-    if (projectCount >= plan.maxProjects) {
+    if (plan.maxProjects !== -1 && projectCount >= plan.maxProjects) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.PROJECT_LIMIT_EXCEEDED,
@@ -126,7 +126,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       );
     }
 
-    if (projectMemberIds.length > plan.maxMembers) {
+    if (plan.maxMembers !== -1 && projectMemberIds.length > plan.maxMembers) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.MEMBER_LIMIT_EXCEEDED,

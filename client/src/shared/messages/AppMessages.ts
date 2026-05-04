@@ -132,4 +132,7 @@ export const AppMessages = {
   CURRENT_PASSWORD_REQUIRED: "Current password is required",
   FULL_NAME_TOO_SHORT: "Full name must be at least 3 characters",
   WORKSPACE_ALREADY_OWNED: "You already own a workspace. Only one workspace is allowed per user.",
+  WORKSPACE_ID_REQUIRED: "Workspace ID is required in headers (x-workspace-id) or params",
+  SUBSCRIPTION_NOT_FOUND: "Subscription not found for this workspace",
+  SUBSCRIPTION_EXPIRED: "Subscription expired or inactive. Please upgrade to continue.",
 } as const;

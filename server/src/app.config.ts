@@ -63,4 +63,7 @@ export const config = {
 
   REFRESH_TOKEN_COOKIE_MAX_AGE:
     Number(env.REFRESH_TOKEN_COOKIE_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
+
+  RAZORPAY_KEY_ID: env.RAZORPAY_KEY_ID || "",
+  RAZORPAY_KEY_SECRET: env.RAZORPAY_KEY_SECRET || "",
 };

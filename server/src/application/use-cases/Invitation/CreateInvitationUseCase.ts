@@ -91,7 +91,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
     const pendingInvitationCount =
       await this._invitationRepo.countPendingByWorkspace(workspaceId);
 
-    if (currentMemberCount + pendingInvitationCount >= plan.maxMembers) {
+    if (plan.maxMembers !== -1 && (currentMemberCount + pendingInvitationCount >= plan.maxMembers)) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.MEMBER_LIMIT_EXCEEDED,
