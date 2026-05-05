@@ -9,6 +9,8 @@ export interface SubscriptionDoc extends Document {
   startDate: Date;
   endDate: Date;
   billingCycle: string;
+  amount: number;
+  currency: string;
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   createdAt: Date;
@@ -28,6 +30,8 @@ const subscriptionSchema = new Schema<SubscriptionDoc>(
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     billingCycle: { type: String, default: "monthly" },
+    amount: { type: Number, required: true },
+    currency: { type: String, required: true },
     razorpayOrderId: { type: String },
     razorpayPaymentId: { type: String },
   },

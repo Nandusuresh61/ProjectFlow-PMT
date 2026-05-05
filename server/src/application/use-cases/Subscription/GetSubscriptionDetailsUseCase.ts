@@ -18,9 +18,22 @@ export class GetSubscriptionDetailsUseCase {
 
     const plan = await this._planRepo.findById(subscription.planId);
     
+    // Fetch History
+    const allSubscriptions = await this._subscriptionRepo.findAllByWorkspaceId(workspaceId);
+    const allPlans = await this._planRepo.findAll();
+    
+    const history = allSubscriptions.map(sub => {
+      const subPlan = allPlans.find(p => p.planId === sub.planId);
+      return {
+        ...sub,
+        planType: subPlan?.type || "Unknown"
+      };
+    });
+
     return {
       subscription,
       plan,
+      history
     };
   }
 }

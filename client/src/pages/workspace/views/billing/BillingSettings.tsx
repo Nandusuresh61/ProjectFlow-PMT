@@ -5,17 +5,20 @@ import { toast } from 'sonner';
 import { getSubscription, upgradeSubscription, verifyPayment } from '@/services/subscription/subscription.api';
 import { getPlans } from '@/services/plan/plan.api';
 import { AuthUserState } from '@/store/auth.store';
+import { useWorkspaceStore } from '@/store/workspace.store';
 import { getErrorMessage } from '@/shared/utils/error';
 import type { Plan } from '@/types/plan.types';
 
 export const BillingSettings = () => {
     const [subscription, setSubscription] = useState<any>(null);
+    const [history, setHistory] = useState<any[]>([]);
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
     const [upgrading, setUpgrading] = useState<string | null>(null);
 
     const user = AuthUserState((state) => state.user);
     const workspaceId = user?.currentWorkspaceId;
+    const fetchWorkspaces = useWorkspaceStore((state) => state.fetchWorkspaces);
 
     useEffect(() => {
         if (workspaceId) {
@@ -31,6 +34,7 @@ export const BillingSettings = () => {
                 getPlans()
             ]);
             setSubscription(subRes.data);
+            setHistory(subRes.data.history || []);
             setPlans(plansRes.data);
         } catch (error) {
             toast.error(getErrorMessage(error) || "Failed to load billing information");
@@ -79,6 +83,7 @@ export const BillingSettings = () => {
                             planId
                         });
                         toast.success("Subscription upgraded successfully! 🎉");
+                        await fetchWorkspaces();
                         fetchBillingData();
                     } catch (error) {
                         toast.error(getErrorMessage(error) || "Payment verification failed");
@@ -247,6 +252,79 @@ export const BillingSettings = () => {
                             </motion.div>
                         );
                     })}
+                </div>
+            </section>
+
+            {/* Billing History */}
+            <section className="pb-12">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <CreditCard className="text-[#A5D7E8]" size={22} />
+                    Billing History
+                </h3>
+
+                <div className="bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-white/5 bg-white/[0.02]">
+                                    <th className="px-6 py-4 text-[10px] font-black text-[#576CBC]/60 uppercase tracking-widest">Date</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-[#576CBC]/60 uppercase tracking-widest">Plan</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-[#576CBC]/60 uppercase tracking-widest">Amount</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-[#576CBC]/60 uppercase tracking-widest">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-[#576CBC]/60 uppercase tracking-widest text-right">Transaction ID</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {history.length > 0 ? (
+                                    history.map((item, index) => (
+                                        <tr key={item.subscriptionId || index} className="group hover:bg-white/[0.01] transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm font-bold text-white/80">
+                                                    {new Date(item.createdAt || item.startDate).toLocaleDateString(undefined, {
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric'
+                                                    })}
+                                                </div>
+                                                <div className="text-[10px] text-white/20 font-medium uppercase tracking-tighter">
+                                                    {new Date(item.createdAt || item.startDate).toLocaleTimeString(undefined, {
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-black text-white/90">{item.planType}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-mono text-[#A5D7E8]">
+                                                {item.amount > 0 ? `₹${item.amount}` : 'FREE'}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className={`text-[10px] font-black px-2 py-0.5 rounded-md w-fit ${
+                                                    item.status === 'active' 
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                                                        : 'bg-white/5 text-white/40 border border-white/10'
+                                                }`}>
+                                                    {item.status?.toUpperCase()}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <span className="text-[10px] font-mono text-white/20 select-all">
+                                                    {item.razorpayPaymentId || 'N/A'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-12 text-center text-white/20 text-sm font-medium">
+                                            No payment history found
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>

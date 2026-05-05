@@ -9,4 +9,5 @@ export interface IWorkspaceRepository {
   findAllWorkspaces(options: WorkspaceQueryOptions): Promise<PaginatedWorkspacesResult>;
   getWorkspaceDetails(workspaceId: string): Promise<WorkspaceDetailsDto | null>;
   updateWorkspaceStatus(workspaceId: string, isSuspended: boolean): Promise<void>;
+  update(workspace: Workspace): Promise<Workspace>;
 }

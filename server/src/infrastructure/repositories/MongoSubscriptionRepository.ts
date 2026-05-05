@@ -20,6 +20,8 @@ export class MongoSubscriptionRepository
       doc.startDate,
       doc.endDate,
       doc.billingCycle as "monthly",
+      doc.amount,
+      doc.currency,
       doc.razorpayOrderId,
       doc.razorpayPaymentId,
       doc.createdAt,
@@ -27,12 +29,35 @@ export class MongoSubscriptionRepository
     );
   }
 
+  async create(subscription: Subscription): Promise<Subscription> {
+    const doc = {
+      subscriptionId: subscription.subscriptionId,
+      workspaceId: subscription.workspaceId,
+      planId: subscription.planId,
+      status: subscription.status,
+      startDate: subscription.startDate,
+      endDate: subscription.endDate,
+      billingCycle: subscription.billingCycle,
+      amount: subscription.amount,
+      currency: subscription.currency,
+      razorpayOrderId: subscription.razorpayOrderId,
+      razorpayPaymentId: subscription.razorpayPaymentId,
+    };
+    return super.create(doc);
+  }
+
   async findById(id: string): Promise<Subscription | null> {
     return this.findOne({ subscriptionId: id });
   }
 
   async findByWorkspaceId(workspaceId: string): Promise<Subscription | null> {
-    return this.findOne({ workspaceId });
+    const docs = await this.model.find({ workspaceId }).sort({ createdAt: -1 }).limit(1).exec();
+    return docs.length > 0 ? this.mapToEntity(docs[0]) : null;
+  }
+
+  async findAllByWorkspaceId(workspaceId: string): Promise<Subscription[]> {
+    const docs = await this.model.find({ workspaceId }).sort({ createdAt: -1 }).exec();
+    return docs.map((doc) => this.mapToEntity(doc));
   }
 
   async update(subscription: Subscription): Promise<Subscription> {
@@ -43,6 +68,8 @@ export class MongoSubscriptionRepository
         planId: subscription.planId,
         startDate: subscription.startDate,
         endDate: subscription.endDate,
+        amount: subscription.amount,
+        currency: subscription.currency,
         razorpayOrderId: subscription.razorpayOrderId,
         razorpayPaymentId: subscription.razorpayPaymentId,
       }
