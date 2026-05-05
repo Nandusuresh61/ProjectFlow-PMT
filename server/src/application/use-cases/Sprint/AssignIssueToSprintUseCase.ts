@@ -128,7 +128,6 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
       );
     }
 
-    // If it's a STORY, move all its tasks to the same sprint
     if (updatedIssue.type === 'STORY') {
       const { issues: childTasks } = await this._issueRepo.findByProjectId(
         updatedIssue.projectId,
@@ -140,13 +139,11 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
       );
 
       for (const task of childTasks) {
-        // Update each task's sprintId and status
         await this._issueRepo.update(task.issueId, {
           sprintId,
           status: newStatus,
         });
 
-        // Also update the sprint's issueIds list for each task
         if (oldSprintId && oldSprintId !== sprintId) {
           const oldSprint = await this._sprintRepo.findById(oldSprintId);
           if (oldSprint) {

@@ -358,38 +358,39 @@ export function IssueCreationModal({
                             />
                         </div>
 
-                        {/* Acceptance Criteria */}
-                        <div className="space-y-4 pt-4 border-t border-[#19376D]/50">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Acceptance Criteria</Label>
-                                <button type="button" onClick={addSubtask} className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors flex items-center gap-1">
-                                    <Plus size={12} /> Add Criteria
-                                </button>
-                            </div>
-                            
-                            {state.values.subtasks.map((task, idx) => (
-                                <div key={idx} className="flex items-center gap-3 group bg-white/[0.02] p-3 rounded-xl border border-white/5 focus-within:border-[#A5D7E8]/30 transition-all">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-[#A5D7E8]/30" />
-                                    <input 
-                                        className="flex-1 bg-transparent border-none text-sm text-white placeholder:text-white/20 focus:outline-none"
-                                        placeholder="Enter criteria..."
-                                        value={task.title}
-                                        onChange={(e) => updateSubtask(idx, e.target.value)}
-                                    />
-                                    <button 
-                                        type="button"
-                                        className="opacity-0 group-hover:opacity-100 p-1 text-white/20 hover:text-rose-400 transition-all"
-                                        onClick={() => removeSubtask(idx)}
-                                    >
-                                        <X size={14} />
+                        {state.values.type === "Story" && (
+                            <div className="space-y-4 pt-4 border-t border-[#19376D]/50">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Acceptance Criteria</Label>
+                                    <button type="button" onClick={addSubtask} className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors flex items-center gap-1">
+                                        <Plus size={12} /> Add Criteria
                                     </button>
                                 </div>
-                            ))}
+                                
+                                {state.values.subtasks.map((task, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 group bg-white/[0.02] p-3 rounded-xl border border-white/5 focus-within:border-[#A5D7E8]/30 transition-all">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#A5D7E8]/30" />
+                                        <input 
+                                            className="flex-1 bg-transparent border-none text-sm text-white placeholder:text-white/20 focus:outline-none"
+                                            placeholder="Enter criteria..."
+                                            value={task.title}
+                                            onChange={(e) => updateSubtask(idx, e.target.value)}
+                                        />
+                                        <button 
+                                            type="button"
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-white/20 hover:text-rose-400 transition-all"
+                                            onClick={() => removeSubtask(idx)}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                ))}
 
-                            {state.values.subtasks.length === 0 && (
-                                <p className="text-xs text-[#576CBC]/50 italic">No acceptance criteria added.</p>
-                            )}
-                        </div>
+                                {state.values.subtasks.length === 0 && (
+                                    <p className="text-xs text-[#576CBC]/50 italic">No acceptance criteria added.</p>
+                                )}
+                            </div>
+                        )}
 
                         {/* Attachments */}
                         <div className="space-y-4 pt-4 border-t border-[#19376D]/50">

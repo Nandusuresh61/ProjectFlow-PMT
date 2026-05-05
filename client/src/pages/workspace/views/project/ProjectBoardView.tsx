@@ -25,6 +25,7 @@ interface BoardCardData {
     priority: 'High' | 'Medium' | 'Low';
     parentTitle?: string;
     parentKey?: string;
+    parentId?: string;
 }
 
 interface Column {
@@ -47,7 +48,7 @@ const tagColors: Record<string, string> = {
     BUG: '#E94560',
 };
 
-const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void }) => (
+const BoardCard = ({ card, onClick, onParentClick }: { card: BoardCardData; onClick: () => void; onParentClick?: (e: React.MouseEvent) => void }) => (
     <motion.div
         layout
         initial={{ opacity: 0, y: 10 }}
@@ -66,9 +67,20 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
         className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer active:cursor-grabbing group border border-white/5"
     >
         {card.parentTitle && (
-            <div className="flex items-center gap-1.5 mb-2.5 px-2 py-1 rounded bg-[#A5D7E8]/5 border border-[#A5D7E8]/10 w-fit max-w-full">
-                <span className="text-[9px] font-black text-[#A5D7E8]/60 uppercase tracking-tighter whitespace-nowrap">{card.parentKey}</span>
-                <span className="text-[10px] font-medium text-[#A5D7E8]/80 truncate">{card.parentTitle}</span>
+            <div 
+                className="flex items-center gap-1.5 mb-2.5 px-2 py-1 rounded bg-[#A5D7E8]/10 border border-[#A5D7E8]/20 w-fit max-w-full hover:bg-[#A5D7E8]/20 hover:border-[#A5D7E8]/30 transition-all cursor-pointer group/parent relative"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onParentClick?.(e);
+                }}
+            >
+                <div className="flex items-center gap-1.5 group-hover/parent:opacity-0 transition-opacity duration-200">
+                    <span className="text-[9px] font-black text-[#A5D7E8] uppercase tracking-tighter whitespace-nowrap">{card.parentKey}</span>
+                    <span className="text-[10px] font-medium text-[#A5D7E8] truncate">{card.parentTitle}</span>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/parent:opacity-100 transition-opacity duration-200">
+                    <span className="text-[9px] font-black text-[#A5D7E8] uppercase tracking-widest whitespace-nowrap">View Parent Story</span>
+                </div>
             </div>
         )}
         <div className="flex items-start justify-between mb-3">
@@ -228,9 +240,17 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     };
 
     const handleIssueClick = (issueId: string) => {
-        const issue = activeSprintData?.issues.find(i => i.issueId === issueId);
+        const issue = issues.find(i => i.issueId === issueId) || issuesMap[issueId];
         if (issue) {
             setSelectedIssue(issue);
+            setIsDetailModalOpen(true);
+        }
+    };
+
+    const handleParentClick = (parentId: string) => {
+        const parent = issuesMap[parentId];
+        if (parent) {
+            setSelectedIssue(parent);
             setIsDetailModalOpen(true);
         }
     };
@@ -257,7 +277,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                         assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
                         priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                         parentTitle: parent?.title,
-                        parentKey: parent?.issueKey
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
                     };
                 }),
             count: 0
@@ -279,7 +300,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                         assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
                         priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                         parentTitle: parent?.title,
-                        parentKey: parent?.issueKey
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
                     };
                 }),
             count: 0
@@ -301,7 +323,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                         assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
                         priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                         parentTitle: parent?.title,
-                        parentKey: parent?.issueKey
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
                     };
                 }),
             count: 0
@@ -323,7 +346,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                         assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
                         priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                         parentTitle: parent?.title,
-                        parentKey: parent?.issueKey
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
                     };
                 }),
             count: 0
@@ -412,6 +436,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                                         key={card.id} 
                                         card={card} 
                                         onClick={() => handleIssueClick(card.id)}
+                                        onParentClick={() => card.parentId && handleParentClick(card.parentId)}
                                     />
                                 ))}
                             </AnimatePresence>
