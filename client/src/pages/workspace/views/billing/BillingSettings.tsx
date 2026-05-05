@@ -53,9 +53,38 @@ export const BillingSettings = () => {
         });
     };
 
+    const currentPlan = subscription?.plan;
+    const subDetails = subscription?.subscription;
+    const usage = subscription?.usage || { projects: 0, members: 0 };
+
+    const calculateDaysRemaining = (endDate: string | Date | undefined) => {
+        if (!endDate) return null;
+        const end = new Date(endDate);
+        const now = new Date();
+        const diffTime = end.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+    };
+
+    const daysRemaining = calculateDaysRemaining(subDetails?.endDate);
+
     const handleUpgrade = async (planId: string) => {
         if (upgrading) return;
         
+        const targetPlan = plans.find(p => p.planId === planId);
+        if (!targetPlan) return;
+
+        // Frontend validation: Check usage limits
+        if (targetPlan.maxProjects !== -1 && usage.projects > targetPlan.maxProjects) {
+            toast.error(`Cannot downgrade: current project count (${usage.projects}) exceeds the new plan's limit (${targetPlan.maxProjects}). Please remove some projects first.`);
+            return;
+        }
+
+        if (targetPlan.maxMembers !== -1 && usage.members > targetPlan.maxMembers) {
+            toast.error(`Cannot downgrade: current member count (${usage.members}) exceeds the new plan's limit (${targetPlan.maxMembers}). Please remove some members first.`);
+            return;
+        }
+
         setUpgrading(planId);
         try {
             const res = await loadRazorpay();
@@ -72,7 +101,7 @@ export const BillingSettings = () => {
                 amount: amount.toString(),
                 currency: currency,
                 name: "ProjectFlow",
-                description: `Upgrade to ${plans.find(p => p.planId === planId)?.type} Plan`,
+                description: `Upgrade to ${targetPlan.type} Plan`,
                 order_id: orderId,
                 handler: async (response: any) => {
                     try {
@@ -115,21 +144,8 @@ export const BillingSettings = () => {
         );
     }
 
-    const currentPlan = subscription?.plan;
-    const subDetails = subscription?.subscription;
-
-    const calculateDaysRemaining = (endDate: string | Date | undefined) => {
-        if (!endDate) return null;
-        const end = new Date(endDate);
-        const now = new Date();
-        const diffTime = end.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays > 0 ? diffDays : 0;
-    };
-
-    const daysRemaining = calculateDaysRemaining(subDetails?.endDate);
-
     return (
+
         <div className="p-8 space-y-10">
             {/* Current Plan Summary */}
             <section>
@@ -177,16 +193,21 @@ export const BillingSettings = () => {
                         <div className="space-y-3 mt-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-white/60">Projects</span>
-                                <span className="text-white font-bold">{currentPlan?.maxProjects === -1 ? 'Unlimited' : `${currentPlan?.maxProjects || 3} Max`}</span>
+                                <span className="text-white font-bold">
+                                    {usage.projects} / {currentPlan?.maxProjects === -1 ? '∞' : `${currentPlan?.maxProjects || 3}`}
+                                </span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-white/60">Members</span>
-                                <span className="text-white font-bold">{currentPlan?.maxMembers === -1 ? 'Unlimited' : `${currentPlan?.maxMembers || 5} Max`}</span>
+                                <span className="text-white font-bold">
+                                    {usage.members} / {currentPlan?.maxMembers === -1 ? '∞' : `${currentPlan?.maxMembers || 5}`}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
 
             {/* Upgrade Options */}
             <section>

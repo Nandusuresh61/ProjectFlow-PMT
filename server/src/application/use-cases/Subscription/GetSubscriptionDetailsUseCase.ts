@@ -1,5 +1,7 @@
 import { ISubscriptionRepository } from "@/application/interfaces/repositories/ISubscriptionRepository";
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
+import { IProjectRepository } from "@/application/interfaces/repositories/IProjectRepository";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
@@ -7,7 +9,9 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 export class GetSubscriptionDetailsUseCase {
   constructor(
     private readonly _subscriptionRepo: ISubscriptionRepository,
-    private readonly _planRepo: IPlanRepository
+    private readonly _planRepo: IPlanRepository,
+    private readonly _projectRepo: IProjectRepository,
+    private readonly _membershipRepo: IMembershipRepository
   ) {}
 
   async execute(workspaceId: string) {
@@ -30,10 +34,19 @@ export class GetSubscriptionDetailsUseCase {
       };
     });
 
+    // Fetch Current Usage
+    const projectCount = await this._projectRepo.countByWorkspaceId(workspaceId);
+    const memberCount = await this._membershipRepo.countByWorkspace(workspaceId);
+
     return {
       subscription,
       plan,
-      history
+      history,
+      usage: {
+        projects: projectCount,
+        members: memberCount
+      }
     };
   }
 }
+
