@@ -5,6 +5,7 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { PlanType } from "@/shared/enums/PlanType";
 
 export interface UpgradeSubscriptionDto {
   workspaceId: string;
@@ -22,6 +23,10 @@ export class UpgradeSubscriptionUseCase {
     const plan = await this._planRepo.findById(dto.planId);
     if (!plan || !plan.isActive) {
       throw new AppError(ErrorCode.PLAN, AppMessages.PLAN_NOT_FOUND, HttpStatusCode.NOT_FOUND);
+    }
+
+    if (plan.type === PlanType.FREE) {
+      throw new AppError(ErrorCode.PLAN, "Cannot downgrade to Free plan", HttpStatusCode.BAD_REQUEST);
     }
 
     const currentSubscription = await this._subscriptionRepo.findByWorkspaceId(dto.workspaceId);

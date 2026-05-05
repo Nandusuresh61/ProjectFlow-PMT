@@ -73,7 +73,7 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
 
     const now = new Date();
     const planExpireDate = new Date();
-    planExpireDate.setFullYear(now.getFullYear() + 100); // Free plan effectively never expires
+    planExpireDate.setMonth(now.getMonth() + 1); // Free plan initially set for 1 month
 
     const workspace = new Workspace(
       this._uidGenerator.createId(),

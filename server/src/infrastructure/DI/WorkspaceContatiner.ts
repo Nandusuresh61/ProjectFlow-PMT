@@ -12,6 +12,7 @@ import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
 import { UidService } from "../services/UidService";
+import { subscriptionRepo } from "./SubscriptionContainer";
 
 
 const membershipRepo = new MembershipRepository();
@@ -39,6 +40,7 @@ const createWorkspaceUseCase = new CreateWorkspaceUseCase(
   workspaceRepo,
   membershipRepo,
   planRepo,
+  subscriptionRepo,
   uidGenerator
 );
 

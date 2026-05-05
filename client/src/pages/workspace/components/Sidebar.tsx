@@ -221,7 +221,6 @@ const WorkspaceNav = ({
                 isActive={activeTab === 'chat'}
                 isCollapsed={isCollapsed}
                 onClick={() => onTabChange('chat')}
-                badge={3}
             />
             <NavItem
                 id="meetings"

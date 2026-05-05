@@ -113,6 +113,17 @@ export const BillingSettings = () => {
     const currentPlan = subscription?.plan;
     const subDetails = subscription?.subscription;
 
+    const calculateDaysRemaining = (endDate: string | Date | undefined) => {
+        if (!endDate) return null;
+        const end = new Date(endDate);
+        const now = new Date();
+        const diffTime = end.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+    };
+
+    const daysRemaining = calculateDaysRemaining(subDetails?.endDate);
+
     return (
         <div className="p-8 space-y-10">
             {/* Current Plan Summary */}
@@ -129,9 +140,21 @@ export const BillingSettings = () => {
                         </div>
                         <p className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest mb-1">Active Plan</p>
                         <h4 className="text-2xl font-black text-white mb-4">{currentPlan?.type || 'Free'}</h4>
-                        <div className="flex items-center gap-2 text-[#A5D7E8] bg-[#A5D7E8]/10 w-fit px-3 py-1 rounded-full text-xs font-bold">
-                            <span className="w-1.5 h-1.5 bg-[#A5D7E8] rounded-full animate-pulse"></span>
-                            {subDetails?.status?.toUpperCase()}
+                        <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center gap-2 text-[#A5D7E8] bg-[#A5D7E8]/10 w-fit px-3 py-1 rounded-full text-xs font-bold">
+                                <span className="w-1.5 h-1.5 bg-[#A5D7E8] rounded-full animate-pulse"></span>
+                                {subDetails?.status?.toUpperCase()}
+                            </div>
+                            
+                            {daysRemaining !== null && (
+                                <div className={`text-xs font-bold px-3 py-1 rounded-full ${
+                                    daysRemaining < 7 
+                                        ? 'bg-red-500/10 text-red-400' 
+                                        : 'bg-white/5 text-white/40'
+                                }`}>
+                                    {daysRemaining} days left
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -170,6 +193,10 @@ export const BillingSettings = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {plans.map((plan) => {
                         const isCurrent = plan.planId === currentPlan?.planId;
+                        const isFree = plan.type.toUpperCase() === 'FREE';
+                        const currentIsPaid = currentPlan?.type?.toUpperCase() !== 'FREE';
+                        const isRestricted = isFree && currentIsPaid;
+
                         return (
                             <motion.div
                                 key={plan.planId}
@@ -200,9 +227,9 @@ export const BillingSettings = () => {
 
                                 <button
                                     onClick={() => handleUpgrade(plan.planId)}
-                                    disabled={isCurrent || (upgrading !== null)}
+                                    disabled={isCurrent || (upgrading !== null) || isRestricted}
                                     className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                                        isCurrent
+                                        isCurrent || isRestricted
                                             ? 'bg-white/5 text-white/40 cursor-default'
                                             : 'bg-[#A5D7E8] text-[#0B2447] hover:bg-white hover:shadow-[0_0_20px_rgba(165,215,232,0.4)]'
                                     }`}
@@ -211,6 +238,8 @@ export const BillingSettings = () => {
                                         <div className="w-4 h-4 border-2 border-[#0B2447] border-t-transparent rounded-full animate-spin"></div>
                                     ) : isCurrent ? (
                                         'Current Plan'
+                                    ) : isRestricted ? (
+                                        'Unavailable'
                                     ) : (
                                         'Upgrade Now'
                                     )}
