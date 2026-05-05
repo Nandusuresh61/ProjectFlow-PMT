@@ -8,10 +8,16 @@ import { MembershipRepository } from "../repositories/MongoMembershipRepository"
 import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
 import { UidService } from "../services/UidService";
 
+// Comments
+import { MongoCommentRepository } from "../repositories/MongoCommentRepository";
+import { AddCommentUseCase } from "@/application/use-cases/Issue/AddCommentUseCase";
+import { GetIssueCommentsUseCase } from "@/application/use-cases/Issue/GetIssueCommentsUseCase";
+
 const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
 const membershipRepository = new MembershipRepository();
 const workspaceRepository = new WorkspaceRepository();
+const commentRepository = new MongoCommentRepository();
 const uidGenerator = new UidService();
 
 const createissueUseCase = new CreateIssueUseCase(
@@ -36,8 +42,20 @@ const updateIssueUseCase = new UpdateIssueUseCase(
   membershipRepository
 );
 
+const addCommentUseCase = new AddCommentUseCase(
+  commentRepository,
+  issueRepository,
+  uidGenerator
+);
+
+const getIssueCommentsUseCase = new GetIssueCommentsUseCase(
+  commentRepository
+);
+
 export const issueController = new IssueController(
   createissueUseCase,
   getIssuesByProjectUseCase,
-  updateIssueUseCase
+  updateIssueUseCase,
+  addCommentUseCase,
+  getIssueCommentsUseCase
 );

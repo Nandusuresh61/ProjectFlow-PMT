@@ -7,6 +7,7 @@ import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitat
 import { InviteMember } from "@/services/Invitation/invitation.api";
 import { AuthUserState } from "@/store/auth.store";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export const InviteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) => {
   const [email, setEmail] = useState("");
@@ -45,8 +46,8 @@ export const InviteModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () 
       toast.success(response.message || AppMessages.INVITATION_SENT_SUCCESS);
       setEmail("");
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || AppMessages.INVITATION_FAILED);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || AppMessages.INVITATION_FAILED);
     } finally {
       setLoading(false);
     }

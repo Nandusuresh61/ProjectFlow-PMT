@@ -1,6 +1,7 @@
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { Issue } from "@/domain/entities/Issue";
-import { IssueModel } from "../database/models/MongoIssueModel";
+import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
+
 
 export class MongoIssueRepository implements IIssueRepository {
   
@@ -28,7 +29,10 @@ export class MongoIssueRepository implements IIssueRepository {
   }
 
   async findByProjectId(projectId: string, page: number, limit: number, search?: string): Promise<{ issues: Issue[], total: number }> {
-    const query: any = { projectId };
+    const query: {
+      projectId: string;
+      $or?: Array<{ [key: string]: { $regex: string; $options: string } }>;
+    } = { projectId };
     
     if (search) {
       query.$or = [
@@ -45,7 +49,7 @@ export class MongoIssueRepository implements IIssueRepository {
     ]);
 
     return {
-      issues: issues.map((doc: any) => this.toDomain(doc)),
+      issues: issues.map((doc: IssueDocument) => this.toDomain(doc)),
       total
     };
   }
@@ -69,7 +73,7 @@ export class MongoIssueRepository implements IIssueRepository {
 
   async findBySprintId(sprintId: string): Promise<Issue[]> {
     const issues = await IssueModel.find({ sprintId }).lean();
-    return issues.map((doc: any) => this.toDomain(doc));
+    return issues.map((doc: IssueDocument) => this.toDomain(doc));
   }
 
   async countActiveByAssigneeAndProject(assigneeId: string, projectId: string): Promise<number> {
@@ -92,19 +96,43 @@ export class MongoIssueRepository implements IIssueRepository {
       .sort({ updatedAt: -1 })
       .limit(limit)
       .lean();
-    return issues.map((doc: any) => this.toDomain(doc));
+    return issues.map((doc: IssueDocument) => this.toDomain(doc));
   }
 
-  private toDomain(doc: any): Issue {
+  async countByWorkspaceId(workspaceId: string): Promise<number> {
+    return IssueModel.countDocuments({ workspaceId });
+  }
+
+  async countByWorkspaceIdAndAssignee(workspaceId: string, assigneeId: string): Promise<number> {
+    return IssueModel.countDocuments({ workspaceId, assigneeId });
+  }
+
+  async findRecentByWorkspaceId(workspaceId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ workspaceId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: IssueDocument) => this.toDomain(doc));
+  }
+
+  async findRecentByWorkspaceIdAndAssignee(workspaceId: string, assigneeId: string, limit: number): Promise<Issue[]> {
+    const issues = await IssueModel.find({ workspaceId, assigneeId })
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .lean();
+    return issues.map((doc: IssueDocument) => this.toDomain(doc));
+  }
+
+  private toDomain(doc: IssueDocument): Issue {
     return new Issue(
       doc.issueId,
       doc.issueKey,
       doc.title,
       doc.description,
-      doc.type,
-      doc.status,
-      doc.priority,
-      doc.sizeLabel,
+      doc.type as "STORY" | "TASK" | "BUG",
+      doc.status as "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE" | "TESTING" | "READY",
+      doc.priority as "LOW" | "MEDIUM" | "HIGH",
+      doc.sizeLabel as "XS" | "S" | "M" | "L" | "XL" | null,
       doc.storyPoints,
       doc.assigneeId,
       doc.sprintId,
@@ -112,7 +140,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.workspaceId,
       doc.parentId,
       doc.subtasks,
-      doc.attachments || [],
+      (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
       doc.createdAt,
       doc.updatedAt
     );

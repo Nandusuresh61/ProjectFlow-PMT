@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -49,7 +49,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
         switch (activeTab) {
             case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
             case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
-            case 'board': return <ProjectBoardView project={selectedProject} />;
+            case 'board': return <ProjectBoardView project={selectedProject} canManage={canManage} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
             case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
             case 'project-team': return <ProjectTeamView project={selectedProject} />;
@@ -136,7 +136,7 @@ export default function WorkspaceHome() {
         loadCurrentWorkspaceRole();
     }, [currentWorkspace?.workspaceId, currentWorkspace?.ownerId, user?.userId]);
 
-    const loadProjects = async () => {
+    const loadProjects = useCallback(async () => {
         if (!currentWorkspace?.workspaceId) {
             setProjects([]);
             setSelectedProject(null);
@@ -166,11 +166,11 @@ export default function WorkspaceHome() {
             console.error('Failed to fetch projects', error);
             setProjects([]);
         }
-    };
+    }, [currentWorkspace?.workspaceId, sidebarMode, navigate]);
 
     useEffect(() => {
         loadProjects();
-    }, [currentWorkspace?.workspaceId, sidebarMode]);
+    }, [loadProjects]);
 
     useEffect(() => {
         if (!routeProjectId) {

@@ -11,6 +11,7 @@ export interface IUser {
 
 export interface ITokenPayload {
   userId: string;
+  fullName: string;
   email: string;
   isSuperAdmin: boolean;
   isBlocked: boolean;

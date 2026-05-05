@@ -15,7 +15,7 @@ export class TokenService implements ITokenService {
   verifyAccessToken(token: string): TokenPayloadType | null {
     try {
       return jwt.verify(token, config.ACCESS_TOKEN_SECRET) as TokenPayloadType;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -23,7 +23,7 @@ export class TokenService implements ITokenService {
   verifyRefreshToken(token: string): TokenPayloadType | null {
     try {
       return jwt.verify(token, config.REFRESH_TOKEN_SECRET) as TokenPayloadType;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

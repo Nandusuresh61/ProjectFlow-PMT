@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FolderKanban, ListTodo, Users, PencilLine, Loader2, BarChart2, Clock } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { getProjectOverview, type ProjectOverview } from '../../../../services/project/project.api';
+import { getActiveSprint, type ActiveSprintData } from '../../../../services/sprint/sprint.api';
 
 interface ProjectOverviewViewProps {
     project: Project;
@@ -33,26 +34,56 @@ const statusLabel: Record<string, string> = {
 
 export const ProjectOverviewView = ({ project, onEditProject, canEditProject }: ProjectOverviewViewProps) => {
     const [overview, setOverview] = useState<ProjectOverview | null>(null);
+    const [sprintData, setSprintData] = useState<ActiveSprintData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchOverview = async () => {
+        const fetchData = async () => {
             if (!project.id) return;
             
             try {
-                const response = await getProjectOverview(project.id);
-                if (response.success && response.data) {
-                    setOverview(response.data);
+                const [overviewRes, sprintRes] = await Promise.all([
+                    getProjectOverview(project.id),
+                    getActiveSprint(project.id).catch(() => ({ success: false, data: null }))
+                ]);
+
+                if (overviewRes.success && overviewRes.data) {
+                    setOverview(overviewRes.data);
+                }
+                if (sprintRes.success && sprintRes.data) {
+                    setSprintData(sprintRes.data);
                 }
             } catch (error) {
-                console.error('Failed to fetch project overview:', error);
+                console.error('Failed to fetch project data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchOverview();
+        fetchData();
     }, [project.id]);
+
+    const sprintStats = (() => {
+        if (!sprintData?.sprint || !sprintData.issues) return { pct: 0, daysLeft: 'N/A' };
+
+        const issues = sprintData.issues;
+        const totalPoints = issues.reduce((s, i) => s + (i.storyPoints || 0), 0);
+        const donePoints = issues
+            .filter(i => i.status === 'DONE')
+            .reduce((s, i) => s + (i.storyPoints || 0), 0);
+        const pct = totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : 0;
+
+        let daysLeft = 'N/A';
+        if (sprintData.sprint.endDate) {
+            const end = new Date(sprintData.sprint.endDate);
+            const now = new Date();
+            const diff = end.getTime() - now.getTime();
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            daysLeft = days > 0 ? days.toString() : '0';
+        }
+
+        return { pct, daysLeft };
+    })();
 
     const STATS = [
         { 
@@ -69,13 +100,13 @@ export const ProjectOverviewView = ({ project, onEditProject, canEditProject }: 
         },
         { 
             label: 'Sprint Progress', 
-            value: '64%', 
+            value: `${sprintStats.pct}%`, 
             icon: BarChart2, 
             color: '#576CBC' 
         },
         { 
             label: 'Days Left', 
-            value: '12', 
+            value: sprintStats.daysLeft, 
             icon: Clock, 
             color: '#A5D7E8' 
         },

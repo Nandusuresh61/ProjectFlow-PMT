@@ -52,7 +52,7 @@ export class GoogleOAuthService implements IOAuthProviderService {
         providerId: payload.sub,
         profileImage: payload.picture,
       };
-    } catch (error) {
+    } catch {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.GOOGLE_AUTH_FAILED,

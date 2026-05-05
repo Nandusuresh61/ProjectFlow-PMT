@@ -8,8 +8,9 @@ import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { RegisterUserSchema } from "@/shared/schema/auth/RegisterUserSchema";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
 import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
+import { getErrorMessage } from "@/shared/utils/error";
 
 
 
@@ -91,8 +92,8 @@ export default function SignUp() {
       toast.success(response.message);
       setPendingEmail(values.email);
       navigate("/verify-otp");
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

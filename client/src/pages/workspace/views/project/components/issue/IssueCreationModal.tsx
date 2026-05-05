@@ -1,3 +1,5 @@
+import type { IssueData } from "@/services/sprint/sprint.api";
+import { z } from "zod";
 import React, { useCallback, useReducer, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -56,7 +58,8 @@ import { createIssue, updateIssue, getProjectIssues } from "@/services/issue/iss
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { toast } from "sonner";
 import { getMembers } from "@/services/workspace/team.api";
-import { FileText, Image as ImageIcon, Link as LinkIcon, Paperclip, Trash2, Loader2 } from "lucide-react";
+import { FileText, Image as ImageIcon, Link as LinkIcon, Paperclip } from "lucide-react";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export function IssueCreationModal({
     open,
@@ -69,16 +72,16 @@ export function IssueCreationModal({
     onOpenChange: (open: boolean) => void,
     project?: { key: string, id: string, workspaceId: string, memberIds: string[] },
     onSuccess?: () => void,
-    editIssue?: any
+    editIssue?: IssueData | null
 }) {
-    const [members, setMembers] = useState<any[]>([]);
-    const [stories, setStories] = useState<any[]>([]);
+    const [members, setMembers] = useState<{ userId: string, fullName: string, profileImage: string }[]>([]);
+    const [stories, setStories] = useState<IssueData[]>([]);
 
     useEffect(() => {
         if (open && project?.id) {
             getProjectIssues(project.id, { limit: 100 }).then(res => {
                 if (res?.data?.issues) {
-                    setStories(res.data.issues.filter((i: any) => i.type === "STORY"));
+                    setStories(res.data.issues.filter((i: IssueData) => i.type === "STORY"));
                 }
             }).catch(err => console.error("Failed to load stories", err));
         }
@@ -88,11 +91,11 @@ export function IssueCreationModal({
         if (open && project?.workspaceId) {
             getMembers(project.workspaceId).then(res => {
                 if (res?.data) {
-                    setMembers(res.data.filter((m: any) => project.memberIds?.includes(m.userId)));
+                    setMembers(res.data.filter((m: { userId: string }) => project.memberIds?.includes(m.userId)));
                 }
             }).catch(err => console.error("Failed to load members", err));
         }
-    }, [open, project]);
+    }, [open, project?.workspaceId, project?.memberIds]);
 
     const [state, dispatch] = useReducer(formReducer, {
         values: initialValues,
@@ -109,14 +112,14 @@ export function IssueCreationModal({
                         title: editIssue.title || "",
                         description: editIssue.description || "",
                         type: editIssue.type === "STORY" ? "Story" : editIssue.type === "BUG" ? "Bug" : "Task",
-                        status: editIssue.status || "BACKLOG",
+                        status: (editIssue.status === "REVIEW" ? "IN_PROGRESS" : editIssue.status || "BACKLOG") as "BACKLOG" | "TODO" | "IN_PROGRESS" | "DONE",
                         priority: editIssue.priority === "HIGH" ? "High" : editIssue.priority === "LOW" ? "Low" : "Medium",
-                        size: editIssue.sizeLabel || "",
+                        size: (editIssue.sizeLabel || "") as "XS" | "S" | "M" | "L" | "XL" | "",
                         assignee: editIssue.assigneeId || "",
                         sprint: editIssue.sprintId || "Backlog",
                         parentId: editIssue.parentId || "",
                         subtasks: editIssue.subtasks ? [...editIssue.subtasks] : [],
-                        attachments: editIssue.attachments ? [...editIssue.attachments] : []
+                        attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : []
                     }
                 });
             } else {
@@ -128,12 +131,13 @@ export function IssueCreationModal({
     const [linkUrl, setLinkUrl] = useState("");
     const [pendingFiles, setPendingFiles] = useState<{ id: string; file: File }[]>([]);
 
-    const handleChange = useCallback((field: string, value: any) => {
-        dispatch({ type: "SET_VALUE", field, value });
+    const handleChange = useCallback((field: string, value: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch({ type: "SET_VALUE", field: field as "title", value: value as any }); 
     }, []);
 
     const handleBlur = useCallback((field: string) => {
-        dispatch({ type: "TOUCH", field });
+        dispatch({ type: "TOUCH", field: field as "title" });
     }, []);
 
     const addSubtask = () => {
@@ -165,7 +169,7 @@ export function IssueCreationModal({
         setPendingFiles(prev => [...prev, { id, file }]);
         handleChange("attachments", [
             ...state.values.attachments,
-            { name: file.name, url: "", type, id } as any
+            { name: file.name, url: "", type: type as "IMAGE" | "PDF" | "LINK", id }
         ]);
         
         e.target.value = "";
@@ -187,8 +191,8 @@ export function IssueCreationModal({
 
     const removeAttachment = (index: number) => {
         const attachment = state.values.attachments[index];
-        if ((attachment as any).id) {
-            setPendingFiles(prev => prev.filter(f => f.id !== (attachment as any).id));
+        if ((attachment as { id?: string }).id) {
+            setPendingFiles(prev => prev.filter(f => f.id !== (attachment as { id?: string }).id));
         }
         const newAttachments = [...state.values.attachments];
         newAttachments.splice(index, 1);
@@ -204,7 +208,7 @@ export function IssueCreationModal({
         const result = issueFormSchema.safeParse(state.values);
         if (!result.success) {
             const errorMap: Record<string, string> = {};
-            result.error.issues.forEach((issue: any) => {
+            result.error.issues.forEach((issue: z.ZodIssue) => {
                 const key = issue.path.join(".");
                 if (!errorMap[key]) {
                     errorMap[key] = issue.message;
@@ -229,7 +233,7 @@ export function IssueCreationModal({
                     try {
                         const url = await uploadToCloudinary(pending.file);
                         return { id: pending.id, url };
-                    } catch (err) {
+                    } catch {
                         throw new Error(`Failed to upload ${pending.file.name}`);
                     }
                 });
@@ -238,14 +242,14 @@ export function IssueCreationModal({
                 
                 // Map URLs back to attachments
                 uploadedResults.forEach(result => {
-                    const idx = finalAttachments.findIndex(a => (a as any).id === result.id);
+                    const idx = finalAttachments.findIndex(a => (a as { id?: string }).id === result.id);
                     if (idx !== -1) {
                         finalAttachments[idx] = {
                             ...finalAttachments[idx],
                             url: result.url
                         };
                         // Remove the temporary ID before sending to backend
-                        delete (finalAttachments[idx] as any).id;
+                        delete (finalAttachments[idx] as { id?: string }).id;
                     }
                 });
             }
@@ -283,12 +287,12 @@ export function IssueCreationModal({
                 setPendingFiles([]);
             }
             if (onSuccess) onSuccess();
-        } catch (error: any) {
-            toast.error(error.message || `Failed to ${editIssue ? 'update' : 'create'} issue`);
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || `Failed to ${editIssue ? 'update' : 'create'} issue`);
         } finally {
             dispatch({ type: "SET_SUBMITTING", isSubmitting: false });
         }
-    }, [state.values, onOpenChange, editIssue, project, onSuccess]);
+    }, [state.values, onOpenChange, editIssue, project, onSuccess, pendingFiles]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -559,7 +563,7 @@ export function IssueCreationModal({
                                 className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
                             >
                                 <option value="" className="bg-[#0b1b36] text-white">Unassigned</option>
-                                {members.map((member: any) => (
+                                {members.map((member: { userId: string, fullName: string, profileImage: string }) => (
                                     <option key={member.userId} value={member.userId} className="bg-[#0b1b36] text-white">
                                         {member.fullName}
                                     </option>
@@ -589,7 +593,7 @@ export function IssueCreationModal({
                                     className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
                                 >
                                     <option value="" className="bg-[#0b1b36] text-white">None</option>
-                                    {stories.map((story: any) => (
+                                    {stories.map((story: IssueData) => (
                                         <option key={story.issueId} value={story.issueId} className="bg-[#0b1b36] text-white">
                                             {story.issueKey}: {story.title}
                                         </option>

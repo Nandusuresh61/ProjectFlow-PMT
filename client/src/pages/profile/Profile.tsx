@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { UpdateUserProfileSchema } from "@/shared/schema/profile/UpdateUserProfileSchema";
 import { useRef } from "react";
 import { AuthUserState } from "@/store/auth.store";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export default function ProfileSettings() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -36,8 +37,8 @@ export default function ProfileSettings() {
         } else {
           setError(response.message || "Failed to fetch profile");
         }
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching profile");
+      } catch (err: unknown) {
+        setError(getErrorMessage(err) || "An error occurred while fetching profile");
       } finally {
         setLoading(false);
       }
@@ -57,7 +58,7 @@ export default function ProfileSettings() {
         toast.info("Uploading image...");
         try {
           imageUrl = await uploadToCloudinary(selectedImage);
-        } catch (error) {
+        } catch {
           toast.error("Failed to upload image. Please try again.");
           setIsSaving(false);
           return;
@@ -83,13 +84,8 @@ export default function ProfileSettings() {
       } else {
         toast.error(response.message || "Failed to update profile");
       }
-    } catch (error: any) {
-      if (error.errors) {
-        // Zod validation error
-        toast.error(error.errors[0].message);
-      } else {
-        toast.error(error.message || "Failed to update profile");
-      }
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }

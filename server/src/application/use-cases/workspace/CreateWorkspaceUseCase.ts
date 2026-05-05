@@ -11,6 +11,9 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { Workspace } from "@/domain/entities/Workspace";
 import { Membership } from "@/domain/entities/Membership";
+import { Subscription } from "@/domain/entities/Subscription";
+import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
+import { ISubscriptionRepository } from "@/application/interfaces/repositories/ISubscriptionRepository";
 
 export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
   constructor(
@@ -18,6 +21,7 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
     private readonly _workspaceRepo: IWorkspaceRepository,
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _planRepo: IPlanRepository,
+    private readonly _subscriptionRepo: ISubscriptionRepository,
     private readonly _uidGenerator: IUidGenerator
   ) {}
 
@@ -81,6 +85,9 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
 
     const now = new Date();
     
+    const planExpireDate = new Date();
+    planExpireDate.setMonth(now.getMonth() + 1);
+
     // Create new workspace
     const workspace = new Workspace(
         this._uidGenerator.createId(),
@@ -88,9 +95,23 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
         userId,
         defaultPlanId,
         now,
-        now
+        now,
+        false,
+        planExpireDate
     );
     const createdWorkspace = await this._workspaceRepo.create(workspace);
+
+    // Create Subscription
+    const subscription = new Subscription(
+        this._uidGenerator.createId(),
+        createdWorkspace.workspaceId!,
+        defaultPlanId,
+        SubscriptionStatus.ACTIVE,
+        now,
+        planExpireDate,
+        "monthly"
+    );
+    await this._subscriptionRepo.create(subscription);
 
     const membership = new Membership(
         this._uidGenerator.createId(),

@@ -60,4 +60,12 @@ router.get(
   authenticatedUser,
   workspaceController.getMembers
 );
+
+// Dashboard Data
+router.get(
+  "/:workspaceId/dashboard",
+  authenticatedUser,
+  workspaceController.getDashboardData
+);
+
 export default router;

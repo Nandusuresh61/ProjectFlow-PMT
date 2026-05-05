@@ -29,6 +29,7 @@ export const API_ROUTES = {
     GET_INVITATION_DETAILS: (token: string) => `/workspace/invite/details/${token}`,
     MEMBERS: (workspaceId: string) => `/workspace/${workspaceId}/members`,
     SWITCH: (workspaceId: string) => `/workspace/${workspaceId}/switch`,
+    DASHBOARD: (workspaceId: string) => `/workspace/${workspaceId}/dashboard`,
   },
   PROJECT: {
     BASE: "/project",
@@ -41,6 +42,7 @@ export const API_ROUTES = {
     CREATE: "/issue",
     LIST_BY_PROJECT: (projectId: string) => `/issue/project/${projectId}`,
     UPDATE: (issueId: string) => `/issue/${issueId}`,
+    COMMENTS: (issueId: string) => `/issue/${issueId}/comments`,
   },
   SPRINT: {
     BASE: "/sprint",

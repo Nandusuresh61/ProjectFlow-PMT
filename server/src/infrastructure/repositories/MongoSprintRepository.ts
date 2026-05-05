@@ -1,6 +1,6 @@
 import { ISprintRepository } from "@/application/interfaces/repositories/ISprintRepository";
 import { Sprint } from "@/domain/entities/Sprint";
-import { SprintModel } from "@/infrastructure/database/models/MongoSprintModel";
+import { SprintModel, ISprintDocument } from "@/infrastructure/database/models/MongoSprintModel";
 
 export class SprintRepository implements ISprintRepository {
   async create(sprint: Sprint): Promise<void> {
@@ -28,7 +28,7 @@ export class SprintRepository implements ISprintRepository {
   async findById(sprintId: string): Promise<Sprint | null> {
     const doc = await SprintModel.findOne({ sprintId }).lean();
     if (!doc) return null;
-    return this.toDomain(doc as any);
+    return this.toDomain(doc as ISprintDocument);
   }
 
   async update(
@@ -42,7 +42,7 @@ export class SprintRepository implements ISprintRepository {
     ).lean();
 
     if (!updated) return null;
-    return this.toDomain(updated as any);
+    return this.toDomain(updated as unknown as ISprintDocument);
   }
 
   async findActiveProjectId(projectId: string): Promise<Sprint | null> {
@@ -51,7 +51,7 @@ export class SprintRepository implements ISprintRepository {
     return sprint ? this.toDomain(sprint) : null;
   }
 
-  private toDomain(doc: any): Sprint {
+  private toDomain(doc: ISprintDocument): Sprint {
     return new Sprint(
       doc.sprintId,
       doc.projectId,

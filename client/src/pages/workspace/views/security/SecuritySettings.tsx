@@ -4,6 +4,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { changePassword } from "@/services/profile/changePassword.api";
 import { toast } from "sonner";
 import { ChangePasswordSchema } from "@/shared/schema/auth/ChangePasswordSchema";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export const SecuritySettings = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -47,8 +48,8 @@ export const SecuritySettings = () => {
       });
 
       setIsChangingPassword(false);
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Something went wrong");
     } finally {
       setLoading(false);
     }

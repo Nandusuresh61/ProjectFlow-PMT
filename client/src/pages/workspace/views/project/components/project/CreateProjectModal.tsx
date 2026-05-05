@@ -4,6 +4,7 @@ import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { AuthUserState } from "@/store/auth.store";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { ProjectModalShell, ProjectMemberPicker, type WorkspaceMember } from "./ProjectModalHelpers";
+import { getErrorMessage } from "@/shared/utils/error";
 
 
 interface CreateProjectModalProps {
@@ -44,8 +45,8 @@ export const CreateProjectModal = ({
         const { getMembers } = await import("@/services/workspace/team.api");
         const response = await getMembers(currentWorkspaceId);
         setMembers(response.data ?? []);
-      } catch (error: any) {
-        toast.error(error.message || "Failed to load workspace members");
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error) || "Failed to load workspace members");
         setMembers([]);
       } finally {
         setLoadingMembers(false);
@@ -111,8 +112,8 @@ export const CreateProjectModal = ({
       toast.success(response.message || AppMessages.PROJECT_CREATED);
       await onCreated?.();
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || AppMessages.PROJECT_CREATE_FAILED);
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || AppMessages.PROJECT_CREATE_FAILED);
     } finally {
       setSubmitting(false);
     }

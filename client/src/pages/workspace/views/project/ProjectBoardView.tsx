@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, MoreHorizontal, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -11,6 +12,7 @@ import { CompleteSprintModal } from './components/CompleteSprintModal';
 
 interface ProjectBoardViewProps {
     project: Project;
+    canManage: boolean;
 }
 
 interface BoardCardData {
@@ -50,12 +52,12 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         draggable
-        onDragStart={(e: any) => {
+        onDragStartCapture={(e: React.DragEvent<HTMLDivElement>) => {
             e.dataTransfer.setData('issueId', card.id);
             e.dataTransfer.effectAllowed = 'move';
             (e.target as HTMLElement).style.opacity = '0.4';
         }}
-        onDragEnd={(e: any) => {
+        onDragEndCapture={(e: React.DragEvent<HTMLDivElement>) => {
             (e.target as HTMLElement).style.opacity = '1';
         }}
         onClick={onClick}
@@ -85,23 +87,23 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
     </motion.div>
 );
 
-export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
+export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) => {
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
-    const [allSprints, setAllSprints] = useState<any[]>([]);
+    const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     
     // Modal State
-    const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
+    const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
     // Supplemental Data for Modal
-    const [membersMap, setMembersMap] = useState<Record<string, any>>({});
-    const [sprintsMap, setSprintsMap] = useState<Record<string, any>>({});
-    const [issuesMap, setIssuesMap] = useState<Record<string, any>>({});
+    const [membersMap, setMembersMap] = useState<Record<string, { userId: string, fullName: string, profileImage: string, role: string }>>({});
+    const [sprintsMap, setSprintsMap] = useState<Record<string, SprintData>>({});
+    const [issuesMap, setIssuesMap] = useState<Record<string, IssueData>>({});
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             setLoading(true);
             const [sprintRes, membersRes, allSprintsRes, storiesRes] = await Promise.all([
@@ -115,14 +117,14 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                 setActiveSprintData(sprintRes.data);
                 
                 // Build issues map starting with active sprint issues
-                const iMap: Record<string, any> = {};
+                const iMap: Record<string, IssueData> = {};
                 sprintRes.data.issues.forEach(i => {
                     iMap[i.issueId] = i;
                 });
                 
                 // Add stories for parent lookup
                 if (storiesRes.success && storiesRes.data?.issues) {
-                    storiesRes.data.issues.forEach((i: any) => {
+                    storiesRes.data.issues.forEach((i: IssueData) => {
                         if (!iMap[i.issueId]) iMap[i.issueId] = i;
                     });
                 }
@@ -132,8 +134,8 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
             }
 
             if (membersRes.success && membersRes.data) {
-                const mMap: Record<string, any> = {};
-                membersRes.data.forEach((m: any) => {
+                const mMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }> = {};
+                membersRes.data.forEach((m: { userId: string, fullName: string, profileImage: string, role: string }) => {
                     mMap[m.userId] = m;
                 });
                 setMembersMap(mMap);
@@ -141,8 +143,8 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
 
             if (allSprintsRes.success && allSprintsRes.data) {
                 setAllSprints(allSprintsRes.data);
-                const sMap: Record<string, any> = {};
-                allSprintsRes.data.forEach((s: any) => {
+                const sMap: Record<string, SprintData> = {};
+                allSprintsRes.data.forEach((s: SprintData) => {
                     sMap[s.sprintId] = s;
                 });
                 setSprintsMap(sMap);
@@ -153,11 +155,11 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [project.id, project.workspaceId]);
 
     useEffect(() => {
         fetchData();
-    }, [project.id, project.workspaceId]);
+    }, [fetchData]);
 
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;
@@ -172,13 +174,13 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
             return {
                 ...prev,
                 issues: prev.issues.map(i =>
-                    i.issueId === issueId ? { ...i, status: newStatus as any } : i
+                    i.issueId === issueId ? { ...i, status: newStatus as IssueData["status"] } : i
                 )
             };
         });
 
         try {
-            const response = await updateIssue(issueId, { status: newStatus });
+            const response = await updateIssue(issueId, { status: newStatus as IssueData["status"] });
             if (!response.success) {
                 throw new Error(response.message || 'Failed to update status');
             }
@@ -247,7 +249,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -264,7 +266,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -281,7 +283,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
                 })),
             count: 0
         },
@@ -298,7 +300,7 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                     tag: i.type,
                     tagColor: tagColors[i.type] || '#576CBC',
                     assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as any,
+                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as IssueData["priority"],
                 })),
             count: 0
         }
@@ -343,18 +345,20 @@ export const ProjectBoardView = ({ project }: ProjectBoardViewProps) => {
                             {project.name} · {activeSprintData.sprint.name}
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setIsCompleteModalOpen(true)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
-                        >
-                            <CheckCircle2 size={14} />
-                            Complete Sprint
-                        </button>
-                        <span className="text-[10px] font-bold text-[#A5D7E8] bg-[#A5D7E8]/10 px-2 py-1 rounded-full border border-[#A5D7E8]/20">
-                            ACTIVE SPRINT
-                        </span>
-                    </div>
+                    {canManage && (
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setIsCompleteModalOpen(true)}
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10"
+                            >
+                                <CheckCircle2 size={14} />
+                                Complete Sprint
+                            </button>
+                            <span className="text-[10px] font-bold text-[#A5D7E8] bg-[#A5D7E8]/10 px-2 py-1 rounded-full border border-[#A5D7E8]/20">
+                                ACTIVE SPRINT
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 

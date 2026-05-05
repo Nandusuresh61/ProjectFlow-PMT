@@ -1,4 +1,4 @@
-import { Invitation } from "@/domain/entities/Invitation";
+
 
 export interface InvitationDetailsDto {
   email: string;

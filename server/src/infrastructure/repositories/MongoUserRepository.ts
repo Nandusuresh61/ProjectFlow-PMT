@@ -103,7 +103,7 @@ export class MongoUserRepository
     } = options;
     const skip = (page - 1) * limit;
 
-    const matchStage: Record<string, any> = {};
+    const matchStage: Record<string, unknown> = {};
     if (search) {
       matchStage.$or = [
         { fullName: { $regex: search, $options: "i" } },
@@ -144,7 +144,7 @@ export class MongoUserRepository
       },
     ]);
 
-    const users = result[0].users.map((user: UserDoc & { memberships: any[], workspacesData: any[] }) => ({
+    const users = result[0].users.map((user: UserDoc & { memberships: { workspaceId: string, role: string }[], workspacesData: { workspaceId: string, name: string }[] }) => ({
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
@@ -265,8 +265,6 @@ export class MongoUserRepository
     ]);
 
     if (!result || result.length === 0) {
-      // If user has no workspaces, they won't appear in the aggregation because of $unwind "$memberships"
-      // Fallback: fetch user basic details
       const user = await this.model.findOne({ userId });
       if (!user) return null;
 

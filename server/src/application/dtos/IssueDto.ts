@@ -25,7 +25,7 @@ export interface UpdateIssueDto {
   title?: string;
   description?: string;
   type?: "STORY" | "TASK" | "BUG";
-  status?: "BACKLOG" | "TODO" | "IN_PROGRESS" | "DONE";
+  status?: "BACKLOG" | "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE" | "TESTING" | "READY";
   priority?: "LOW" | "MEDIUM" | "HIGH";
   sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
   assigneeId?: string | null;

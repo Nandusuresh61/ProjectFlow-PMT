@@ -1,6 +1,8 @@
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Link2, Paperclip, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { Link2, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
+import { CommentSection } from "./CommentSection";
 
 const sizeColors: Record<string, string> = {
     "XS": "bg-slate-100 text-slate-800",
@@ -39,15 +41,15 @@ export function IssueDetailModal({
 }: { 
     open: boolean, 
     onOpenChange: (open: boolean) => void, 
-    issue: any,
-    membersMap: Record<string, any>,
-    sprintsMap?: Record<string, any>,
-    issuesMap?: Record<string, any>
+    issue: IssueData | null,
+    membersMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }>,
+    sprintsMap?: Record<string, SprintData>,
+    issuesMap?: Record<string, IssueData>
 }) {
     if (!issue) return null;
 
-    const assignee = membersMap[issue.assigneeId];
-    const parentStory = issue.parentId ? issuesMap?.[issue.parentId] : null;
+    const assignee = issue.assigneeId ? membersMap[issue.assigneeId] : null;
+    const parentStory = issue.parentId ? issuesMap?.[issue.parentId as string] : null;
     
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,13 +82,13 @@ export function IssueDetailModal({
                             <div className="flex items-center justify-between border-b border-[#19376D]/50 pb-2">
                                 <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Subtasks</span>
                                 <span className="text-xs font-bold text-[#A5D7E8]">
-                                    {issue.subtasks?.filter((t: any) => t.completed).length || 0} / {issue.subtasks?.length || 0} completed
+                                    {(issue.subtasks || []).filter((t: { completed: boolean }) => t.completed).length || 0} / {issue.subtasks?.length || 0} completed
                                 </span>
                             </div>
 
-                            {issue.subtasks && issue.subtasks.length > 0 ? (
+                            {issue.subtasks && (issue.subtasks || []).length > 0 ? (
                                 <div className="space-y-2">
-                                    {issue.subtasks.map((task: any) => (
+                                    {issue.subtasks.map((task: { id: string, title: string, completed: boolean }) => (
                                         <div key={task.id} className="flex items-center gap-3 group bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
                                             <input 
                                                 type="checkbox" 
@@ -114,9 +116,9 @@ export function IssueDetailModal({
                                 </span>
                             </div>
 
-                            {issue.attachments && issue.attachments.length > 0 ? (
+                            {issue.attachments && (issue.attachments || []).length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {issue.attachments.map((file: any, idx: number) => (
+                                    {issue.attachments.map((file: { name: string, url: string, type: string }, idx: number) => (
                                         <a 
                                             key={idx}
                                             href={file.url}
@@ -146,6 +148,11 @@ export function IssueDetailModal({
                             ) : (
                                 <p className="text-xs text-[#576CBC]/50 italic">No attachments uploaded.</p>
                             )}
+                        </div>
+
+                        {/* Comments Section */}
+                        <div className="pt-6 border-t border-[#19376D]/50">
+                            <CommentSection issueId={issue.issueId} membersMap={membersMap} />
                         </div>
                     </div>
 

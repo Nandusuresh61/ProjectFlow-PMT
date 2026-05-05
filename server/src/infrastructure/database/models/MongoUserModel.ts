@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-import { string } from "zod";
+
 
 export interface UserDoc extends Document {
   userId: string;

@@ -5,9 +5,9 @@ import { Request, Response, NextFunction } from "express";
 
 export const errorMiddleware = (
   err: unknown,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
 
   if (err instanceof ZodError) {

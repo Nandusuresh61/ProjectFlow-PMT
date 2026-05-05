@@ -14,9 +14,19 @@ import userProfile from "@/presentation/routes/ProfileRoutes";
 import projectRoutes from "@/presentation/routes/ProjectRoutes";
 import issueRoutes from "@/presentation/routes/IssueRoutes";
 import sprintRoutes from "@/presentation/routes/SprintRoutes";
+import chatRoutes from "@/presentation/routes/ChatRoutes";
+import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
 import morgan from "morgan";
 
+import http from "http";
+import { SocketServer } from "./infrastructure/services/SocketServer";
+import { ChatSocketHandler } from "./presentation/sockets/ChatSocketHandler";
+
 const app = express();
+const server = http.createServer(app);
+
+const socketServer = SocketServer.init(server);
+socketServer.registerHandler(ChatSocketHandler);
 
 app.use(morgan("dev"));
 connectDB();
@@ -40,8 +50,11 @@ app.use("/api/profile", userProfile);
 app.use("/api/project", projectRoutes);
 app.use("/api/issue", issueRoutes);
 app.use("/api/sprint", sprintRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 
 app.use(errorMiddleware);
 
 const port = config.PORT || 3000;
-app.listen(port, () => console.log(`http:localhost:${port}`));
+server.listen(port, () =>
+  console.log(`Server is running on http://localhost:${config.PORT}`));

@@ -53,8 +53,8 @@ export const getProjectSprints = async (
 export const assignIssueToSprint = async (
   issueId: string,
   sprintId: string | null
-): Promise<SprintResponse<any>> => {
-  const { data } = await API.patch<SprintResponse<any>>(
+): Promise<SprintResponse<IssueData>> => {
+  const { data } = await API.patch<SprintResponse<IssueData>>(
     API_ROUTES.SPRINT.ASSIGN_ISSUE,
     { issueId, sprintId }
   );
@@ -88,7 +88,11 @@ export interface IssueData {
   sprintId: string | null;
   projectId: string;
   workspaceId: string;
+  parentId?: string | null;
   storyPoints: number | null;
+  sizeLabel?: string | null;
+  subtasks?: { id: string; title: string; completed: boolean }[];
+  attachments?: { name: string; url: string; type: string }[];
 }
 
 export interface ActiveSprintData {

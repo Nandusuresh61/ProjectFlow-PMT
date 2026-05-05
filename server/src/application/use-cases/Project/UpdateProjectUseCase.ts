@@ -101,7 +101,7 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
       );
     }
 
-    if (memberIds.length > plan.maxMembers) {
+    if (plan.maxMembers !== -1 && memberIds.length > plan.maxMembers) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.MEMBER_LIMIT_EXCEEDED,

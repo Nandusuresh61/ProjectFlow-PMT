@@ -1,3 +1,4 @@
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy, Paperclip } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
@@ -13,6 +14,7 @@ import { getMembers } from '@/services/workspace/team.api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import IssueCreationModal from './components/issue/IssueCreationModal';
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface ProjectBacklogViewProps {
     project: Project;
@@ -27,24 +29,24 @@ const priorityDot: Record<string, string> = {
 
 export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedIssue, setSelectedIssue] = useState<any | null>(null);
+    const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
     // Edit Modal State 
-    const [editingIssue, setEditingIssue] = useState<any | null>(null);
+    const [editingIssue, setEditingIssue] = useState<IssueData | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    const [issues, setIssues] = useState<any[]>([]);
-    const [sprints, setSprints] = useState<any[]>([]);
+    const [issues, setIssues] = useState<IssueData[]>([]);
+    const [sprints, setSprints] = useState<SprintData[]>([]);
     const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
     const [isStartSprintModalOpen, setIsStartSprintModalOpen] = useState(false);
-    const [activeSprintToStart, setActiveSprintToStart] = useState<any | null>(null);
+    const [activeSprintToStart, setActiveSprintToStart] = useState<SprintData | null>(null);
     const [isEditSprintModalOpen, setIsEditSprintModalOpen] = useState(false);
-    const [editingSprint, setEditingSprint] = useState<any | null>(null);
+    const [editingSprint, setEditingSprint] = useState<SprintData | null>(null);
     const [backlogIsOver, setBacklogIsOver] = useState(false);
 
-    const [membersMap, setMembersMap] = useState<Record<string, any>>({});
-    const [allStories, setAllStories] = useState<any[]>([]);
+    const [membersMap, setMembersMap] = useState<Record<string, { userId: string, fullName: string, profileImage: string, role: string }>>({});
+    const [allStories, setAllStories] = useState<IssueData[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Pagination & Search State
@@ -75,8 +77,8 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                 setIssues(res.data.issues || []);
                 setTotalIssues(res.data.total || 0);
             }
-        } catch (error: any) {
-            toast.error(error.message || "Failed to load issues");
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || "Failed to load issues");
         } finally {
             setIsLoading(false);
         }
@@ -88,7 +90,7 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
             if (res.data) {
                 setSprints(res.data);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to fetch sprints:", error);
         }
     }, [project.id]);
@@ -97,9 +99,9 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
         try {
             const res = await getProjectIssues(project.id, { limit: 100 });
             if (res.data?.issues) {
-                setAllStories(res.data.issues.filter((i: any) => i.type === "STORY"));
+                setAllStories(res.data.issues.filter((i: IssueData) => i.type === "STORY"));
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to fetch stories for lookup:", error);
         }
     }, [project.id]);
@@ -117,8 +119,8 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
         if (project.workspaceId) {
             getMembers(project.workspaceId).then(res => {
                 if (res?.data) {
-                    const map: Record<string, any> = {};
-                    res.data.forEach((m: any) => {
+                    const map: Record<string, { userId: string, fullName: string, profileImage: string, role: string }> = {};
+                    res.data.forEach((m: { userId: string, role: string, fullName: string, profileImage: string }) => {
                         map[m.userId] = m;
                     });
                     setMembersMap(map);
@@ -140,17 +142,17 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
         fetchStories(); // Refresh stories map as well
     };
 
-    const handleSprintCreated = (newSprint: any) => {
+    const handleSprintCreated = (newSprint: SprintData) => {
         setSprints(prev => [...prev, newSprint]);
     };
 
-    const handleSprintStarted = (updatedSprint: any) => {
+    const handleSprintStarted = (updatedSprint: SprintData) => {
         setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
     };
 
-    const handleSprintUpdated = (updatedSprint: any) => {
+    const handleSprintUpdated = (updatedSprint: SprintData) => {
         setSprints(prev => prev.map(s => s.sprintId === updatedSprint.sprintId ? updatedSprint : s));
-        fetchIssues(); // Refresh issues as they might be linked to sprint dates/details if needed
+        fetchIssues();
     };
 
     const handleIssueDrop = async (issueId: string, targetSprintId: string | null) => {
@@ -192,10 +194,10 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
             } else {
                 throw new Error(res.message);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             // Rollback
             setIssues(previousIssues);
-            toast.error(error.message || `Failed to move issue to ${targetName}`);
+            toast.error(getErrorMessage(error) || `Failed to move issue to ${targetName}`);
         }
     };
 
@@ -254,16 +256,16 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                                 setEditingIssue(issue);
                                 setIsEditModalOpen(true);
                             }}
-                             onStart={canManage ? (s) => {
-                                 setActiveSprintToStart(s);
-                                 setIsStartSprintModalOpen(true);
-                             } : undefined}
-                             onEdit={canManage ? (s) => {
-                                 setEditingSprint(s);
-                                 setIsEditSprintModalOpen(true);
-                             } : undefined}
-                             membersMap={membersMap}
-                             canManage={canManage}
+                            onStart={canManage ? (s) => {
+                                setActiveSprintToStart(s);
+                                setIsStartSprintModalOpen(true);
+                            } : undefined}
+                            onEdit={canManage ? (s) => {
+                                setEditingSprint(s);
+                                setIsEditSprintModalOpen(true);
+                            } : undefined}
+                            membersMap={membersMap}
+                            canManage={canManage}
                         />
                     ))}
                 </div>
@@ -335,10 +337,10 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                                     <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
-                                    {issue.attachments?.length > 0 && (
+                                    {(issue.attachments?.length || 0) > 0 && (
                                         <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
                                             <Paperclip size={10} className="text-[#A5D7E8]/60" />
-                                            <span>{issue.attachments.length}</span>
+                                            <span>{issue.attachments?.length}</span>
                                         </div>
                                     )}
                                 </div>
@@ -347,7 +349,7 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                                     <span className="text-xs text-white/40">{issue.priority}</span>
                                 </div>
                                 <div className="w-6 h-6 rounded-full bg-[#19376D] flex items-center justify-center text-[9px] font-black text-[#A5D7E8]">
-                                    {getAssigneeInitials(issue.assigneeId)}
+                                    {getAssigneeInitials(issue.assigneeId || "")}
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
                                 <div className="flex items-center justify-end w-8">

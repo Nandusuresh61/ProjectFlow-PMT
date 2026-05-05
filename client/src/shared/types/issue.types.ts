@@ -20,7 +20,7 @@ export type FormState = {
 };
 
 export type FormAction =
-    | { type: "SET_VALUE"; field: string; value: any }
+    | { type: "SET_VALUE"; field: string; value: FormValues[keyof FormValues] }
     | { type: "SET_ERRORS"; errors: Partial<Record<string, string>> }
     | { type: "TOUCH"; field: string }
     | { type: "SET_SUBMITTING"; isSubmitting: boolean }

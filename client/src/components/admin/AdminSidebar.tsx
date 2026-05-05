@@ -7,6 +7,7 @@ import { logoutUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface SidebarProps {
     collapsed: boolean;
@@ -37,8 +38,8 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
                 clearUser();
                 navigate('/login');
             }, 800);
-        } catch (error: any) {
-            toast.error(error.message || "Failed to logout");
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || "Failed to logout");
             setIsLoading(false);
         }
     };

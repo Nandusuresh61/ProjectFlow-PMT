@@ -97,6 +97,30 @@ function compareValues(a: unknown, b: unknown, dir: "asc" | "desc"): number {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+// ── Sort icon helper ──────────────────────────────────────────────────────
+function SortIcon({ colKey, sortKey, sortDir }: { colKey: string; sortKey: string | null; sortDir: SortDirection }) {
+    if (sortKey !== colKey) return <ChevronsUpDown className="ml-1.5 inline h-3.5 w-3.5 opacity-40" />;
+    if (sortDir === "asc") return <ChevronUp className="ml-1.5 inline h-3.5 w-3.5" />;
+    return <ChevronDown className="ml-1.5 inline h-3.5 w-3.5" />;
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────
+function SkeletonRows<TRow>({ skeletonRows, columns }: { skeletonRows: number; columns: TableColumn<TRow>[] }) {
+    return (
+        <>
+            {Array.from({ length: skeletonRows }).map((_, ri) => (
+                <TableRow key={`skeleton-${ri}`} className="hover:bg-transparent">
+                    {columns.map((col) => (
+                        <TableCell key={col.key}>
+                            <div className="h-4 w-3/4 animate-pulse rounded bg-white/10" />
+                        </TableCell>
+                    ))}
+                </TableRow>
+            ))}
+        </>
+    );
+}
+
 
 /**
  * CustomTable – a single reusable table engine for the entire app.
@@ -189,29 +213,7 @@ function CustomTable<TRow>({
         setPage(Math.min(Math.max(1, next), totalPages));
     }
 
-    // ── Sort icon helper ──────────────────────────────────────────────────────
-    function SortIcon({ colKey }: { colKey: string }) {
-        if (sortKey !== colKey) return <ChevronsUpDown className="ml-1.5 inline h-3.5 w-3.5 opacity-40" />;
-        if (sortDir === "asc") return <ChevronUp className="ml-1.5 inline h-3.5 w-3.5" />;
-        return <ChevronDown className="ml-1.5 inline h-3.5 w-3.5" />;
-    }
 
-    // ── Skeleton ──────────────────────────────────────────────────────────────
-    function SkeletonRows() {
-        return (
-            <>
-                {Array.from({ length: skeletonRows }).map((_, ri) => (
-                    <TableRow key={`skeleton-${ri}`} className="hover:bg-transparent">
-                        {columns.map((col) => (
-                            <TableCell key={col.key}>
-                                <div className="h-4 w-3/4 animate-pulse rounded bg-white/10" />
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                ))}
-            </>
-        );
-    }
 
     // ── Empty state ───────────────────────────────────────────────────────────
     const defaultEmpty = (
@@ -240,7 +242,7 @@ function CustomTable<TRow>({
                                     onClick={col.sortable ? () => handleSort(col.key) : undefined}
                                 >
                                     {col.header}
-                                    {col.sortable && <SortIcon colKey={col.key} />}
+                                    {col.sortable && <SortIcon colKey={col.key} sortKey={sortKey} sortDir={sortDir} />}
                                 </TableHead>
                             ))}
                         </TableRow>
@@ -248,7 +250,7 @@ function CustomTable<TRow>({
 
                     <TableBody>
                         {isLoading ? (
-                            <SkeletonRows />
+                            <SkeletonRows skeletonRows={skeletonRows} columns={columns} />
                         ) : visibleData.length === 0 ? (
                             <TableRow className="hover:bg-transparent">
                                 <TableCell

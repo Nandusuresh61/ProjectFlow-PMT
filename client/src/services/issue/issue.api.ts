@@ -1,5 +1,6 @@
 import { API_ROUTES } from "@/constants/api.constants";
 import { API } from "@/services/api";
+import type { IssueData } from "@/services/sprint/sprint.api";
 
 export interface CreateIssuePayload {
   title: string;
@@ -24,6 +25,15 @@ export interface CreateIssuePayload {
   }>;
 }
 
+export interface CommentData {
+  commentId: string;
+  issueId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IssueResponse<T = unknown> {
   success: boolean;
   message: string;
@@ -44,8 +54,8 @@ export const createIssue = async (
 export const getProjectIssues = async (
   projectId: string,
   params?: { page?: number; limit?: number; search?: string }
-): Promise<IssueResponse<{ issues: any[], total: number }>> => {
-  const { data } = await API.get<IssueResponse<{ issues: any[], total: number }>>(
+): Promise<IssueResponse<{ issues: IssueData[], total: number }>> => {
+  const { data } = await API.get<IssueResponse<{ issues: IssueData[], total: number }>>(
     API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId),
     { params }
   );
@@ -55,11 +65,33 @@ export const getProjectIssues = async (
 
 export const updateIssue = async (
   issueId: string,
-  payload: any
+  payload: Partial<IssueData>
 ): Promise<IssueResponse> => {
   const { data } = await API.patch<IssueResponse>(
     API_ROUTES.ISSUE.UPDATE(issueId),
     payload
+  );
+
+  return data;
+};
+
+export const getIssueComments = async (
+  issueId: string
+): Promise<IssueResponse<CommentData[]>> => {
+  const { data } = await API.get<IssueResponse<CommentData[]>>(
+    API_ROUTES.ISSUE.COMMENTS(issueId)
+  );
+
+  return data;
+};
+
+export const addComment = async (
+  issueId: string,
+  content: string
+): Promise<IssueResponse<CommentData>> => {
+  const { data } = await API.post<IssueResponse<CommentData>>(
+    API_ROUTES.ISSUE.COMMENTS(issueId),
+    { content }
   );
 
   return data;

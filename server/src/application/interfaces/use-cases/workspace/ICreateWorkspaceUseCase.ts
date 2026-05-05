@@ -1,4 +1,4 @@
-import { Workspace } from "@/domain/entities/Workspace";
+
 
 export interface ICreateWorkspaceUseCase {
   execute(

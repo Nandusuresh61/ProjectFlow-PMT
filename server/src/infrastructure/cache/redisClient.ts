@@ -4,11 +4,11 @@ import { createClient } from "redis";
 export const redisClient = createClient({
   url: config.RedisURL,
 });
-redisClient.on("error", (error) => {
-  console.error(" Redis Error: ", error);
+redisClient.on("error", (error: Error) => {
+  console.error("Redis connection error:", error);
 });
 
 export const connectRedis = async () => {
   await redisClient.connect();
-  console.log("Redis connected.");
+  console.log("Connected to Redis");
 };

@@ -9,6 +9,10 @@ import { IGetUserWorkspacesUseCase } from "@/application/interfaces/use-cases/wo
 import { ISwitchWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ISwitchWorkspaceUseCase";
 import { ICreateWorkspaceUseCase } from "@/application/interfaces/use-cases/workspace/ICreateWorkspaceUseCase";
 import { ICheckWorkspaceNameUseCase } from "@/application/interfaces/use-cases/workspace/ICheckWorkspaceNameUseCase";
+import { IGetWorkspaceDashboardDataUseCase } from "@/application/interfaces/use-cases/workspace/IGetWorkspaceDashboardDataUseCase";
+import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class WorkspaceController {
   constructor(
@@ -16,7 +20,10 @@ export class WorkspaceController {
     private readonly _getUserWorkspacesUseCase: IGetUserWorkspacesUseCase,
     private readonly _switchWorkspaceUseCase: ISwitchWorkspaceUseCase,
     private readonly _createWorkspaceUseCase: ICreateWorkspaceUseCase,
-    private readonly _checkNameUseCase: ICheckWorkspaceNameUseCase
+    private readonly _checkNameUseCase: ICheckWorkspaceNameUseCase,
+    private readonly _getDashboardDataUseCase: IGetWorkspaceDashboardDataUseCase,
+    private readonly _membershipRepo: IMembershipRepository,
+    private readonly _workspaceRepo: IWorkspaceRepository
   ) {}
 
   getMembers = asyncHandler(async (req: Request, res: Response) => {
@@ -24,7 +31,6 @@ export class WorkspaceController {
     const search = req.query.search as string || "";
 
     const members = await this._getMembersUseCase.execute(workspaceId, search);
-    console.log(members)
 
     res
       .status(HttpStatusCode.OK)
@@ -73,5 +79,33 @@ export class WorkspaceController {
     }
 
     res.status(HttpStatusCode.OK).json(ResponseHandler.success("Workspace name is available", { isAvailable }));
+  });
+
+  getDashboardData = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { workspaceId } = req.params;
+    const { userId } = req.user!;
+
+    // Determine role
+    const workspace = await this._workspaceRepo.findById(workspaceId);
+    if (!workspace) {
+        res.status(HttpStatusCode.NOT_FOUND).json(ResponseHandler.error("Workspace not found"));
+        return;
+    }
+
+    let role: WorkspaceRoleEnum;
+    if (workspace.ownerId === userId) {
+        role = WorkspaceRoleEnum.WORKSPACE_OWNER;
+    } else {
+        const membership = await this._membershipRepo.findByUserAndWorkspace(userId, workspaceId);
+        if (!membership) {
+            res.status(HttpStatusCode.FORBIDDEN).json(ResponseHandler.error("You are not a member of this workspace"));
+            return;
+        }
+        role = membership.role;
+    }
+
+    const data = await this._getDashboardDataUseCase.execute(workspaceId, userId, role);
+
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.OPERATION_SUCCESS, data));
   });
 }

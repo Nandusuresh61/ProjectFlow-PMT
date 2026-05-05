@@ -3,10 +3,7 @@ import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepo
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICreatePlanUseCase } from "@/application/interfaces/use-cases/Plan/ICreatePlanUseCase";
 import { Plan } from "@/domain/entities/Plan";
-import { AppError } from "@/shared/errors/AppError";
-import { AppMessages } from "@/shared/messages/AppMessages";
-import { ErrorCode } from "@/shared/enums/ErrorCode";
-import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+
 
 import { PlanType } from "@/shared/enums/PlanType";
 
@@ -27,14 +24,18 @@ export class CreatePlanUseCase implements ICreatePlanUseCase{
     // 2. Determine price
     const priceMonthly = data.type === PlanType.FREE ? 0 : data.priceMonthly;
 
+    // 3. Determine limits
+    const maxProjects = data.type === PlanType.ENTERPRISE ? -1 : (data.maxProjects ?? 0);
+    const maxMembers = data.type === PlanType.ENTERPRISE ? -1 : (data.maxMembers ?? 0);
+
     const now = new Date();
     const plan = new Plan(
       this._uidGenerator.createId(),
       data.type,
       priceMonthly,
       data.description,
-      data.maxProjects,
-      data.maxMembers,
+      maxProjects,
+      maxMembers,
       data.features,
       true,
       now,

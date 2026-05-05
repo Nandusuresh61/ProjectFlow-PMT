@@ -150,4 +150,13 @@ export const AppMessages = {
   PERFORMANCE_RETRIEVED_SUCCESS: "Performance metrics retrieved successfully",
   SPRINT_NOT_ACTIVE: "Only active sprints can be completed",
   SPRINT_UPDATED_SUCCESS: "Sprint updated successfully",
+  COMMENT_ADDED_SUCCESS: "Comment added successfully",
+  COMMENTS_RETRIEVED_SUCCESS: "Comments retrieved successfully",
+  COMMENT_ID_REQUIRED: "Comment ID is required",
+  COMMENT_NOT_FOUND: "Comment not found",
+  COMMENT_DELETED_SUCCESS: "Comment deleted successfully",
+  COMMENT_UPDATED_SUCCESS: "Comment updated successfully",
+  WORKSPACE_ID_REQUIRED: "Workspace ID is required in headers (x-workspace-id) or params",
+  SUBSCRIPTION_NOT_FOUND: "Subscription not found for this workspace",
+  SUBSCRIPTION_EXPIRED: "Subscription expired or inactive. Please upgrade to continue.",
 };

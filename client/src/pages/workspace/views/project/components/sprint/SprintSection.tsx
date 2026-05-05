@@ -1,3 +1,4 @@
+import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import React, { useState } from 'react';
 import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -5,21 +6,14 @@ import { Button } from '@/components/ui/button';
 import { IssueTypeIcon } from '../issue/IssueTypeIcon';
 
 interface SprintSectionProps {
-    sprint: {
-        sprintId: string;
-        name: string;
-        status: string;
-        goal?: string;
-        startDate?: Date;
-        endDate?: Date;
-    };
-    issues: any[];
+    sprint: SprintData;
+    issues: IssueData[];
     onIssueDrop: (issueId: string, targetSprintId: string) => void;
-    onIssueClick: (issue: any) => void;
-    onEditIssue: (issue: any) => void;
-    onStart?: (sprint: any) => void;
-    onEdit?: (sprint: any) => void;
-    membersMap: Record<string, any>;
+    onIssueClick: (issue: IssueData) => void;
+    onEditIssue: (issue: IssueData) => void;
+    onStart?: (sprint: SprintData) => void;
+    onEdit?: (sprint: SprintData) => void;
+    membersMap: Record<string, { userId: string, fullName: string, profileImage: string, role: string }>;
     canManage?: boolean;
 }
 
@@ -71,7 +65,7 @@ export const SprintSection = ({
         }
     };
 
-    const formatDate = (date?: Date) => {
+    const formatDate = (date?: Date | string) => {
         if (!date) return null;
         return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
@@ -134,7 +128,7 @@ export const SprintSection = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    {sprint.status === 'PLANNED' && (
+                    {canManage && sprint.status === 'PLANNED' && (
                         <Button 
                             variant="outline" 
                             size="sm" 
@@ -203,10 +197,10 @@ export const SprintSection = ({
                                     <IssueTypeIcon type={issue.type} size={14} className="flex-shrink-0" />
                                     <span className="text-xs font-mono text-white/25 flex-shrink-0">{issue.issueKey}</span>
                                     <span className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{issue.title}</span>
-                                    {issue.attachments?.length > 0 && (
+                                    {(issue.attachments || []).length > 0 && (
                                         <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
                                             <Paperclip size={10} className="text-[#A5D7E8]/60" />
-                                            <span>{issue.attachments.length}</span>
+                                            <span>{(issue.attachments || []).length}</span>
                                         </div>
                                     )}
                                 </div>
@@ -215,7 +209,7 @@ export const SprintSection = ({
                                     <span className="text-xs text-white/40">{issue.priority}</span>
                                 </div>
                                 <div className="w-6 h-6 rounded-full bg-[#19376D] flex items-center justify-center text-[9px] font-black text-[#A5D7E8]">
-                                    {getAssigneeInitials(issue.assigneeId)}
+                                    {getAssigneeInitials(issue.assigneeId || "")}
                                 </div>
                                 <span className="text-xs text-white/30 text-right w-6">{issue.sizeLabel || '--'}</span>
                                 <div className="w-8 flex justify-end">

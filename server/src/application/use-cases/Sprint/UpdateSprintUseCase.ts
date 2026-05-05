@@ -49,7 +49,7 @@ export class UpdateSprintUseCase implements IUpdateSprintUseCase {
       startDate: data.startDate ? new Date(data.startDate) : undefined,
       endDate: data.endDate ? new Date(data.endDate) : undefined,
       updatedAt: new Date(),
-    } as any);
+    });
 
     if (!updatedSprint) {
       throw new AppError(

@@ -20,10 +20,9 @@ if (!parsedEnv.success) {
     console.error(`   - ${pathName}: ${issue.message} (${issue.code})`);
   });
 
-  // Extra help for the user
   const missingVars = parsedEnv.error.issues
     .filter(
-      (i) => i.code === "invalid_type" && (i as any).received === "undefined",
+      (i) => i.code === "invalid_type" && (i as { received?: string }).received === "undefined",
     )
     .map((i) => i.path.join("."));
 
@@ -64,4 +63,7 @@ export const config = {
 
   REFRESH_TOKEN_COOKIE_MAX_AGE:
     Number(env.REFRESH_TOKEN_COOKIE_MAX_AGE) || 7 * 24 * 60 * 60 * 1000,
+
+  RAZORPAY_KEY_ID: env.RAZORPAY_KEY_ID || "",
+  RAZORPAY_KEY_SECRET: env.RAZORPAY_KEY_SECRET || "",
 };
