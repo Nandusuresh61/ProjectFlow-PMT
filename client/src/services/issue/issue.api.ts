@@ -53,7 +53,7 @@ export const createIssue = async (
 
 export const getProjectIssues = async (
   projectId: string,
-  params?: { page?: number; limit?: number; search?: string }
+  params?: { page?: number; limit?: number; search?: string; type?: string; parentId?: string | null }
 ): Promise<IssueResponse<{ issues: IssueData[], total: number }>> => {
   const { data } = await API.get<IssueResponse<{ issues: IssueData[], total: number }>>(
     API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId),

@@ -34,6 +34,7 @@ export class Issue {
     public readonly projectId: string,
     public readonly workspaceId: string,
     public readonly parentId: string | null,
+    public taskIds: string[],
     public subtasks: SubTask[],
     public attachments: Attachment[],
     public createdAt: Date,

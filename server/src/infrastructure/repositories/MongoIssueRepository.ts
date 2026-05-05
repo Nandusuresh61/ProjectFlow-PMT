@@ -21,6 +21,7 @@ export class MongoIssueRepository implements IIssueRepository {
       projectId: issue.projectId,
       workspaceId: issue.workspaceId,
       parentId: issue.parentId,
+      taskIds: issue.taskIds,
       subtasks: issue.subtasks,
       attachments: issue.attachments,
     });
@@ -28,17 +29,22 @@ export class MongoIssueRepository implements IIssueRepository {
     return this.toDomain(created);
   }
 
-  async findByProjectId(projectId: string, page: number, limit: number, search?: string): Promise<{ issues: Issue[], total: number }> {
-    const query: {
-      projectId: string;
-      $or?: Array<{ [key: string]: { $regex: string; $options: string } }>;
-    } = { projectId };
+  async findByProjectId(projectId: string, page: number, limit: number, search?: string, type?: string, parentId?: string | null): Promise<{ issues: Issue[], total: number }> {
+    const query: any = { projectId };
     
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { issueKey: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    if (type) {
+      query.type = type;
+    }
+
+    if (parentId !== undefined) {
+      query.parentId = parentId;
     }
 
     const skip = (page - 1) * limit;
@@ -139,6 +145,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.projectId,
       doc.workspaceId,
       doc.parentId,
+      doc.taskIds || [],
       doc.subtasks,
       (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
       doc.createdAt,

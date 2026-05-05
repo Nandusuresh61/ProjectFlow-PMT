@@ -41,4 +41,5 @@ export interface UpdateIssueDto {
     type: "IMAGE" | "PDF" | "LINK";
   }[];
   parentId?: string | null;
+  taskIds?: string[];
 }

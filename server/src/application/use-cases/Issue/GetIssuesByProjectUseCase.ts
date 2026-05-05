@@ -23,7 +23,9 @@ export class GetIssuesByProjectUseCase implements IGetIssuesByProjectUseCase {
     projectId: string,
     page: number,
     limit: number,
-    search?: string
+    search?: string,
+    type?: string,
+    parentId?: string | null
   ): Promise<{ issues: Issue[]; total: number }> {
     const project = await this._projectRepository.findById(projectId);
 
@@ -76,7 +78,9 @@ export class GetIssuesByProjectUseCase implements IGetIssuesByProjectUseCase {
       projectId,
       page,
       limit,
-      search
+      search,
+      type,
+      parentId
     );
   }
 }

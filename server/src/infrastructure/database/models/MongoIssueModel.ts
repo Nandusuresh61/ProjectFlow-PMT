@@ -15,6 +15,7 @@ export interface IssueDocument extends Document {
   projectId: string;
   workspaceId: string;
   parentId: string | null;
+  taskIds: string[];
   subtasks: {
     id: string;
     title: string;
@@ -51,6 +52,7 @@ const IssueSchema = new Schema<IssueDocument>(
     projectId: { type: String, required: true },
     workspaceId: { type: String, required: true },
     parentId: { type: String, default: null },
+    taskIds: { type: [String], default: [] },
     subtasks: [
       {
         id: String,

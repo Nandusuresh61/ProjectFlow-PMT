@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Link2, FileText, Image as ImageIcon, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { IssueTypeIcon } from "./IssueTypeIcon";
 import { CommentSection } from "./CommentSection";
+import { cn } from "@/lib/utils";
 
 const sizeColors: Record<string, string> = {
     "XS": "bg-slate-100 text-slate-800",
@@ -77,12 +78,12 @@ export function IssueDetailModal({
                             </div>
                         </div>
 
-                        {/* Subtasks */}
+                        {/* Acceptance Criteria */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between border-b border-[#19376D]/50 pb-2">
-                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Subtasks</span>
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Acceptance Criteria</span>
                                 <span className="text-xs font-bold text-[#A5D7E8]">
-                                    {(issue.subtasks || []).filter((t: { completed: boolean }) => t.completed).length || 0} / {issue.subtasks?.length || 0} completed
+                                    {(issue.subtasks || []).filter((t: { completed: boolean }) => t.completed).length || 0} / {issue.subtasks?.length || 0} met
                                 </span>
                             </div>
 
@@ -103,7 +104,7 @@ export function IssueDetailModal({
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-xs text-[#576CBC]/50 italic">No subtasks added.</p>
+                                <p className="text-xs text-[#576CBC]/50 italic">No acceptance criteria added.</p>
                             )}
                         </div>
 
@@ -223,6 +224,41 @@ export function IssueDetailModal({
                                     <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center gap-2 text-sm">
                                         <Link2 size={13} className="text-white/20" />
                                         <span className="text-white/30 italic text-xs">No parent story</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {issue.type === "STORY" && (
+                            <div className="space-y-1.5">
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Child Tasks</span>
+                                {(issue as any).taskIds && (issue as any).taskIds.length > 0 ? (
+                                    <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                                        {(issue as any).taskIds.map((taskId: string) => {
+                                            const childTask = issuesMap?.[taskId];
+                                            if (!childTask) return null;
+                                            return (
+                                                <div key={taskId} className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2 flex items-center justify-between group">
+                                                    <div className="flex items-center gap-2.5 min-w-0">
+                                                        <IssueTypeIcon type={childTask.type} size={12} className="flex-shrink-0" />
+                                                        <div className="min-w-0 flex flex-col">
+                                                            <span className="text-[9px] font-mono text-[#A5D7E8]/60 leading-none mb-0.5">{childTask.issueKey}</span>
+                                                            <span className="text-xs text-white/80 leading-tight truncate">{childTask.title}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span className={cn(
+                                                        "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider",
+                                                        childTask.status === "DONE" ? "text-emerald-400 bg-emerald-400/10" : "text-white/40 bg-white/5"
+                                                    )}>
+                                                        {childTask.status}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center gap-2 text-sm">
+                                        <span className="text-white/30 italic text-xs">No tasks added yet</span>
                                     </div>
                                 )}
                             </div>

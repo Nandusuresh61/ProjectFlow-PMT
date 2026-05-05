@@ -113,6 +113,7 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     }
 
     const newStatus = sprintId ? "TODO" : "BACKLOG";
+    const oldStatus = issue.status;
 
     const updatedIssue = await this._issueRepo.update(issueId, {
       sprintId,
@@ -125,6 +126,45 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
         AppMessages.ISSUE_UPDATE_FAILED,
         HttpStatusCode.INTERNAL_SERVER_ERROR,
       );
+    }
+
+    // If it's a STORY, move all its tasks to the same sprint
+    if (updatedIssue.type === 'STORY') {
+      const { issues: childTasks } = await this._issueRepo.findByProjectId(
+        updatedIssue.projectId,
+        1,
+        1000,
+        undefined,
+        undefined,
+        updatedIssue.issueId
+      );
+
+      for (const task of childTasks) {
+        // Update each task's sprintId and status
+        await this._issueRepo.update(task.issueId, {
+          sprintId,
+          status: newStatus,
+        });
+
+        // Also update the sprint's issueIds list for each task
+        if (oldSprintId && oldSprintId !== sprintId) {
+          const oldSprint = await this._sprintRepo.findById(oldSprintId);
+          if (oldSprint) {
+            const updatedIssueIds = oldSprint.issueIds.filter(id => id !== task.issueId);
+            await this._sprintRepo.update(oldSprintId, { issueIds: updatedIssueIds });
+          }
+        }
+
+        if (sprintId && oldSprintId !== sprintId) {
+          const newSprint = await this._sprintRepo.findById(sprintId);
+          if (newSprint) {
+            if (!newSprint.issueIds.includes(task.issueId)) {
+              const updatedIssueIds = [...newSprint.issueIds, task.issueId];
+              await this._sprintRepo.update(sprintId, { issueIds: updatedIssueIds });
+            }
+          }
+        }
+      }
     }
 
     return updatedIssue;

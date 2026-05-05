@@ -89,12 +89,24 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.projectId,
       data.workspaceId,
       data.parentId || null,
+      [], // taskIds
       data.subtasks || [],
       data.attachments || [],
       new Date(),
       new Date()
     );
 
-    return await this._issueRepo.create(issue);
+    const createdIssue = await this._issueRepo.create(issue);
+
+    // If it's a task/bug created under a story, update the story's taskIds
+    if (data.parentId) {
+      const parentStory = await this._issueRepo.findById(data.parentId);
+      if (parentStory) {
+        parentStory.taskIds.push(createdIssue.issueId);
+        await this._issueRepo.update(parentStory.issueId, { taskIds: parentStory.taskIds });
+      }
+    }
+
+    return createdIssue;
   }
 }

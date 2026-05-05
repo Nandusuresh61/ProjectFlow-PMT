@@ -23,6 +23,8 @@ interface BoardCardData {
     tagColor: string;
     assignee: string;
     priority: 'High' | 'Medium' | 'Low';
+    parentTitle?: string;
+    parentKey?: string;
 }
 
 interface Column {
@@ -63,6 +65,12 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
         onClick={onClick}
         className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer active:cursor-grabbing group border border-white/5"
     >
+        {card.parentTitle && (
+            <div className="flex items-center gap-1.5 mb-2.5 px-2 py-1 rounded bg-[#A5D7E8]/5 border border-[#A5D7E8]/10 w-fit max-w-full">
+                <span className="text-[9px] font-black text-[#A5D7E8]/60 uppercase tracking-tighter whitespace-nowrap">{card.parentKey}</span>
+                <span className="text-[10px] font-medium text-[#A5D7E8]/80 truncate">{card.parentTitle}</span>
+            </div>
+        )}
         <div className="flex items-start justify-between mb-3">
             <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full"
@@ -93,12 +101,10 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     
-    // Modal State
     const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
-    // Supplemental Data for Modal
     const [membersMap, setMembersMap] = useState<Record<string, { userId: string, fullName: string, profileImage: string, role: string }>>({});
     const [sprintsMap, setSprintsMap] = useState<Record<string, SprintData>>({});
     const [issuesMap, setIssuesMap] = useState<Record<string, IssueData>>({});
@@ -116,13 +122,11 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             if (sprintRes.success && sprintRes.data) {
                 setActiveSprintData(sprintRes.data);
                 
-                // Build issues map starting with active sprint issues
                 const iMap: Record<string, IssueData> = {};
                 sprintRes.data.issues.forEach(i => {
                     iMap[i.issueId] = i;
                 });
                 
-                // Add stories for parent lookup
                 if (storiesRes.success && storiesRes.data?.issues) {
                     storiesRes.data.issues.forEach((i: IssueData) => {
                         if (!iMap[i.issueId]) iMap[i.issueId] = i;
@@ -241,16 +245,21 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'To Do',
             accent: 'bg-white/20',
             cards: issues
-                .filter(i => i.status === 'TODO' || i.status === 'BACKLOG')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => (i.status === 'TODO' || i.status === 'BACKLOG') && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey
+                    };
+                }),
             count: 0
         },
         {
@@ -258,16 +267,21 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'In Progress',
             accent: 'bg-[#A5D7E8]',
             cards: issues
-                .filter(i => i.status === 'IN_PROGRESS')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => i.status === 'IN_PROGRESS' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey
+                    };
+                }),
             count: 0
         },
         {
@@ -275,16 +289,21 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'Review',
             accent: 'bg-indigo-400',
             cards: issues
-                .filter(i => i.status === 'REVIEW')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => i.status === 'REVIEW' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey
+                    };
+                }),
             count: 0
         },
         {
@@ -292,16 +311,21 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'Done',
             accent: 'bg-emerald-400',
             cards: issues
-                .filter(i => i.status === 'DONE')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as IssueData["priority"],
-                })),
+                .filter(i => i.status === 'DONE' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey
+                    };
+                }),
             count: 0
         }
     ].map(col => ({ ...col, count: col.cards.length } as Column));
