@@ -11,12 +11,15 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
+import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkLogRepository";
+
 export class UpdateIssueUseCase implements IUpdateIssueUseCase {
   constructor(
     private readonly _issueRepository: IIssueRepository,
     private readonly _projectRepository: IProjectRepository,
     private readonly _workspaceRepository: IWorkspaceRepository,
-    private readonly _membershipRepository: IMembershipRepository
+    private readonly _membershipRepository: IMembershipRepository,
+    private readonly _workLogRepository: IWorkLogRepository
   ) {}
 
   async execute(
@@ -91,6 +94,9 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
 
     if (data.status === "DONE") {
       data.remainingHours = 0;
+    } else if (data.estimatedHours !== undefined) {
+      const totalLogged = await this._workLogRepository.getTotalLoggedHours(issueId);
+      data.remainingHours = Math.max(0, data.estimatedHours - totalLogged);
     }
 
     const updatedIssue = await this._issueRepository.update(

@@ -13,11 +13,14 @@ import { MongoCommentRepository } from "../repositories/MongoCommentRepository";
 import { AddCommentUseCase } from "@/application/use-cases/Issue/AddCommentUseCase";
 import { GetIssueCommentsUseCase } from "@/application/use-cases/Issue/GetIssueCommentsUseCase";
 
+import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
+
 const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
 const membershipRepository = new MembershipRepository();
 const workspaceRepository = new WorkspaceRepository();
 const commentRepository = new MongoCommentRepository();
+const workLogRepository = new MongoWorkLogRepository();
 const uidGenerator = new UidService();
 
 const createissueUseCase = new CreateIssueUseCase(
@@ -39,7 +42,8 @@ const updateIssueUseCase = new UpdateIssueUseCase(
   issueRepository,
   projectRepository,
   workspaceRepository,
-  membershipRepository
+  membershipRepository,
+  workLogRepository
 );
 
 const addCommentUseCase = new AddCommentUseCase(
