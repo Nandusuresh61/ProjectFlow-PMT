@@ -16,6 +16,7 @@ router.post(
 router.get("/project/:projectId", authenticatedUser, sprintController.getSprintsByProject);
 router.get("/project/:projectId/active", authenticatedUser, sprintController.getActiveSprint);
 router.get("/project/:projectId/performance", authenticatedUser, sprintController.getProjectPerformance);
+router.get("/:sprintId/burndown", authenticatedUser, sprintController.getBurndown);
 
 router.patch("/assign-issue", authenticatedUser, sprintController.assignIssueToSprint);
 

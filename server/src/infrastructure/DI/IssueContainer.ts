@@ -14,6 +14,8 @@ import { AddCommentUseCase } from "@/application/use-cases/Issue/AddCommentUseCa
 import { GetIssueCommentsUseCase } from "@/application/use-cases/Issue/GetIssueCommentsUseCase";
 
 import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
+import { sprintBurndownSnapshotService } from "./SprintContainer";
+
 
 const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
@@ -43,8 +45,10 @@ const updateIssueUseCase = new UpdateIssueUseCase(
   projectRepository,
   workspaceRepository,
   membershipRepository,
-  workLogRepository
+  workLogRepository,
+  sprintBurndownSnapshotService
 );
+
 
 const addCommentUseCase = new AddCommentUseCase(
   commentRepository,

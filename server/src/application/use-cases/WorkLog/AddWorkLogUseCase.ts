@@ -7,13 +7,17 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+
 
 export class AddWorkLogUseCase implements IAddWorkLogUseCase {
   constructor(
     private readonly _workLogRepository: IWorkLogRepository,
     private readonly _issueRepository: IIssueRepository,
-    private readonly _uidService: IUidGenerator
+    private readonly _uidService: IUidGenerator,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService
   ) {}
+
 
   async execute(userId: string, issueId: string, data: AddWorkLogDto): Promise<WorkLog> {
     const issue = await this._issueRepository.findById(issueId);
@@ -46,6 +50,12 @@ export class AddWorkLogUseCase implements IAddWorkLogUseCase {
       await this._issueRepository.update(issueId, { remainingHours: remaining });
     }
 
+    // Trigger burndown snapshot
+    if (issue.sprintId) {
+      await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
+    }
+
     return createdWorkLog;
+
   }
 }

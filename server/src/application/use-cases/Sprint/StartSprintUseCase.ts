@@ -10,6 +10,8 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+
 
 export class StartSprintUseCase implements IStartSprintUseCase {
   constructor(
@@ -17,7 +19,9 @@ export class StartSprintUseCase implements IStartSprintUseCase {
     private readonly _issueRepo: IIssueRepository,
     private readonly _projectRepo: IProjectRepository,
     private readonly _membershipRepo: IMembershipRepository,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
   ) {}
+
 
   async execute(userId: string, data: StartSprintDto): Promise<Sprint> {
     const { sprintId, startDate, endDate } = data;
@@ -107,6 +111,9 @@ export class StartSprintUseCase implements IStartSprintUseCase {
       );
     }
 
+    await this._burndownSnapshotService.captureSnapshot(sprintId);
+
     return updatedSprint;
+
   }
 }

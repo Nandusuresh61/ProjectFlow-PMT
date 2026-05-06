@@ -10,12 +10,17 @@ import {
     getSprintAnalytics,
     type SprintAnalyticsData,
     getSprintPerformanceSummary,
-    type SprintPerformanceSummaryData
+    type SprintPerformanceSummaryData,
+    getSprintBurndown,
+    type BurndownResponseData
 } from '@/services/sprint/sprint.api';
+
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
 import { EditSprintModal } from './components/sprint/EditSprintModal';
+import { SprintBurndownChart } from './components/sprint/SprintBurndownChart';
 import { Button } from '@/components/ui/button';
+
 
 interface ProjectSprintViewProps {
     project: Project;
@@ -50,7 +55,9 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [data, setData] = useState<ActiveSprintData | null>(null);
     const [analytics, setAnalytics] = useState<SprintAnalyticsData | null>(null);
     const [summary, setSummary] = useState<SprintPerformanceSummaryData | null>(null);
+    const [burndownData, setBurndownData] = useState<BurndownResponseData | null>(null);
     const [members, setMembers] = useState<ProjectMember[]>([]);
+
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
@@ -69,11 +76,17 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
             if (sprintRes.success && sprintRes.data) {
                 setData(sprintRes.data);
                 if (sprintRes.data.sprint) {
-                    const analyticsRes = await getSprintAnalytics(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null }));
+                    const [analyticsRes, burndownRes] = await Promise.all([
+                        getSprintAnalytics(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null })),
+                        getSprintBurndown(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null }))
+                    ]);
                     setAnalytics(analyticsRes.success && analyticsRes.data ? analyticsRes.data : null);
+                    setBurndownData(burndownRes.success && burndownRes.data ? burndownRes.data : null);
                 } else {
                     setAnalytics(null);
+                    setBurndownData(null);
                 }
+
             }
             if (membersRes.success && membersRes.data) {
                 setMembers(membersRes.data);
@@ -287,7 +300,15 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                 </div>
             </div>
 
+            {/* Burndown Chart Section */}
+            {burndownData && (
+                <div className="grid grid-cols-1 gap-5">
+                    <SprintBurndownChart data={burndownData} />
+                </div>
+            )}
+
             {/* Issue list */}
+
             <div className="bg-white/[0.025] rounded-2xl overflow-hidden">
                 <div className="px-5 py-3 border-b border-white/[0.05] flex items-center justify-between">
                     <span className="text-sm font-bold text-white/50">Sprint Issues</span>

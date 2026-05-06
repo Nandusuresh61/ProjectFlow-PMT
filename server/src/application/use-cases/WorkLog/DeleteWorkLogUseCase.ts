@@ -5,12 +5,16 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+
 
 export class DeleteWorkLogUseCase implements IDeleteWorkLogUseCase {
   constructor(
     private readonly _workLogRepository: IWorkLogRepository,
-    private readonly _issueRepository: IIssueRepository
+    private readonly _issueRepository: IIssueRepository,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService
   ) {}
+
 
   async execute(userId: string, workLogId: string): Promise<void> {
     const workLog = await this._workLogRepository.findById(workLogId);
@@ -33,6 +37,11 @@ export class DeleteWorkLogUseCase implements IDeleteWorkLogUseCase {
       const totalLogged = await this._workLogRepository.getTotalLoggedHours(workLog.issueId);
       const remaining = Math.max(0, issue.estimatedHours - totalLogged);
       await this._issueRepository.update(workLog.issueId, { remainingHours: remaining });
+      
+      if (issue.sprintId) {
+        await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
+      }
     }
   }
 }
+

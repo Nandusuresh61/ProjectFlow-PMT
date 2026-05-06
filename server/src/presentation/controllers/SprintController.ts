@@ -7,6 +7,8 @@ import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Spri
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
 import { IGetProjectPerformanceUseCase } from "@/application/interfaces/use-cases/Sprint/IGetProjectPerformanceUseCase";
 import { IUpdateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IUpdateSprintUseCase";
+import { IGetSprintBurndownUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintBurndownUseCase";
+
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
@@ -32,7 +34,9 @@ export class SprintController {
     private readonly _completeSprintUseCase: ICompleteSprintUseCase,
     private readonly _getProjectPerformanceUseCase: IGetProjectPerformanceUseCase,
     private readonly _updateSprintUseCase: IUpdateSprintUseCase,
+    private readonly _getSprintBurndownUseCase: IGetSprintBurndownUseCase,
   ) { }
+
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
     const validatedData = CreateSprintSchema.parse(req.body) as CreateSprintDto;
@@ -233,4 +237,26 @@ export class SprintController {
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.SPRINT_UPDATED_SUCCESS, result));
   });
+  
+  getBurndown = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getSprintBurndownUseCase.execute(sprintId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success("Burndown data retrieved successfully", result),
+      );
+  });
 }
+

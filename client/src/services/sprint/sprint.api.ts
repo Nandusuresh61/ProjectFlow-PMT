@@ -249,3 +249,33 @@ export const updateSprint = async (
 
   return data;
 };
+
+export interface BurndownDataPoint {
+  date: string;
+  remainingHours: number;
+}
+
+export interface BurndownResponseData {
+  sprintId: string;
+  startDate: string;
+  endDate: string;
+  idealLine: BurndownDataPoint[];
+  actualLine: BurndownDataPoint[];
+  metrics: {
+    totalEstimatedHours: number;
+    currentRemainingHours: number;
+    loggedHours: number;
+    completedTasks: number;
+    incompleteTasks: number;
+  };
+}
+
+export const getSprintBurndown = async (
+  sprintId: string
+): Promise<SprintResponse<BurndownResponseData>> => {
+  const { data } = await API.get<SprintResponse<BurndownResponseData>>(
+    API_ROUTES.SPRINT.BURNDOWN(sprintId)
+  );
+
+  return data;
+};

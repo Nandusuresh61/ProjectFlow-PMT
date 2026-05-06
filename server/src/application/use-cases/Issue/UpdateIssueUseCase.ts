@@ -13,6 +13,8 @@ import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { sizeToPointsMap } from "@/shared/story/sizeToPointsMap";
 
 import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkLogRepository";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+
 
 export class UpdateIssueUseCase implements IUpdateIssueUseCase {
   constructor(
@@ -20,8 +22,10 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
     private readonly _projectRepository: IProjectRepository,
     private readonly _workspaceRepository: IWorkspaceRepository,
     private readonly _membershipRepository: IMembershipRepository,
-    private readonly _workLogRepository: IWorkLogRepository
+    private readonly _workLogRepository: IWorkLogRepository,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService
   ) {}
+
 
   async execute(
     userId: string,
@@ -154,6 +158,22 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
       }
     }
 
+    if (updatedIssue.sprintId) {
+      const statusChanged = data.status !== undefined && data.status !== issue.status;
+      const hoursChanged = data.estimatedHours !== undefined && data.estimatedHours !== issue.estimatedHours;
+      const sprintChanged = data.sprintId !== undefined && data.sprintId !== issue.sprintId;
+
+      if (statusChanged || hoursChanged || sprintChanged) {
+        await this._burndownSnapshotService.captureSnapshot(updatedIssue.sprintId);
+      }
+      
+      // If issue was moved from another sprint, update that sprint's burndown too
+      if (sprintChanged && issue.sprintId) {
+        await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
+      }
+    }
+
     return updatedIssue;
+
   }
 }

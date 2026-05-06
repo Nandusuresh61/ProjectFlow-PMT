@@ -16,6 +16,8 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+
 
 export class CompleteSprintUseCase implements ICompleteSprintUseCase {
   constructor(
@@ -27,7 +29,9 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
     private readonly _workLogRepo: IWorkLogRepository,
     private readonly _uidGenerator: IUidGenerator,
     private readonly _metricsCalculator: ISprintMetricsCalculatorService,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
   ) { }
+
 
   async execute(userId: string, data: CompleteSprintDto): Promise<Sprint> {
     const { sprintId, moveToSprintId } = data;
@@ -280,6 +284,13 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
       );
     }
 
+    // Capture final snapshot for both old and new sprint
+    await this._burndownSnapshotService.captureSnapshot(sprintId);
+    if (moveToSprintId) {
+      await this._burndownSnapshotService.captureSnapshot(moveToSprintId);
+    }
+
     return updatedSprint;
+
   }
 }
