@@ -29,4 +29,5 @@ export const CreateIssueSchema = z.object({
     .optional()
     .default([]),
   parentId: z.string().optional().nullable(),
+  estimatedHours: z.number().min(0).max(999).optional().nullable(),
 });

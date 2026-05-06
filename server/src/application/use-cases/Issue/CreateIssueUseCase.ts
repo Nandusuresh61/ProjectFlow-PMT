@@ -92,6 +92,8 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       [], // taskIds
       data.acceptanceCriteria || [],
       data.attachments || [],
+      data.estimatedHours ?? null,
+      data.estimatedHours ?? null, // initially remaining = estimated
       new Date(),
       new Date()
     );

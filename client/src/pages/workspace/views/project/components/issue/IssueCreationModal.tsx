@@ -22,7 +22,8 @@ const initialValues: FormValues = {
     sprint: "Backlog",
     parentId: "",
     subtasks: [],
-    attachments: []
+    attachments: [],
+    estimatedHours: undefined,
 };
 
 function formReducer(state: FormState, action: FormAction): FormState {
@@ -77,15 +78,10 @@ export function IssueCreationModal({
     parentStoryId?: string
 }) {
     const [members, setMembers] = useState<{ userId: string, fullName: string, profileImage: string }[]>([]);
-    const [stories, setStories] = useState<IssueData[]>([]);
 
     useEffect(() => {
         if (open && project?.id) {
-            getProjectIssues(project.id, { limit: 100 }).then(res => {
-                if (res?.data?.issues) {
-                    setStories(res.data.issues.filter((i: IssueData) => i.type === "STORY"));
-                }
-            }).catch(err => console.error("Failed to load stories", err));
+            getProjectIssues(project.id, { limit: 100 }).catch(err => console.error("Failed to load issues", err));
         }
     }, [open, project?.id]);
 
@@ -121,7 +117,9 @@ export function IssueCreationModal({
                         sprint: editIssue.sprintId || "Backlog",
                         parentId: editIssue.parentId || "",
                         subtasks: editIssue.subtasks ? [...editIssue.subtasks] : [],
-                        attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : []
+                        attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : [],
+                        estimatedHours: editIssue.estimatedHours || undefined,
+                        remainingHours: editIssue.remainingHours || undefined
                     }
                 });
             } else if (parentStoryId) {
@@ -281,6 +279,7 @@ export function IssueCreationModal({
                 workspaceId: project.workspaceId,
                 subtasks: state.values.subtasks,
                 attachments: cleanedAttachments,
+                estimatedHours: state.values.estimatedHours || null,
             };
 
             let response;
@@ -609,6 +608,21 @@ export function IssueCreationModal({
                                 <option value="Sprint 2" className="bg-[#0b1b36] text-white">Sprint 2</option>
                             </select>
                         </div>
+
+                        {state.values.type !== "Story" && (
+                            <div className="space-y-1.5 pt-4 border-t border-[#19376D]/50">
+                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Estimated Hours</Label>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    max="999"
+                                    value={state.values.estimatedHours || ""}
+                                    onChange={(e) => handleChange("estimatedHours", e.target.value ? parseFloat(e.target.value) : undefined)}
+                                    placeholder="e.g. 8"
+                                    className="bg-[#19376D]/20 border-[#576CBC]/20 text-white placeholder:text-[#576CBC]/40 text-sm h-10 focus-visible:ring-[#A5D7E8]/20 focus-visible:border-[#A5D7E8]/50"
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -89,6 +89,10 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
       }
     }
 
+    if (data.status === "DONE") {
+      data.remainingHours = 0;
+    }
+
     const updatedIssue = await this._issueRepository.update(
       issueId,
       data as Partial<Issue>

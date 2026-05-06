@@ -24,6 +24,8 @@ export class MongoIssueRepository implements IIssueRepository {
       taskIds: issue.taskIds,
       acceptanceCriteria: issue.acceptanceCriteria,
       attachments: issue.attachments,
+      estimatedHours: issue.estimatedHours,
+      remainingHours: issue.remainingHours,
     });
 
     return this.toDomain(created);
@@ -148,6 +150,8 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.taskIds || [],
       doc.acceptanceCriteria,
       (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
+      doc.estimatedHours,
+      doc.remainingHours,
       doc.createdAt,
       doc.updatedAt
     );

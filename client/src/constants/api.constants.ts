@@ -68,4 +68,8 @@ export const API_ROUTES = {
     WORKSPACE_DETAILS: (workspaceId: string) => `/super-admin/workspace/${workspaceId}`,
     TOGGLE_SUSPEND: (workspaceId: string) => `/super-admin/workspace/${workspaceId}/toggle-suspend`,
   },
+  WORKLOG: {
+    ISSUE: (issueId: string) => `/worklog/issue/${issueId}`,
+    LOG: (workLogId: string) => `/worklog/${workLogId}`,
+  },
 } as const;

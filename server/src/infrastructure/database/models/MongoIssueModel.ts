@@ -22,6 +22,8 @@ export interface IssueDocument extends Document {
     url: string;
     type: string;
   }[];
+  estimatedHours: number | null;
+  remainingHours: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +53,8 @@ const IssueSchema = new Schema<IssueDocument>(
     taskIds: { type: [String], default: [] },
     acceptanceCriteria: { type: [String], default: [] },
     attachments: [AttachmentSchema],
+    estimatedHours: { type: Number, default: null },
+    remainingHours: { type: Number, default: null },
   },
   { timestamps: true }
 );

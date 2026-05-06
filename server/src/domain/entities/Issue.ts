@@ -31,6 +31,8 @@ export class Issue {
     public taskIds: string[],
     public acceptanceCriteria: string[],
     public attachments: Attachment[],
+    public estimatedHours: number | null,
+    public remainingHours: number | null,
     public createdAt: Date,
     public updatedAt: Date,
   ) {}

@@ -25,4 +25,6 @@ export const UpdateIssueSchema = z.object({
     )
     .optional(),
   parentId: z.string().optional().nullable(),
+  estimatedHours: z.number().min(0).max(999).optional().nullable(),
+  remainingHours: z.number().min(0).max(999).optional().nullable(),
 });

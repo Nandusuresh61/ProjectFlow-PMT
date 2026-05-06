@@ -15,6 +15,7 @@ export interface CreateIssueDto {
     type: "IMAGE" | "PDF" | "LINK";
   }[];
   parentId?: string | null;
+  estimatedHours?: number;
 }
 
 export interface UpdateIssueDto {
@@ -34,4 +35,6 @@ export interface UpdateIssueDto {
   }[];
   parentId?: string | null;
   taskIds?: string[];
+  estimatedHours?: number;
+  remainingHours?: number;
 }

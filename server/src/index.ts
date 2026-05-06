@@ -16,6 +16,7 @@ import issueRoutes from "@/presentation/routes/IssueRoutes";
 import sprintRoutes from "@/presentation/routes/SprintRoutes";
 import chatRoutes from "@/presentation/routes/ChatRoutes";
 import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
+import workLogRoutes from "@/presentation/routes/WorkLogRoutes";
 import morgan from "morgan";
 
 import http from "http";
@@ -52,6 +53,7 @@ app.use("/api/issue", issueRoutes);
 app.use("/api/sprint", sprintRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/subscription", subscriptionRoutes);
+app.use("/api/worklog", workLogRoutes);
 
 app.use(errorMiddleware);
 

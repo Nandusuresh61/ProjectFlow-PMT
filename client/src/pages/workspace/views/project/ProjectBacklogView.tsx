@@ -595,6 +595,11 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                     ...Object.fromEntries(issues.map(i => [i.issueId, i])),
                     ...Object.fromEntries(Object.values(tasksMap).flat().map(i => [i.issueId, i]))
                 }}
+                onUpdate={() => {
+                    fetchIssues();
+                    fetchSprints();
+                    fetchStories();
+                }}
             />
 
             <SprintCreationModal

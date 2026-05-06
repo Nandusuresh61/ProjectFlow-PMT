@@ -93,6 +93,8 @@ export interface IssueData {
   sizeLabel?: string | null;
   subtasks?: { id: string; title: string; completed: boolean }[];
   attachments?: { name: string; url: string; type: string }[];
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
 }
 
 export interface ActiveSprintData {

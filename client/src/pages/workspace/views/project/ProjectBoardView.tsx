@@ -464,6 +464,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                 membersMap={membersMap}
                 sprintsMap={sprintsMap}
                 issuesMap={issuesMap}
+                onUpdate={fetchData}
             />
 
             {activeSprintData.sprint && (

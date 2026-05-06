@@ -23,6 +23,7 @@ export interface CreateIssuePayload {
     url: string;
     type: "IMAGE" | "PDF" | "LINK";
   }>;
+  estimatedHours?: number | null;
 }
 
 export interface CommentData {
