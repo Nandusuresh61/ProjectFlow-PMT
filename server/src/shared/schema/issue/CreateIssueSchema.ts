@@ -29,5 +29,14 @@ export const CreateIssueSchema = z.object({
     .optional()
     .default([]),
   parentId: z.string().optional().nullable(),
+  storyPoints: z.number().min(0).max(100).optional().nullable(),
   estimatedHours: z.number().min(0).max(999).optional().nullable(),
+}).transform((data) => {
+  if (data.type !== "TASK") return data;
+
+  return {
+    ...data,
+    sizeLabel: null,
+    storyPoints: null,
+  };
 });

@@ -3,7 +3,8 @@ export interface CreateIssueDto {
   description: string;
   type: "STORY" | "TASK" | "BUG";
   priority: "LOW" | "MEDIUM" | "HIGH";
-  sizeLabel?: "XS" | "S" | "M" | "L" | "XL";
+  sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
+  storyPoints?: number | null;
   assigneeId?: string;
   sprintId?: string;
   projectId: string;
@@ -35,6 +36,7 @@ export interface UpdateIssueDto {
   }[];
   parentId?: string | null;
   taskIds?: string[];
-  estimatedHours?: number;
-  remainingHours?: number;
+  storyPoints?: number | null;
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
 }

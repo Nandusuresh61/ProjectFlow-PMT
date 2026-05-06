@@ -262,8 +262,9 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     };
 
     const issues = activeSprintData?.issues || [];
-    const incompleteIssues = issues.filter(i => i.status !== 'DONE');
-    const completedIssues = issues.filter(i => i.status === 'DONE');
+    const sprintLevelIssues = issues.filter(i => i.type === 'STORY' || i.type === 'BUG');
+    const incompleteIssues = sprintLevelIssues.filter(i => i.status !== 'DONE');
+    const completedIssues = sprintLevelIssues.filter(i => i.status === 'DONE');
 
     const columns: Column[] = [
         {

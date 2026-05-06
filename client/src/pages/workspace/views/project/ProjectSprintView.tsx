@@ -1,8 +1,17 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle, Pencil } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Zap, Calendar, CheckCircle2, Circle, Clock, Loader2, AlertCircle, Pencil, TrendingUp, Percent, RotateCcw, Timer, Hourglass } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Project } from '../../types/sidebar.types';
-import { getActiveSprint, type ActiveSprintData, getProjectSprints, type SprintData } from '@/services/sprint/sprint.api';
+import {
+    getActiveSprint,
+    type ActiveSprintData,
+    getProjectSprints,
+    type SprintData,
+    getSprintAnalytics,
+    type SprintAnalyticsData,
+    getSprintPerformanceSummary,
+    type SprintPerformanceSummaryData
+} from '@/services/sprint/sprint.api';
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
 import { EditSprintModal } from './components/sprint/EditSprintModal';
@@ -39,6 +48,8 @@ const getInitials = (name: string) => {
 
 export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [data, setData] = useState<ActiveSprintData | null>(null);
+    const [analytics, setAnalytics] = useState<SprintAnalyticsData | null>(null);
+    const [summary, setSummary] = useState<SprintPerformanceSummaryData | null>(null);
     const [members, setMembers] = useState<ProjectMember[]>([]);
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,20 +59,30 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const [sprintRes, membersRes, allSprintsRes] = await Promise.all([
+            const [sprintRes, membersRes, allSprintsRes, summaryRes] = await Promise.all([
                 getActiveSprint(project.id),
                 getProjectMembers(project.id),
-                getProjectSprints(project.id).catch(() => ({ success: false, data: [] }))
+                getProjectSprints(project.id).catch(() => ({ success: false, data: [] })),
+                getSprintPerformanceSummary(project.id).catch(() => ({ success: false, data: null }))
             ]);
 
             if (sprintRes.success && sprintRes.data) {
                 setData(sprintRes.data);
+                if (sprintRes.data.sprint) {
+                    const analyticsRes = await getSprintAnalytics(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null }));
+                    setAnalytics(analyticsRes.success && analyticsRes.data ? analyticsRes.data : null);
+                } else {
+                    setAnalytics(null);
+                }
             }
             if (membersRes.success && membersRes.data) {
                 setMembers(membersRes.data);
             }
             if (allSprintsRes.success && allSprintsRes.data) {
                 setAllSprints(allSprintsRes.data);
+            }
+            if (summaryRes.success && summaryRes.data) {
+                setSummary(summaryRes.data);
             }
         } catch (error) {
             console.error('Failed to fetch sprint data:', error);
@@ -75,17 +96,11 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     }, [fetchData]);
 
     const { sprint, issues } = data || { sprint: null, issues: [] };
-    const incompleteIssues = issues.filter(i => i.status !== 'DONE');
-    const completedIssues = issues.filter(i => i.status === 'DONE');
-
-    const stats = useMemo(() => {
-        const totalPoints = issues.reduce((s, i) => s + (i.storyPoints || 0), 0);
-        const donePoints = issues
-            .filter(i => i.status === 'DONE')
-            .reduce((s, i) => s + (i.storyPoints || 0), 0);
-        const pct = totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : 0;
-        return { totalPoints, donePoints, pct };
-    }, [issues]);
+    const sprintLevelIssues = issues.filter(i => i.type === 'STORY' || i.type === 'BUG');
+    const incompleteIssues = sprintLevelIssues.filter(i => i.status !== 'DONE');
+    const completedIssues = sprintLevelIssues.filter(i => i.status === 'DONE');
+    const completionRate = Math.round(analytics?.completionRate ?? 0);
+    const historicalSprints = summary?.sprints ?? [];
 
     const getDaysRemaining = (endDate: string) => {
         const end = new Date(endDate);
@@ -109,6 +124,40 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
         return member ? getInitials(member.fullName) : '??';
     };
 
+    const getIssueEffort = (issue: ActiveSprintData['issues'][number]) => {
+        if (issue.type === 'TASK') return `${issue.estimatedHours ?? 0}h`;
+        if (issue.type === 'BUG' && issue.estimatedHours) return `${issue.storyPoints || 0}pt / ${issue.estimatedHours}h`;
+        return `${issue.storyPoints || 0}pt`;
+    };
+
+    const renderHistoricalSprintList = () => (
+        <div className="bg-white/[0.025] rounded-2xl overflow-hidden">
+            <div className="px-5 py-3 border-b border-white/[0.05] flex items-center justify-between">
+                <span className="text-sm font-bold text-white/50">Historical Sprints</span>
+                <span className="text-xs font-medium text-white/20">{historicalSprints.length} completed</span>
+            </div>
+            <div className="divide-y divide-white/[0.03]">
+                {historicalSprints.map(item => (
+                    <div key={item.sprintId} className="grid grid-cols-2 md:grid-cols-[1fr_90px_110px_130px_120px] gap-3 px-5 py-3.5 items-center hover:bg-white/[0.02] transition-colors">
+                        <div className="min-w-0 col-span-2 md:col-span-1">
+                            <p className="text-sm font-bold text-white/80 truncate">{item.sprintName}</p>
+                            <p className="text-xs text-white/25">{item.completedAt ? new Date(item.completedAt).toLocaleDateString() : 'Completed'}</p>
+                        </div>
+                        <span className="text-xs font-black text-[#A5D7E8]">{item.velocity} pts</span>
+                        <span className="text-xs font-bold text-white/50">{Math.round(item.completionRate)}% complete</span>
+                        <span className="text-xs font-bold text-white/35">{item.completedStoryPoints}/{item.committedStoryPoints} pts</span>
+                        <span className="text-xs font-bold text-white/35">{item.spilloverStoryPoints} spillover</span>
+                    </div>
+                ))}
+                {historicalSprints.length === 0 && (
+                    <div className="px-5 py-10 text-center">
+                        <p className="text-white/20 text-sm font-medium">No completed sprints yet</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
@@ -120,16 +169,19 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
 
     if (!sprint) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
-                    <AlertCircle className="text-white/20" size={24} />
+            <div className="space-y-5">
+                <div className="flex flex-col items-center justify-center min-h-[320px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                        <AlertCircle className="text-white/20" size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-white font-bold text-lg">No Active Sprint</h3>
+                        <p className="text-white/40 text-sm max-w-xs mt-1">
+                            There is no sprint currently active for this project. Go to the backlog to start a new sprint.
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h3 className="text-white font-bold text-lg">No Active Sprint</h3>
-                    <p className="text-white/40 text-sm max-w-xs mt-1">
-                        There is no sprint currently active for this project. Go to the backlog to start a new sprint.
-                    </p>
-                </div>
+                {renderHistoricalSprintList()}
             </div>
         );
     }
@@ -179,15 +231,59 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                 <div className="bg-white/[0.025] rounded-2xl p-4">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-xs font-bold text-white/25 uppercase tracking-wider">Progress</p>
-                        <span className="text-sm font-bold text-white">{stats.pct}%</span>
+                        <span className="text-sm font-bold text-white">{completionRate}%</span>
                     </div>
                     <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                         <div
                             className="h-full bg-[#A5D7E8] rounded-full transition-all"
-                            style={{ width: `${stats.pct}%` }}
+                            style={{ width: `${completionRate}%` }}
                         />
                     </div>
-                    <p className="text-xs text-white/25 mt-1">{stats.donePoints}/{stats.totalPoints} story points</p>
+                    <p className="text-xs text-white/25 mt-1">{analytics?.completedStoryPoints ?? 0}/{analytics?.committedStoryPoints ?? 0} story points</p>
+                </div>
+            </div>
+
+            {/* Analytics cards */}
+            <div className="grid grid-cols-2 xl:grid-cols-5 gap-3">
+                <div className="bg-white/[0.025] rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-white/25 mb-2">
+                        <TrendingUp size={14} />
+                        <p className="text-xs font-bold uppercase tracking-wider">Velocity</p>
+                    </div>
+                    <p className="text-2xl font-black text-white">{analytics?.velocity ?? 0}</p>
+                    <p className="text-xs text-white/25 mt-0.5">points</p>
+                </div>
+                <div className="bg-white/[0.025] rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-white/25 mb-2">
+                        <Percent size={14} />
+                        <p className="text-xs font-bold uppercase tracking-wider">Completion</p>
+                    </div>
+                    <p className="text-2xl font-black text-white">{completionRate}%</p>
+                    <p className="text-xs text-white/25 mt-0.5">{analytics?.completedIssues ?? 0}/{analytics?.committedIssues ?? 0} issues</p>
+                </div>
+                <div className="bg-white/[0.025] rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-white/25 mb-2">
+                        <RotateCcw size={14} />
+                        <p className="text-xs font-bold uppercase tracking-wider">Spillover</p>
+                    </div>
+                    <p className="text-2xl font-black text-white">{analytics?.spilloverStoryPoints ?? 0}</p>
+                    <p className="text-xs text-white/25 mt-0.5">points</p>
+                </div>
+                <div className="bg-white/[0.025] rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-white/25 mb-2">
+                        <Timer size={14} />
+                        <p className="text-xs font-bold uppercase tracking-wider">Logged</p>
+                    </div>
+                    <p className="text-2xl font-black text-white">{analytics?.loggedHours ?? 0}h</p>
+                    <p className="text-xs text-white/25 mt-0.5">{analytics?.committedEstimatedHours ?? 0}h estimated</p>
+                </div>
+                <div className="bg-white/[0.025] rounded-2xl p-4">
+                    <div className="flex items-center gap-2 text-white/25 mb-2">
+                        <Hourglass size={14} />
+                        <p className="text-xs font-bold uppercase tracking-wider">Remaining</p>
+                    </div>
+                    <p className="text-2xl font-black text-white">{analytics?.remainingHours ?? 0}h</p>
+                    <p className="text-xs text-white/25 mt-0.5">open estimate</p>
                 </div>
             </div>
 
@@ -211,7 +307,7 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                             <div className="w-6 h-6 rounded-full bg-[#19376D] flex items-center justify-center text-[9px] font-black text-[#A5D7E8]">
                                 {getAssigneeInitials(issue.assigneeId)}
                             </div>
-                            <span className="text-xs font-bold text-white/25 w-8 text-right">{issue.storyPoints || 0}pt</span>
+                            <span className="text-xs font-bold text-white/25 w-20 text-right">{getIssueEffort(issue)}</span>
                         </div>
                     ))}
                     {issues.length === 0 && (
@@ -221,6 +317,8 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     )}
                 </div>
             </div>
+
+            {renderHistoricalSprintList()}
 
             {sprint && (
                 <CompleteSprintModal

@@ -66,10 +66,11 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
 
     const issueKey = `${project.projectKey}-${sequence}`;
 
+    const sizeLabel = data.type === "TASK" ? null : data.sizeLabel || null;
     let storyPoints: number | null = null;
 
-    if (data.sizeLabel) {
-      storyPoints = sizeToPointsMap[data.sizeLabel];
+    if (data.type !== "TASK") {
+      storyPoints = data.storyPoints ?? (sizeLabel ? sizeToPointsMap[sizeLabel] : null);
     }
 
     const status = data.sprintId ? "TODO" : "BACKLOG";
@@ -82,7 +83,7 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.type,
       status,
       data.priority,
-      data.sizeLabel || null,
+      sizeLabel,
       storyPoints,
       data.assigneeId || null,
       data.sprintId || null,

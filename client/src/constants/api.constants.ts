@@ -53,6 +53,11 @@ export const API_ROUTES = {
     GET_PERFORMANCE: (projectId: string) => `/sprint/project/${projectId}/performance`,
     COMPLETE: (sprintId: string) => `/sprint/${sprintId}/complete`,
   },
+  ANALYTICS: {
+    PROJECT_VELOCITY: (projectId: string) => `/projects/${projectId}/analytics/velocity`,
+    PROJECT_SPRINTS: (projectId: string) => `/projects/${projectId}/analytics/sprints`,
+    SPRINT: (sprintId: string) => `/sprints/${sprintId}/analytics`,
+  },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",
   },

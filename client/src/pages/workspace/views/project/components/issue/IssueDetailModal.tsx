@@ -304,9 +304,9 @@ export function IssueDetailModal({
                             </div>
                         </div>
 
-                        {issue.type === "STORY" && issue.sizeLabel && (
+                        {(issue.type === "STORY" || issue.type === "BUG") && issue.sizeLabel && (
                             <div className="space-y-1.5">
-                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Size</span>
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Story Points</span>
                                 <div className={`w-12 h-10 rounded-md flex items-center justify-center text-sm font-bold ${sizeColors[issue.sizeLabel] || 'bg-[#19376D]/20 text-white'}`}>
                                     {issue.sizeLabel}
                                 </div>

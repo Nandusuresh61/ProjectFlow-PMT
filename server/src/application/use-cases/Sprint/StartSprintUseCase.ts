@@ -88,7 +88,9 @@ export class StartSprintUseCase implements IStartSprintUseCase {
     }
 
     const issues = await this._issueRepo.findBySprintId(sprintId);
-    const plannedPoints = issues.reduce((total, issue) => total + (issue.storyPoints || 0), 0);
+    const plannedPoints = issues
+      .filter((issue) => issue.type === "STORY" || issue.type === "BUG")
+      .reduce((total, issue) => total + (issue.storyPoints || 0), 0);
 
     const updatedSprint = await this._sprintRepo.update(sprintId, {
       status: "ACTIVE",

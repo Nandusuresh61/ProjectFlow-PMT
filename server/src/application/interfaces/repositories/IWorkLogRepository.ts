@@ -7,4 +7,5 @@ export interface IWorkLogRepository {
   update(workLogId: string, data: Partial<WorkLog>): Promise<WorkLog | null>;
   delete(workLogId: string): Promise<boolean>;
   getTotalLoggedHours(issueId: string): Promise<number>;
+  getTotalLoggedHoursByIssueIds(issueIds: string[]): Promise<Record<string, number>>;
 }

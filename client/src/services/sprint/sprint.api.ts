@@ -130,11 +130,86 @@ export interface PerformanceData {
   metrics: MetricData[];
 }
 
+export interface SprintAnalyticsData {
+  analyticsId: string | null;
+  sprintId: string;
+  projectId: string;
+  workspaceId: string;
+  sprintName: string;
+  sprintGoal: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  committedIssues: number;
+  completedIssues: number;
+  incompleteIssues: number;
+  committedStoryPoints: number;
+  completedStoryPoints: number;
+  spilloverStoryPoints: number;
+  committedEstimatedHours: number;
+  loggedHours: number;
+  remainingHours: number;
+  completionRate: number;
+  velocity: number;
+  scopeChangeCount: number;
+  createdAt: string | null;
+  isSnapshot: boolean;
+}
+
+export interface ProjectVelocityData {
+  projectId: string;
+  averageVelocity: number;
+  sprints: Array<{
+    sprintId: string;
+    sprintName: string;
+    completedAt: string;
+    committedStoryPoints: number;
+    completedStoryPoints: number;
+    velocity: number;
+  }>;
+}
+
+export interface SprintPerformanceSummaryData {
+  projectId: string;
+  averageVelocity: number;
+  totalSprints: number;
+  sprints: SprintAnalyticsData[];
+}
+
 export const getProjectPerformance = async (
   projectId: string
 ): Promise<SprintResponse<PerformanceData>> => {
   const { data } = await API.get<SprintResponse<PerformanceData>>(
     API_ROUTES.SPRINT.GET_PERFORMANCE(projectId)
+  );
+
+  return data;
+};
+
+export const getSprintAnalytics = async (
+  sprintId: string
+): Promise<SprintResponse<SprintAnalyticsData>> => {
+  const { data } = await API.get<SprintResponse<SprintAnalyticsData>>(
+    API_ROUTES.ANALYTICS.SPRINT(sprintId)
+  );
+
+  return data;
+};
+
+export const getProjectVelocity = async (
+  projectId: string
+): Promise<SprintResponse<ProjectVelocityData>> => {
+  const { data } = await API.get<SprintResponse<ProjectVelocityData>>(
+    API_ROUTES.ANALYTICS.PROJECT_VELOCITY(projectId)
+  );
+
+  return data;
+};
+
+export const getSprintPerformanceSummary = async (
+  projectId: string
+): Promise<SprintResponse<SprintPerformanceSummaryData>> => {
+  const { data } = await API.get<SprintResponse<SprintPerformanceSummaryData>>(
+    API_ROUTES.ANALYTICS.PROJECT_SPRINTS(projectId)
   );
 
   return data;

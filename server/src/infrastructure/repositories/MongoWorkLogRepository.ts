@@ -48,6 +48,20 @@ export class MongoWorkLogRepository implements IWorkLogRepository {
     return result.length > 0 ? result[0].total : 0;
   }
 
+  async getTotalLoggedHoursByIssueIds(issueIds: string[]): Promise<Record<string, number>> {
+    if (issueIds.length === 0) return {};
+
+    const result = await WorkLogModel.aggregate([
+      { $match: { issueId: { $in: issueIds } } },
+      { $group: { _id: "$issueId", total: { $sum: "$hours" } } },
+    ]);
+
+    return result.reduce<Record<string, number>>((totals, item) => {
+      totals[item._id] = item.total;
+      return totals;
+    }, {});
+  }
+
   private toDomain(doc: WorkLogDocument): WorkLog {
     return new WorkLog(
       doc.workLogId,

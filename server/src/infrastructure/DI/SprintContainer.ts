@@ -12,12 +12,18 @@ import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
 import { UidService } from "../services/UidService";
 import { SprintRepository } from "../repositories/MongoSprintRepository";
 import { MembershipRepository } from "../repositories/MongoMembershipRepository";
+import { MongoSprintAnalyticsRepository } from "../repositories/MongoSprintAnalyticsRepository";
+import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
+import { SprintMetricsCalculatorService } from "@/application/services/SprintMetricsCalculatorService";
 
 const sprintRepository = new SprintRepository();
 const projectRepository = new MongoProjectRepository();
 const issueRepository = new MongoIssueRepository();
 const membershipRepository = new MembershipRepository();
 const uidGenarator = new UidService();
+const sprintAnalyticsRepository = new MongoSprintAnalyticsRepository();
+const workLogRepository = new MongoWorkLogRepository();
+const sprintMetricsCalculatorService = new SprintMetricsCalculatorService();
 
 const createSprintUseCase = new CreateSprintUseCase(
   projectRepository,
@@ -57,12 +63,15 @@ const completeSprintUseCase = new CompleteSprintUseCase(
   sprintRepository,
   issueRepository,
   projectRepository,
-  membershipRepository
+  membershipRepository,
+  sprintAnalyticsRepository,
+  workLogRepository,
+  uidGenarator,
+  sprintMetricsCalculatorService
 );
 
 const getProjectPerformanceUseCase = new GetProjectPerformanceUseCase(
-  sprintRepository,
-  issueRepository
+  sprintAnalyticsRepository
 );
 
 const updateSprintUseCase = new UpdateSprintUseCase(

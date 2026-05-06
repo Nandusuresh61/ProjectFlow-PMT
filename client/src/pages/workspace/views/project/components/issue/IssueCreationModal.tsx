@@ -148,6 +148,13 @@ export function IssueCreationModal({
         dispatch({ type: "TOUCH", field: field as "title" });
     }, []);
 
+    const handleTypeChange = useCallback((value: "Story" | "Task" | "Bug") => {
+        handleChange("type", value);
+        if (value === "Task") {
+            handleChange("size", "");
+        }
+    }, [handleChange]);
+
     const addSubtask = () => {
         handleChange("subtasks", [
             ...state.values.subtasks,
@@ -271,7 +278,7 @@ export function IssueCreationModal({
                 type: state.values.type.toUpperCase() as "STORY" | "TASK" | "BUG",
                 status: state.values.status,
                 priority: state.values.priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH",
-                sizeLabel: state.values.size || null,
+                sizeLabel: state.values.type === "Task" ? null : state.values.size || null,
                 assigneeId: state.values.assignee || null,
                 sprintId: state.values.sprint === "Backlog" ? null : state.values.sprint,
                 parentId: state.values.parentId || null,
@@ -494,7 +501,7 @@ export function IssueCreationModal({
                             <div className="relative">
                                 <select
                                     value={state.values.type}
-                                    onChange={(e) => handleChange("type", e.target.value)}
+                                    onChange={(e) => handleTypeChange(e.target.value as "Story" | "Task" | "Bug")}
                                     disabled={!!parentStoryId && !editIssue}
                                     className={cn(
                                         "w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 pl-9 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer",
@@ -547,10 +554,10 @@ export function IssueCreationModal({
                             </select>
                         </div>
 
-                        {(state.values.type === "Story") && (
+                        {(state.values.type === "Story" || state.values.type === "Bug") && (
                             <div className="space-y-1.5">
                                 <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest flex items-center justify-between">
-                                    Size *
+                                    Story Points {state.values.type === "Story" ? "*" : ""}
                                     {state.touched.size && state.errors.size && <span className="text-red-400 normal-case tracking-normal">{state.errors.size}</span>}
                                 </Label>
                                 <div className="flex items-center gap-1.5">

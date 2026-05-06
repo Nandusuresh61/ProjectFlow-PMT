@@ -19,7 +19,8 @@ export const issueFormSchema = z.object({
         name: z.string(),
         url: z.string(),
         type: z.enum(["IMAGE", "PDF", "LINK"])
-    })).optional()
+    })).optional(),
+    estimatedHours: z.number().min(0).max(999).optional()
 }).superRefine((data, ctx) => {
     if (data.type === "Story" && !data.size) {
         ctx.addIssue({

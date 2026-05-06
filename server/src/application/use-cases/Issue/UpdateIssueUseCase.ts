@@ -10,6 +10,7 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { sizeToPointsMap } from "@/shared/story/sizeToPointsMap";
 
 import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkLogRepository";
 
@@ -92,6 +93,15 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
       }
     }
 
+    const issueType = data.type || issue.type;
+
+    if (issueType === "TASK") {
+      data.sizeLabel = null;
+      data.storyPoints = null;
+    } else if (data.sizeLabel !== undefined) {
+      data.storyPoints = data.sizeLabel ? sizeToPointsMap[data.sizeLabel] : null;
+    }
+
     if (data.status === "DONE") {
       data.remainingHours = 0;
     } else if (data.estimatedHours !== undefined) {
@@ -110,6 +120,38 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
         AppMessages.ISSUE_NOT_FOUND,
         HttpStatusCode.NOT_FOUND
       );
+    }
+
+    if (updatedIssue.type === "TASK" && updatedIssue.parentId) {
+      const parentStory = await this._issueRepository.findById(updatedIssue.parentId);
+      if (parentStory && parentStory.type === "STORY") {
+        const { issues: siblings } = await this._issueRepository.findByProjectId(
+          updatedIssue.projectId,
+          1,
+          1000,
+          undefined,
+          "TASK",
+          updatedIssue.parentId
+        );
+
+        if (siblings.length > 0) {
+          const allTodo = siblings.every(s => s.status === "TODO" || s.status === "BACKLOG");
+          const allDone = siblings.every(s => s.status === "DONE");
+
+          let newStatus = parentStory.status;
+          if (allDone) {
+            newStatus = "DONE";
+          } else if (allTodo) {
+            newStatus = "TODO";
+          } else {
+            newStatus = "IN_PROGRESS";
+          }
+
+          if (parentStory.status !== newStatus) {
+            await this._issueRepository.update(parentStory.issueId, { status: newStatus });
+          }
+        }
+      }
     }
 
     return updatedIssue;

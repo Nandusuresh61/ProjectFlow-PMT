@@ -59,6 +59,25 @@ const IssueSchema = new Schema<IssueDocument>(
   { timestamps: true }
 );
 
+IssueSchema.pre("save", function () {
+  if (this.type === "TASK") {
+    this.storyPoints = null;
+    this.sizeLabel = null;
+  }
+});
+
+IssueSchema.pre("findOneAndUpdate", function () {
+  const update = this.getUpdate() as { $set?: Partial<IssueDocument> };
+  const set = update.$set || {};
+
+  if (set.type === "TASK") {
+    set.storyPoints = null;
+    set.sizeLabel = null;
+    update.$set = set;
+    this.setUpdate(update);
+  }
+});
+
 export const IssueModel = mongoose.model<IssueDocument>(
   "Issue",
   IssueSchema
