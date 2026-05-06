@@ -23,6 +23,9 @@ import { EditSprintModal } from './components/sprint/EditSprintModal';
 import { SprintBurndownChart } from './components/sprint/SprintBurndownChart';
 import { SprintAllocationSection } from './components/sprint/SprintAllocationSection';
 import { Button } from '@/components/ui/button';
+import { useWorkspaceStore } from "@/store/workspace.store";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { Briefcase } from "lucide-react";
 
 
 interface ProjectSprintViewProps {
@@ -55,6 +58,26 @@ const getInitials = (name: string) => {
 };
 
 export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
+    const role = useWorkspaceStore(state => state.currentWorkspaceRole);
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+    const canManage = role === WorkspaceRoleEnum.WORKSPACE_OWNER || role === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+
+    if (isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view this section. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const [data, setData] = useState<ActiveSprintData | null>(null);
     const [analytics, setAnalytics] = useState<SprintAnalyticsData | null>(null);
     const [summary, setSummary] = useState<SprintPerformanceSummaryData | null>(null);
@@ -213,23 +236,25 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     <h1 className="text-2xl font-black text-white tracking-tight">{sprint.name}</h1>
                     <p className="text-[#576CBC]/50 text-sm font-medium mt-0.5">{project.name} · Active sprint</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={() => setIsEditModalOpen(true)}
-                        className="flex items-center gap-2 h-9 px-4 rounded-xl bg-white/[0.05] border-white/10 text-white text-xs font-black hover:bg-white/10 transition-all"
-                    >
-                        <Pencil size={14} />
-                        Edit Sprint
-                    </Button>
-                    <button
-                        onClick={() => setIsCompleteModalOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10 h-9"
-                    >
-                        <CheckCircle2 size={14} />
-                        Complete Sprint
-                    </button>
-                </div>
+                {canManage && (
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="flex items-center gap-2 h-9 px-4 rounded-xl bg-white/[0.05] border-white/10 text-white text-xs font-black hover:bg-white/10 transition-all"
+                        >
+                            <Pencil size={14} />
+                            Edit Sprint
+                        </Button>
+                        <button
+                            onClick={() => setIsCompleteModalOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#A5D7E8] text-[#0B2447] text-xs font-black hover:bg-[#A5D7E8]/90 transition-all shadow-lg shadow-[#A5D7E8]/10 h-9"
+                        >
+                            <CheckCircle2 size={14} />
+                            Complete Sprint
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* Sprint meta */}

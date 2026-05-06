@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { SidebarMode } from '../types/sidebar.types';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 
 interface MobileNavItem {
     id: string;
@@ -39,10 +40,16 @@ export interface MobileNavProps {
     activeTab: string;
     onTabChange: (tab: string) => void;
     mode: SidebarMode;
+    role: WorkspaceRoleEnum | null;
 }
 
-export const MobileNav = ({ activeTab, onTabChange, mode }: MobileNavProps) => {
-    const items = mode === 'workspace' ? WORKSPACE_NAV_ITEMS : PROJECT_NAV_ITEMS;
+export const MobileNav = ({ activeTab, onTabChange, mode, role }: MobileNavProps) => {
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+    const restrictedTabs = ['backlogs', 'sprint'];
+
+    const items = mode === 'workspace' 
+        ? WORKSPACE_NAV_ITEMS 
+        : PROJECT_NAV_ITEMS.filter(item => !(isMemberOrViewer && restrictedTabs.includes(item.id)));
 
     return (
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#060d1a]/95 backdrop-blur-xl flex items-center justify-around px-2 h-16 shadow-[0_-4px_24px_rgba(0,0,0,0.3)] border-t border-white/5 pb-safe">

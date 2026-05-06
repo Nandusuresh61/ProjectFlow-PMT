@@ -2,12 +2,34 @@ import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, BarChart2, CheckCircle2, Loader2 } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { getProjectPerformance, type PerformanceData } from '@/services/sprint/sprint.api';
+import { useWorkspaceStore } from "@/store/workspace.store";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { Briefcase } from "lucide-react";
 
 interface ProjectSprintPerformanceViewProps {
     project: Project;
 }
 
 export const ProjectSprintPerformanceView = ({ project }: ProjectSprintPerformanceViewProps) => {
+    const role = useWorkspaceStore(state => state.currentWorkspaceRole);
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+
+    if (isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view this section. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const [performance, setPerformance] = useState<PerformanceData | null>(null);
     const [loading, setLoading] = useState(true);
 

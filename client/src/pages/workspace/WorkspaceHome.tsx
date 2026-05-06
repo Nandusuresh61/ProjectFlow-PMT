@@ -29,6 +29,7 @@ import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { AppMessages } from '@/shared/messages/AppMessages';
+import { Briefcase } from 'lucide-react';
 
 const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
 const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-performance', 'project-team'] as const;
@@ -42,10 +43,31 @@ interface ContentRouterProps {
     openInvite: () => void;
     openEditProject: () => void;
     canManage: boolean;
+    role: WorkspaceRoleEnum | null;
 }
 
-const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManage }: ContentRouterProps) => {
+const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManage, role }: ContentRouterProps) => {
+    // Role-based view restriction logic
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+    const restrictedTabs = ['backlogs', 'sprint', 'sprint-performance'];
+
     if (mode === 'project' && selectedProject) {
+        if (isMemberOrViewer && restrictedTabs.includes(activeTab)) {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                    <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                        <Briefcase className="text-white/20" size={24} />
+                    </div>
+                    <div>
+                        <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                        <p className="text-white/40 text-sm max-w-xs mt-1">
+                            You don't have the required permissions to view this section. Please contact your workspace administrator.
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
         switch (activeTab) {
             case 'overview': return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
             case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
@@ -118,6 +140,7 @@ export default function WorkspaceHome() {
 
             if (currentWorkspace.ownerId === user.userId) {
                 setCurrentWorkspaceRole(WorkspaceRoleEnum.WORKSPACE_OWNER);
+                useWorkspaceStore.getState().setWorkspaceRole(WorkspaceRoleEnum.WORKSPACE_OWNER);
                 return;
             }
 
@@ -126,10 +149,13 @@ export default function WorkspaceHome() {
                 const currentMember = (response.data ?? []).find(
                     (member: { userId: string; role: WorkspaceRoleEnum }) => member.userId === user.userId
                 );
-                setCurrentWorkspaceRole(currentMember?.role ?? null);
+                const role = currentMember?.role ?? null;
+                setCurrentWorkspaceRole(role);
+                useWorkspaceStore.getState().setWorkspaceRole(role);
             } catch (error) {
                 console.error('Failed to fetch workspace role', error);
                 setCurrentWorkspaceRole(null);
+                useWorkspaceStore.getState().setWorkspaceRole(null);
             }
         };
 
@@ -255,6 +281,7 @@ export default function WorkspaceHome() {
                 canCreateProject={canManageProjects}
                 onCreateProject={() => setIsCreateProjectModalOpen(true)}
                 onBackToWorkspace={handleBackToWorkspace}
+                role={currentWorkspaceRole}
             />
 
             <main className="flex-1 flex flex-col min-w-0 relative h-full">
@@ -293,6 +320,7 @@ export default function WorkspaceHome() {
                                     openInvite={() => setIsInviteModalOpen(true)}
                                     openEditProject={() => setIsEditProjectModalOpen(true)}
                                     canManage={canManageProjects}
+                                    role={currentWorkspaceRole}
                                 />
                             </motion.div>
                         </AnimatePresence>
@@ -300,7 +328,7 @@ export default function WorkspaceHome() {
                 </div>
             </main>
 
-            <MobileNav activeTab={activeTab} onTabChange={handleTabChange} mode={sidebarMode} />
+            <MobileNav activeTab={activeTab} onTabChange={handleTabChange} mode={sidebarMode} role={currentWorkspaceRole} />
 
             <InviteModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
             <CreateProjectModal

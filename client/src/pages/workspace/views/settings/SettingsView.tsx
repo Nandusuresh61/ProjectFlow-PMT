@@ -3,13 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProfileSettings from '@/pages/profile/Profile';
 import { SecuritySettings } from '../security/SecuritySettings';
 import { BillingSettings } from '../billing/BillingSettings';
+import { useWorkspaceStore } from '@/store/workspace.store';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 
 export const SettingsView = () => {
     const [activeTab, setActiveTab] = useState('account');
 
+    const role = useWorkspaceStore(state => state.currentWorkspaceRole);
+    const isOwner = role === WorkspaceRoleEnum.WORKSPACE_OWNER;
+
     const tabs = [
         { id: 'general', label: 'General' },
-        { id: 'billing', label: 'Billing' },
+        ...(isOwner ? [{ id: 'billing', label: 'Billing' }] : []),
         { id: 'tickets', label: 'Tickets' },
         { id: 'security', label: 'Security' },
         { id: 'account', label: 'Account' },

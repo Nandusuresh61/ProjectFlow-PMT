@@ -15,6 +15,9 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import IssueCreationModal from './components/issue/IssueCreationModal';
 import { getErrorMessage } from "@/shared/utils/error";
+import { useWorkspaceStore } from "@/store/workspace.store";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { Briefcase } from "lucide-react";
 
 interface ProjectBacklogViewProps {
     project: Project;
@@ -28,6 +31,25 @@ const priorityDot: Record<string, string> = {
 };
 
 export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewProps) => {
+    const role = useWorkspaceStore(state => state.currentWorkspaceRole);
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+
+    if (isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view this section. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
