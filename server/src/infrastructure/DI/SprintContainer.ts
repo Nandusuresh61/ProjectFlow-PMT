@@ -7,6 +7,7 @@ import { CompleteSprintUseCase } from "@/application/use-cases/Sprint/CompleteSp
 import { UpdateSprintUseCase } from "@/application/use-cases/Sprint/UpdateSprintUseCase";
 import { GetSprintBurndownUseCase } from "@/application/use-cases/Sprint/GetSprintBurndownUseCase";
 import { GetSprintAllocationUseCase } from "@/application/use-cases/Sprint/GetSprintAllocationUseCase";
+import { GetSprintHistoryDetailsUseCase } from "@/application/use-cases/Sprint/GetSprintHistoryDetailsUseCase";
 
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
@@ -119,6 +120,15 @@ const getSprintAllocationUseCase = new GetSprintAllocationUseCase(
   userRepository
 );
 
+const getSprintHistoryDetailsUseCase = new GetSprintHistoryDetailsUseCase(
+  sprintRepository,
+  sprintAnalyticsRepository,
+  sprintDailyMetricRepository,
+  sprintMemberAllocationRepository,
+  issueRepository,
+  userRepository
+);
+
 
 export const sprintController = new SprintController(
   createSprintUseCase,
@@ -129,6 +139,7 @@ export const sprintController = new SprintController(
   completeSprintUseCase,
   updateSprintUseCase,
   getSprintBurndownUseCase,
-  getSprintAllocationUseCase
+  getSprintAllocationUseCase,
+  getSprintHistoryDetailsUseCase
 );
 

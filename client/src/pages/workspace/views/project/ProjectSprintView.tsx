@@ -22,6 +22,7 @@ import { CompleteSprintModal } from './components/CompleteSprintModal';
 import { EditSprintModal } from './components/sprint/EditSprintModal';
 import { SprintBurndownChart } from './components/sprint/SprintBurndownChart';
 import { SprintAllocationSection } from './components/sprint/SprintAllocationSection';
+import { CompletedSprintDetailsModal } from './components/sprint/CompletedSprintDetailsModal';
 import { Button } from '@/components/ui/button';
 import { useWorkspaceStore } from "@/store/workspace.store";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
@@ -74,6 +75,7 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [loading, setLoading] = useState(true);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedHistoricalSprintId, setSelectedHistoricalSprintId] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
         if (isMemberOrViewer) return;
@@ -146,6 +148,9 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const completedIssues = sprintLevelIssues.filter(i => i.status === 'DONE');
     const completionRate = Math.round(analytics?.completionRate ?? 0);
     const historicalSprints = summary?.sprints ?? [];
+    const selectedHistoricalSprint = historicalSprints.find(
+        (s) => s.sprintId === selectedHistoricalSprintId
+    );
 
     const getDaysRemaining = (endDate: string) => {
         const end = new Date(endDate);
@@ -183,16 +188,21 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
             </div>
             <div className="divide-y divide-white/[0.03]">
                 {historicalSprints.map(item => (
-                    <div key={item.sprintId} className="grid grid-cols-2 md:grid-cols-[1fr_90px_110px_130px_120px] gap-3 px-5 py-3.5 items-center hover:bg-white/[0.02] transition-colors">
+                    <button
+                        key={item.sprintId}
+                        id={`historical-sprint-${item.sprintId}`}
+                        onClick={() => setSelectedHistoricalSprintId(item.sprintId)}
+                        className="w-full text-left grid grid-cols-2 md:grid-cols-[1fr_90px_110px_130px_120px] gap-3 px-5 py-3.5 items-center hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors cursor-pointer group"
+                    >
                         <div className="min-w-0 col-span-2 md:col-span-1">
-                            <p className="text-sm font-bold text-white/80 truncate">{item.sprintName}</p>
+                            <p className="text-sm font-bold text-white/80 truncate group-hover:text-white transition-colors">{item.sprintName}</p>
                             <p className="text-xs text-white/25">{item.completedAt ? new Date(item.completedAt).toLocaleDateString() : 'Completed'}</p>
                         </div>
                         <span className="text-xs font-black text-[#A5D7E8]">{item.velocity} pts</span>
                         <span className="text-xs font-bold text-white/50">{Math.round(item.completionRate)}% complete</span>
                         <span className="text-xs font-bold text-white/35">{item.completedStoryPoints}/{item.committedStoryPoints} pts</span>
                         <span className="text-xs font-bold text-white/35">{item.spilloverStoryPoints} spillover</span>
-                    </div>
+                    </button>
                 ))}
                 {historicalSprints.length === 0 && (
                     <div className="px-5 py-10 text-center">
@@ -227,6 +237,14 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     </div>
                 </div>
                 {renderHistoricalSprintList()}
+
+                {selectedHistoricalSprintId && selectedHistoricalSprint && (
+                    <CompletedSprintDetailsModal
+                        sprintId={selectedHistoricalSprintId}
+                        sprintName={selectedHistoricalSprint.sprintName}
+                        onClose={() => setSelectedHistoricalSprintId(null)}
+                    />
+                )}
             </div>
         );
     }
@@ -403,6 +421,14 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     onSuccess={() => {
                         fetchData();
                     }}
+                />
+            )}
+
+            {selectedHistoricalSprintId && selectedHistoricalSprint && (
+                <CompletedSprintDetailsModal
+                    sprintId={selectedHistoricalSprintId}
+                    sprintName={selectedHistoricalSprint.sprintName}
+                    onClose={() => setSelectedHistoricalSprintId(null)}
                 />
             )}
         </div>

@@ -8,6 +8,7 @@ import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprin
 import { IUpdateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IUpdateSprintUseCase";
 import { IGetSprintBurndownUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintBurndownUseCase";
 import { IGetSprintAllocationUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintAllocationUseCase";
+import { GetSprintHistoryDetailsUseCase } from "@/application/use-cases/Sprint/GetSprintHistoryDetailsUseCase";
 
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Response } from "express";
@@ -35,6 +36,7 @@ export class SprintController {
     private readonly _updateSprintUseCase: IUpdateSprintUseCase,
     private readonly _getSprintBurndownUseCase: IGetSprintBurndownUseCase,
     private readonly _getSprintAllocationUseCase: IGetSprintAllocationUseCase,
+    private readonly _getSprintHistoryDetailsUseCase: GetSprintHistoryDetailsUseCase,
   ) { }
 
 
@@ -253,6 +255,27 @@ export class SprintController {
       .status(HttpStatusCode.OK)
       .json(
         ResponseHandler.success("Sprint allocation retrieved successfully", result),
+      );
+  });
+
+  getSprintHistoryDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getSprintHistoryDetailsUseCase.execute(sprintId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.SPRINT_HISTORY_RETRIEVED_SUCCESS, result),
       );
   });
 }

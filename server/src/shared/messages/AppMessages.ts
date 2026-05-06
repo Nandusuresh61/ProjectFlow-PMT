@@ -174,4 +174,8 @@ export const AppMessages = {
   CHAT_SEND_FAILED: "Failed to send message",
   INVALID_INPUT: "Invalid input",
   SUBSCRIPTION_DETAILS_FETCHED: "Subscription details fetched successfully",
+
+  SPRINT_HISTORY_NOT_FOUND: "Sprint not found",
+  SPRINT_HISTORY_ONLY_COMPLETED: "Historical details are only available for completed sprints",
+  SPRINT_HISTORY_RETRIEVED_SUCCESS: "Sprint history details retrieved successfully",
 };

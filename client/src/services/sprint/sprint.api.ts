@@ -282,3 +282,64 @@ export const getSprintAllocation = async (
 
   return data;
 };
+
+export interface SprintHistoryIssue {
+  issueId: string;
+  issueKey: string;
+  title: string;
+  type: "STORY" | "TASK" | "BUG";
+  status: string;
+  priority: string;
+  assigneeId: string | null;
+  storyPoints: number | null;
+  estimatedHours: number | null;
+  remainingHours: number | null;
+  parentId: string | null;
+  continuedFromIssueId: string | null;
+  continuedIssueId: string | null;
+  taskIds: string[];
+  sizeLabel: string | null;
+}
+
+export interface SprintHistoryDetailsData {
+  sprint: {
+    sprintId: string;
+    name: string;
+    goal: string | null;
+    status: string;
+    startDate: string | null;
+    endDate: string | null;
+    plannedPoints: number;
+    completedPoints: number;
+  };
+  analytics: {
+    velocity: number;
+    completionRate: number;
+    committedIssues: number;
+    completedIssues: number;
+    incompleteIssues: number;
+    committedStoryPoints: number;
+    completedStoryPoints: number;
+    spilloverStoryPoints: number;
+    committedEstimatedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+    scopeChangeCount: number;
+    startedAt: string | null;
+    completedAt: string | null;
+  } | null;
+  burndown: BurndownResponseData | null;
+  allocation: SprintAllocationData | null;
+  issues: SprintHistoryIssue[];
+  spilloverIssues: SprintHistoryIssue[];
+}
+
+export const getSprintHistoryDetails = async (
+  sprintId: string
+): Promise<SprintResponse<SprintHistoryDetailsData>> => {
+  const { data } = await API.get<SprintResponse<SprintHistoryDetailsData>>(
+    API_ROUTES.SPRINT.HISTORY_DETAILS(sprintId)
+  );
+
+  return data;
+};

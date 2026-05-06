@@ -17,6 +17,7 @@ router.get("/project/:projectId", authenticatedUser, sprintController.getSprints
 router.get("/project/:projectId/active", authenticatedUser, sprintController.getActiveSprint);
 router.get("/:sprintId/burndown", authenticatedUser, sprintController.getBurndown);
 router.get("/:sprintId/allocation", authenticatedUser, sprintController.getSprintAllocation);
+router.get("/:sprintId/history-details", authenticatedUser, sprintController.getSprintHistoryDetails);
 
 router.patch("/assign-issue", authenticatedUser, sprintController.assignIssueToSprint);
 
