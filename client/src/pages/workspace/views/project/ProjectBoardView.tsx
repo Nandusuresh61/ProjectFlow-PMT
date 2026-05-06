@@ -177,6 +177,12 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
         fetchData();
     }, [fetchData]);
 
+    useEffect(() => {
+        if (selectedIssue && issuesMap[selectedIssue.issueId]) {
+            setSelectedIssue(issuesMap[selectedIssue.issueId]);
+        }
+    }, [issuesMap]);
+
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;
 

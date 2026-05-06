@@ -45,7 +45,8 @@ export function IssueDetailModal({
     issue,
     membersMap,
     sprintsMap,
-    issuesMap
+    issuesMap,
+    onUpdate
 }: { 
     open: boolean, 
     onOpenChange: (open: boolean) => void, 

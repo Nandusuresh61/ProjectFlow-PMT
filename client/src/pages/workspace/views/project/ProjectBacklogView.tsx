@@ -160,6 +160,15 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     }, [fetchIssues, fetchSprints, fetchStories]);
 
     useEffect(() => {
+        if (selectedIssue) {
+            const updated = issues.find(i => i.issueId === selectedIssue.issueId);
+            if (updated) {
+                setSelectedIssue(updated);
+            }
+        }
+    }, [issues]);
+
+    useEffect(() => {
         if (project.workspaceId) {
             getMembers(project.workspaceId).then(res => {
                 if (res?.data) {
