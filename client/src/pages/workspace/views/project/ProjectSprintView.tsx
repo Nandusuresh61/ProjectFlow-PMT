@@ -12,13 +12,16 @@ import {
     getSprintPerformanceSummary,
     type SprintPerformanceSummaryData,
     getSprintBurndown,
-    type BurndownResponseData
+    type BurndownResponseData,
+    getSprintAllocation,
+    type SprintAllocationData
 } from '@/services/sprint/sprint.api';
 
 import { getProjectMembers, type ProjectMember } from '@/services/project/project.api';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
 import { EditSprintModal } from './components/sprint/EditSprintModal';
 import { SprintBurndownChart } from './components/sprint/SprintBurndownChart';
+import { SprintAllocationSection } from './components/sprint/SprintAllocationSection';
 import { Button } from '@/components/ui/button';
 
 
@@ -56,6 +59,7 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [analytics, setAnalytics] = useState<SprintAnalyticsData | null>(null);
     const [summary, setSummary] = useState<SprintPerformanceSummaryData | null>(null);
     const [burndownData, setBurndownData] = useState<BurndownResponseData | null>(null);
+    const [allocationData, setAllocationData] = useState<SprintAllocationData | null>(null);
     const [members, setMembers] = useState<ProjectMember[]>([]);
 
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
@@ -76,15 +80,18 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
             if (sprintRes.success && sprintRes.data) {
                 setData(sprintRes.data);
                 if (sprintRes.data.sprint) {
-                    const [analyticsRes, burndownRes] = await Promise.all([
+                    const [analyticsRes, burndownRes, allocationRes] = await Promise.all([
                         getSprintAnalytics(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null })),
-                        getSprintBurndown(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null }))
+                        getSprintBurndown(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null })),
+                        getSprintAllocation(sprintRes.data.sprint.sprintId).catch(() => ({ success: false, data: null }))
                     ]);
                     setAnalytics(analyticsRes.success && analyticsRes.data ? analyticsRes.data : null);
                     setBurndownData(burndownRes.success && burndownRes.data ? burndownRes.data : null);
+                    setAllocationData(allocationRes.success && allocationRes.data ? allocationRes.data : null);
                 } else {
                     setAnalytics(null);
                     setBurndownData(null);
+                    setAllocationData(null);
                 }
 
             }
@@ -306,6 +313,9 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
                     <SprintBurndownChart data={burndownData} />
                 </div>
             )}
+
+            {/* Allocation Section */}
+            <SprintAllocationSection allocation={allocationData} />
 
             {/* Issue list */}
 

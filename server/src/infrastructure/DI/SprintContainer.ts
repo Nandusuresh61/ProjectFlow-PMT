@@ -7,6 +7,7 @@ import { CompleteSprintUseCase } from "@/application/use-cases/Sprint/CompleteSp
 import { GetProjectPerformanceUseCase } from "@/application/use-cases/Sprint/GetProjectPerformanceUseCase";
 import { UpdateSprintUseCase } from "@/application/use-cases/Sprint/UpdateSprintUseCase";
 import { GetSprintBurndownUseCase } from "@/application/use-cases/Sprint/GetSprintBurndownUseCase";
+import { GetSprintAllocationUseCase } from "@/application/use-cases/Sprint/GetSprintAllocationUseCase";
 
 import { SprintController } from "@/presentation/controllers/SprintController";
 import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
@@ -19,6 +20,9 @@ import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
 import { SprintMetricsCalculatorService } from "@/application/services/SprintMetricsCalculatorService";
 import { MongoSprintDailyMetricRepository } from "../repositories/MongoSprintDailyMetricRepository";
 import { SprintBurndownSnapshotService } from "@/application/services/SprintBurndownSnapshotService";
+import { MongoSprintMemberAllocationRepository } from "../repositories/MongoSprintMemberAllocationRepository";
+import { SprintAllocationCalculatorService } from "@/application/services/SprintAllocationCalculatorService";
+import { MongoUserRepository } from "../repositories/MongoUserRepository";
 
 
 const sprintRepository = new SprintRepository();
@@ -30,12 +34,22 @@ const sprintAnalyticsRepository = new MongoSprintAnalyticsRepository();
 const workLogRepository = new MongoWorkLogRepository();
 const sprintMetricsCalculatorService = new SprintMetricsCalculatorService();
 const sprintDailyMetricRepository = new MongoSprintDailyMetricRepository();
+const sprintMemberAllocationRepository = new MongoSprintMemberAllocationRepository();
+const userRepository = new MongoUserRepository();
 
 export const sprintBurndownSnapshotService = new SprintBurndownSnapshotService(
   sprintRepository,
   issueRepository,
   workLogRepository,
   sprintDailyMetricRepository,
+  uidGenarator
+);
+
+export const sprintAllocationCalculatorService = new SprintAllocationCalculatorService(
+  sprintRepository,
+  issueRepository,
+  workLogRepository,
+  sprintMemberAllocationRepository,
   uidGenarator
 );
 
@@ -58,6 +72,7 @@ const assignIssueToSprintUseCase = new AssignIssueToSprintUseCase(
   sprintRepository,
   projectRepository,
   membershipRepository,
+  sprintAllocationCalculatorService
 );
 
 const startSprintUseCase = new StartSprintUseCase(
@@ -65,7 +80,8 @@ const startSprintUseCase = new StartSprintUseCase(
   issueRepository,
   projectRepository,
   membershipRepository,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 const getActiveSprintUseCase = new GetActiveSprintUseCase(
@@ -84,7 +100,8 @@ const completeSprintUseCase = new CompleteSprintUseCase(
   workLogRepository,
   uidGenarator,
   sprintMetricsCalculatorService,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 const getProjectPerformanceUseCase = new GetProjectPerformanceUseCase(
@@ -101,6 +118,12 @@ const getSprintBurndownUseCase = new GetSprintBurndownUseCase(
   sprintDailyMetricRepository
 );
 
+const getSprintAllocationUseCase = new GetSprintAllocationUseCase(
+  sprintRepository,
+  sprintMemberAllocationRepository,
+  userRepository
+);
+
 
 export const sprintController = new SprintController(
   createSprintUseCase,
@@ -111,6 +134,7 @@ export const sprintController = new SprintController(
   completeSprintUseCase,
   getProjectPerformanceUseCase,
   updateSprintUseCase,
-  getSprintBurndownUseCase
+  getSprintBurndownUseCase,
+  getSprintAllocationUseCase
 );
 

@@ -8,6 +8,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
 
 
 export class AddWorkLogUseCase implements IAddWorkLogUseCase {
@@ -15,7 +16,8 @@ export class AddWorkLogUseCase implements IAddWorkLogUseCase {
     private readonly _workLogRepository: IWorkLogRepository,
     private readonly _issueRepository: IIssueRepository,
     private readonly _uidService: IUidGenerator,
-    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
   ) {}
 
 
@@ -53,6 +55,7 @@ export class AddWorkLogUseCase implements IAddWorkLogUseCase {
     // Trigger burndown snapshot
     if (issue.sprintId) {
       await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
+      await this._allocationCalculatorService.calculateAndSaveAllocation(issue.sprintId);
     }
 
     return createdWorkLog;

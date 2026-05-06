@@ -1,7 +1,7 @@
 import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
 import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
 import { UidService } from "../services/UidService";
-import { sprintBurndownSnapshotService } from "./SprintContainer";
+import { sprintBurndownSnapshotService, sprintAllocationCalculatorService } from "./SprintContainer";
 
 import { AddWorkLogUseCase } from "@/application/use-cases/WorkLog/AddWorkLogUseCase";
 import { UpdateWorkLogUseCase } from "@/application/use-cases/WorkLog/UpdateWorkLogUseCase";
@@ -17,19 +17,22 @@ const addWorkLogUseCase = new AddWorkLogUseCase(
   workLogRepository,
   issueRepository,
   uidService,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 const updateWorkLogUseCase = new UpdateWorkLogUseCase(
   workLogRepository,
   issueRepository,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 const deleteWorkLogUseCase = new DeleteWorkLogUseCase(
   workLogRepository,
   issueRepository,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 

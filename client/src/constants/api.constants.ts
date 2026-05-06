@@ -53,6 +53,7 @@ export const API_ROUTES = {
     GET_PERFORMANCE: (projectId: string) => `/sprint/project/${projectId}/performance`,
     COMPLETE: (sprintId: string) => `/sprint/${sprintId}/complete`,
     BURNDOWN: (sprintId: string) => `/sprint/${sprintId}/burndown`,
+    ALLOCATION: (sprintId: string) => `/sprint/${sprintId}/allocation`,
   },
   ANALYTICS: {
     PROJECT_VELOCITY: (projectId: string) => `/projects/${projectId}/analytics/velocity`,

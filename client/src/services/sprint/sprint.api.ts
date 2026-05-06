@@ -279,3 +279,33 @@ export const getSprintBurndown = async (
 
   return data;
 };
+
+export interface SprintAllocationData {
+  sprintId: string;
+  members: {
+    userId: string;
+    fullName: string;
+    profileImage: string | null;
+    assignedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+    completedTasks: number;
+    incompleteTasks: number;
+    capacityStatus: "UNDERLOADED" | "HEALTHY" | "OVERLOADED";
+  }[];
+  totals: {
+    assignedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+  };
+}
+
+export const getSprintAllocation = async (
+  sprintId: string
+): Promise<SprintResponse<SprintAllocationData>> => {
+  const { data } = await API.get<SprintResponse<SprintAllocationData>>(
+    API_ROUTES.SPRINT.ALLOCATION(sprintId)
+  );
+
+  return data;
+};

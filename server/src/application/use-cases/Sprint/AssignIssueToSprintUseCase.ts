@@ -10,6 +10,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
 
 export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
   constructor(
@@ -17,6 +18,7 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     private readonly _sprintRepo: ISprintRepository,
     private readonly _projectRepo: IProjectRepository,
     private readonly _membershipRepo: IMembershipRepository,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
   ) { }
 
   async execute(userId: string, data: AssignIssueToSprintDto): Promise<Issue> {
@@ -162,6 +164,13 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
           }
         }
       }
+    }
+
+    if (sprintId) {
+      await this._allocationCalculatorService.calculateAndSaveAllocation(sprintId);
+    }
+    if (oldSprintId && oldSprintId !== sprintId) {
+      await this._allocationCalculatorService.calculateAndSaveAllocation(oldSprintId);
     }
 
     return updatedIssue;

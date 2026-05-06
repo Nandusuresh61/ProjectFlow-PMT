@@ -17,6 +17,7 @@ import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
 
 
 export class CompleteSprintUseCase implements ICompleteSprintUseCase {
@@ -30,6 +31,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
     private readonly _uidGenerator: IUidGenerator,
     private readonly _metricsCalculator: ISprintMetricsCalculatorService,
     private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService,
   ) { }
 
 
@@ -286,8 +288,11 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
 
     // Capture final snapshot for both old and new sprint
     await this._burndownSnapshotService.captureSnapshot(sprintId);
+    await this._allocationCalculatorService.calculateAndSaveAllocation(sprintId);
+    
     if (moveToSprintId) {
       await this._burndownSnapshotService.captureSnapshot(moveToSprintId);
+      await this._allocationCalculatorService.calculateAndSaveAllocation(moveToSprintId);
     }
 
     return updatedSprint;

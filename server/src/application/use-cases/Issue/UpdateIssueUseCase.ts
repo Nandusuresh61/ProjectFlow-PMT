@@ -14,6 +14,7 @@ import { sizeToPointsMap } from "@/shared/story/sizeToPointsMap";
 
 import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkLogRepository";
 import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
 
 
 export class UpdateIssueUseCase implements IUpdateIssueUseCase {
@@ -23,7 +24,8 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
     private readonly _workspaceRepository: IWorkspaceRepository,
     private readonly _membershipRepository: IMembershipRepository,
     private readonly _workLogRepository: IWorkLogRepository,
-    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
   ) {}
 
 
@@ -162,14 +164,17 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
       const statusChanged = data.status !== undefined && data.status !== issue.status;
       const hoursChanged = data.estimatedHours !== undefined && data.estimatedHours !== issue.estimatedHours;
       const sprintChanged = data.sprintId !== undefined && data.sprintId !== issue.sprintId;
+      const assigneeChanged = data.assigneeId !== undefined && data.assigneeId !== issue.assigneeId;
 
-      if (statusChanged || hoursChanged || sprintChanged) {
+      if (statusChanged || hoursChanged || sprintChanged || assigneeChanged) {
         await this._burndownSnapshotService.captureSnapshot(updatedIssue.sprintId);
+        await this._allocationCalculatorService.calculateAndSaveAllocation(updatedIssue.sprintId);
       }
       
-      // If issue was moved from another sprint, update that sprint's burndown too
+      // If issue was moved from another sprint, update that sprint too
       if (sprintChanged && issue.sprintId) {
         await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
+        await this._allocationCalculatorService.calculateAndSaveAllocation(issue.sprintId);
       }
     }
 

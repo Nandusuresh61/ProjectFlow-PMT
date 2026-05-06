@@ -14,7 +14,7 @@ import { AddCommentUseCase } from "@/application/use-cases/Issue/AddCommentUseCa
 import { GetIssueCommentsUseCase } from "@/application/use-cases/Issue/GetIssueCommentsUseCase";
 
 import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
-import { sprintBurndownSnapshotService } from "./SprintContainer";
+import { sprintBurndownSnapshotService, sprintAllocationCalculatorService } from "./SprintContainer";
 
 
 const projectRepository = new MongoProjectRepository();
@@ -46,7 +46,8 @@ const updateIssueUseCase = new UpdateIssueUseCase(
   workspaceRepository,
   membershipRepository,
   workLogRepository,
-  sprintBurndownSnapshotService
+  sprintBurndownSnapshotService,
+  sprintAllocationCalculatorService
 );
 
 
