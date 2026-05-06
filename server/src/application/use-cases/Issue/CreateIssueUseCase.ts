@@ -94,9 +94,7 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.acceptanceCriteria || [],
       data.attachments || [],
       data.estimatedHours ?? null,
-      data.estimatedHours ?? null, // initially remaining = estimated
-      new Date(),
-      new Date()
+      data.estimatedHours ?? null // initially remaining = estimated
     );
 
     const createdIssue = await this._issueRepo.create(issue);

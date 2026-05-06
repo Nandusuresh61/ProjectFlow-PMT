@@ -9,6 +9,8 @@ export interface CreateSubscriptionDto {
   startDate: Date;
   endDate: Date;
   status?: SubscriptionStatus;
+  amount?: number;
+  currency?: string;
 }
 
 export class CreateSubscriptionUseCase {
@@ -25,7 +27,9 @@ export class CreateSubscriptionUseCase {
       dto.status || SubscriptionStatus.ACTIVE,
       dto.startDate,
       dto.endDate,
-      "monthly"
+      "monthly",
+      dto.amount || 0,
+      dto.currency || "INR"
     );
 
     return this._subscriptionRepo.create(subscription);

@@ -21,7 +21,6 @@ export class OnboardingController {
       const result = await this._completeOnboardingUseCase.execute({
         userId,
         workspaceName: validatedData.workspaceName,
-        planId: validatedData.planId,
         invites: validatedData.invites,
       });
 
