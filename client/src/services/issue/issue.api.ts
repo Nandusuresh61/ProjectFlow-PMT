@@ -12,11 +12,7 @@ export interface CreateIssuePayload {
   sprintId?: string | null;
   projectId: string;
   workspaceId?: string;
-  subtasks?: Array<{
-    id: string;
-    title: string;
-    completed: boolean;
-  }>;
+  acceptanceCriteria?: string[];
   parentId?: string | null;
   attachments?: Array<{
     name: string;

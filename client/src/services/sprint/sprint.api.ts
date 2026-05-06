@@ -91,7 +91,7 @@ export interface IssueData {
   parentId?: string | null;
   storyPoints: number | null;
   sizeLabel?: string | null;
-  subtasks?: { id: string; title: string; completed: boolean }[];
+  acceptanceCriteria?: string[];
   attachments?: { name: string; url: string; type: string }[];
   estimatedHours?: number | null;
   remainingHours?: number | null;

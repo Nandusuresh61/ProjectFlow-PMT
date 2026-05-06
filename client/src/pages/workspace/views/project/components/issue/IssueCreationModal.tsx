@@ -116,7 +116,7 @@ export function IssueCreationModal({
                         assignee: editIssue.assigneeId || "",
                         sprint: editIssue.sprintId || "Backlog",
                         parentId: editIssue.parentId || "",
-                        subtasks: editIssue.subtasks ? [...editIssue.subtasks] : [],
+                        subtasks: editIssue.acceptanceCriteria ? editIssue.acceptanceCriteria.map((title: string, i: number) => ({ id: `ac-${i}`, title, completed: false })) : [],
                         attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : [],
                         estimatedHours: editIssue.estimatedHours || undefined,
                         remainingHours: editIssue.remainingHours || undefined
@@ -284,7 +284,7 @@ export function IssueCreationModal({
                 parentId: state.values.parentId || null,
                 projectId: project.id,
                 workspaceId: project.workspaceId,
-                subtasks: state.values.subtasks,
+                acceptanceCriteria: state.values.subtasks.map(t => t.title).filter(t => t.trim().length > 0),
                 attachments: cleanedAttachments,
                 estimatedHours: state.values.estimatedHours || null,
             };

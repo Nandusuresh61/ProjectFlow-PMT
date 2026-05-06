@@ -117,22 +117,17 @@ export function IssueDetailModal({
                                 <div className="flex items-center justify-between border-b border-[#19376D]/50 pb-2">
                                     <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Acceptance Criteria</span>
                                     <span className="text-xs font-bold text-[#A5D7E8]">
-                                        {(issue.subtasks || []).filter((t: { completed: boolean }) => t.completed).length || 0} / {issue.subtasks?.length || 0} met
+                                        {issue.acceptanceCriteria?.length || 0} items
                                     </span>
                                 </div>
 
-                                {issue.subtasks && (issue.subtasks || []).length > 0 ? (
+                                {issue.acceptanceCriteria && issue.acceptanceCriteria.length > 0 ? (
                                     <div className="space-y-2">
-                                        {issue.subtasks.map((task: { id: string, title: string, completed: boolean }) => (
-                                            <div key={task.id} className="flex items-center gap-3 group bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
-                                                <input 
-                                                    type="checkbox" 
-                                                    disabled 
-                                                    checked={task.completed}
-                                                    className="w-4 h-4 outline-none rounded appearance-none border border-[#576CBC]/40 bg-[#19376D]/20 opacity-70 checked:bg-[#A5D7E8]" 
-                                                />
-                                                <span className={`text-sm ${task.completed ? 'text-white/40 line-through' : 'text-white/90'}`}>
-                                                    {task.title}
+                                        {issue.acceptanceCriteria.map((criteria: string, index: number) => (
+                                            <div key={index} className="flex items-center gap-3 group bg-white/[0.02] p-2.5 rounded-lg border border-white/5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#A5D7E8]/30" />
+                                                <span className="text-sm text-white/90">
+                                                    {criteria}
                                                 </span>
                                             </div>
                                         ))}
