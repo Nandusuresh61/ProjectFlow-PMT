@@ -8,11 +8,7 @@ export interface CreateIssueDto {
   sprintId?: string;
   projectId: string;
   workspaceId: string;
-  subtasks?: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  acceptanceCriteria?: string[];
   attachments?: {
     name: string;
     url: string;
@@ -30,11 +26,7 @@ export interface UpdateIssueDto {
   sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
   assigneeId?: string | null;
   sprintId?: string | null;
-  subtasks?: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  acceptanceCriteria?: string[];
   attachments?: {
     name: string;
     url: string;

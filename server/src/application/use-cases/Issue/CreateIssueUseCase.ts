@@ -90,7 +90,7 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.workspaceId,
       data.parentId || null,
       [], // taskIds
-      data.subtasks || [],
+      data.acceptanceCriteria || [],
       data.attachments || [],
       new Date(),
       new Date()

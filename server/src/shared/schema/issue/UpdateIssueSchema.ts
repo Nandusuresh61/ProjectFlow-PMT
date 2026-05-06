@@ -14,15 +14,7 @@ export const UpdateIssueSchema = z.object({
   sizeLabel: z.enum(["XS", "S", "M", "L", "XL"]).optional().nullable(),
   assigneeId: z.string().optional().nullable(),
   sprintId: z.string().optional().nullable(),
-  subtasks: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().min(1),
-        completed: z.boolean(),
-      })
-    )
-    .optional(),
+  acceptanceCriteria: z.array(z.string()).optional(),
   attachments: z
     .array(
       z.object({

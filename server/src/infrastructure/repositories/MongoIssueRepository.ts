@@ -22,7 +22,7 @@ export class MongoIssueRepository implements IIssueRepository {
       workspaceId: issue.workspaceId,
       parentId: issue.parentId,
       taskIds: issue.taskIds,
-      subtasks: issue.subtasks,
+      acceptanceCriteria: issue.acceptanceCriteria,
       attachments: issue.attachments,
     });
 
@@ -146,7 +146,7 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.workspaceId,
       doc.parentId,
       doc.taskIds || [],
-      doc.subtasks,
+      doc.acceptanceCriteria,
       (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
       doc.createdAt,
       doc.updatedAt

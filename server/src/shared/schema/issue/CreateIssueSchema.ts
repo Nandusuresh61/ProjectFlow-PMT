@@ -14,14 +14,8 @@ export const CreateIssueSchema = z.object({
   sprintId: z.string().optional().nullable(),
   projectId: z.string().min(1, "Project ID is required"),
   workspaceId: z.string().optional(),
-  subtasks: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().min(1),
-        completed: z.boolean(),
-      })
-    )
+  acceptanceCriteria: z
+    .array(z.string())
     .optional()
     .default([]),
   attachments: z

@@ -16,11 +16,7 @@ export interface IssueDocument extends Document {
   workspaceId: string;
   parentId: string | null;
   taskIds: string[];
-  subtasks: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  acceptanceCriteria: string[];
   attachments: {
     name: string;
     url: string;
@@ -53,13 +49,7 @@ const IssueSchema = new Schema<IssueDocument>(
     workspaceId: { type: String, required: true },
     parentId: { type: String, default: null },
     taskIds: { type: [String], default: [] },
-    subtasks: [
-      {
-        id: String,
-        title: String,
-        completed: Boolean,
-      },
-    ],
+    acceptanceCriteria: { type: [String], default: [] },
     attachments: [AttachmentSchema],
   },
   { timestamps: true }
