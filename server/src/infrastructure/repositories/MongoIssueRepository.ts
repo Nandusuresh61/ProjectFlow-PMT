@@ -4,7 +4,7 @@ import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
 
 
 export class MongoIssueRepository implements IIssueRepository {
-  
+
   async create(issue: Issue): Promise<Issue> {
     const created = await IssueModel.create({
       issueId: issue.issueId,
@@ -26,6 +26,8 @@ export class MongoIssueRepository implements IIssueRepository {
       attachments: issue.attachments,
       estimatedHours: issue.estimatedHours,
       remainingHours: issue.remainingHours,
+      continuedFromIssueId: issue.continuedFromIssueId,
+      continuedIssueId: issue.continuedIssueId,
     });
 
     return this.toDomain(created);
@@ -33,7 +35,7 @@ export class MongoIssueRepository implements IIssueRepository {
 
   async findByProjectId(projectId: string, page: number, limit: number, search?: string, type?: string, parentId?: string | null): Promise<{ issues: Issue[], total: number }> {
     const query: any = { projectId };
-    
+
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -152,6 +154,8 @@ export class MongoIssueRepository implements IIssueRepository {
       (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
       doc.estimatedHours,
       doc.remainingHours,
+      doc.continuedFromIssueId,
+      doc.continuedIssueId,
       doc.createdAt,
       doc.updatedAt
     );

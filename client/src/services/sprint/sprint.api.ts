@@ -95,6 +95,8 @@ export interface IssueData {
   attachments?: { name: string; url: string; type: string }[];
   estimatedHours?: number | null;
   remainingHours?: number | null;
+  continuedFromIssueId?: string | null;
+  continuedIssueId?: string | null;
 }
 
 export interface ActiveSprintData {

@@ -9,6 +9,7 @@ import { ISprintMetricsCalculatorService } from "@/application/interfaces/servic
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
 import { Sprint } from "@/domain/entities/Sprint";
 import { SprintAnalytics } from "@/domain/entities/SprintAnalytics";
+import { Issue } from "@/domain/entities/Issue";
 import { CompleteSprintDto } from "@/application/dtos/SprintDto";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
@@ -135,29 +136,115 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
       );
     }
 
-    const incompleteIssues = issues.filter(issue => issue.status !== "DONE");
+    const issuesToMove: Issue[] = [];
+    const issuesToStay: Issue[] = [];
+    const movedIssueIds = new Set<string>();
 
-    const issuesToMove = [];
-    const issuesToStay = issues.filter(issue => issue.status === "DONE");
+    const stories = issues.filter(i => i.type === "STORY");
+    const bugs = issues.filter(i => i.type === "BUG");
+    const tasks = issues.filter(i => i.type === "TASK");
 
-    for (const issue of incompleteIssues) {
-      if (issue.type === "STORY" || issue.type === "BUG") {
-        const childTasks = issues.filter(i => i.parentId === issue.issueId);
-        if (childTasks.length === 0) {
-          issuesToMove.push(issue);
-        } else {
-          issuesToStay.push(issue);
+    for (const story of stories) {
+      const childTasks = tasks.filter(t => t.parentId === story.issueId);
+      const doneTasks = childTasks.filter(t => t.status === "DONE");
+      const notDoneTasks = childTasks.filter(t => t.status !== "DONE");
+
+      if (doneTasks.length > 0 && notDoneTasks.length > 0) {
+        // PARTIAL STORY CONTINUATION
+        const sequence = await this._projectRepo.incrementIssueSequence(story.projectId);
+        const continuationIssueKey = `${project.projectKey}-${sequence}`;
+        const continuationStoryId = this._uidGenerator.createId();
+
+        const continuationStory = new Issue(
+          continuationStoryId,
+          continuationIssueKey,
+          `${story.title} (Continued)`,
+          story.description,
+          "STORY",
+          moveToSprintId ? "TODO" : "BACKLOG",
+          story.priority,
+          story.sizeLabel,
+          story.storyPoints,
+          story.assigneeId,
+          moveToSprintId || null,
+          story.projectId,
+          story.workspaceId,
+          null, // parentId
+          notDoneTasks.map(t => t.issueId), // taskIds
+          story.acceptanceCriteria,
+          story.attachments,
+          null, // estimatedHours
+          null, // remainingHours
+          story.continuedFromIssueId || story.issueId,
+          null, // continuedIssueId
+          new Date(),
+          new Date()
+        );
+
+        // Update original story as historical snapshot
+        await this._issueRepo.update(story.issueId, {
+          continuedIssueId: continuationStoryId,
+          taskIds: doneTasks.map(t => t.issueId),
+          status: "DONE"
+        });
+
+        // Create continuation story
+        await this._issueRepo.create(continuationStory);
+
+        // Move incomplete tasks to new story
+        for (const task of notDoneTasks) {
+          await this._issueRepo.update(task.issueId, {
+            parentId: continuationStoryId,
+            sprintId: moveToSprintId || null,
+            status: moveToSprintId ? "TODO" : "BACKLOG"
+          });
+          movedIssueIds.add(task.issueId);
         }
+
+        issuesToMove.push(continuationStory);
+        movedIssueIds.add(continuationStoryId);
+        
+        // Original story stays in the old sprint
+        issuesToStay.push(story);
+      } else if (doneTasks.length === 0 && childTasks.length > 0) {
+        // All tasks incomplete or story itself is incomplete - move whole story
+        issuesToMove.push(story);
+        movedIssueIds.add(story.issueId);
+        for (const task of notDoneTasks) {
+          issuesToMove.push(task);
+          movedIssueIds.add(task.issueId);
+        }
+      } else if (childTasks.length === 0 && story.status !== "DONE") {
+        // Orphan incomplete story - move
+        issuesToMove.push(story);
+        movedIssueIds.add(story.issueId);
       } else {
-        issuesToMove.push(issue);
+        // Story is fully DONE
+        issuesToStay.push(story);
+        doneTasks.forEach(t => issuesToStay.push(t));
       }
     }
 
-    for (const issue of issuesToMove) {
-      let newStatus = moveToSprintId ? "TODO" : "BACKLOG";
-      if (issue.type === "STORY" || issue.type === "BUG") {
-        newStatus = moveToSprintId ? "TODO" : "BACKLOG";
+    // Handle BUGs and Orphan TASKs that weren't moved with a story
+    const remainingIssues = [...bugs, ...tasks.filter(t => !t.parentId)];
+    for (const issue of remainingIssues) {
+      if (movedIssueIds.has(issue.issueId)) continue;
+
+      if (issue.status !== "DONE") {
+        issuesToMove.push(issue);
+        movedIssueIds.add(issue.issueId);
+      } else {
+        issuesToStay.push(issue);
       }
+    }
+
+    // Update moved issues in DB
+    for (const issue of issuesToMove) {
+      // If it's a new continuation story, it's already saved with correct sprintId
+      const original = issues.find(i => i.issueId === issue.issueId);
+      if (!original) continue; 
+
+      const newStatus = moveToSprintId ? "TODO" : "BACKLOG";
       await this._issueRepo.update(issue.issueId, {
         sprintId: moveToSprintId || null,
         status: newStatus as any,

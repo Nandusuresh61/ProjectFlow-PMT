@@ -33,7 +33,9 @@ export class Issue {
     public attachments: Attachment[],
     public estimatedHours: number | null,
     public remainingHours: number | null,
-    public createdAt: Date,
-    public updatedAt: Date,
+    public continuedFromIssueId: string | null = null,
+    public continuedIssueId: string | null = null,
+    public createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
   ) {}
 }

@@ -5,7 +5,7 @@ import { IssueTypeIcon } from "./IssueTypeIcon";
 import { CommentSection } from "./CommentSection";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useCallback } from "react";
-import { Clock, History, Trash2, Edit2, Plus, Timer } from "lucide-react";
+import { Clock, History, Trash2, Edit2, Plus, Timer, ArrowRight } from "lucide-react";
 import { getIssueWorkLogs, deleteWorkLog, type WorkLogData } from "@/services/issue/worklog.api";
 import { WorkLogModal } from "./WorkLogModal";
 import { format } from "date-fns";
@@ -423,6 +423,40 @@ export function IssueDetailModal({
                                 <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 flex items-center text-sm text-white">
                                     {sprintsMap?.[issue.sprintId]?.name || issue.sprintId}
                                 </div>
+                            </div>
+                        )}
+
+                        {issue.continuedFromIssueId && (
+                            <div className="space-y-1.5">
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Continued From</span>
+                                {issuesMap?.[issue.continuedFromIssueId] ? (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2 flex items-center gap-2">
+                                        <History size={12} className="text-[#A5D7E8]" />
+                                        <span className="text-xs text-white/80">{issuesMap[issue.continuedFromIssueId].issueKey}</span>
+                                    </div>
+                                ) : (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2 flex items-center gap-2">
+                                        <History size={12} className="text-white/20" />
+                                        <span className="text-xs text-white/40 italic">Previous part exists</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {issue.continuedIssueId && (
+                            <div className="space-y-1.5">
+                                <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Continued In</span>
+                                {issuesMap?.[issue.continuedIssueId] ? (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2 flex items-center gap-2">
+                                        <ArrowRight size={12} className="text-[#A5D7E8]" />
+                                        <span className="text-xs text-white/80">{issuesMap[issue.continuedIssueId].issueKey}</span>
+                                    </div>
+                                ) : (
+                                    <div className="w-full bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md px-3 py-2 flex items-center gap-2">
+                                        <ArrowRight size={12} className="text-white/20" />
+                                        <span className="text-xs text-white/40 italic">Next part exists</span>
+                                    </div>
+                                )}
                             </div>
                         )}
 

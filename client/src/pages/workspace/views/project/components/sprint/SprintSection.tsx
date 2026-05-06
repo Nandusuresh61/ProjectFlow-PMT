@@ -1,6 +1,6 @@
 import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical, Paperclip } from 'lucide-react';
+import { ChevronDown, ChevronRight, MoreHorizontal, Calendar, Target, MoveVertical, Paperclip, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { IssueTypeIcon } from '../issue/IssueTypeIcon';
@@ -305,6 +305,18 @@ const SprintIssueRow = ({
                         <div className="flex items-center gap-1 text-[10px] text-white/20 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-white/[0.03]">
                             <Paperclip size={10} className="text-[#A5D7E8]/60" />
                             <span>{(issue.attachments || []).length}</span>
+                        </div>
+                    )}
+                    {issue.continuedFromIssueId && (
+                        <div className="flex items-center gap-1 text-[9px] text-[#A5D7E8]/60 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-[#A5D7E8]/5 border border-[#A5D7E8]/10" title="Continued from previous sprint">
+                            <History size={8} />
+                            <span>Cont.</span>
+                        </div>
+                    )}
+                    {issue.continuedIssueId && (
+                        <div className="flex items-center gap-1 text-[9px] text-amber-400/60 font-bold ml-1.5 px-1.5 py-0.5 rounded bg-amber-400/5 border border-amber-400/10" title="Continued in next sprint">
+                            <ChevronRight size={8} />
+                            <span>Split</span>
                         </div>
                     )}
                     {isOrphan && <span className="text-[9px] text-[#A5D7E8]/40 border border-[#A5D7E8]/10 px-1 rounded uppercase tracking-tighter ml-1">Subtask</span>}

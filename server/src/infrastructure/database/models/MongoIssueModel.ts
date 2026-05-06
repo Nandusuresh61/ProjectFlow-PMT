@@ -24,6 +24,8 @@ export interface IssueDocument extends Document {
   }[];
   estimatedHours: number | null;
   remainingHours: number | null;
+  continuedFromIssueId: string | null;
+  continuedIssueId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +57,8 @@ const IssueSchema = new Schema<IssueDocument>(
     attachments: [AttachmentSchema],
     estimatedHours: { type: Number, default: null },
     remainingHours: { type: Number, default: null },
+    continuedFromIssueId: { type: String, default: null },
+    continuedIssueId: { type: String, default: null },
   },
   { timestamps: true }
 );
