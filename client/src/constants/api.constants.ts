@@ -50,7 +50,6 @@ export const API_ROUTES = {
     ASSIGN_ISSUE: "/sprint/assign-issue",
     START: "/sprint/start",
     GET_ACTIVE: (projectId: string) => `/sprint/project/${projectId}/active`,
-    GET_PERFORMANCE: (projectId: string) => `/sprint/project/${projectId}/performance`,
     COMPLETE: (sprintId: string) => `/sprint/${sprintId}/complete`,
     BURNDOWN: (sprintId: string) => `/sprint/${sprintId}/burndown`,
     ALLOCATION: (sprintId: string) => `/sprint/${sprintId}/allocation`,

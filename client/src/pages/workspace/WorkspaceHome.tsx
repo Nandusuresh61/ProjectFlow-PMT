@@ -24,7 +24,6 @@ import { ProjectOverviewView } from './views/project/ProjectOverviewView';
 import { ProjectBacklogView } from './views/project/ProjectBacklogView';
 import { ProjectBoardView } from './views/project/ProjectBoardView';
 import { ProjectSprintView } from './views/project/ProjectSprintView';
-import { ProjectSprintPerformanceView } from './views/project/ProjectSprintPerformanceView';
 import { ProjectTeamView } from './views/project/ProjectTeamView';
 import type { SidebarMode, Project } from './types/sidebar.types';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
@@ -32,7 +31,7 @@ import { AppMessages } from '@/shared/messages/AppMessages';
 import { Briefcase } from 'lucide-react';
 
 const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
-const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'sprint-performance', 'project-team'] as const;
+const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'project-team'] as const;
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
 
@@ -49,7 +48,7 @@ interface ContentRouterProps {
 const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditProject, canManage, role }: ContentRouterProps) => {
     // Role-based view restriction logic
     const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
-    const restrictedTabs = ['backlogs', 'sprint', 'sprint-performance'];
+    const restrictedTabs = ['backlogs', 'sprint'];
 
     if (mode === 'project' && selectedProject) {
         if (isMemberOrViewer && restrictedTabs.includes(activeTab)) {
@@ -73,7 +72,6 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
             case 'backlogs': return <ProjectBacklogView project={selectedProject} canManage={canManage} />;
             case 'board': return <ProjectBoardView project={selectedProject} canManage={canManage} />;
             case 'sprint': return <ProjectSprintView project={selectedProject} />;
-            case 'sprint-performance': return <ProjectSprintPerformanceView project={selectedProject} />;
             case 'project-team': return <ProjectTeamView project={selectedProject} />;
             default: return <ProjectOverviewView project={selectedProject} onEditProject={openEditProject} canEditProject={canManage} />;
         }

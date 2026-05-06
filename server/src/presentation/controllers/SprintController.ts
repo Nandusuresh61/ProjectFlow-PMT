@@ -5,7 +5,6 @@ import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/
 import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
 import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IGetActiveSprintUseCase";
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
-import { IGetProjectPerformanceUseCase } from "@/application/interfaces/use-cases/Sprint/IGetProjectPerformanceUseCase";
 import { IUpdateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IUpdateSprintUseCase";
 import { IGetSprintBurndownUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintBurndownUseCase";
 import { IGetSprintAllocationUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintAllocationUseCase";
@@ -33,7 +32,6 @@ export class SprintController {
     private readonly _startSprintUseCase: IStartSprintUseCase,
     private readonly _getActiveSprintUseCase: IGetActiveSprintUseCase,
     private readonly _completeSprintUseCase: ICompleteSprintUseCase,
-    private readonly _getProjectPerformanceUseCase: IGetProjectPerformanceUseCase,
     private readonly _updateSprintUseCase: IUpdateSprintUseCase,
     private readonly _getSprintBurndownUseCase: IGetSprintBurndownUseCase,
     private readonly _getSprintAllocationUseCase: IGetSprintAllocationUseCase,
@@ -192,30 +190,6 @@ export class SprintController {
       );
   });
 
-  getProjectPerformance = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { projectId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      throw new AppError(
-        ErrorCode.AUTH,
-        AppMessages.UNAUTHORIZED_ACCESS,
-        HttpStatusCode.UNAUTHORIZED,
-      );
-    }
-
-    const result = await this._getProjectPerformanceUseCase.execute(
-      userId,
-      projectId,
-    );
-
-    res
-      .status(HttpStatusCode.OK)
-      .json(
-        ResponseHandler.success(AppMessages.PERFORMANCE_RETRIEVED_SUCCESS, result),
-      );
-  });
-  
   updateSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { sprintId } = req.params;
     const userId = req.user?.userId;

@@ -4,7 +4,6 @@ import { AssignIssueToSprintUseCase } from "@/application/use-cases/Sprint/Assig
 import { StartSprintUseCase } from "@/application/use-cases/Sprint/StartSprintUseCase";
 import { GetActiveSprintUseCase } from "@/application/use-cases/Sprint/GetActiveSprintUseCase";
 import { CompleteSprintUseCase } from "@/application/use-cases/Sprint/CompleteSprintUseCase";
-import { GetProjectPerformanceUseCase } from "@/application/use-cases/Sprint/GetProjectPerformanceUseCase";
 import { UpdateSprintUseCase } from "@/application/use-cases/Sprint/UpdateSprintUseCase";
 import { GetSprintBurndownUseCase } from "@/application/use-cases/Sprint/GetSprintBurndownUseCase";
 import { GetSprintAllocationUseCase } from "@/application/use-cases/Sprint/GetSprintAllocationUseCase";
@@ -104,10 +103,6 @@ const completeSprintUseCase = new CompleteSprintUseCase(
   sprintAllocationCalculatorService
 );
 
-const getProjectPerformanceUseCase = new GetProjectPerformanceUseCase(
-  sprintAnalyticsRepository
-);
-
 const updateSprintUseCase = new UpdateSprintUseCase(
   sprintRepository,
   membershipRepository
@@ -132,7 +127,6 @@ export const sprintController = new SprintController(
   startSprintUseCase,
   getActiveSprintUseCase,
   completeSprintUseCase,
-  getProjectPerformanceUseCase,
   updateSprintUseCase,
   getSprintBurndownUseCase,
   getSprintAllocationUseCase

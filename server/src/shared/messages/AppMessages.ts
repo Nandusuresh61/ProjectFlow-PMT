@@ -147,7 +147,6 @@ export const AppMessages = {
   SPRINT_STARTED_SUCCESS: "Sprint started successfully",
   ACTIVE_SPRINT_RETRIEVED_SUCCESS: "Active sprint retrieved successfully",
   SPRINT_COMPLETED_SUCCESS: "Sprint completed successfully",
-  PERFORMANCE_RETRIEVED_SUCCESS: "Performance metrics retrieved successfully",
   SPRINT_ANALYTICS_RETRIEVED_SUCCESS: "Sprint analytics retrieved successfully",
   SPRINT_NOT_ACTIVE: "Only active sprints can be completed",
   SPRINT_UPDATED_SUCCESS: "Sprint updated successfully",

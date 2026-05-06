@@ -266,13 +266,12 @@ const PROJECT_NAV_ITEMS = [
     { id: 'backlogs', icon: ClipboardList, label: 'Backlogs' },
     { id: 'board', icon: Kanban, label: 'Board' },
     { id: 'sprint', icon: Zap, label: 'Sprint' },
-    { id: 'sprint-performance', icon: BarChart2, label: 'Performance' },
     { id: 'project-team', icon: Users, label: 'Team' },
 ] as const;
 
 const ProjectNav = ({ activeTab, isCollapsed, onTabChange, project, onBack, role }: ProjectNavProps) => {
     const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
-    const restrictedTabs = ['backlogs', 'sprint', 'sprint-performance'];
+    const restrictedTabs = ['backlogs', 'sprint'];
     
     const visibleNavItems = PROJECT_NAV_ITEMS.filter(item => {
         if (isMemberOrViewer && restrictedTabs.includes(item.id)) return false;
