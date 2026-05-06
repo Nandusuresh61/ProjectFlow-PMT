@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-import { MessageType } from "@/domain/entities/Chat/Message";
+import { MessageType } from "@/domain/entities/Message";
 
 export interface MessageDoc extends Document {
   messageId: string;

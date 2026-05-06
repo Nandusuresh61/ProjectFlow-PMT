@@ -1,4 +1,4 @@
-import { Message, MessageType } from "@/domain/entities/Chat/Message";
+import { Message, MessageType } from "@/domain/entities/Message";
 
 export interface SendMessageDto {
   roomId: string;

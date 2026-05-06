@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { AuthenticatedSocket } from "@/infrastructure/services/SocketServer";
 import { sendMessageUseCase, checkChatAccessUseCase } from "@/infrastructure/DI/ChatContainer";
-import { MessageType } from "@/domain/entities/Chat/Message";
+import { MessageType } from "@/domain/entities/Message";
 import { logger } from "@/infrastructure/utils/Logger";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
