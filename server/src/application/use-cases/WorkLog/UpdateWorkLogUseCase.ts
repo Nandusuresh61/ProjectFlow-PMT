@@ -16,7 +16,7 @@ export class UpdateWorkLogUseCase implements IUpdateWorkLogUseCase {
   async execute(userId: string, workLogId: string, data: UpdateWorkLogDto): Promise<WorkLog> {
     const workLog = await this._workLogRepository.findById(workLogId);
     if (!workLog) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Worklog not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.WORKLOG_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     if (workLog.userId !== userId) {
@@ -25,7 +25,7 @@ export class UpdateWorkLogUseCase implements IUpdateWorkLogUseCase {
 
     const updatedWorkLog = await this._workLogRepository.update(workLogId, data);
     if (!updatedWorkLog) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to update worklog", HttpStatusCode.INTERNAL_SERVER_ERROR);
+      throw new AppError(ErrorCode.INTERNAL_ERROR, AppMessages.INTERNAL_SERVER_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
     // Recalculate remaining hours

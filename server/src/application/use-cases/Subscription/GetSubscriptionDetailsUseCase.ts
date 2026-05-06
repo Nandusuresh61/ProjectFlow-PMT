@@ -5,6 +5,7 @@ import { IMembershipRepository } from "@/application/interfaces/repositories/IMe
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class GetSubscriptionDetailsUseCase {
   constructor(
@@ -17,7 +18,7 @@ export class GetSubscriptionDetailsUseCase {
   async execute(workspaceId: string) {
     const subscription = await this._subscriptionRepo.findByWorkspaceId(workspaceId);
     if (!subscription) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Subscription not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.SUBSCRIPTION_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     const plan = await this._planRepo.findById(subscription.planId);

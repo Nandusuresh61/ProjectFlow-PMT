@@ -22,7 +22,7 @@ export class AddWorkLogUseCase implements IAddWorkLogUseCase {
     }
 
     if (issue.type === "STORY") {
-      throw new AppError(ErrorCode.VALIDATION, "Time tracking is not available for Story", HttpStatusCode.BAD_REQUEST);
+      throw new AppError(ErrorCode.VALIDATION, AppMessages.TIME_TRACKING_NOT_AVAILABLE, HttpStatusCode.BAD_REQUEST);
     }
 
     const workLogId = this._uidService.createId();

@@ -9,6 +9,8 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
 
+import { AppMessages } from "@/shared/messages/AppMessages";
+
 export interface VerifyPaymentDto {
   workspaceId: string;
   razorpayOrderId: string;
@@ -34,22 +36,22 @@ export class VerifyPaymentUseCase {
     );
 
     if (!isValid) {
-      throw new AppError(ErrorCode.AUTH, "Invalid payment signature", HttpStatusCode.BAD_REQUEST);
+      throw new AppError(ErrorCode.AUTH, AppMessages.INVALID_PAYMENT_SIGNATURE, HttpStatusCode.BAD_REQUEST);
     }
 
     const currentSubscription = await this._subscriptionRepo.findByWorkspaceId(dto.workspaceId);
     if (!currentSubscription) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Subscription not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.SUBSCRIPTION_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     const plan = await this._planRepo.findById(dto.planId);
     if (!plan) {
-      throw new AppError(ErrorCode.PLAN, "Plan not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.PLAN, AppMessages.PLAN_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     const workspace = await this._workspaceRepo.findById(dto.workspaceId);
     if (!workspace) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Workspace not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.WORKSPACE_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     // Mark current active subscription as expired if it exists and is different

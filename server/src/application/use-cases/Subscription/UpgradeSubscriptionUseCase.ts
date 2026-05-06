@@ -30,7 +30,7 @@ export class UpgradeSubscriptionUseCase {
     }
 
     if (plan.type === PlanType.FREE) {
-      throw new AppError(ErrorCode.PLAN, "Cannot downgrade to Free plan", HttpStatusCode.BAD_REQUEST);
+      throw new AppError(ErrorCode.PLAN, AppMessages.CANNOT_DOWNGRADE_TO_FREE, HttpStatusCode.BAD_REQUEST);
     }
 
     // Check usage limits before allowing downgrade/upgrade
@@ -55,7 +55,7 @@ export class UpgradeSubscriptionUseCase {
 
     const currentSubscription = await this._subscriptionRepo.findByWorkspaceId(dto.workspaceId);
     if (!currentSubscription) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Subscription not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.SUBSCRIPTION_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     // Create Razorpay Order

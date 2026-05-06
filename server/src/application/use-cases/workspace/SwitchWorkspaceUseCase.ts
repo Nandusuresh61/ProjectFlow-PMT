@@ -26,7 +26,7 @@ export class SwitchWorkspaceUseCase implements ISwitchWorkspaceUseCase {
     if (!membership) {
         throw new AppError(
             ErrorCode.AUTH,
-            "User is not a member of this workspace",
+            AppMessages.USER_NOT_WORKSPACE_MEMBER,
             HttpStatusCode.FORBIDDEN
         );
     }
@@ -36,7 +36,7 @@ export class SwitchWorkspaceUseCase implements ISwitchWorkspaceUseCase {
 
     return {
         success: true,
-        message: "Switched workspace successfully"
+        message: AppMessages.WORKSPACE_SWITCH_SUCCESS
     };
   }
 }

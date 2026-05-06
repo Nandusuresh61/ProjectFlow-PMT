@@ -15,7 +15,7 @@ export class DeleteWorkLogUseCase implements IDeleteWorkLogUseCase {
   async execute(userId: string, workLogId: string): Promise<void> {
     const workLog = await this._workLogRepository.findById(workLogId);
     if (!workLog) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Worklog not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.WORKLOG_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     if (workLog.userId !== userId) {
@@ -24,7 +24,7 @@ export class DeleteWorkLogUseCase implements IDeleteWorkLogUseCase {
 
     const deleted = await this._workLogRepository.delete(workLogId);
     if (!deleted) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, "Failed to delete worklog", HttpStatusCode.INTERNAL_SERVER_ERROR);
+      throw new AppError(ErrorCode.INTERNAL_ERROR, AppMessages.INTERNAL_SERVER_ERROR, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
     // Recalculate remaining hours
