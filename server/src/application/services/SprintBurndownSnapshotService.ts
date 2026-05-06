@@ -40,12 +40,13 @@ export class SprintBurndownSnapshotService implements ISprintBurndownSnapshotSer
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const workspaceId = issues.length > 0 ? issues[0].workspaceId : "";
 
     const metric = new SprintDailyMetric(
       this._uidGenerator.createId(),
       sprintId,
       sprint.projectId,
-      "", // workspaceId will be set from sprint's project if needed, but let's just use empty for now or fetch project
+      workspaceId,
       today,
       totalEstimatedHours,
       totalLogged,
@@ -54,12 +55,6 @@ export class SprintBurndownSnapshotService implements ISprintBurndownSnapshotSer
       incompleteTasks,
       completedStoryPoints
     );
-
-    // Fetch workspaceId if missing (optional but better)
-    // Actually sprint entity doesn't have workspaceId, but we can get it from first issue or project
-    if (issues.length > 0) {
-      (metric as any).workspaceId = issues[0].workspaceId;
-    }
 
     await this._metricRepo.upsertDailyMetric(metric);
   }

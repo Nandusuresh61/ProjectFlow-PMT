@@ -1,4 +1,4 @@
-import { Users, User, CheckCircle2, Circle, TrendingUp, BarChart3, Info } from 'lucide-react';
+import { Users, CheckCircle2, Circle, BarChart3, Info } from 'lucide-react';
 import { 
     BarChart, 
     Bar, 
@@ -7,8 +7,7 @@ import {
     CartesianGrid, 
     Tooltip, 
     ResponsiveContainer, 
-    Legend,
-    Cell
+    Legend
 } from 'recharts';
 import { type SprintAllocationData } from '@/services/sprint/sprint.api';
 

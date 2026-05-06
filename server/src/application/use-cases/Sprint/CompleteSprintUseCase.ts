@@ -253,7 +253,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
       const newStatus = moveToSprintId ? "TODO" : "BACKLOG";
       await this._issueRepo.update(issue.issueId, {
         sprintId: moveToSprintId || null,
-        status: newStatus as any,
+        status: newStatus,
       });
     }
 

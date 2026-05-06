@@ -70,11 +70,14 @@ export function IssueDetailModal({
         } catch (error) {
             console.error("Failed to fetch worklogs", error);
         }
-    }, [issue?.issueId]);
+    }, [issue]);
 
     useEffect(() => {
         if (open && issue?.issueId) {
-            fetchWorkLogs();
+            const timeoutId = setTimeout(() => {
+                fetchWorkLogs();
+            }, 0);
+            return () => clearTimeout(timeoutId);
         }
     }, [open, issue?.issueId, fetchWorkLogs]);
 
@@ -380,9 +383,9 @@ export function IssueDetailModal({
                         {issue.type === "STORY" && (
                             <div className="space-y-1.5">
                                 <span className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Child Tasks</span>
-                                {(issue as any).taskIds && (issue as any).taskIds.length > 0 ? (
+                                {issue.taskIds && issue.taskIds.length > 0 ? (
                                     <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
-                                        {(issue as any).taskIds.map((taskId: string) => {
+                                        {issue.taskIds.map((taskId: string) => {
                                             const childTask = issuesMap?.[taskId];
                                             if (!childTask) return null;
                                             return (

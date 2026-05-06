@@ -1,7 +1,6 @@
 import { ISprintMemberAllocationRepository } from "@/application/interfaces/repositories/ISprintMemberAllocationRepository";
 import { ISprintRepository } from "@/application/interfaces/repositories/ISprintRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
-import { SprintMemberAllocation } from "@/domain/entities/SprintMemberAllocation";
 
 export interface SprintMemberAllocationResponse {
   sprintId: string;

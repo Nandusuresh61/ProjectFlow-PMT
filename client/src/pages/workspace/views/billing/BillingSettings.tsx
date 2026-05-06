@@ -7,11 +7,12 @@ import { getPlans } from '@/services/plan/plan.api';
 import { AuthUserState } from '@/store/auth.store';
 import { useWorkspaceStore } from '@/store/workspace.store';
 import { getErrorMessage } from '@/shared/utils/error';
+import type { SubscriptionResponse, SubscriptionHistoryItem } from '@/services/subscription/subscription.api';
 import type { Plan } from '@/types/plan.types';
 
 export const BillingSettings = () => {
-    const [subscription, setSubscription] = useState<any>(null);
-    const [history, setHistory] = useState<any[]>([]);
+    const [subscription, setSubscription] = useState<SubscriptionResponse | null>(null);
+    const [history, setHistory] = useState<SubscriptionHistoryItem[]>([]);
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
     const [upgrading, setUpgrading] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export const BillingSettings = () => {
 
     const handleUpgrade = async (planId: string) => {
         if (upgrading) return;
-        
+
         const targetPlan = plans.find(p => p.planId === planId);
         if (!targetPlan) return;
 
@@ -103,7 +104,7 @@ export const BillingSettings = () => {
                 name: "ProjectFlow",
                 description: `Upgrade to ${targetPlan.type} Plan`,
                 order_id: orderId,
-                handler: async (response: any) => {
+                handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
                     try {
                         await verifyPayment(workspaceId!, {
                             razorpayOrderId: response.razorpay_order_id,
@@ -127,7 +128,7 @@ export const BillingSettings = () => {
                 },
             };
 
-            const paymentObject = new (window as any).Razorpay(options);
+            const paymentObject = new (window as unknown as { Razorpay: new (options: unknown) => { open: () => void } }).Razorpay(options);
             paymentObject.open();
         } catch (error) {
             toast.error(getErrorMessage(error) || "Failed to initiate upgrade");
@@ -153,7 +154,7 @@ export const BillingSettings = () => {
                     <CreditCard className="text-[#A5D7E8]" size={22} />
                     Current Subscription
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white/[0.03] border border-white/5 rounded-3xl p-6 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -166,13 +167,12 @@ export const BillingSettings = () => {
                                 <span className="w-1.5 h-1.5 bg-[#A5D7E8] rounded-full animate-pulse"></span>
                                 {subDetails?.status?.toUpperCase()}
                             </div>
-                            
+
                             {daysRemaining !== null && (
-                                <div className={`text-xs font-bold px-3 py-1 rounded-full ${
-                                    daysRemaining < 7 
-                                        ? 'bg-red-500/10 text-red-400' 
+                                <div className={`text-xs font-bold px-3 py-1 rounded-full ${daysRemaining < 7
+                                        ? 'bg-red-500/10 text-red-400'
                                         : 'bg-white/5 text-white/40'
-                                }`}>
+                                    }`}>
                                     {daysRemaining} days left
                                 </div>
                             )}
@@ -227,9 +227,8 @@ export const BillingSettings = () => {
                             <motion.div
                                 key={plan.planId}
                                 whileHover={{ y: -5 }}
-                                className={`bg-white/[0.03] border rounded-[2.5rem] p-8 flex flex-col transition-all ${
-                                    isCurrent ? 'border-[#A5D7E8]/30 bg-[#A5D7E8]/5' : 'border-white/5 hover:border-white/20'
-                                }`}
+                                className={`bg-white/[0.03] border rounded-[2.5rem] p-8 flex flex-col transition-all ${isCurrent ? 'border-[#A5D7E8]/30 bg-[#A5D7E8]/5' : 'border-white/5 hover:border-white/20'
+                                    }`}
                             >
                                 <div className="mb-6">
                                     <h4 className="text-xl font-bold text-white mb-2">{plan.type}</h4>
@@ -254,11 +253,10 @@ export const BillingSettings = () => {
                                 <button
                                     onClick={() => handleUpgrade(plan.planId)}
                                     disabled={isCurrent || (upgrading !== null) || isRestricted}
-                                    className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                                        isCurrent || isRestricted
+                                    className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${isCurrent || isRestricted
                                             ? 'bg-white/5 text-white/40 cursor-default'
                                             : 'bg-[#A5D7E8] text-[#0B2447] hover:bg-white hover:shadow-[0_0_20px_rgba(165,215,232,0.4)]'
-                                    }`}
+                                        }`}
                                 >
                                     {upgrading === plan.planId ? (
                                         <div className="w-4 h-4 border-2 border-[#0B2447] border-t-transparent rounded-full animate-spin"></div>
@@ -321,11 +319,10 @@ export const BillingSettings = () => {
                                                 {item.amount > 0 ? `₹${item.amount}` : 'FREE'}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <div className={`text-[10px] font-black px-2 py-0.5 rounded-md w-fit ${
-                                                    item.status === 'active' 
-                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                                                <div className={`text-[10px] font-black px-2 py-0.5 rounded-md w-fit ${item.status === 'active'
+                                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                                                         : 'bg-white/5 text-white/40 border border-white/10'
-                                                }`}>
+                                                    }`}>
                                                     {item.status?.toUpperCase()}
                                                 </div>
                                             </td>

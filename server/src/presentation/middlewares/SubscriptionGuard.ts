@@ -3,7 +3,7 @@ import { subscriptionRepo } from "@/infrastructure/DI/SubscriptionContainer";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
-import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
+import { AuthRequest } from "./AuthMiddleware";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export const subscriptionGuard = async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +20,7 @@ export const subscriptionGuard = async (req: Request, res: Response, next: NextF
   }
 
   // Skip guard for super admins
-  if ((req as any).user?.isSuperAdmin) {
+  if ((req as AuthRequest).user?.isSuperAdmin) {
     return next();
   }
 

@@ -1,6 +1,6 @@
 import type { IssueData, SprintData } from "@/services/sprint/sprint.api";
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Search, Pencil, ChevronLeft, ChevronRight, PackagePlus, Trophy, Paperclip, ChevronDown } from 'lucide-react';
+import { Plus, Search, ChevronLeft, ChevronRight, PackagePlus, Trophy, Paperclip, ChevronDown } from 'lucide-react';
 import type { Project } from '../../types/sidebar.types';
 import { IssueDetailModal } from './components/issue/IssueDetailModal';
 import { SprintSection } from './components/sprint/SprintSection';
@@ -34,21 +34,6 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     const role = useWorkspaceStore(state => state.currentWorkspaceRole);
     const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
 
-    if (isMemberOrViewer) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
-                    <Briefcase className="text-white/20" size={24} />
-                </div>
-                <div>
-                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
-                    <p className="text-white/40 text-sm max-w-xs mt-1">
-                        You don't have the required permissions to view this section. Please contact your workspace administrator.
-                    </p>
-                </div>
-            </div>
-        );
-    }
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
@@ -176,10 +161,11 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     const startIndex = (currentPage - 1) * itemsPerPage;
 
     useEffect(() => {
+        if (isMemberOrViewer) return;
         fetchIssues();
         fetchSprints();
         fetchStories();
-    }, [fetchIssues, fetchSprints, fetchStories]);
+    }, [fetchIssues, fetchSprints, fetchStories, isMemberOrViewer]);
 
     useEffect(() => {
         if (selectedIssue) {
@@ -191,7 +177,7 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
     }, [issues]);
 
     useEffect(() => {
-        if (project.workspaceId) {
+        if (project.workspaceId && !isMemberOrViewer) {
             getMembers(project.workspaceId).then(res => {
                 if (res?.data) {
                     const map: Record<string, { userId: string, fullName: string, profileImage: string, role: string }> = {};
@@ -202,7 +188,23 @@ export const ProjectBacklogView = ({ project, canManage }: ProjectBacklogViewPro
                 }
             }).catch(() => { });
         }
-    }, [project.workspaceId]);
+    }, [project.workspaceId, isMemberOrViewer]);
+
+    if (isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view this section. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     const handleIssueCreated = () => {
         setIsModalOpen(false);

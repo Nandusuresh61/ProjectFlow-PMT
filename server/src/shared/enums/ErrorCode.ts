@@ -9,7 +9,6 @@ export enum ErrorCode {
     OTP_RESEND_COOLDOWN = "OTP_RESEND_COOLDOWN",
     RESOURCE_NOT_FOUND = "Resource Not Found",
     INVALID_OPERATION = "Invalid Operation",
-    VALIDATION = "Validation Error",
     VALIDATION_ERROR = "Validation Error",
     INTERNAL_ERROR = "Internal Error",
 }

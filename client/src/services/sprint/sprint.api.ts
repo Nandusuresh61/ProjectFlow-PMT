@@ -97,6 +97,7 @@ export interface IssueData {
   remainingHours?: number | null;
   continuedFromIssueId?: string | null;
   continuedIssueId?: string | null;
+  taskIds?: string[] | null;
 }
 
 export interface ActiveSprintData {

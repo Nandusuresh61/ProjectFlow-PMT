@@ -62,21 +62,6 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
     const canManage = role === WorkspaceRoleEnum.WORKSPACE_OWNER || role === WorkspaceRoleEnum.WORKSPACE_ADMIN;
 
-    if (isMemberOrViewer) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
-                    <Briefcase className="text-white/20" size={24} />
-                </div>
-                <div>
-                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
-                    <p className="text-white/40 text-sm max-w-xs mt-1">
-                        You don't have the required permissions to view this section. Please contact your workspace administrator.
-                    </p>
-                </div>
-            </div>
-        );
-    }
 
     const [data, setData] = useState<ActiveSprintData | null>(null);
     const [analytics, setAnalytics] = useState<SprintAnalyticsData | null>(null);
@@ -91,6 +76,7 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
+        if (isMemberOrViewer) return;
         try {
             setLoading(true);
             const [sprintRes, membersRes, allSprintsRes, summaryRes] = await Promise.all([
@@ -132,11 +118,27 @@ export const ProjectSprintView = ({ project }: ProjectSprintViewProps) => {
         } finally {
             setLoading(false);
         }
-    }, [project.id]);
+    }, [project.id, isMemberOrViewer]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    if (isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view this section. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     const { sprint, issues } = data || { sprint: null, issues: [] };
     const sprintLevelIssues = issues.filter(i => i.type === 'STORY' || i.type === 'BUG');

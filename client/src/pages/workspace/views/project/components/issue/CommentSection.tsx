@@ -45,7 +45,7 @@ export function CommentSection({ issueId, membersMap }: CommentSectionProps) {
         setNewComment("");
         toast.success("Comment added");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to add comment");
     } finally {
       setIsSubmitting(false);

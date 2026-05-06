@@ -11,7 +11,7 @@ export class MongoMessageRepository
     super(MessageModel);
   }
 
-  protected mapToEntity(doc: any): Message {
+  protected mapToEntity(doc: MessageDoc): Message {
     return new Message(
       doc.messageId,
       doc.roomId,

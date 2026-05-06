@@ -9,6 +9,7 @@ export interface MessageDoc extends Document {
   type: MessageType;
   createdAt: Date;
   updatedAt: Date;
+  senderName?: string;
 }
 
 const MessageSchema = new Schema<MessageDoc>({

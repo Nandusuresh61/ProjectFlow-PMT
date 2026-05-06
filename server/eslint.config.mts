@@ -5,8 +5,12 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
   {
-    files: ["**/*.{ts,tsx}"],
     ignores: ["dist", "node_modules"],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx}"],
 
     languageOptions: {
       parser: tseslint.parser,
@@ -27,15 +31,12 @@ export default defineConfig([
       "no-debugger": "error",
 
       // TypeScript rules
-      "@typescript-eslint/no-unused-vars": ["warn"],
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/explicit-function-return-type": "off",
 
       //  Clean code
       "prefer-const": "warn",
     },
   },
-
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
 ]);

@@ -1,6 +1,7 @@
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { Issue } from "@/domain/entities/Issue";
 import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
+import { QueryFilter } from "mongoose";
 
 
 export class MongoIssueRepository implements IIssueRepository {
@@ -34,7 +35,7 @@ export class MongoIssueRepository implements IIssueRepository {
   }
 
   async findByProjectId(projectId: string, page: number, limit: number, search?: string, type?: string, parentId?: string | null): Promise<{ issues: Issue[], total: number }> {
-    const query: any = { projectId };
+    const query: QueryFilter<IssueDocument> = { projectId };
 
     if (search) {
       query.$or = [

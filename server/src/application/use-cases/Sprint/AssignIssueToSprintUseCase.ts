@@ -115,7 +115,6 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     }
 
     const newStatus = sprintId ? "TODO" : "BACKLOG";
-    const oldStatus = issue.status;
 
     const updatedIssue = await this._issueRepo.update(issueId, {
       sprintId,
