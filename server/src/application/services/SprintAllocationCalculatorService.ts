@@ -91,20 +91,11 @@ export class SprintAllocationCalculatorService implements ISprintAllocationCalcu
       await this._allocationRepo.upsert(allocation);
     }
 
-    // Optional: Clean up allocations for users who no longer have tasks in this sprint?
-    // For now, upsert handles existing records. If a user was removed from all tasks, 
-    // their old record might persist. Let's handle that.
+    
     const currentAllocations = await this._allocationRepo.findBySprintId(sprintId);
     for (const allocation of currentAllocations) {
       if (!allocationMap.has(allocation.userId)) {
-        // User no longer has tasks, reset their allocation or delete?
-        // Let's reset to 0 to keep history of their involvement if they once had tasks, 
-        // but if they have 0 tasks, maybe it's better to keep it as 0s.
-        // Actually, if they have no tasks, they shouldn't be in the list.
-        // But some systems keep them. The prompt says "one allocation record per user per sprint".
-        // Let's just set them to 0 or delete. Deleting is cleaner if they are not part of the sprint workload.
-        // Wait, if I delete, then the GET endpoint won't show them.
-        // Let's just keep it simple and only update those who have tasks.
+      
       }
     }
   }
