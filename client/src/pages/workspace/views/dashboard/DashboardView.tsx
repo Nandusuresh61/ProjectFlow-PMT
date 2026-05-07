@@ -12,7 +12,6 @@ import { getDashboardData } from '@/services/workspace/workspace.api';
 import type { DashboardData } from '@/services/workspace/workspace.api';
 import { useWorkspaceStore } from '@/store/workspace.store';
 import { AuthUserState } from '@/store/auth.store';
-import { toast } from 'sonner';
 
 interface StatItem {
     label: string;
@@ -50,12 +49,9 @@ export const DashboardView = ({ openInvite, canManage }: DashboardViewProps) => 
                 const response = await getDashboardData(currentWorkspace.workspaceId);
                 if (response.success && response.data) {
                     setData(response.data);
-                } else {
-                    toast.error(response.message || 'Failed to fetch dashboard data');
                 }
             } catch (error) {
                 console.error('Dashboard fetch error:', error);
-                toast.error('An error occurred while fetching dashboard data');
             } finally {
                 setIsLoading(false);
             }
