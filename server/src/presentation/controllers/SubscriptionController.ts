@@ -3,15 +3,15 @@ import { asyncHandler } from "../utils/AsyncHandler";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
-import { UpgradeSubscriptionUseCase } from "@/application/use-cases/Subscription/UpgradeSubscriptionUseCase";
-import { VerifyPaymentUseCase } from "@/application/use-cases/Subscription/VerifyPaymentUseCase";
-import { GetSubscriptionDetailsUseCase } from "@/application/use-cases/Subscription/GetSubscriptionDetailsUseCase";
+import { IUpgradeSubscriptionUseCase } from "@/application/interfaces/use-cases/Subscription/IUpgradeSubscriptionUseCase";
+import { IVerifyPaymentUseCase } from "@/application/interfaces/use-cases/Subscription/IVerifyPaymentUseCase";
+import { IGetSubscriptionDetailsUseCase } from "@/application/interfaces/use-cases/Subscription/IGetSubscriptionDetailsUseCase";
 
 export class SubscriptionController {
   constructor(
-    private readonly _upgradeUseCase: UpgradeSubscriptionUseCase,
-    private readonly _verifyUseCase: VerifyPaymentUseCase,
-    private readonly _getDetailsUseCase: GetSubscriptionDetailsUseCase
+    private readonly _upgradeUseCase: IUpgradeSubscriptionUseCase,
+    private readonly _verifyUseCase: IVerifyPaymentUseCase,
+    private readonly _getDetailsUseCase: IGetSubscriptionDetailsUseCase
   ) {}
 
   getSubscription = asyncHandler(async (req: Request, res: Response) => {
