@@ -20,7 +20,7 @@ export class GetSprintBurndownUseCase implements IGetSprintBurndownUseCase {
     }
 
     if (!sprint.startDate || !sprint.endDate) {
-      throw new AppError(ErrorCode.VALIDATION, "Sprint dates are not set", HttpStatusCode.BAD_REQUEST);
+      throw new AppError(ErrorCode.VALIDATION_ERROR, AppMessages.SPRINT_DATE_NOT_SET, HttpStatusCode.BAD_REQUEST);
     }
 
     const historicalMetrics = await this._metricRepo.findBySprintId(sprintId);
