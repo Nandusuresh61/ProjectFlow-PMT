@@ -1,8 +1,9 @@
 import { Server } from "socket.io";
 import { AuthenticatedSocket } from "@/infrastructure/services/SocketServer";
 import { sendMessageUseCase, checkChatAccessUseCase } from "@/infrastructure/DI/ChatContainer";
-import { MessageType } from "@/domain/entities/Chat/Message";
+import { MessageType } from "@/domain/entities/Message";
 import { logger } from "@/infrastructure/utils/Logger";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export const ChatSocketHandler = (io: Server, socket: AuthenticatedSocket) => {
   socket.on("join_room", async (roomId: string) => {
@@ -11,7 +12,7 @@ export const ChatSocketHandler = (io: Server, socket: AuthenticatedSocket) => {
     const hasAccess = await checkChatAccessUseCase.execute(socket.user.userId, roomId);
     if (!hasAccess) {
       logger.warn(`User ${socket.user.userId} attempted to join unauthorized room ${roomId}`);
-      socket.emit("error", { message: "Unauthorized access to chat room" });
+      socket.emit("error", { message: AppMessages.CHAT_UNAUTHORIZED_ROOM });
       return;
     }
 
@@ -37,7 +38,7 @@ export const ChatSocketHandler = (io: Server, socket: AuthenticatedSocket) => {
       const hasAccess = await checkChatAccessUseCase.execute(socket.user.userId, data.roomId);
       if (!hasAccess) {
         logger.warn(`User ${socket.user.userId} unauthorized for room ${data.roomId}`);
-        socket.emit("error", { message: "Unauthorized to send messages to this room" });
+        socket.emit("error", { message: AppMessages.CHAT_UNAUTHORIZED_SEND });
         return;
       }
 
@@ -63,7 +64,7 @@ export const ChatSocketHandler = (io: Server, socket: AuthenticatedSocket) => {
       });
     } catch (error) {
       logger.error("Error sending message via socket", error);
-      socket.emit("error", { message: "Failed to send message" });
+      socket.emit("error", { message: AppMessages.CHAT_SEND_FAILED });
     }
   });
 

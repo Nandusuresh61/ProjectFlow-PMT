@@ -12,17 +12,14 @@ export interface CreateIssuePayload {
   sprintId?: string | null;
   projectId: string;
   workspaceId?: string;
-  subtasks?: Array<{
-    id: string;
-    title: string;
-    completed: boolean;
-  }>;
+  acceptanceCriteria?: string[];
   parentId?: string | null;
   attachments?: Array<{
     name: string;
     url: string;
     type: "IMAGE" | "PDF" | "LINK";
   }>;
+  estimatedHours?: number | null;
 }
 
 export interface CommentData {
@@ -53,7 +50,7 @@ export const createIssue = async (
 
 export const getProjectIssues = async (
   projectId: string,
-  params?: { page?: number; limit?: number; search?: string }
+  params?: { page?: number; limit?: number; search?: string; type?: string; parentId?: string | null }
 ): Promise<IssueResponse<{ issues: IssueData[], total: number }>> => {
   const { data } = await API.get<IssueResponse<{ issues: IssueData[], total: number }>>(
     API_ROUTES.ISSUE.LIST_BY_PROJECT(projectId),

@@ -66,10 +66,11 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
 
     const issueKey = `${project.projectKey}-${sequence}`;
 
+    const sizeLabel = data.type === "TASK" ? null : data.sizeLabel || null;
     let storyPoints: number | null = null;
 
-    if (data.sizeLabel) {
-      storyPoints = sizeToPointsMap[data.sizeLabel];
+    if (data.type !== "TASK") {
+      storyPoints = data.storyPoints ?? (sizeLabel ? sizeToPointsMap[sizeLabel] : null);
     }
 
     const status = data.sprintId ? "TODO" : "BACKLOG";
@@ -82,19 +83,31 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       data.type,
       status,
       data.priority,
-      data.sizeLabel || null,
+      sizeLabel,
       storyPoints,
       data.assigneeId || null,
       data.sprintId || null,
       data.projectId,
       data.workspaceId,
       data.parentId || null,
-      data.subtasks || [],
+      [], // taskIds
+      data.acceptanceCriteria || [],
       data.attachments || [],
-      new Date(),
-      new Date()
+      data.estimatedHours ?? null,
+      data.estimatedHours ?? null // initially remaining = estimated
     );
 
-    return await this._issueRepo.create(issue);
+    const createdIssue = await this._issueRepo.create(issue);
+
+    // If it's a task/bug created under a story, update the story's taskIds
+    if (data.parentId) {
+      const parentStory = await this._issueRepo.findById(data.parentId);
+      if (parentStory) {
+        parentStory.taskIds.push(createdIssue.issueId);
+        await this._issueRepo.update(parentStory.issueId, { taskIds: parentStory.taskIds });
+      }
+    }
+
+    return createdIssue;
   }
 }

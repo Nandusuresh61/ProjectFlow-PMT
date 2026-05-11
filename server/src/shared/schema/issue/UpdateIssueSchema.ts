@@ -14,15 +14,7 @@ export const UpdateIssueSchema = z.object({
   sizeLabel: z.enum(["XS", "S", "M", "L", "XL"]).optional().nullable(),
   assigneeId: z.string().optional().nullable(),
   sprintId: z.string().optional().nullable(),
-  subtasks: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().min(1),
-        completed: z.boolean(),
-      })
-    )
-    .optional(),
+  acceptanceCriteria: z.array(z.string()).optional(),
   attachments: z
     .array(
       z.object({
@@ -33,4 +25,15 @@ export const UpdateIssueSchema = z.object({
     )
     .optional(),
   parentId: z.string().optional().nullable(),
+  storyPoints: z.number().min(0).max(100).optional().nullable(),
+  estimatedHours: z.number().min(0).max(999).optional().nullable(),
+  remainingHours: z.number().min(0).max(999).optional().nullable(),
+}).transform((data) => {
+  if (data.type !== "TASK") return data;
+
+  return {
+    ...data,
+    sizeLabel: null,
+    storyPoints: null,
+  };
 });

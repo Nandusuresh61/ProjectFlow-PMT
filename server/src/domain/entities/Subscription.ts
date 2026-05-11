@@ -9,6 +9,8 @@ export class Subscription {
     public startDate: Date,
     public endDate: Date,
     public billingCycle: "monthly",
+    public amount: number,
+    public currency: string,
     public razorpayOrderId?: string,
     public razorpayPaymentId?: string,
     public createdAt?: Date,

@@ -50,8 +50,15 @@ export const API_ROUTES = {
     ASSIGN_ISSUE: "/sprint/assign-issue",
     START: "/sprint/start",
     GET_ACTIVE: (projectId: string) => `/sprint/project/${projectId}/active`,
-    GET_PERFORMANCE: (projectId: string) => `/sprint/project/${projectId}/performance`,
     COMPLETE: (sprintId: string) => `/sprint/${sprintId}/complete`,
+    BURNDOWN: (sprintId: string) => `/sprint/${sprintId}/burndown`,
+    ALLOCATION: (sprintId: string) => `/sprint/${sprintId}/allocation`,
+    HISTORY_DETAILS: (sprintId: string) => `/sprint/${sprintId}/history-details`,
+  },
+  ANALYTICS: {
+    PROJECT_VELOCITY: (projectId: string) => `/projects/${projectId}/analytics/velocity`,
+    PROJECT_SPRINTS: (projectId: string) => `/projects/${projectId}/analytics/sprints`,
+    SPRINT: (sprintId: string) => `/sprints/${sprintId}/analytics`,
   },
   ONBOARDING: {
     COMPLETE: "/onboarding/complete",
@@ -67,5 +74,9 @@ export const API_ROUTES = {
     GET_WORKSPACES: "/super-admin/workspaces",
     WORKSPACE_DETAILS: (workspaceId: string) => `/super-admin/workspace/${workspaceId}`,
     TOGGLE_SUSPEND: (workspaceId: string) => `/super-admin/workspace/${workspaceId}/toggle-suspend`,
+  },
+  WORKLOG: {
+    ISSUE: (issueId: string) => `/worklog/issue/${issueId}`,
+    LOG: (workLogId: string) => `/worklog/${workLogId}`,
   },
 } as const;

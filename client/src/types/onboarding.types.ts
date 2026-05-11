@@ -1,5 +1,4 @@
 import type { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
-import type { Plan } from "./plan.types";
 
 export interface CompleteOnboardingPayload {
   workspaceName: string;

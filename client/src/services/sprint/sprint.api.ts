@@ -91,8 +91,13 @@ export interface IssueData {
   parentId?: string | null;
   storyPoints: number | null;
   sizeLabel?: string | null;
-  subtasks?: { id: string; title: string; completed: boolean }[];
+  acceptanceCriteria?: string[];
   attachments?: { name: string; url: string; type: string }[];
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
+  continuedFromIssueId?: string | null;
+  continuedIssueId?: string | null;
+  taskIds?: string[] | null;
 }
 
 export interface ActiveSprintData {
@@ -110,29 +115,76 @@ export const getActiveSprint = async (
   return data;
 };
 
-export interface VelocityBar {
-  sprint: string;
-  planned: number;
-  completed: number;
+export interface SprintAnalyticsData {
+  analyticsId: string | null;
+  sprintId: string;
+  projectId: string;
+  workspaceId: string;
+  sprintName: string;
+  sprintGoal: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  committedIssues: number;
+  completedIssues: number;
+  incompleteIssues: number;
+  committedStoryPoints: number;
+  completedStoryPoints: number;
+  spilloverStoryPoints: number;
+  committedEstimatedHours: number;
+  loggedHours: number;
+  remainingHours: number;
+  completionRate: number;
+  velocity: number;
+  scopeChangeCount: number;
+  createdAt: string | null;
+  isSnapshot: boolean;
 }
 
-export interface MetricData {
-  label: string;
-  value: string;
-  trend: string;
-  up: boolean;
+export interface ProjectVelocityData {
+  projectId: string;
+  averageVelocity: number;
+  sprints: Array<{
+    sprintId: string;
+    sprintName: string;
+    completedAt: string;
+    committedStoryPoints: number;
+    completedStoryPoints: number;
+    velocity: number;
+  }>;
 }
 
-export interface PerformanceData {
-  velocityBars: VelocityBar[];
-  metrics: MetricData[];
+export interface SprintPerformanceSummaryData {
+  projectId: string;
+  averageVelocity: number;
+  totalSprints: number;
+  sprints: SprintAnalyticsData[];
 }
 
-export const getProjectPerformance = async (
+export const getSprintAnalytics = async (
+  sprintId: string
+): Promise<SprintResponse<SprintAnalyticsData>> => {
+  const { data } = await API.get<SprintResponse<SprintAnalyticsData>>(
+    API_ROUTES.ANALYTICS.SPRINT(sprintId)
+  );
+
+  return data;
+};
+
+export const getProjectVelocity = async (
   projectId: string
-): Promise<SprintResponse<PerformanceData>> => {
-  const { data } = await API.get<SprintResponse<PerformanceData>>(
-    API_ROUTES.SPRINT.GET_PERFORMANCE(projectId)
+): Promise<SprintResponse<ProjectVelocityData>> => {
+  const { data } = await API.get<SprintResponse<ProjectVelocityData>>(
+    API_ROUTES.ANALYTICS.PROJECT_VELOCITY(projectId)
+  );
+
+  return data;
+};
+
+export const getSprintPerformanceSummary = async (
+  projectId: string
+): Promise<SprintResponse<SprintPerformanceSummaryData>> => {
+  const { data } = await API.get<SprintResponse<SprintPerformanceSummaryData>>(
+    API_ROUTES.ANALYTICS.PROJECT_SPRINTS(projectId)
   );
 
   return data;
@@ -166,6 +218,127 @@ export const updateSprint = async (
   const { data } = await API.patch<SprintResponse<SprintData>>(
     `${API_ROUTES.SPRINT.BASE}/${sprintId}`,
     payload
+  );
+
+  return data;
+};
+
+export interface BurndownDataPoint {
+  date: string;
+  remainingHours: number;
+}
+
+export interface BurndownResponseData {
+  sprintId: string;
+  startDate: string;
+  endDate: string;
+  idealLine: BurndownDataPoint[];
+  actualLine: BurndownDataPoint[];
+  metrics: {
+    totalEstimatedHours: number;
+    currentRemainingHours: number;
+    loggedHours: number;
+    completedTasks: number;
+    incompleteTasks: number;
+  };
+}
+
+export const getSprintBurndown = async (
+  sprintId: string
+): Promise<SprintResponse<BurndownResponseData>> => {
+  const { data } = await API.get<SprintResponse<BurndownResponseData>>(
+    API_ROUTES.SPRINT.BURNDOWN(sprintId)
+  );
+
+  return data;
+};
+
+export interface SprintAllocationData {
+  sprintId: string;
+  members: {
+    userId: string;
+    fullName: string;
+    profileImage: string | null;
+    assignedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+    completedTasks: number;
+    incompleteTasks: number;
+    capacityStatus: "UNDERLOADED" | "HEALTHY" | "OVERLOADED";
+  }[];
+  totals: {
+    assignedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+  };
+}
+
+export const getSprintAllocation = async (
+  sprintId: string
+): Promise<SprintResponse<SprintAllocationData>> => {
+  const { data } = await API.get<SprintResponse<SprintAllocationData>>(
+    API_ROUTES.SPRINT.ALLOCATION(sprintId)
+  );
+
+  return data;
+};
+
+export interface SprintHistoryIssue {
+  issueId: string;
+  issueKey: string;
+  title: string;
+  type: "STORY" | "TASK" | "BUG";
+  status: string;
+  priority: string;
+  assigneeId: string | null;
+  storyPoints: number | null;
+  estimatedHours: number | null;
+  remainingHours: number | null;
+  parentId: string | null;
+  continuedFromIssueId: string | null;
+  continuedIssueId: string | null;
+  taskIds: string[];
+  sizeLabel: string | null;
+}
+
+export interface SprintHistoryDetailsData {
+  sprint: {
+    sprintId: string;
+    name: string;
+    goal: string | null;
+    status: string;
+    startDate: string | null;
+    endDate: string | null;
+    plannedPoints: number;
+    completedPoints: number;
+  };
+  analytics: {
+    velocity: number;
+    completionRate: number;
+    committedIssues: number;
+    completedIssues: number;
+    incompleteIssues: number;
+    committedStoryPoints: number;
+    completedStoryPoints: number;
+    spilloverStoryPoints: number;
+    committedEstimatedHours: number;
+    loggedHours: number;
+    remainingHours: number;
+    scopeChangeCount: number;
+    startedAt: string | null;
+    completedAt: string | null;
+  } | null;
+  burndown: BurndownResponseData | null;
+  allocation: SprintAllocationData | null;
+  issues: SprintHistoryIssue[];
+  spilloverIssues: SprintHistoryIssue[];
+}
+
+export const getSprintHistoryDetails = async (
+  sprintId: string
+): Promise<SprintResponse<SprintHistoryDetailsData>> => {
+  const { data } = await API.get<SprintResponse<SprintHistoryDetailsData>>(
+    API_ROUTES.SPRINT.HISTORY_DETAILS(sprintId)
   );
 
   return data;

@@ -10,6 +10,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
 
 export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
   constructor(
@@ -17,6 +18,7 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     private readonly _sprintRepo: ISprintRepository,
     private readonly _projectRepo: IProjectRepository,
     private readonly _membershipRepo: IMembershipRepository,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
   ) { }
 
   async execute(userId: string, data: AssignIssueToSprintDto): Promise<Issue> {
@@ -125,6 +127,49 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
         AppMessages.ISSUE_UPDATE_FAILED,
         HttpStatusCode.INTERNAL_SERVER_ERROR,
       );
+    }
+
+    if (updatedIssue.type === 'STORY') {
+      const { issues: childTasks } = await this._issueRepo.findByProjectId(
+        updatedIssue.projectId,
+        1,
+        1000,
+        undefined,
+        undefined,
+        updatedIssue.issueId
+      );
+
+      for (const task of childTasks) {
+        await this._issueRepo.update(task.issueId, {
+          sprintId,
+          status: newStatus,
+        });
+
+        if (oldSprintId && oldSprintId !== sprintId) {
+          const oldSprint = await this._sprintRepo.findById(oldSprintId);
+          if (oldSprint) {
+            const updatedIssueIds = oldSprint.issueIds.filter(id => id !== task.issueId);
+            await this._sprintRepo.update(oldSprintId, { issueIds: updatedIssueIds });
+          }
+        }
+
+        if (sprintId && oldSprintId !== sprintId) {
+          const newSprint = await this._sprintRepo.findById(sprintId);
+          if (newSprint) {
+            if (!newSprint.issueIds.includes(task.issueId)) {
+              const updatedIssueIds = [...newSprint.issueIds, task.issueId];
+              await this._sprintRepo.update(sprintId, { issueIds: updatedIssueIds });
+            }
+          }
+        }
+      }
+    }
+
+    if (sprintId) {
+      await this._allocationCalculatorService.calculateAndSaveAllocation(sprintId);
+    }
+    if (oldSprintId && oldSprintId !== sprintId) {
+      await this._allocationCalculatorService.calculateAndSaveAllocation(oldSprintId);
     }
 
     return updatedIssue;

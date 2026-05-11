@@ -58,13 +58,16 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
     }
 
     let defaultPlanId = planId;
+    let planAmount = 0;
     if (!defaultPlanId) {
         const plans = await this._planRepo.findAll();
         const freePlan = plans.find(p => p.priceMonthly === 0 && p.isActive);
         if (freePlan) {
             defaultPlanId = freePlan.planId!;
+            planAmount = freePlan.priceMonthly;
         } else if (plans.length > 0) {
             defaultPlanId = plans[0].planId!;
+            planAmount = plans[0].priceMonthly;
         } else {
              throw new AppError(
                 ErrorCode.PLAN,
@@ -81,6 +84,7 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
                 HttpStatusCode.BAD_REQUEST
             );
         }
+        planAmount = plan.priceMonthly;
     }
 
     const now = new Date();
@@ -109,7 +113,9 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
         SubscriptionStatus.ACTIVE,
         now,
         planExpireDate,
-        "monthly"
+        "monthly",
+        planAmount,
+        "INR"
     );
     await this._subscriptionRepo.create(subscription);
 

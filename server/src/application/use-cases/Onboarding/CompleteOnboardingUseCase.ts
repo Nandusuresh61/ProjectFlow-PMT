@@ -96,7 +96,9 @@ export class CompleteOnboardingUseCase implements ICompleteOnboardingUseCase {
       SubscriptionStatus.ACTIVE,
       now,
       planExpireDate,
-      "monthly"
+      "monthly",
+      0,
+      "INR"
     );
     await this._subscriptionRepo.create(subscription);
 

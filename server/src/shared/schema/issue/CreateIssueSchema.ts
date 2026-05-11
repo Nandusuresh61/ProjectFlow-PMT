@@ -14,14 +14,8 @@ export const CreateIssueSchema = z.object({
   sprintId: z.string().optional().nullable(),
   projectId: z.string().min(1, "Project ID is required"),
   workspaceId: z.string().optional(),
-  subtasks: z
-    .array(
-      z.object({
-        id: z.string(),
-        title: z.string().min(1),
-        completed: z.boolean(),
-      })
-    )
+  acceptanceCriteria: z
+    .array(z.string())
     .optional()
     .default([]),
   attachments: z
@@ -35,4 +29,14 @@ export const CreateIssueSchema = z.object({
     .optional()
     .default([]),
   parentId: z.string().optional().nullable(),
+  storyPoints: z.number().min(0).max(100).optional().nullable(),
+  estimatedHours: z.number().min(0).max(999).optional().nullable(),
+}).transform((data) => {
+  if (data.type !== "TASK") return data;
+
+  return {
+    ...data,
+    sizeLabel: null,
+    storyPoints: null,
+  };
 });

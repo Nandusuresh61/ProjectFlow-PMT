@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { motion } from "framer-motion";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -141,7 +142,7 @@ export default function SignUp() {
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
-              schema={RegisterUserSchema as any}
+              schema={RegisterUserSchema as unknown as z.ZodType<SignUpValues>}
               onSubmit={handleSubmit}
               submitLabel="Create Account"
               loadingLabel="Creating Account..."

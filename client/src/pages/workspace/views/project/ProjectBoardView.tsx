@@ -23,6 +23,9 @@ interface BoardCardData {
     tagColor: string;
     assignee: string;
     priority: 'High' | 'Medium' | 'Low';
+    parentTitle?: string;
+    parentKey?: string;
+    parentId?: string;
 }
 
 interface Column {
@@ -45,7 +48,7 @@ const tagColors: Record<string, string> = {
     BUG: '#E94560',
 };
 
-const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void }) => (
+const BoardCard = ({ card, onClick, onParentClick }: { card: BoardCardData; onClick: () => void; onParentClick?: (e: React.MouseEvent) => void }) => (
     <motion.div
         layout
         initial={{ opacity: 0, y: 10 }}
@@ -63,6 +66,23 @@ const BoardCard = ({ card, onClick }: { card: BoardCardData; onClick: () => void
         onClick={onClick}
         className="bg-white/[0.05] rounded-xl p-4 hover:bg-white/[0.08] transition-all cursor-pointer active:cursor-grabbing group border border-white/5"
     >
+        {card.parentTitle && (
+            <div 
+                className="flex items-center gap-1.5 mb-2.5 px-2 py-1 rounded bg-[#A5D7E8]/10 border border-[#A5D7E8]/20 w-fit max-w-full hover:bg-[#A5D7E8]/20 hover:border-[#A5D7E8]/30 transition-all cursor-pointer group/parent relative"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onParentClick?.(e);
+                }}
+            >
+                <div className="flex items-center gap-1.5 group-hover/parent:opacity-0 transition-opacity duration-200">
+                    <span className="text-[9px] font-black text-[#A5D7E8] uppercase tracking-tighter whitespace-nowrap">{card.parentKey}</span>
+                    <span className="text-[10px] font-medium text-[#A5D7E8] truncate">{card.parentTitle}</span>
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/parent:opacity-100 transition-opacity duration-200">
+                    <span className="text-[9px] font-black text-[#A5D7E8] uppercase tracking-widest whitespace-nowrap">View Parent Story</span>
+                </div>
+            </div>
+        )}
         <div className="flex items-start justify-between mb-3">
             <span
                 className="text-[10px] font-bold px-2 py-0.5 rounded-full"
@@ -93,12 +113,10 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
     const [allSprints, setAllSprints] = useState<SprintData[]>([]);
     
-    // Modal State
     const [selectedIssue, setSelectedIssue] = useState<IssueData | null>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
 
-    // Supplemental Data for Modal
     const [membersMap, setMembersMap] = useState<Record<string, { userId: string, fullName: string, profileImage: string, role: string }>>({});
     const [sprintsMap, setSprintsMap] = useState<Record<string, SprintData>>({});
     const [issuesMap, setIssuesMap] = useState<Record<string, IssueData>>({});
@@ -116,13 +134,11 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             if (sprintRes.success && sprintRes.data) {
                 setActiveSprintData(sprintRes.data);
                 
-                // Build issues map starting with active sprint issues
                 const iMap: Record<string, IssueData> = {};
                 sprintRes.data.issues.forEach(i => {
                     iMap[i.issueId] = i;
                 });
                 
-                // Add stories for parent lookup
                 if (storiesRes.success && storiesRes.data?.issues) {
                     storiesRes.data.issues.forEach((i: IssueData) => {
                         if (!iMap[i.issueId]) iMap[i.issueId] = i;
@@ -160,6 +176,12 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        if (selectedIssue && issuesMap[selectedIssue.issueId]) {
+            setSelectedIssue(issuesMap[selectedIssue.issueId]);
+        }
+    }, [issuesMap]);
 
     const moveIssue = async (issueId: string, newStatus: string) => {
         if (!activeSprintData) return;
@@ -224,16 +246,25 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
     };
 
     const handleIssueClick = (issueId: string) => {
-        const issue = activeSprintData?.issues.find(i => i.issueId === issueId);
+        const issue = issues.find(i => i.issueId === issueId) || issuesMap[issueId];
         if (issue) {
             setSelectedIssue(issue);
             setIsDetailModalOpen(true);
         }
     };
 
+    const handleParentClick = (parentId: string) => {
+        const parent = issuesMap[parentId];
+        if (parent) {
+            setSelectedIssue(parent);
+            setIsDetailModalOpen(true);
+        }
+    };
+
     const issues = activeSprintData?.issues || [];
-    const incompleteIssues = issues.filter(i => i.status !== 'DONE');
-    const completedIssues = issues.filter(i => i.status === 'DONE');
+    const sprintLevelIssues = issues.filter(i => i.type === 'STORY' || i.type === 'BUG');
+    const incompleteIssues = sprintLevelIssues.filter(i => i.status !== 'DONE');
+    const completedIssues = sprintLevelIssues.filter(i => i.status === 'DONE');
 
     const columns: Column[] = [
         {
@@ -241,16 +272,22 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'To Do',
             accent: 'bg-white/20',
             cards: issues
-                .filter(i => i.status === 'TODO' || i.status === 'BACKLOG')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => (i.status === 'TODO' || i.status === 'BACKLOG') && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
+                    };
+                }),
             count: 0
         },
         {
@@ -258,16 +295,22 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'In Progress',
             accent: 'bg-[#A5D7E8]',
             cards: issues
-                .filter(i => i.status === 'IN_PROGRESS')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => i.status === 'IN_PROGRESS' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
+                    };
+                }),
             count: 0
         },
         {
@@ -275,16 +318,22 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'Review',
             accent: 'bg-indigo-400',
             cards: issues
-                .filter(i => i.status === 'REVIEW')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
-                })),
+                .filter(i => i.status === 'REVIEW' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
+                    };
+                }),
             count: 0
         },
         {
@@ -292,16 +341,22 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
             label: 'Done',
             accent: 'bg-emerald-400',
             cards: issues
-                .filter(i => i.status === 'DONE')
-                .map(i => ({
-                    id: i.issueId,
-                    issueKey: i.issueKey,
-                    title: i.title,
-                    tag: i.type,
-                    tagColor: tagColors[i.type] || '#576CBC',
-                    assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
-                    priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as IssueData["priority"],
-                })),
+                .filter(i => i.status === 'DONE' && i.type !== 'STORY')
+                .map(i => {
+                    const parent = i.parentId ? issuesMap[i.parentId] : null;
+                    return {
+                        id: i.issueId,
+                        issueKey: i.issueKey,
+                        title: i.title,
+                        tag: i.type,
+                        tagColor: tagColors[i.type] || '#576CBC',
+                        assignee: i.assigneeId ? i.assigneeId.slice(0, 2).toUpperCase() : '--',
+                        priority: (i.priority ? i.priority.charAt(0) + i.priority.slice(1).toLowerCase() : 'Medium') as "High" | "Medium" | "Low",
+                        parentTitle: parent?.title,
+                        parentKey: parent?.issueKey,
+                        parentId: i.parentId || undefined
+                    };
+                }),
             count: 0
         }
     ].map(col => ({ ...col, count: col.cards.length } as Column));
@@ -388,6 +443,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                                         key={card.id} 
                                         card={card} 
                                         onClick={() => handleIssueClick(card.id)}
+                                        onParentClick={() => card.parentId && handleParentClick(card.parentId)}
                                     />
                                 ))}
                             </AnimatePresence>
@@ -415,6 +471,7 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
                 membersMap={membersMap}
                 sprintsMap={sprintsMap}
                 issuesMap={issuesMap}
+                onUpdate={fetchData}
             />
 
             {activeSprintData.sprint && (

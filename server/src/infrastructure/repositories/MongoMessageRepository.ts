@@ -1,4 +1,4 @@
-import { Message } from "@/domain/entities/Chat/Message";
+import { Message } from "@/domain/entities/Message";
 import { IMessageRepository } from "@/application/interfaces/repositories/IMessageRepository";
 import { MessageDoc, MessageModel } from "../database/models/MongoMessageModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
@@ -11,7 +11,7 @@ export class MongoMessageRepository
     super(MessageModel);
   }
 
-  protected mapToEntity(doc: any): Message {
+  protected mapToEntity(doc: MessageDoc): Message {
     return new Message(
       doc.messageId,
       doc.roomId,

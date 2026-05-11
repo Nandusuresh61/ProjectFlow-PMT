@@ -10,6 +10,9 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
+import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
+
 
 export class StartSprintUseCase implements IStartSprintUseCase {
   constructor(
@@ -17,7 +20,10 @@ export class StartSprintUseCase implements IStartSprintUseCase {
     private readonly _issueRepo: IIssueRepository,
     private readonly _projectRepo: IProjectRepository,
     private readonly _membershipRepo: IMembershipRepository,
+    private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService,
   ) {}
+
 
   async execute(userId: string, data: StartSprintDto): Promise<Sprint> {
     const { sprintId, startDate, endDate } = data;
@@ -88,7 +94,9 @@ export class StartSprintUseCase implements IStartSprintUseCase {
     }
 
     const issues = await this._issueRepo.findBySprintId(sprintId);
-    const plannedPoints = issues.reduce((total, issue) => total + (issue.storyPoints || 0), 0);
+    const plannedPoints = issues
+      .filter((issue) => issue.type === "STORY" || issue.type === "BUG")
+      .reduce((total, issue) => total + (issue.storyPoints || 0), 0);
 
     const updatedSprint = await this._sprintRepo.update(sprintId, {
       status: "ACTIVE",
@@ -105,6 +113,10 @@ export class StartSprintUseCase implements IStartSprintUseCase {
       );
     }
 
+    await this._burndownSnapshotService.captureSnapshot(sprintId);
+    await this._allocationCalculatorService.calculateAndSaveAllocation(sprintId);
+
     return updatedSprint;
+
   }
 }

@@ -22,7 +22,8 @@ const initialValues: FormValues = {
     sprint: "Backlog",
     parentId: "",
     subtasks: [],
-    attachments: []
+    attachments: [],
+    estimatedHours: undefined,
 };
 
 function formReducer(state: FormState, action: FormAction): FormState {
@@ -66,24 +67,21 @@ export function IssueCreationModal({
     onOpenChange,
     project,
     onSuccess,
-    editIssue
+    editIssue,
+    parentStoryId
 }: {
     open: boolean,
     onOpenChange: (open: boolean) => void,
     project?: { key: string, id: string, workspaceId: string, memberIds: string[] },
     onSuccess?: () => void,
-    editIssue?: IssueData | null
+    editIssue?: IssueData | null,
+    parentStoryId?: string
 }) {
     const [members, setMembers] = useState<{ userId: string, fullName: string, profileImage: string }[]>([]);
-    const [stories, setStories] = useState<IssueData[]>([]);
 
     useEffect(() => {
         if (open && project?.id) {
-            getProjectIssues(project.id, { limit: 100 }).then(res => {
-                if (res?.data?.issues) {
-                    setStories(res.data.issues.filter((i: IssueData) => i.type === "STORY"));
-                }
-            }).catch(err => console.error("Failed to load stories", err));
+            getProjectIssues(project.id, { limit: 100 }).catch(err => console.error("Failed to load issues", err));
         }
     }, [open, project?.id]);
 
@@ -118,15 +116,25 @@ export function IssueCreationModal({
                         assignee: editIssue.assigneeId || "",
                         sprint: editIssue.sprintId || "Backlog",
                         parentId: editIssue.parentId || "",
-                        subtasks: editIssue.subtasks ? [...editIssue.subtasks] : [],
-                        attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : []
+                        subtasks: editIssue.acceptanceCriteria ? editIssue.acceptanceCriteria.map((title: string, i: number) => ({ id: `ac-${i}`, title, completed: false })) : [],
+                        attachments: editIssue.attachments ? [...editIssue.attachments as { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[]] : [],
+                        estimatedHours: editIssue.estimatedHours || undefined,
+                        remainingHours: editIssue.remainingHours || undefined
+                    }
+                });
+            } else if (parentStoryId) {
+                dispatch({
+                    type: "RESET", values: {
+                        ...initialValues,
+                        type: "Task",
+                        parentId: parentStoryId
                     }
                 });
             } else {
                 dispatch({ type: "RESET", values: initialValues });
             }
         }
-    }, [open, editIssue]);
+    }, [open, editIssue, parentStoryId]);
 
     const [linkUrl, setLinkUrl] = useState("");
     const [pendingFiles, setPendingFiles] = useState<{ id: string; file: File }[]>([]);
@@ -139,6 +147,13 @@ export function IssueCreationModal({
     const handleBlur = useCallback((field: string) => {
         dispatch({ type: "TOUCH", field: field as "title" });
     }, []);
+
+    const handleTypeChange = useCallback((value: "Story" | "Task" | "Bug") => {
+        handleChange("type", value);
+        if (value === "Task") {
+            handleChange("size", "");
+        }
+    }, [handleChange]);
 
     const addSubtask = () => {
         handleChange("subtasks", [
@@ -263,14 +278,15 @@ export function IssueCreationModal({
                 type: state.values.type.toUpperCase() as "STORY" | "TASK" | "BUG",
                 status: state.values.status,
                 priority: state.values.priority.toUpperCase() as "LOW" | "MEDIUM" | "HIGH",
-                sizeLabel: state.values.size || null,
+                sizeLabel: state.values.type === "Task" ? null : state.values.size || null,
                 assigneeId: state.values.assignee || null,
                 sprintId: state.values.sprint === "Backlog" ? null : state.values.sprint,
                 parentId: state.values.parentId || null,
                 projectId: project.id,
                 workspaceId: project.workspaceId,
-                subtasks: state.values.subtasks,
+                acceptanceCriteria: state.values.subtasks.map(t => t.title).filter(t => t.trim().length > 0),
                 attachments: cleanedAttachments,
+                estimatedHours: state.values.estimatedHours || null,
             };
 
             let response;
@@ -314,7 +330,9 @@ export function IssueCreationModal({
                 <div className="px-6 py-4 border-b border-[#19376D] flex items-center justify-between bg-[#19376D]/10">
                     <div className="flex items-center gap-3">
                         <span className="text-xs font-mono bg-[#19376D] text-[#A5D7E8] px-2 py-1 rounded">{editIssue ? editIssue.issueKey : project?.key || "PF"}</span>
-                        <DialogTitle className="text-lg font-bold">{editIssue ? "Edit Issue" : "Create New Issue"}</DialogTitle>
+                        <DialogTitle className="text-lg font-bold">
+                            {editIssue ? "Edit Issue" : parentStoryId ? "Add Task to Story" : "Create New Issue"}
+                        </DialogTitle>
                     </div>
                 </div>
 
@@ -346,37 +364,39 @@ export function IssueCreationModal({
                             />
                         </div>
 
-                        {/* Subtasks */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between border-b border-[#19376D]/50 pb-2">
-                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Subtasks</Label>
-                                <button type="button" onClick={addSubtask} className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors flex items-center gap-1">
-                                    <Plus size={12} /> Add Subtask
-                                </button>
-                            </div>
-
-                            {state.values.subtasks.map((task, idx) => (
-                                <div key={task.id} className="flex items-center gap-2 group">
-                                    <input type="checkbox" disabled className="w-4 h-4 outline-none rounded appearance-none border border-[#576CBC]/40 bg-[#19376D]/20 opacity-50 cursor-not-allowed checked:bg-[#A5D7E8]" />
-                                    <Input
-                                        value={task.title}
-                                        onChange={(e) => updateSubtask(idx, e.target.value)}
-                                        placeholder="What needs to be done?"
-                                        className="h-8 bg-transparent border-transparent hover:border-[#576CBC]/20 focus-visible:bg-[#19376D]/10 focus-visible:border-[#A5D7E8]/50 text-sm"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeSubtask(idx)}
-                                        className="text-[#576CBC] opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all p-1"
-                                    >
-                                        <X size={14} />
+                        {state.values.type === "Story" && (
+                            <div className="space-y-4 pt-4 border-t border-[#19376D]/50">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Acceptance Criteria</Label>
+                                    <button type="button" onClick={addSubtask} className="text-xs font-bold text-[#A5D7E8] hover:text-white transition-colors flex items-center gap-1">
+                                        <Plus size={12} /> Add Criteria
                                     </button>
                                 </div>
-                            ))}
-                            {state.values.subtasks.length === 0 && (
-                                <p className="text-xs text-[#576CBC]/50 italic">No subtasks added.</p>
-                            )}
-                        </div>
+                                
+                                {state.values.subtasks.map((task, idx) => (
+                                    <div key={idx} className="flex items-center gap-3 group bg-white/[0.02] p-3 rounded-xl border border-white/5 focus-within:border-[#A5D7E8]/30 transition-all">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-[#A5D7E8]/30" />
+                                        <input 
+                                            className="flex-1 bg-transparent border-none text-sm text-white placeholder:text-white/20 focus:outline-none"
+                                            placeholder="Enter criteria..."
+                                            value={task.title}
+                                            onChange={(e) => updateSubtask(idx, e.target.value)}
+                                        />
+                                        <button 
+                                            type="button"
+                                            className="opacity-0 group-hover:opacity-100 p-1 text-white/20 hover:text-rose-400 transition-all"
+                                            onClick={() => removeSubtask(idx)}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {state.values.subtasks.length === 0 && (
+                                    <p className="text-xs text-[#576CBC]/50 italic">No acceptance criteria added.</p>
+                                )}
+                            </div>
+                        )}
 
                         {/* Attachments */}
                         <div className="space-y-4 pt-4 border-t border-[#19376D]/50">
@@ -481,15 +501,25 @@ export function IssueCreationModal({
                             <div className="relative">
                                 <select
                                     value={state.values.type}
-                                    onChange={(e) => handleChange("type", e.target.value)}
+                                    onChange={(e) => handleTypeChange(e.target.value as "Story" | "Task" | "Bug")}
+                                    disabled={!!parentStoryId && !editIssue}
                                     className={cn(
                                         "w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 pl-9 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer",
-                                        state.touched.type && state.errors.type && "border-red-500/60"
+                                        state.touched.type && state.errors.type && "border-red-500/60",
+                                        (!!parentStoryId && !editIssue) && "opacity-50 cursor-not-allowed"
                                     )}
                                 >
-                                    <option value="Story" className="bg-[#0b1b36] text-white">Story</option>
-                                    <option value="Task" className="bg-[#0b1b36] text-white">Task</option>
-                                    <option value="Bug" className="bg-[#0b1b36] text-white">Bug</option>
+                                    {parentStoryId && !editIssue ? (
+                                        <option value="Task" className="bg-[#0b1b36] text-white">Task</option>
+                                    ) : (
+                                        <>
+                                            <option value="Story" className="bg-[#0b1b36] text-white">Story</option>
+                                            <option value="Bug" className="bg-[#0b1b36] text-white">Bug</option>
+                                            {editIssue && editIssue.type === "TASK" && (
+                                                <option value="Task" className="bg-[#0b1b36] text-white">Task</option>
+                                            )}
+                                        </>
+                                    )}
                                 </select>
                                 <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                                     <IssueTypeIcon type={state.values.type} size={14} />
@@ -524,10 +554,10 @@ export function IssueCreationModal({
                             </select>
                         </div>
 
-                        {(state.values.type === "Story") && (
+                        {(state.values.type === "Story" || state.values.type === "Bug") && (
                             <div className="space-y-1.5">
                                 <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest flex items-center justify-between">
-                                    Size *
+                                    Story Points {state.values.type === "Story" ? "*" : ""}
                                     {state.touched.size && state.errors.size && <span className="text-red-400 normal-case tracking-normal">{state.errors.size}</span>}
                                 </Label>
                                 <div className="flex items-center gap-1.5">
@@ -555,21 +585,23 @@ export function IssueCreationModal({
                             </div>
                         )}
 
-                        <div className="space-y-1.5">
-                            <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Assignee</Label>
-                            <select
-                                value={state.values.assignee}
-                                onChange={(e) => handleChange("assignee", e.target.value)}
-                                className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
-                            >
-                                <option value="" className="bg-[#0b1b36] text-white">Unassigned</option>
-                                {members.map((member: { userId: string, fullName: string, profileImage: string }) => (
-                                    <option key={member.userId} value={member.userId} className="bg-[#0b1b36] text-white">
-                                        {member.fullName}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {state.values.type !== "Story" && (
+                            <div className="space-y-1.5">
+                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Assignee</Label>
+                                <select
+                                    value={state.values.assignee}
+                                    onChange={(e) => handleChange("assignee", e.target.value)}
+                                    className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
+                                >
+                                    <option value="" className="bg-[#0b1b36] text-white">Unassigned</option>
+                                    {members.map((member: { userId: string, fullName: string, profileImage: string }) => (
+                                        <option key={member.userId} value={member.userId} className="bg-[#0b1b36] text-white">
+                                            {member.fullName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
 
                         <div className="space-y-1.5">
                             <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Sprint</Label>
@@ -584,21 +616,18 @@ export function IssueCreationModal({
                             </select>
                         </div>
 
-                        {(state.values.type === "Task" || state.values.type === "Bug") && stories.length > 0 && (
-                            <div className="space-y-1.5">
-                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Parent Story</Label>
-                                <select
-                                    value={state.values.parentId}
-                                    onChange={(e) => handleChange("parentId", e.target.value)}
-                                    className="w-full appearance-none bg-[#19376D]/20 border border-[#576CBC]/20 rounded-md h-10 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#A5D7E8]/20 cursor-pointer"
-                                >
-                                    <option value="" className="bg-[#0b1b36] text-white">None</option>
-                                    {stories.map((story: IssueData) => (
-                                        <option key={story.issueId} value={story.issueId} className="bg-[#0b1b36] text-white">
-                                            {story.issueKey}: {story.title}
-                                        </option>
-                                    ))}
-                                </select>
+                        {state.values.type !== "Story" && (
+                            <div className="space-y-1.5 pt-4 border-t border-[#19376D]/50">
+                                <Label className="text-[#576CBC]/60 text-xs font-bold uppercase tracking-widest">Estimated Hours</Label>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    max="999"
+                                    value={state.values.estimatedHours || ""}
+                                    onChange={(e) => handleChange("estimatedHours", e.target.value ? parseFloat(e.target.value) : undefined)}
+                                    placeholder="e.g. 8"
+                                    className="bg-[#19376D]/20 border-[#576CBC]/20 text-white placeholder:text-[#576CBC]/40 text-sm h-10 focus-visible:ring-[#A5D7E8]/20 focus-visible:border-[#A5D7E8]/50"
+                                />
                             </div>
                         )}
                     </div>
@@ -615,7 +644,7 @@ export function IssueCreationModal({
                             disabled={state.isSubmitting}
                             className="font-bold bg-[#A5D7E8] text-[#0B2447] hover:bg-white transition-all shadow-[0_0_15px_rgba(165,215,232,0.2)] h-9 px-6"
                         >
-                            {state.isSubmitting ? "Saving..." : editIssue ? "Save Changes" : "Create Issue"}
+                            {state.isSubmitting ? "Saving..." : editIssue ? "Save Changes" : parentStoryId ? "Add Task" : "Create Issue"}
                         </Button>
                     </div>
                 </div>

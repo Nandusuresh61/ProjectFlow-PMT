@@ -1,6 +1,33 @@
 import { API } from "../api";
+import type { Plan } from "@/types/plan.types";
 
-export const getSubscription = async (workspaceId: string) => {
+export interface SubscriptionDetail {
+  subscriptionId: string;
+  workspaceId: string;
+  planId: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  billingCycle: string;
+  createdAt?: string;
+  razorpayPaymentId?: string;
+  amount: number;
+  planType?: string;
+}
+
+export type SubscriptionHistoryItem = SubscriptionDetail;
+
+export interface SubscriptionResponse {
+  plan: Plan;
+  subscription: SubscriptionDetail;
+  usage: {
+    projects: number;
+    members: number;
+  };
+  history: SubscriptionHistoryItem[];
+}
+
+export const getSubscription = async (workspaceId: string): Promise<{ data: SubscriptionResponse }> => {
   const response = await API.get(`/subscription/${workspaceId}`);
   return response.data;
 };

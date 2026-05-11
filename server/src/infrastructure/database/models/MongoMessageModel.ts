@@ -1,5 +1,5 @@
 import { Document, model, Schema } from "mongoose";
-import { MessageType } from "@/domain/entities/Chat/Message";
+import { MessageType } from "@/domain/entities/Message";
 
 export interface MessageDoc extends Document {
   messageId: string;
@@ -9,6 +9,7 @@ export interface MessageDoc extends Document {
   type: MessageType;
   createdAt: Date;
   updatedAt: Date;
+  senderName?: string;
 }
 
 const MessageSchema = new Schema<MessageDoc>({

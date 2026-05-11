@@ -26,5 +26,4 @@ export type ProjectTab =
     | 'backlogs'
     | 'board'
     | 'sprint'
-    | 'sprint-performance'
     | 'project-team';

@@ -1,7 +1,7 @@
 import { IMessageRepository } from "@/application/interfaces/repositories/IMessageRepository";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ISendMessageUseCase, SendMessageDto } from "@/application/interfaces/use-cases/Chat/ISendMessageUseCase";
-import { Message } from "@/domain/entities/Chat/Message";
+import { Message } from "@/domain/entities/Message";
 
 export class SendMessageUseCase implements ISendMessageUseCase {
   constructor(

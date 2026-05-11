@@ -1,5 +1,5 @@
 import { IMessageRepository } from "@/application/interfaces/repositories/IMessageRepository";
-import { Message } from "@/domain/entities/Chat/Message";
+import { Message } from "@/domain/entities/Message";
 
 export interface IGetChatMessagesUseCase {
   execute(roomId: string, limit?: number, skip?: number): Promise<Message[]>;

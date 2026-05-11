@@ -135,4 +135,10 @@ export const AppMessages = {
   WORKSPACE_ID_REQUIRED: "Workspace ID is required in headers (x-workspace-id) or params",
   SUBSCRIPTION_NOT_FOUND: "Subscription not found for this workspace",
   SUBSCRIPTION_EXPIRED: "Subscription expired or inactive. Please upgrade to continue.",
+  WORKLOG_ADDED_SUCCESS: "Worklog added successfully",
+  WORKLOG_UPDATED_SUCCESS: "Worklog updated successfully",
+  WORKLOG_DELETED_SUCCESS: "Worklog deleted successfully",
+  WORKLOGS_RETRIEVED_SUCCESS: "Worklogs retrieved successfully",
+  WORKLOG_NOT_FOUND: "Worklog not found",
+  TIME_TRACKING_NOT_AVAILABLE: "Time tracking is not available for this issue type",
 } as const;

@@ -3,22 +3,20 @@ export interface CreateIssueDto {
   description: string;
   type: "STORY" | "TASK" | "BUG";
   priority: "LOW" | "MEDIUM" | "HIGH";
-  sizeLabel?: "XS" | "S" | "M" | "L" | "XL";
+  sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
+  storyPoints?: number | null;
   assigneeId?: string;
   sprintId?: string;
   projectId: string;
   workspaceId: string;
-  subtasks?: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  acceptanceCriteria?: string[];
   attachments?: {
     name: string;
     url: string;
     type: "IMAGE" | "PDF" | "LINK";
   }[];
   parentId?: string | null;
+  estimatedHours?: number;
 }
 
 export interface UpdateIssueDto {
@@ -30,15 +28,15 @@ export interface UpdateIssueDto {
   sizeLabel?: "XS" | "S" | "M" | "L" | "XL" | null;
   assigneeId?: string | null;
   sprintId?: string | null;
-  subtasks?: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  acceptanceCriteria?: string[];
   attachments?: {
     name: string;
     url: string;
     type: "IMAGE" | "PDF" | "LINK";
   }[];
   parentId?: string | null;
+  taskIds?: string[];
+  storyPoints?: number | null;
+  estimatedHours?: number | null;
+  remainingHours?: number | null;
 }

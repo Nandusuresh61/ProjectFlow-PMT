@@ -4,7 +4,7 @@ import { authenticatedUser } from "../middlewares/AuthMiddleware";
 
 const router = Router();
 
-router.get("/messages/:roomId", authenticatedUser as any, (req, res, next) => 
+router.get("/messages/:roomId", authenticatedUser, (req, res, next) => 
   chatController.getMessages(req, res, next)
 );
 

@@ -5,8 +5,11 @@ import { IAssignIssueToSprintUseCase } from "@/application/interfaces/use-cases/
 import { IStartSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IStartSprintUseCase";
 import { IGetActiveSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IGetActiveSprintUseCase";
 import { ICompleteSprintUseCase } from "@/application/interfaces/use-cases/Sprint/ICompleteSprintUseCase";
-import { IGetProjectPerformanceUseCase } from "@/application/interfaces/use-cases/Sprint/IGetProjectPerformanceUseCase";
 import { IUpdateSprintUseCase } from "@/application/interfaces/use-cases/Sprint/IUpdateSprintUseCase";
+import { IGetSprintBurndownUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintBurndownUseCase";
+import { IGetSprintAllocationUseCase } from "@/application/interfaces/use-cases/Sprint/IGetSprintAllocationUseCase";
+import { GetSprintHistoryDetailsUseCase } from "@/application/use-cases/Sprint/GetSprintHistoryDetailsUseCase";
+
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/AuthMiddleware";
@@ -30,9 +33,12 @@ export class SprintController {
     private readonly _startSprintUseCase: IStartSprintUseCase,
     private readonly _getActiveSprintUseCase: IGetActiveSprintUseCase,
     private readonly _completeSprintUseCase: ICompleteSprintUseCase,
-    private readonly _getProjectPerformanceUseCase: IGetProjectPerformanceUseCase,
     private readonly _updateSprintUseCase: IUpdateSprintUseCase,
+    private readonly _getSprintBurndownUseCase: IGetSprintBurndownUseCase,
+    private readonly _getSprintAllocationUseCase: IGetSprintAllocationUseCase,
+    private readonly _getSprintHistoryDetailsUseCase: GetSprintHistoryDetailsUseCase,
   ) { }
+
 
   createSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
     const validatedData = CreateSprintSchema.parse(req.body) as CreateSprintDto;
@@ -186,30 +192,6 @@ export class SprintController {
       );
   });
 
-  getProjectPerformance = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { projectId } = req.params;
-    const userId = req.user?.userId;
-
-    if (!userId) {
-      throw new AppError(
-        ErrorCode.AUTH,
-        AppMessages.UNAUTHORIZED_ACCESS,
-        HttpStatusCode.UNAUTHORIZED,
-      );
-    }
-
-    const result = await this._getProjectPerformanceUseCase.execute(
-      userId,
-      projectId,
-    );
-
-    res
-      .status(HttpStatusCode.OK)
-      .json(
-        ResponseHandler.success(AppMessages.PERFORMANCE_RETRIEVED_SUCCESS, result),
-      );
-  });
-  
   updateSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { sprintId } = req.params;
     const userId = req.user?.userId;
@@ -233,4 +215,68 @@ export class SprintController {
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.SPRINT_UPDATED_SUCCESS, result));
   });
+  
+  getBurndown = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getSprintBurndownUseCase.execute(sprintId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success("Burndown data retrieved successfully", result),
+      );
+  });
+
+  getSprintAllocation = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getSprintAllocationUseCase.execute(sprintId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success("Sprint allocation retrieved successfully", result),
+      );
+  });
+
+  getSprintHistoryDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const { sprintId } = req.params;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.UNAUTHORIZED_ACCESS,
+        HttpStatusCode.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this._getSprintHistoryDetailsUseCase.execute(sprintId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.SPRINT_HISTORY_RETRIEVED_SUCCESS, result),
+      );
+  });
 }
+

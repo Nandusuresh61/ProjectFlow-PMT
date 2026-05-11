@@ -15,6 +15,7 @@ import {
     FolderKanban,
     Plus,
 } from 'lucide-react';
+import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { Logo } from '@/components/common/Logo';
 import {
     NavItem,
@@ -40,6 +41,7 @@ export interface SidebarProps {
     onCreateProject?: () => void;
     canCreateProject?: boolean;
     onBackToWorkspace: () => void;
+    role: WorkspaceRoleEnum | null;
 }
 
 export const Sidebar = ({
@@ -56,6 +58,7 @@ export const Sidebar = ({
     onCreateProject,
     canCreateProject,
     onBackToWorkspace,
+    role,
 }: SidebarProps) => {
     const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
 
@@ -118,6 +121,7 @@ export const Sidebar = ({
                             onTabChange={onTabChange}
                             project={selectedProject}
                             onBack={onBackToWorkspace}
+                            role={role}
                         />
                     )}
                 </AnimatePresence>
@@ -254,6 +258,7 @@ interface ProjectNavProps {
     onTabChange: (tab: string) => void;
     project: Project | null;
     onBack: () => void;
+    role: WorkspaceRoleEnum | null;
 }
 
 const PROJECT_NAV_ITEMS = [
@@ -261,65 +266,74 @@ const PROJECT_NAV_ITEMS = [
     { id: 'backlogs', icon: ClipboardList, label: 'Backlogs' },
     { id: 'board', icon: Kanban, label: 'Board' },
     { id: 'sprint', icon: Zap, label: 'Sprint' },
-    { id: 'sprint-performance', icon: BarChart2, label: 'Performance' },
     { id: 'project-team', icon: Users, label: 'Team' },
 ] as const;
 
-const ProjectNav = ({ activeTab, isCollapsed, onTabChange, project, onBack }: ProjectNavProps) => (
-    <motion.div
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 10 }}
-        transition={{ duration: 0.2 }}
-        className="pt-1"
-    >
-        {/* Back button */}
-        <button
-            onClick={onBack}
-            className={`w-full flex items-center gap-2 h-9 rounded-xl px-3 mb-1
-                text-[#576CBC]/60 hover:text-white hover:bg-white/5 transition-all group
-                ${isCollapsed ? 'justify-center px-0' : ''}`}
+const ProjectNav = ({ activeTab, isCollapsed, onTabChange, project, onBack, role }: ProjectNavProps) => {
+    const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
+    const restrictedTabs = ['backlogs', 'sprint'];
+    
+    const visibleNavItems = PROJECT_NAV_ITEMS.filter(item => {
+        if (isMemberOrViewer && restrictedTabs.includes(item.id)) return false;
+        return true;
+    });
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.2 }}
+            className="pt-1"
         >
-            <ArrowLeft size={14} className="opacity-60 group-hover:opacity-100 flex-shrink-0" />
-            {!isCollapsed && (
-                <span className="text-[12px] font-medium">Back to menu</span>
-            )}
-        </button>
-
-        {/* Project identity header */}
-        {!isCollapsed && project && (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2.5 px-3 py-3 mb-1"
+            {/* Back button */}
+            <button
+                onClick={onBack}
+                className={`w-full flex items-center gap-2 h-9 rounded-xl px-3 mb-1
+                    text-[#576CBC]/60 hover:text-white hover:bg-white/5 transition-all group
+                    ${isCollapsed ? 'justify-center px-0' : ''}`}
             >
-                <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black text-[#060d1a] flex-shrink-0"
-                    style={{ backgroundColor: project.color }}
+                <ArrowLeft size={14} className="opacity-60 group-hover:opacity-100 flex-shrink-0" />
+                {!isCollapsed && (
+                    <span className="text-[12px] font-medium">Back to menu</span>
+                )}
+            </button>
+
+            {/* Project identity header */}
+            {!isCollapsed && project && (
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-2.5 px-3 py-3 mb-1"
                 >
-                    {project.key}
-                </div>
-                <span className="text-[13px] font-semibold text-white truncate">
-                    {project.name}
-                </span>
-            </motion.div>
-        )}
+                    <div
+                        className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black text-[#060d1a] flex-shrink-0"
+                        style={{ backgroundColor: project.color }}
+                    >
+                        {project.key}
+                    </div>
+                    <span className="text-[13px] font-semibold text-white truncate">
+                        {project.name}
+                    </span>
+                </motion.div>
+            )}
 
-        <SidebarDivider />
+            <SidebarDivider />
 
-        {/* Project nav items */}
-        <div className="space-y-0.5 pt-1">
-            {PROJECT_NAV_ITEMS.map(item => (
-                <NavItem
-                    key={item.id}
-                    id={item.id}
-                    icon={item.icon}
-                    label={item.label}
-                    isActive={activeTab === item.id}
-                    isCollapsed={isCollapsed}
-                    onClick={() => onTabChange(item.id)}
-                />
-            ))}
-        </div>
-    </motion.div>
-);
+            {/* Project nav items */}
+            <div className="space-y-0.5 pt-1">
+                {visibleNavItems.map(item => (
+                    <NavItem
+                        key={item.id}
+                        id={item.id}
+                        icon={item.icon}
+                        label={item.label}
+                        isActive={activeTab === item.id}
+                        isCollapsed={isCollapsed}
+                        onClick={() => onTabChange(item.id)}
+                    />
+                ))}
+            </div>
+        </motion.div>
+    );
+};

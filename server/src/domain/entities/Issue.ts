@@ -12,12 +12,6 @@ export interface Attachment {
   type: "IMAGE" | "PDF" | "LINK";
 }
 
-export interface SubTask {
-  id: string;
-  title: string;
-  completed: boolean;
-}
-
 export class Issue {
   constructor(
     public readonly issueId: string,
@@ -34,9 +28,14 @@ export class Issue {
     public readonly projectId: string,
     public readonly workspaceId: string,
     public readonly parentId: string | null,
-    public subtasks: SubTask[],
+    public taskIds: string[],
+    public acceptanceCriteria: string[],
     public attachments: Attachment[],
-    public createdAt: Date,
-    public updatedAt: Date,
+    public estimatedHours: number | null,
+    public remainingHours: number | null,
+    public continuedFromIssueId: string | null = null,
+    public continuedIssueId: string | null = null,
+    public createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
   ) {}
 }

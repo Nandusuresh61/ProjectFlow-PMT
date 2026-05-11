@@ -171,4 +171,19 @@ export class WorkspaceRepository extends MongoBaseRepository<Workspace, Workspac
   async updateWorkspaceStatus(workspaceId: string, isSuspended: boolean): Promise<void> {
     await this.model.updateOne({ workspaceId }, { $set: { isSuspended } });
   }
+
+  async update(workspace: Workspace): Promise<Workspace> {
+    const updated = await this.updateOne(
+      { workspaceId: workspace.workspaceId },
+      {
+        name: workspace.name,
+        ownerId: workspace.ownerId,
+        planId: workspace.planId,
+        isSuspended: workspace.isSuspended,
+        planExpireDate: workspace.planExpireDate,
+      }
+    );
+    if (!updated) throw new Error("Workspace not found");
+    return updated;
+  }
 }

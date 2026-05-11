@@ -1,10 +1,11 @@
 import { IIssueRepository } from "@/application/interfaces/repositories/IIssueRepository";
 import { Issue } from "@/domain/entities/Issue";
 import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
+import { QueryFilter } from "mongoose";
 
 
 export class MongoIssueRepository implements IIssueRepository {
-  
+
   async create(issue: Issue): Promise<Issue> {
     const created = await IssueModel.create({
       issueId: issue.issueId,
@@ -21,24 +22,34 @@ export class MongoIssueRepository implements IIssueRepository {
       projectId: issue.projectId,
       workspaceId: issue.workspaceId,
       parentId: issue.parentId,
-      subtasks: issue.subtasks,
+      taskIds: issue.taskIds,
+      acceptanceCriteria: issue.acceptanceCriteria,
       attachments: issue.attachments,
+      estimatedHours: issue.estimatedHours,
+      remainingHours: issue.remainingHours,
+      continuedFromIssueId: issue.continuedFromIssueId,
+      continuedIssueId: issue.continuedIssueId,
     });
 
     return this.toDomain(created);
   }
 
-  async findByProjectId(projectId: string, page: number, limit: number, search?: string): Promise<{ issues: Issue[], total: number }> {
-    const query: {
-      projectId: string;
-      $or?: Array<{ [key: string]: { $regex: string; $options: string } }>;
-    } = { projectId };
-    
+  async findByProjectId(projectId: string, page: number, limit: number, search?: string, type?: string, parentId?: string | null): Promise<{ issues: Issue[], total: number }> {
+    const query: QueryFilter<IssueDocument> = { projectId };
+
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { issueKey: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    if (type) {
+      query.type = type;
+    }
+
+    if (parentId !== undefined) {
+      query.parentId = parentId;
     }
 
     const skip = (page - 1) * limit;
@@ -139,8 +150,13 @@ export class MongoIssueRepository implements IIssueRepository {
       doc.projectId,
       doc.workspaceId,
       doc.parentId,
-      doc.subtasks,
+      doc.taskIds || [],
+      doc.acceptanceCriteria,
       (doc.attachments || []) as { name: string, url: string, type: "IMAGE" | "PDF" | "LINK" }[],
+      doc.estimatedHours,
+      doc.remainingHours,
+      doc.continuedFromIssueId,
+      doc.continuedIssueId,
       doc.createdAt,
       doc.updatedAt
     );

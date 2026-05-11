@@ -7,12 +7,14 @@ import { AuthUserState } from "@/store/auth.store";
 interface WorkspaceState {
   workspaces: WorkspaceData[];
   currentWorkspace: WorkspaceData | null;
+  currentWorkspaceRole: string | null;
   isLoading: boolean;
   
   fetchWorkspaces: () => Promise<void>;
   switchActiveWorkspace: (workspaceId: string) => Promise<boolean>;
   clearWorkspaceState: () => void;
   setCurrentWorkspaceFromAuth: (workspaceId: string | undefined) => void;
+  setWorkspaceRole: (role: string | null) => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>()(
@@ -20,6 +22,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
     (set, get) => ({
       workspaces: [],
       currentWorkspace: null,
+      currentWorkspaceRole: null,
       isLoading: false,
 
       fetchWorkspaces: async () => {
@@ -77,10 +80,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           }
       },
       
+      setWorkspaceRole: (role: string | null) => {
+          set({ currentWorkspaceRole: role });
+      },
+      
       clearWorkspaceState: () => {
           set({
               workspaces: [],
               currentWorkspace: null,
+              currentWorkspaceRole: null,
               isLoading: false
           });
       }

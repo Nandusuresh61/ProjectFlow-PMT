@@ -10,6 +10,8 @@ export type FormValues = {
     parentId?: string;
     subtasks: { id: string; title: string; completed: boolean }[];
     attachments: { name: string; url: string; type: "IMAGE" | "PDF" | "LINK" }[];
+    estimatedHours?: number;
+    remainingHours?: number;
 };
 
 export type FormState = {

@@ -15,16 +15,17 @@ export interface IssueDocument extends Document {
   projectId: string;
   workspaceId: string;
   parentId: string | null;
-  subtasks: {
-    id: string;
-    title: string;
-    completed: boolean;
-  }[];
+  taskIds: string[];
+  acceptanceCriteria: string[];
   attachments: {
     name: string;
     url: string;
     type: string;
   }[];
+  estimatedHours: number | null;
+  remainingHours: number | null;
+  continuedFromIssueId: string | null;
+  continuedIssueId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,17 +52,35 @@ const IssueSchema = new Schema<IssueDocument>(
     projectId: { type: String, required: true },
     workspaceId: { type: String, required: true },
     parentId: { type: String, default: null },
-    subtasks: [
-      {
-        id: String,
-        title: String,
-        completed: Boolean,
-      },
-    ],
+    taskIds: { type: [String], default: [] },
+    acceptanceCriteria: { type: [String], default: [] },
     attachments: [AttachmentSchema],
+    estimatedHours: { type: Number, default: null },
+    remainingHours: { type: Number, default: null },
+    continuedFromIssueId: { type: String, default: null },
+    continuedIssueId: { type: String, default: null },
   },
   { timestamps: true }
 );
+
+IssueSchema.pre("save", function () {
+  if (this.type === "TASK") {
+    this.storyPoints = null;
+    this.sizeLabel = null;
+  }
+});
+
+IssueSchema.pre("findOneAndUpdate", function () {
+  const update = this.getUpdate() as { $set?: Partial<IssueDocument> };
+  const set = update.$set || {};
+
+  if (set.type === "TASK") {
+    set.storyPoints = null;
+    set.sizeLabel = null;
+    update.$set = set;
+    this.setUpdate(update);
+  }
+});
 
 export const IssueModel = mongoose.model<IssueDocument>(
   "Issue",
