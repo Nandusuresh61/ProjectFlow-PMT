@@ -6,5 +6,7 @@ export class Comment {
     public content: string,
     public readonly createdAt: Date,
     public updatedAt: Date,
+    public mentions: string[] = [],
+    public attachments: string[] = [],
   ) {}
 }

@@ -1,6 +1,8 @@
 export interface AddCommentDto {
   issueId: string;
   content: string;
+  mentions?: string[];
+  attachments?: string[];
 }
 
 export interface CommentResponseDto {
@@ -10,4 +12,6 @@ export interface CommentResponseDto {
   content: string;
   createdAt: string;
   updatedAt: string;
+  mentions: string[];
+  attachments: string[];
 }

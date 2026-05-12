@@ -134,7 +134,9 @@ export class IssueController {
     const result = await this._addCommentUseCase.execute(
       user.userId,
       issueId,
-      validatedData.content
+      validatedData.content,
+      validatedData.mentions,
+      validatedData.attachments
     );
 
     res
