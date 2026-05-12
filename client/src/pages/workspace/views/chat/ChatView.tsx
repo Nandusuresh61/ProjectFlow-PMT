@@ -305,7 +305,14 @@ export const ChatView = () => {
                                     <div className="flex items-center justify-between">
                                         <p className="text-xs text-white/40 truncate">
                                             {conv.lastMessage 
-                                                ? (conv.lastMessage.type === 'IMAGE' ? 'Sent an image' : conv.lastMessage.content)
+                                                ? (
+                                                    <>
+                                                        <span className="font-semibold text-white/50">
+                                                            {conv.lastMessage.senderId === user?.userId ? 'You' : (conv.lastMessage.senderName?.split(' ')[0] || 'Member')}:
+                                                        </span>{' '}
+                                                        {conv.lastMessage.type === 'IMAGE' ? 'Sent an image' : conv.lastMessage.content}
+                                                    </>
+                                                  )
                                                 : (conv.type === 'workspace' ? 'General Channel' : 'Project Channel')
                                             }
                                         </p>
