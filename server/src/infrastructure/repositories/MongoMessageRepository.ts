@@ -66,4 +66,34 @@ export class MongoMessageRepository
     };
     return super.create(doc as MessageDoc);
   }
+
+  async getLastMessagesForRooms(roomIds: string[]): Promise<Message[]> {
+    const results = await this.model.aggregate([
+      { $match: { roomId: { $in: roomIds } } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$roomId",
+          lastMessage: { $first: "$$ROOT" },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lastMessage.senderId",
+          foreignField: "userId",
+          as: "sender",
+        },
+      },
+      { $unwind: { path: "$sender", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          "lastMessage.senderName": "$sender.fullName",
+        },
+      },
+      { $replaceRoot: { newRoot: "$lastMessage" } },
+    ]);
+
+    return results.map((doc) => this.mapToEntity(doc));
+  }
 }

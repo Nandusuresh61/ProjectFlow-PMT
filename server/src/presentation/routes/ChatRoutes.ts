@@ -8,4 +8,8 @@ router.get("/messages/:roomId", authenticatedUser, (req, res, next) =>
   chatController.getMessages(req, res, next)
 );
 
+router.get("/conversations/:workspaceId", authenticatedUser, (req, res, next) =>
+  chatController.getConversations(req, res, next)
+);
+
 export default router;
