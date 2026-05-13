@@ -16,7 +16,7 @@ export class AddCommentUseCase implements IAddCommentUseCase {
     private readonly _uidService: UidService
   ) {}
 
-  async execute(userId: string, issueId: string, content: string): Promise<CommentResponseDto> {
+  async execute(userId: string, issueId: string, content: string, mentions?: string[], attachments?: string[]): Promise<CommentResponseDto> {
     const issue = await this._issueRepository.findById(issueId);
     if (!issue) {
       throw new AppError(
@@ -35,7 +35,9 @@ export class AddCommentUseCase implements IAddCommentUseCase {
       userId,
       content,
       now,
-      now
+      now,
+      mentions || [],
+      attachments || []
     );
 
     const created = await this._commentRepository.create(comment);
@@ -47,6 +49,8 @@ export class AddCommentUseCase implements IAddCommentUseCase {
       content: created.content,
       createdAt: created.createdAt.toISOString(),
       updatedAt: created.updatedAt.toISOString(),
+      mentions: created.mentions,
+      attachments: created.attachments,
     };
   }
 }

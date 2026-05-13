@@ -9,6 +9,8 @@ export class MongoCommentRepository implements ICommentRepository {
       issueId: comment.issueId,
       authorId: comment.authorId,
       content: comment.content,
+      mentions: comment.mentions,
+      attachments: comment.attachments,
     });
 
     return this.toDomain(created);
@@ -16,13 +18,13 @@ export class MongoCommentRepository implements ICommentRepository {
 
   async findByIssueId(issueId: string): Promise<Comment[]> {
     const docs = await CommentModel.find({ issueId }).sort({ createdAt: 1 }).lean();
-    return docs.map((doc: CommentDocument) => this.toDomain(doc));
+    return (docs as unknown as CommentDocument[]).map((doc: CommentDocument) => this.toDomain(doc));
   }
 
   async findById(commentId: string): Promise<Comment | null> {
     const doc = await CommentModel.findOne({ commentId }).lean();
     if (!doc) return null;
-    return this.toDomain(doc);
+    return this.toDomain(doc as unknown as CommentDocument);
   }
 
   async update(commentId: string, content: string): Promise<Comment | null> {
@@ -33,7 +35,7 @@ export class MongoCommentRepository implements ICommentRepository {
     ).lean();
 
     if (!updated) return null;
-    return this.toDomain(updated as CommentDocument);
+    return this.toDomain(updated as unknown as CommentDocument);
   }
 
   async delete(commentId: string): Promise<boolean> {
@@ -48,7 +50,9 @@ export class MongoCommentRepository implements ICommentRepository {
       doc.authorId,
       doc.content,
       doc.createdAt,
-      doc.updatedAt
+      doc.updatedAt,
+      doc.mentions || [],
+      doc.attachments || []
     );
   }
 }

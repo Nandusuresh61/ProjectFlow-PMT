@@ -29,6 +29,8 @@ export interface CommentData {
   content: string;
   createdAt: string;
   updatedAt: string;
+  mentions: string[];
+  attachments: string[];
 }
 
 export interface IssueResponse<T = unknown> {
@@ -84,11 +86,13 @@ export const getIssueComments = async (
 
 export const addComment = async (
   issueId: string,
-  content: string
+  content: string,
+  mentions?: string[],
+  attachments?: string[]
 ): Promise<IssueResponse<CommentData>> => {
   const { data } = await API.post<IssueResponse<CommentData>>(
     API_ROUTES.ISSUE.COMMENTS(issueId),
-    { content }
+    { content, mentions, attachments }
   );
 
   return data;

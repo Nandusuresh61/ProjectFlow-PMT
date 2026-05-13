@@ -5,6 +5,8 @@ export interface CommentDocument extends Document {
   issueId: string;
   authorId: string;
   content: string;
+  mentions: string[];
+  attachments: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +17,8 @@ const CommentSchema = new Schema<CommentDocument>(
     issueId: { type: String, required: true, index: true },
     authorId: { type: String, required: true },
     content: { type: String, required: true },
+    mentions: { type: [String], default: [] },
+    attachments: { type: [String], default: [] },
   },
   { timestamps: true }
 );
