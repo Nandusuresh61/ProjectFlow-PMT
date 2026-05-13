@@ -5,13 +5,12 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IResetPasswordOtpStore } from "@/application/interfaces/use-cases/cache/IResetPasswordOtpStore";
 import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/User/IForgotPasswordOtpUseCase";
-import {
-  AppError,
-  AppMessages,
-  EmailType,
-  ErrorCode,
-  HttpStatusCode,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { EmailTemplates } from "@/infrastructure/utils/EmailTemplates";
 
 export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
   constructor(
@@ -20,7 +19,7 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
     private readonly _emailService: IEmailService,
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _passwordHash: IPasswordHasher,
-  ) {}
+  ) { }
   async execute(dto: ForgotRequestDto): Promise<void> {
     const { email } = dto;
     const user = await this._userRepo.findByEmail(email);
@@ -33,8 +32,8 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
       );
 
     const otp = this._otpGenerator.generateOtp();
-    
-    console.log("ForgotPasswordOtp : ", otp);
+
+    console.log(`OTP for forgot password: ${otp}`);
 
     const otpHash = await this._passwordHash.createHashPassword(otp);
 
@@ -43,15 +42,12 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
       { otpHash, attempt: 0, lastOtpAttemptAt: Date.now() },
       300,
     );
+    const { subject, body } = EmailTemplates.getResetPasswordTemplate(otp);
+
     await this._emailService.sendMail({
       to: email,
-      subject: "Reset your password - OTP",
-      body: `
-        <p>You requested to reset your password.</p>
-        <p>Your OTP is:</p>
-        <h2>${otp}</h2>
-        <p>This OTP will expire in 5 minutes.</p>
-      `,
+      subject,
+      body,
       type: EmailType.RESET_PASSWORD,
     });
   }

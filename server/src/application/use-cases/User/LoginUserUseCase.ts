@@ -5,13 +5,11 @@ import {
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
-import {
-  AppError,
-  AppMessages,
-  ErrorCode,
-  HttpStatusCode,
-  TokenEnums,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 
 export class LoginUserUseCase {
@@ -43,6 +41,14 @@ export class LoginUserUseCase {
         HttpStatusCode.CONFLICT,
       );
 
+    if (user.isBlocked) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.USER_BLOCKED,
+        HttpStatusCode.FORBIDDEN
+      );
+    }
+
     const membershipCount = await this._membershipRepo.countByUserId(user.userId);
 
     const accessToken = this._tokenService.createAccessToken({
@@ -50,6 +56,8 @@ export class LoginUserUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -57,6 +65,8 @@ export class LoginUserUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.REFRESH_TOKEN,
     });
     return {
@@ -65,8 +75,10 @@ export class LoginUserUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
+        profileImage: user.profileImage,
       },
       accessToken,
       refreshToken,

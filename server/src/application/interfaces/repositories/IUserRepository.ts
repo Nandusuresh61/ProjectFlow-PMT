@@ -9,6 +9,7 @@ export interface IUserRepository {
   update(user: User): Promise<void>;
   getAllUsersWithWorkspaces(options: UserQueryOptions): Promise<PaginatedUsersResult>;
   getUserDetails(userId: string): Promise<UserDetailsDto | null>;
+  findByIds(ids: string[]): Promise<User[]>;
   updateCurrentWorkspace(userId:string,currentWorkspaceId: string): Promise<void>
 
 }

@@ -34,7 +34,7 @@ export default function UserRoutes() {
       {/* User Protected Routes */}
       <Route element={<ProtectedRoutes />}>
         <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home/*" element={<Home />} />
       </Route>
 
       {/* Catch-all 404 for User Routes */}

@@ -11,7 +11,7 @@ export class MongoPlanRepository extends MongoBaseRepository<Plan, PlanDocument>
   protected mapToEntity(doc: PlanDocument): Plan {
     return new Plan(
       doc.planId,
-      doc.name,
+      doc.type,
       doc.priceMonthly,
       doc.description,
       doc.maxProjects,
@@ -26,7 +26,7 @@ export class MongoPlanRepository extends MongoBaseRepository<Plan, PlanDocument>
   async create(plan: Plan): Promise<Plan> {
     const planDoc = {
       planId: plan.planId,
-      name: plan.name,
+      type: plan.type,
       priceMonthly: plan.priceMonthly,
       description: plan.description,
       maxProjects: plan.maxProjects,
@@ -45,15 +45,15 @@ export class MongoPlanRepository extends MongoBaseRepository<Plan, PlanDocument>
     return super.findAll();
   }
 
-  async findByName(name: string): Promise<Plan | null> {
-    return this.findOne({ name });
+  async findActiveByType(type: string): Promise<Plan | null> {
+    return this.findOne({ type, isActive: true });
   }
 
   async update(plan: Plan): Promise<void> {
     await this.updateOne(
       { planId: plan.planId },
       {
-        name: plan.name,
+        type: plan.type,
         priceMonthly: plan.priceMonthly,
         description: plan.description,
         maxProjects: plan.maxProjects,

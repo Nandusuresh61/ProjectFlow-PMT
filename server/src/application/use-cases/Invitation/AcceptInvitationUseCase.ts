@@ -1,8 +1,14 @@
 import { IInvitationRepository } from "@/application/interfaces/repositories/IInvitationRepository";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
+import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode, InvitationStatus } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
 import crypto from "crypto";
 import { Membership } from "@/domain/entities/Membership";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
@@ -13,6 +19,8 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
     private readonly _invitationRepo: IInvitationRepository,
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _userRepo: IUserRepository,
+    private readonly _workspaceRepo: IWorkspaceRepository,
+    private readonly _planRepo: IPlanRepository,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _uidGenerator: IUidGenerator
   ) { }
@@ -59,11 +67,43 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
       );
     }
 
-    if (user.email !== invitation.email) {
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
       throw new AppError(
         ErrorCode.AUTH,
         AppMessages.UNAUTHORIZED_ACCESS,
         HttpStatusCode.FORBIDDEN
+      );
+    }
+
+    const workspace = await this._workspaceRepo.findById(invitation.workspaceId);
+
+    if (!workspace) {
+      throw new AppError(
+        ErrorCode.RESOURCE_NOT_FOUND,
+        AppMessages.WORKSPACE_NOT_FOUND,
+        HttpStatusCode.NOT_FOUND
+      );
+    }
+
+    const plan = await this._planRepo.findById(workspace.planId);
+
+    if (!plan) {
+      throw new AppError(
+        ErrorCode.PLAN,
+        AppMessages.PLAN_NOT_FOUND,
+        HttpStatusCode.BAD_REQUEST
+      );
+    }
+
+    const currentMemberCount = await this._membershipRepo.countByWorkspace(
+      invitation.workspaceId
+    );
+
+    if (plan.maxMembers !== -1 && currentMemberCount >= plan.maxMembers) {
+      throw new AppError(
+        ErrorCode.PLAN,
+        AppMessages.MEMBER_LIMIT_EXCEEDED,
+        HttpStatusCode.BAD_REQUEST
       );
     }
 

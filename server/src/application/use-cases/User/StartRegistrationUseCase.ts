@@ -5,14 +5,19 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IStartRegisterUseCase } from "@/application/interfaces/use-cases/User/IStartRegisterUseCase";
-import { AppError, AppMessages, EmailType, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { logger } from "@/infrastructure/utils/Logger";
+import { EmailTemplates } from "@/infrastructure/utils/EmailTemplates";
 
 export class StartRegistrationUseCase implements IStartRegisterUseCase {
   constructor(
     private readonly _userRepo: IUserRepository,
     private readonly _passwordHasher: IPasswordHasher,
-    private readonly _otpStore: IOtpStore,
+    private readonly _otpStore: IOtpStore,  
     private readonly _otpGenerator: IOtpGenerator,
     private readonly _emailService: IEmailService
   ) { }
@@ -50,16 +55,12 @@ export class StartRegistrationUseCase implements IStartRegisterUseCase {
       300
     );
 
+    const { subject, body } = EmailTemplates.getOtpTemplate(otp, data.fullName);
+
     await this._emailService.sendMail({
       to: data.email,
-      subject: AppMessages.EMAIL_SUBJECT_OTP,
-      body: `
-    <h3>OTP Verification</h3>
-    <p>Hello ${data.fullName},</p>
-    <p>Your OTP is:</p>
-    <h2>${otp}</h2>
-    <p>This OTP is valid for 5 minutes.</p>
-  `,
+      subject,
+      body,
       type: EmailType.OTP,
     });
   }

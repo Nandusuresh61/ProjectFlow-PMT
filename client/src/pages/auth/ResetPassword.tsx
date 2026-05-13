@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { resetPassword } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
+import { getErrorMessage } from "@/shared/utils/error";
 
 type ResetPasswordValues = { otp: string; newPassword: string };
 
@@ -56,8 +57,8 @@ export default function ResetPassword() {
       });
       toast.success(res.message || "Password reset successful");
       navigate("/login");
-    } catch (error: any) {
-      toast.error(error?.message || "Invalid OTP");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Invalid OTP");
     }
   };
 

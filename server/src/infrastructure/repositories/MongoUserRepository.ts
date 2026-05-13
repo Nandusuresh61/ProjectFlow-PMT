@@ -8,7 +8,7 @@ import {
 import { User } from "@/domain/entities/User";
 
 import { MongoBaseRepository } from "./MongoBaseRepository";
-import { AuthProvider } from "shared";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
 
 export class MongoUserRepository
   extends MongoBaseRepository<User, UserDoc>
@@ -27,6 +27,8 @@ export class MongoUserRepository
       providerId: doc.providerId,
       currentWorkspaceId: doc.currentWorkspaceId,
       isSuperAdmin: doc.isSuperAdmin,
+      isBlocked: doc.isBlocked,
+      profileImage: doc.profileImage || null,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
     };
@@ -38,6 +40,10 @@ export class MongoUserRepository
       throw new Error("User not found");
     }
     return user;
+  }
+
+  async findByIds(ids: string[]): Promise<User[]> {
+    return this.find({ userId: { $in: ids } });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -78,6 +84,8 @@ export class MongoUserRepository
         providerId: user.providerId,
         currentWorkspaceId: user.currentWorkspaceId,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
+        profileImage: user.profileImage,
         updatedAt: new Date(),
       },
     );
@@ -95,7 +103,7 @@ export class MongoUserRepository
     } = options;
     const skip = (page - 1) * limit;
 
-    const matchStage: any = {};
+    const matchStage: Record<string, unknown> = {};
     if (search) {
       matchStage.$or = [
         { fullName: { $regex: search, $options: "i" } },
@@ -103,7 +111,7 @@ export class MongoUserRepository
       ];
     }
 
-    const sortStage: any = {};
+    const sortStage: Record<string, 1 | -1> = {};
     sortStage[sortBy] = sortOrder === "asc" ? 1 : -1;
 
     const result = await this.model.aggregate([
@@ -136,14 +144,17 @@ export class MongoUserRepository
       },
     ]);
 
-    const users = result[0].users.map((user: any) => ({
+    const users = result[0].users.map((user: UserDoc & { memberships: { workspaceId: string, role: string }[], workspacesData: { workspaceId: string, name: string }[] }) => ({
       userId: user.userId,
       fullName: user.fullName,
       email: user.email,
+      isBlocked: user.isBlocked,
+      isSuperAdmin: user.isSuperAdmin,
+      profileImage: user.profileImage,
       createdAt: user.createdAt,
-      workspaces: user.memberships.map((membership: any) => {
+      workspaces: user.memberships.map((membership: { workspaceId: string, role: string }) => {
         const workspace = user.workspacesData.find(
-          (o: any) => o.workspaceId === membership.workspaceId,
+          (o: { workspaceId: string, name: string }) => o.workspaceId === membership.workspaceId,
         );
 
         return {
@@ -235,6 +246,9 @@ export class MongoUserRepository
           userId: { $first: "$userId" },
           fullName: { $first: "$fullName" },
           email: { $first: "$email" },
+          isBlocked: { $first: "$isBlocked" },
+          isSuperAdmin: { $first: "$isSuperAdmin" },
+          profileImage: { $first: "$profileImage" },
           createdAt: { $first: "$createdAt" },
           workspaces: {
             $push: {
@@ -251,8 +265,6 @@ export class MongoUserRepository
     ]);
 
     if (!result || result.length === 0) {
-      // If user has no workspaces, they won't appear in the aggregation because of $unwind "$memberships"
-      // Fallback: fetch user basic details
       const user = await this.model.findOne({ userId });
       if (!user) return null;
 
@@ -260,6 +272,9 @@ export class MongoUserRepository
         userId: user.userId,
         fullName: user.fullName,
         email: user.email,
+        isBlocked: user.isBlocked,
+        isSuperAdmin: user.isSuperAdmin,
+        profileImage: user.profileImage,
         createdAt: user.createdAt,
         workspaces: [],
       };

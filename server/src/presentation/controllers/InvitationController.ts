@@ -1,27 +1,28 @@
 import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import {
-  AppMessages,
-  CreateInvitationSchema,
-  HttpStatusCode,
-  ResponseHandler,
-  WorkspaceRoleEnum,
-} from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { CreateInvitationSchema } from "@/shared/schema/invitation/CreateInvitationSchema";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+
 import { IAcceptInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/IAcceptInvitationUseCase";
+import { IGetInvitationDetailsUseCase } from "@/application/interfaces/use-cases/Invitation/IGetInvitationDetailsUseCase";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 
 export class InvitationController {
   constructor(
     private readonly _createInvitationUseCase: ICreateInvitationUseCase,
-    private readonly _acceptInvitationUseCase: IAcceptInvitationUseCase
+    private readonly _acceptInvitationUseCase: IAcceptInvitationUseCase,
+    private readonly _getInvitationDetailsUseCase: IGetInvitationDetailsUseCase
   ) {}
 
   inviteUser = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: AuthRequest, res: Response): Promise<void> => {
       const validatedData = CreateInvitationSchema.parse(req.body);
 
       const workspaceId = req.params.workspaceId;
-      const inviterId = (req as any).user?.userId;
+      const inviterId = req.user?.userId;
 
       await Promise.all(
         validatedData.invites.map((invite) =>
@@ -40,9 +41,9 @@ export class InvitationController {
   );
 
   acceptInvitation = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const { token } = req.body;
-    const userId = (req as any).user?.userId;
+    const userId = req.user?.userId;
 
     const result = await this._acceptInvitationUseCase.execute(token, userId);
 
@@ -54,4 +55,18 @@ export class InvitationController {
     );
   }
 );
+
+  getInvitationDetails = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const { token } = req.params;
+      const details = await this._getInvitationDetailsUseCase.execute(token);
+
+      res.status(HttpStatusCode.OK).json(
+        ResponseHandler.success(
+          "Invitation details fetched successfully",
+          details
+        )
+      );
+    }
+  );
 }

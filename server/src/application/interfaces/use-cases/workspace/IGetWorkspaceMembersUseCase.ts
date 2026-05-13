@@ -1,6 +1,7 @@
 export interface IGetWorkspaceMembersUseCase {
   execute(
     workspaceId: string,
+    search?: string,
   ): Promise<
     {
       userId: string;
@@ -8,6 +9,7 @@ export interface IGetWorkspaceMembersUseCase {
       email: string;
       role: string;
       joinedAt: Date;
+      profileImage?: string;
     }[]
   >;
 }

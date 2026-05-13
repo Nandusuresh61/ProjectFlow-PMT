@@ -1,13 +1,20 @@
-import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/GetAllUserWithWorkspaceUsecase";
-import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDetailsUseCase";
+
 import { asyncHandler } from "../utils/AsyncHandler";
 import { Request, Response } from "express";
-import { AppMessages, HttpStatusCode, ResponseHandler, AppError, ErrorCode } from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { IGetAllUsersWithWorkspaceUsecase } from "@/application/interfaces/use-cases/SuperAdmin/IGetAllUsersWithWorkspaceUseCase";
+import { IGetUserDetailsUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetUserDetailsUseCase";
+import { IToggleUserBlockUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IToggleUserBlockUseCase";
 
 export class SuperAdminUserController {
   constructor(
-    private readonly _getAllUsersWithWorkspaceUseCase: GetAllUsersWithWorkspaceUseCase,
-    private readonly _getUserDetailsUseCase: GetUserDetailsUseCase,
+    private readonly _getAllUsersWithWorkspaceUseCase: IGetAllUsersWithWorkspaceUsecase,
+    private readonly _getUserDetailsUseCase: IGetUserDetailsUseCase,
+    private readonly _toggleUserBlockUseCase: IToggleUserBlockUseCase,
   ) { }
   getAllUsersWithWorkspaces = asyncHandler(
     async (req: Request, res: Response) => {
@@ -48,6 +55,17 @@ export class SuperAdminUserController {
       .status(HttpStatusCode.OK)
       .json(
         ResponseHandler.success(AppMessages.USER_FETCHING_SUCCESSFUL, result),
+      );
+  });
+
+  toggleUserBlock = asyncHandler(async (req: Request, res: Response) => {
+    const { userId } = req.params;
+    await this._toggleUserBlockUseCase.execute(userId);
+
+    res
+      .status(HttpStatusCode.OK)
+      .json(
+        ResponseHandler.success(AppMessages.USER_BLOCK_STATUS_UPDATED, null),
       );
   });
 }

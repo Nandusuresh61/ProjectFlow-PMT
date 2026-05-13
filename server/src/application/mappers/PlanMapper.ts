@@ -4,7 +4,7 @@ export class PlanMapper {
     static toDTO(plan: Plan) {
         return {
             planId: plan.planId,
-            name: plan.name,
+            type: plan.type,
             priceMonthly: plan.priceMonthly,
             description: plan.description,
             maxProjects: plan.maxProjects,

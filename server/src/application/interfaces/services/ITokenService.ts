@@ -1,4 +1,4 @@
-import { TokenPayloadType } from "shared";
+import { TokenPayloadType } from "@/shared/schema/TokenPayload";
 
 export interface ITokenService {
     createAccessToken(payload: TokenPayloadType): string;

@@ -1,17 +1,14 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler";
-import {
-  AppMessages,
-  AppError,
-  LoginUserSchema,
-  RegisterUserSchema,
-  ResponseHandler,
-  ErrorCode,
-  ForgotEmailSchema,
-  ResetPasswordSchema,
-} from "shared";
-import { HttpStatusCode } from "shared";
-import { config } from "@/app.config";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { AppError } from "@/shared/errors/AppError";
+import { LoginUserSchema } from "@/shared/schema/auth/LoginUserSchema";
+import { RegisterUserSchema } from "@/shared/schema/auth/RegisterUserSchema";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { ForgotEmailSchema } from "@/shared/schema/auth/ForgotEmailSchema";
+import { ResetPasswordSchema } from "@/shared/schema/auth/ResetPasswordSchema";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 
 import { IAuthController } from "../interfaces/IAuthController";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
@@ -25,9 +22,10 @@ import { IForgotPasswordOtpUseCase } from "@/application/interfaces/use-cases/Us
 import { IResetPasswordUseCase } from "@/application/interfaces/use-cases/User/IResetPasswordUseCase";
 import { IOAuthProviderService } from "@/application/interfaces/services/IOAuthProviderService";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { IGetMeUseCase } from "@/application/interfaces/use-cases/User/IGetMeUseCase";
 import { logger } from "@/infrastructure/utils/Logger";
-import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
+import { IAuthCookieService } from "@/application/interfaces/services/IAuthCookieService";
 
 export class AuthController implements IAuthController {
   constructor(
@@ -40,9 +38,9 @@ export class AuthController implements IAuthController {
     private readonly _resetPasswordUseCase: IResetPasswordUseCase,
     private readonly _googleOAuthService: IOAuthProviderService,
     private readonly _googleAuthUseCase: IGoogleAuthUseCase,
-    private readonly _userRepo: IUserRepository,
-    private readonly _membershipRepo: IMembershipRepository
-  ) { }
+    private readonly _getMeUseCase: IGetMeUseCase,
+    private readonly _authCookieService: IAuthCookieService,
+  ) {}
 
   startRegister = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
@@ -50,7 +48,9 @@ export class AuthController implements IAuthController {
 
       const dto = AuthRequestMapper.toStartRegisterDto(validatedData);
 
-      logger.info(`>>>  OTP <<< [AuthController] startRegister called with email: ${dto.email}`);
+      logger.info(
+        `>>>  OTP <<< [AuthController] startRegister called with email: ${dto.email}`,
+      );
 
       await this._startRegisterUseCase.execute(dto);
 
@@ -66,21 +66,11 @@ export class AuthController implements IAuthController {
 
       const result = await this._verifyOtpUseCase.execute({ email, otp });
 
-      res.cookie("access_token", result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-        path: "/",
-      });
-
-      res.cookie("refresh_token", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
-      });
+      this._authCookieService.setAuthCookies(
+        res,
+        result.accessToken,
+        result.refreshToken,
+      );
 
       res
         .status(HttpStatusCode.OK)
@@ -114,21 +104,11 @@ export class AuthController implements IAuthController {
       const dto = AuthRequestMapper.toLoginDto(validatedData);
       const result = await this._loginUserUseCase.execute(dto);
 
-      res.cookie("access_token", result.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-        path: "/",
-      });
-
-      res.cookie("refresh_token", result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
-      });
+      this._authCookieService.setAuthCookies(
+        res,
+        result.accessToken,
+        result.refreshToken,
+      );
 
       res
         .status(HttpStatusCode.OK)
@@ -156,21 +136,7 @@ export class AuthController implements IAuthController {
       const { accessToken, refreshToken: newRefreshToken } =
         await this._refreshTokenUseCase.execute(refreshToken);
 
-      res.cookie("access_token", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000,
-        path: "/",
-      });
-
-      res.cookie("refresh_token", newRefreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        path: "/api/auth" + config.REFRESH_TOKEN_PATH,
-      });
+      this._authCookieService.setAuthCookies(res, accessToken, newRefreshToken);
 
       res
         .status(HttpStatusCode.OK)
@@ -179,43 +145,22 @@ export class AuthController implements IAuthController {
   );
 
   LogoutUser = asyncHandler(async (req: Request, res: Response) => {
-    res.clearCookie("access_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
-    res.clearCookie("refresh_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/api/auth" + config.REFRESH_TOKEN_PATH,
-    });
+    this._authCookieService.clearAuthCookies(res);
 
     res
       .status(HttpStatusCode.OK)
       .json(ResponseHandler.success(AppMessages.LOGOUT_SUCCESS));
   });
 
-  getMe = asyncHandler(async (req: Request, res: Response) => {
-    const tokenPayload = (req as any).user;
+  getMe = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const tokenPayload = req.user!;
 
-    const user = await this._userRepo.findById(tokenPayload.userId);
-
-    const membershipCount = await this._membershipRepo.countByUserId(
-    user.userId
-  );
+    const userProfile = await this._getMeUseCase.execute(tokenPayload.userId);
 
     res.status(200).json(
       ResponseHandler.success(AppMessages.OPERATION_SUCCESS, {
-        user: {
-          userId: user.userId,
-          fullName: user.fullName,
-          email: user.email,
-          isSuperAdmin: user.isSuperAdmin,
-          currentWorkspaceId: user.currentWorkspaceId,
-          membershipCount
-        },
-      })
+        user: userProfile,
+      }),
     );
   });
 
@@ -257,28 +202,17 @@ export class AuthController implements IAuthController {
 
     const result = await this._googleAuthUseCase.execute(oauthPayload);
 
-    res.cookie("access_token", result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 15 * 60 * 1000,
-      path: "/",
-    });
+    this._authCookieService.setAuthCookies(
+      res,
+      result.accessToken,
+      result.refreshToken,
+    );
 
-    res.cookie("refresh_token", result.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/api/auth" + config.REFRESH_TOKEN_PATH,
-    });
-
-    res
-      .json(
-        ResponseHandler.success(
-          AppMessages.LOGIN_SUCCESS,
-          AuthResponseMapper.toUserResponse(result),
-        ),
-      );
+    res.json(
+      ResponseHandler.success(
+        AppMessages.LOGIN_SUCCESS,
+        AuthResponseMapper.toUserResponse(result),
+      ),
+    );
   });
 }

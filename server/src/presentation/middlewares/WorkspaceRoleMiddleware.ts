@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError, ErrorCode, HttpStatusCode, AppMessages } from "shared";
+import { Response, NextFunction } from "express";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
-import { WorkspaceRoleEnum } from "shared";
-
-interface AuthRequest extends Request {
-  user?: any;
-}
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { AuthRequest } from "./AuthMiddleware";
 
 export class WorkspaceRoleMiddleware {
   constructor(
@@ -18,7 +18,15 @@ export class WorkspaceRoleMiddleware {
     return async (req: AuthRequest, res: Response, next: NextFunction) => {
       try {
         const userId = req.user?.userId;
-        const { workspaceId } = req.params;
+        const workspaceId = req.params.workspaceId || req.body.workspaceId || req.query.workspaceId;
+
+        if (!workspaceId) {
+          throw new AppError(
+            ErrorCode.VALIDATION_ERROR,
+            AppMessages.WORKSPACE_NOT_FOUND,
+            HttpStatusCode.BAD_REQUEST
+          );
+        }
 
         if (!userId) {
           throw new AppError(

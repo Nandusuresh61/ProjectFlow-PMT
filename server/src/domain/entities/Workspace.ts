@@ -5,6 +5,8 @@ export class Workspace {
     public ownerId: string,
     public planId: string,
     public createdAt: Date,
-    public updatedAt: Date
+    public updatedAt: Date,
+    public isSuspended: boolean = false,
+    public planExpireDate: Date | null = null,
   ) { }
 }

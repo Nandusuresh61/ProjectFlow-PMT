@@ -1,0 +1,25 @@
+export class SprintAnalytics {
+  constructor(
+    public readonly analyticsId: string,
+    public readonly sprintId: string,
+    public readonly projectId: string,
+    public readonly workspaceId: string,
+    public readonly sprintName: string,
+    public readonly sprintGoal: string | null,
+    public readonly startedAt: Date,
+    public readonly completedAt: Date,
+    public readonly committedIssues: number,
+    public readonly completedIssues: number,
+    public readonly incompleteIssues: number,
+    public readonly committedStoryPoints: number,
+    public readonly completedStoryPoints: number,
+    public readonly spilloverStoryPoints: number,
+    public readonly committedEstimatedHours: number,
+    public readonly loggedHours: number,
+    public readonly remainingHours: number,
+    public readonly completionRate: number,
+    public readonly velocity: number,
+    public readonly scopeChangeCount: number,
+    public readonly createdAt: Date,
+  ) {}
+}

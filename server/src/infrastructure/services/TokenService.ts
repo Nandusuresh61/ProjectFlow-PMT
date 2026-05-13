@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
-import { TokenPayloadType } from "shared";
+import { TokenPayloadType } from "@/shared/schema/TokenPayload";
 import { config } from "@/app.config";
 
 export class TokenService implements ITokenService {
@@ -15,7 +15,7 @@ export class TokenService implements ITokenService {
   verifyAccessToken(token: string): TokenPayloadType | null {
     try {
       return jwt.verify(token, config.ACCESS_TOKEN_SECRET) as TokenPayloadType;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -23,7 +23,7 @@ export class TokenService implements ITokenService {
   verifyRefreshToken(token: string): TokenPayloadType | null {
     try {
       return jwt.verify(token, config.REFRESH_TOKEN_SECRET) as TokenPayloadType;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

@@ -11,7 +11,7 @@ export default function AdminRouteProtection() {
   }
 
   if (!user || !user.isSuperAdmin) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/home/dashboard" replace />;
   }
 
   return <Outlet />;

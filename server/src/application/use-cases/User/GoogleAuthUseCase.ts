@@ -3,15 +3,15 @@ import { IUserRepository } from "@/application/interfaces/repositories/IUserRepo
 import { ITokenService } from "@/application/interfaces/services/ITokenService";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { IGoogleAuthUseCase } from "@/application/interfaces/use-cases/User/IGoogleAuthUseCase";
-import {
-  AppError,
-  AppMessages,
-  AuthProvider,
-  ErrorCode,
-  HttpStatusCode,
-  TokenEnums,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { TokenEnums } from "@/shared/enums/TokenEnums";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { User } from "@/domain/entities/User";
+import { UserAuthResponseDto } from "@/application/dtos/UserDtos";
 
 export class GoogleAuthUseCase implements IGoogleAuthUseCase {
   constructor(
@@ -21,7 +21,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
     private readonly _membershipRepo: IMembershipRepository
   ) { }
 
-  async execute(payload: OAuthUserPayload) {
+  async execute(payload: OAuthUserPayload) : Promise<UserAuthResponseDto>{
     if (payload.provider !== AuthProvider.GOOGLE) {
       throw new AppError(
         ErrorCode.AUTH,
@@ -33,18 +33,30 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
 
     if (!user) {
       const now = new Date();
-      user = {
-        userId: this._uidGenerator.createId(),
-        fullName: payload.fullName,
-        email: payload.email,
-        authProvider: AuthProvider.GOOGLE,
-        providerId: payload.providerId,
-        isSuperAdmin: false,
-        createdAt: now,
-        updatedAt: now,
-      };
+      user = new User(
+        this._uidGenerator.createId(),
+        payload.fullName,
+        payload.email,
+        undefined,
+        AuthProvider.GOOGLE,
+        payload.providerId,
+        undefined,
+        false,
+        false,
+        payload.profileImage || null,
+        now,
+        now,
+      );
 
       await this._userRepo.createUser(user);
+    }
+
+    if (user.isBlocked) {
+      throw new AppError(
+        ErrorCode.AUTH,
+        AppMessages.USER_BLOCKED,
+        HttpStatusCode.FORBIDDEN
+      );
     }
 
     const membershipCount = await this._membershipRepo.countByUserId(user.userId);
@@ -54,6 +66,8 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.ACCESS_TOKEN,
     });
     const refreshToken = this._tokenService.createRefreshToken({
@@ -61,6 +75,8 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       fullName: user.fullName,
       email: user.email,
       isSuperAdmin: user.isSuperAdmin,
+      isBlocked: user.isBlocked,
+      currentWorkspaceId: user.currentWorkspaceId,
       type: TokenEnums.REFRESH_TOKEN,
     });
 
@@ -70,8 +86,10 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
         fullName: user.fullName,
         email: user.email,
         isSuperAdmin: user.isSuperAdmin,
+        isBlocked: user.isBlocked,
         currentWorkspaceId: user.currentWorkspaceId,
         membershipCount,
+        profileImage: user.profileImage,
       },
       accessToken,
       refreshToken,

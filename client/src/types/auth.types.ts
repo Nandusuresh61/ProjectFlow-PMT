@@ -11,6 +11,7 @@ export interface User {
   isSuperAdmin: boolean;
   membershipCount: number;
   currentWorkspaceId?: string;
+  profileImage?: string | null;
 }
 
 export interface AuthData {
@@ -41,4 +42,9 @@ export interface ResetPasswordOtpPayload {
 
 export interface ResendOtpPayload {
   email: string;
+}
+
+export interface changePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
 }

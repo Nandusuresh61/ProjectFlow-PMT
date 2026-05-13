@@ -1,18 +1,20 @@
-import { AppError, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export const errorMiddleware = (
-  err: any,
-  req: Request,
+  err: unknown,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
 
   if (err instanceof ZodError) {
     return res.status(HttpStatusCode.BAD_REQUEST).json({
       success: false,
-      message: err.issues[0]?.message || "Invalid input",
+      message: err.issues[0]?.message || AppMessages.INVALID_INPUT,
     });
   }
 
@@ -27,6 +29,6 @@ export const errorMiddleware = (
 
   return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
     success: false,
-    message: "Internal Server Error",
+    message: AppMessages.INTERNAL_SERVER_ERROR,
   });
 };

@@ -1,5 +1,6 @@
 import { Document, model, Schema } from "mongoose";
 
+
 export interface UserDoc extends Document {
   userId: string;
   fullName: string;
@@ -9,6 +10,8 @@ export interface UserDoc extends Document {
   providerId?: string;
   currentWorkspaceId?: string;
   isSuperAdmin: boolean;
+  isBlocked: boolean;
+  profileImage?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +50,13 @@ const UserSchema = new Schema<UserDoc>({
   isSuperAdmin: {
     type: Boolean,
     default: false,
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  profileImage: {
+    type: String
   },
   createdAt: {
     type: Date,

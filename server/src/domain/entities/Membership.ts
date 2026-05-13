@@ -1,4 +1,4 @@
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 
 export class Membership {
   constructor(

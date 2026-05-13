@@ -1,15 +1,15 @@
 export interface CreatePlanPayload {
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
-  maxProjects: number;
-  maxMembers: number;
+  maxProjects?: number;
+  maxMembers?: number;
   features: string[];
 }
 
 export interface Plan {
   planId: string;
-  name: string;
+  type: string;
   priceMonthly: number;
   description: string;
   maxProjects: number;

@@ -10,15 +10,14 @@ import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHash
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { Invitation } from "@/domain/entities/Invitation";
-import {
-  AppError,
-  AppMessages,
-  EmailType,
-  ErrorCode,
-  HttpStatusCode,
-  InvitationStatus,
-  WorkspaceRoleEnum,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { EmailTemplates } from "@/infrastructure/utils/EmailTemplates";
 
 import crypto from "crypto";
 
@@ -75,7 +74,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
      */
     const plan = await this._planRepo.findById(workspace.planId);
 
-    if (!plan || !plan.isActive) {
+    if (!plan) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.PLAN_NOT_FOUND,
@@ -89,7 +88,10 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
     const currentMemberCount =
       await this._membershipRepo.countByWorkspace(workspaceId);
 
-    if (currentMemberCount >= plan.maxMembers) {
+    const pendingInvitationCount =
+      await this._invitationRepo.countPendingByWorkspace(workspaceId);
+
+    if (plan.maxMembers !== -1 && (currentMemberCount + pendingInvitationCount >= plan.maxMembers)) {
       throw new AppError(
         ErrorCode.PLAN,
         AppMessages.MEMBER_LIMIT_EXCEEDED,
@@ -173,15 +175,12 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
      */
     const inviteLink = `${config.FRONTEND_BASE_URL}/invite/accept?token=${rawToken}`;
 
+    const { subject, body } = EmailTemplates.getInviteTemplate(inviteLink);
+
     await this._emailService.sendMail({
       to: email,
-      subject: "You're invited to join a workspace",
-      body: `
-        <p>You have been invited to join a workspace.</p>
-        <p>Click the link below to accept:</p>
-        <a href="${inviteLink}">${inviteLink}</a>
-        <p>This link will expire in 24 hours.</p>
-      `,
+      subject,
+      body,
       type: EmailType.INVITE_USER,
     });
   }

@@ -1,12 +1,11 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { AuthRequest } from "../middlewares/AuthMiddleware";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ICompleteOnboardingUseCase } from "@/application/interfaces/use-cases/Onboarding/ICompleteOnboardingUseCase";
-import {
-  CompleteOnboardingSchema,
-  ResponseHandler,
-  HttpStatusCode,
-  AppMessages,
-} from "shared";
+import { CompleteOnboardingSchema } from "@/shared/schema/onboarding/CompleteOnboardingSchema";
+import { ResponseHandler } from "@/shared/response/responseHandler";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class OnboardingController {
   constructor(
@@ -14,15 +13,14 @@ export class OnboardingController {
   ) { }
 
   completeOnboarding = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
+    async (req: AuthRequest, res: Response): Promise<void> => {
       const validatedData = CompleteOnboardingSchema.parse(req.body);
 
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.userId;
 
       const result = await this._completeOnboardingUseCase.execute({
         userId,
         workspaceName: validatedData.workspaceName,
-        planId: validatedData.planId,
         invites: validatedData.invites,
       });
 

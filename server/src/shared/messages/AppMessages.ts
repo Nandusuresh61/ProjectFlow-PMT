@@ -1,0 +1,181 @@
+export const AppMessages = {
+  EMAIL_ALREADY_EXISTS:
+    "The given email already exists. Please try a different one.",
+
+  INVALID_EMAIL: "Invalid email address.",
+
+  INVALID_CREDENTIALS: "Invalid email or password.",
+
+  INVALID_AUTH_PROVIDER: "Invalid Auth Provider.",
+
+  INVALID_GOOGLE_TOKEN: "Invalid Google Token.",
+
+  INVALID_GOOGLE_PAYLOAD: "Invalid Google Payload",
+
+  INVALID_GOOGLE_CODE: "Invalid Google Auth Code.",
+
+  GOOGLE_AUTH_FAILED: "Google authentication failed.",
+
+  OTP_INVALID_OR_EXPIRED: "OTP is invalid or has expired.",
+
+  OTP_MAX_ATTEMPTS_REACHED:
+    "Too many invalid OTP attempts. Please try again later.",
+
+  OTP_RESEND_COOLDOWN: "Please wait before requesting a new OTP.",
+
+  UNAUTHORIZED_ACCESS: "You are not authorized to perform this action.",
+
+  USER_NOT_FOUND: "User not found.",
+
+  TOKEN_EXPIRED: "Session expired. Please login again.",
+
+  TOKEN_INVALID: "Invalid authentication token.",
+
+  TOKEN_REFRESH_INVALID: "Invalid Refresh Token.",
+
+  OTP_SENT: "OTP has been sent to your email.",
+
+  OTP_RESENT: "OTP has been resent successfully.",
+
+  EMAIL_VERIFIED: "Email verified successfully.",
+
+  LOGIN_SUCCESS: "Login successful.",
+
+  LOGOUT_SUCCESS: "Logout successful.",
+
+  PASSWORD_RESET_SUCCESS: "Password reset successful.",
+
+  EMAIL_SENT_SUCCESS: "Email sent successfully.",
+
+  EMAIL_SENT_FAILED: "Unable to send email at the moment.",
+
+  EMAIL_SUBJECT_OTP: "Your OTP Code",
+  EMAIL_SUBJECT_RESEND_OTP: "Your Resend OTP Code",
+
+  EMAIL_SUBJECT_RESET_PASSWORD: "Reset your password",
+
+  EMAIL_SUBJECT_INVITE_USER: "You have been invited",
+
+  INTERNAL_SERVER_ERROR: "Something went wrong. Please try again later.",
+
+  VALIDATION_FAILED: "Invalid input data.",
+
+  RESOURCE_NOT_FOUND: "Requested resource not found.",
+
+  OPERATION_SUCCESS: "Operation completed successfully.",
+
+  PLAN_NAME_ALREADY_EXISTS: "Plan name already exists",
+
+  PLAN_CREATED: "Plan Created Successful.",
+
+  PLAN_NOT_FOUND: "Plan not found.",
+
+  PLAN_STATUS_UPDATED: "Plan Status updated.",
+
+  ONBOARDING_COMPLETED: "Onboarding completed successfully",
+
+  USER_ALREADY_ONBOARDED: "User already completed onboarding",
+
+  USER_FETCHING_SUCCESSFUL: "User Fetching Successfull",
+
+  WORKSPACE_NOT_FOUND: "Workspace not found",
+  WORKSPACE_NAME_ALREADY_EXISTS: "A workspace with this name already exists",
+  WORKSPACE_ALREADY_OWNED: "You already own a workspace. Only one workspace is allowed per user.",
+
+  WORKSPACE_JOIN_SUCCESS: "Joined workspace successfully!",
+
+  INVITATION_SENT_SUCCESS: "Invitation sent success",
+
+  INVITATION_ALREADY_SENT: " Invitation already sent to this email",
+
+  INVALID_INVITATION: "Invalid Invitation",
+
+  INVITATION_EXPIRED: "Invitation Expired!",
+
+  INVITATION_ACCEPTED: "Invitation Accepted",
+  
+  INVITATION_ALREADY_USED: "Invitation Already Used",
+  
+  MEMBER_LIMIT_EXCEEDED: "Members limit Already Exceeded",
+
+  USER_ALREADY_MEMBER: "User Already Member in this workspace",
+
+  USER_BLOCKED: "Your account has been blocked. Please contact support.",
+
+  USER_BLOCK_STATUS_UPDATED: "User block status updated successfully.",
+
+  USER_PROFILE_UPDATED: "Profile Updated Successfull",
+
+  PROJECT_CREATED: "Project created successfully",
+
+  PROJECT_UPDATED: "Project updated successfully",
+
+  PROJECT_NOT_FOUND: "Project not found",
+
+  PROJECT_LIMIT_EXCEEDED: "Projects limit already exceeded",
+
+  INVALID_PROJECT_MEMBERS: "One or more selected project members are not part of this workspace",
+
+  CURRENT_PASSWORD_IS_WRONG: "Current password is not matching to the exisiting password",
+
+  PASSWORD_CHANGED_SUCCESSFUL: "Password changed ",
+  
+  NO_ACTIVE_PLANS: "No active pricing plans available to assign to the new workspace.",
+
+  WORKSPACE_FETCHED_SUCCESSFULLY: "Workspaces fetched successfully",
+
+  WORKSPACE_STATUS_UPDATED: "Workspace status updated successfully",
+  PROJECT_NAME_ALREADY_EXISTS: "A project with this name already exists in the workspace",
+  PROJECT_KEY_ALREADY_EXISTS: "A project with this key already exists in the workspace",
+  ISSUE_CREATED_SUCCESS: "Issue Created",
+  ISSUE_NOT_FOUND: "Issue not found",
+
+  SPRINT_CREATED_SUCCESS: "Sprint Created Successful.",
+  PROJECT_ID_REQUIRED: "Project ID is required",
+  ISSUES_RETRIEVED_SUCCESS: "Issues retrieved successfully",
+  ISSUE_ID_REQUIRED: "Issue ID is required",
+  INVALID_ISSUE_DATA: "Invalid issue data",
+  ISSUE_UPDATED_SUCCESS: "Issue updated successfully",
+  SPRINTS_RETRIEVED_SUCCESS: "Sprints retrieved successfully",
+  ISSUE_ASSIGNED_TO_SPRINT_SUCCESS: "Issue assigned to sprint successfully",
+  TARGET_SPRINT_NOT_FOUND: "Sprint not found",
+  SPRINT_NOT_BELONG_TO_PROJECT: "Sprint does not belong to this project",
+  ISSUE_UPDATE_FAILED: "Failed to update issue",
+  INVALID_DATE_RANGE: "Start date cannot be after end date",
+  SPRINT_NOT_PLANNED: "Only planned sprints can be started",
+  SPRINT_ALREADY_ACTIVE: "An active sprint already exists for this project",
+  SPRINT_STARTED_SUCCESS: "Sprint started successfully",
+  ACTIVE_SPRINT_RETRIEVED_SUCCESS: "Active sprint retrieved successfully",
+  SPRINT_COMPLETED_SUCCESS: "Sprint completed successfully",
+  SPRINT_ANALYTICS_RETRIEVED_SUCCESS: "Sprint analytics retrieved successfully",
+  SPRINT_NOT_ACTIVE: "Only active sprints can be completed",
+  SPRINT_UPDATED_SUCCESS: "Sprint updated successfully",
+  COMMENT_ADDED_SUCCESS: "Comment added successfully",
+  COMMENTS_RETRIEVED_SUCCESS: "Comments retrieved successfully",
+  COMMENT_ID_REQUIRED: "Comment ID is required",
+  COMMENT_NOT_FOUND: "Comment not found",
+  COMMENT_DELETED_SUCCESS: "Comment deleted successfully",
+  COMMENT_UPDATED_SUCCESS: "Comment updated successfully",
+  WORKSPACE_ID_REQUIRED: "Workspace ID is required in headers (x-workspace-id) or params",
+  SUBSCRIPTION_NOT_FOUND: "Subscription not found for this workspace",
+  SUBSCRIPTION_EXPIRED: "Subscription expired or inactive. Please upgrade to continue.",
+  WORKLOG_ADDED_SUCCESS: "Worklog added successfully",
+  WORKLOG_UPDATED_SUCCESS: "Worklog updated successfully",
+  WORKLOG_DELETED_SUCCESS: "Worklog deleted successfully",
+  WORKLOGS_RETRIEVED_SUCCESS: "Worklogs retrieved successfully",
+  WORKLOG_NOT_FOUND: "Worklog not found",
+  TIME_TRACKING_NOT_AVAILABLE: "Time tracking is not available for this issue type",
+  INVALID_PAYMENT_SIGNATURE: "Invalid payment signature",
+  CANNOT_DOWNGRADE_TO_FREE: "Cannot downgrade to Free plan",
+  USER_NOT_WORKSPACE_MEMBER: "User is not a member of this workspace",
+  WORKSPACE_SWITCH_SUCCESS: "Switched workspace successfully",
+  CHAT_UNAUTHORIZED_ROOM: "Unauthorized access to chat room",
+  CHAT_UNAUTHORIZED_SEND: "Unauthorized to send messages to this room",
+  CHAT_SEND_FAILED: "Failed to send message",
+  INVALID_INPUT: "Invalid input",
+  SUBSCRIPTION_DETAILS_FETCHED: "Subscription details fetched successfully",
+  SPRINT_DATE_NOT_SET: "Sprint dates are not set",
+  SPRINT_HISTORY_NOT_FOUND: "Sprint not found",
+  SPRINT_HISTORY_ONLY_COMPLETED: "Historical details are only available for completed sprints",
+  SPRINT_HISTORY_RETRIEVED_SUCCESS: "Sprint history details retrieved successfully",
+};

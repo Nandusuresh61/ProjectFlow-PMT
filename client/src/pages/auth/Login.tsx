@@ -1,42 +1,21 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GridBackground } from "@/components/ui/gridBackground";
 import { toast } from "sonner";
 import { loginUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
-import { LoginUserSchema } from "shared";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { LoginUserSchema } from "@/shared/schema/auth/LoginUserSchema";
 import { Logo } from "@/components/common/Logo";
-import CustomForm, { type FormField } from "@/components/form/CustomFrom";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import CustomForm, { type FormField } from "@/components/form/CustomForm";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
+import { useEffect } from "react";
+import { getErrorMessage } from "@/shared/utils/error";
 
-type LoginValues = { email: string; password: string };
 
-const fields: FormField<LoginValues>[] = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "m@example.com",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    labelSuffix: (
-      <Link
-        to="/forgot-password"
-        className="text-xs text-[#576CBC]/60 hover:text-[#A5D7E8] transition-colors underline-offset-4 hover:underline"
-      >
-        Forgot password?
-      </Link>
-    ),
-  },
-];
-
-const INITIAL_VALUES: LoginValues = { email: "", password: "" };
 
 const OAuthFooter = (
   <>
@@ -59,6 +38,53 @@ export default function Login() {
   const setLoading = AuthUserState((state) => state.setLoading);
   const checkAuth = AuthUserState((state) => state.checkAuth);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  const prefillEmail = location.state?.prefillEmail || "";
+  const isInvite = location.state?.isInvite || false;
+
+  type LoginValues = { email: string; password: string };
+
+  const INITIAL_VALUES: LoginValues = { email: prefillEmail, password: "" };
+
+  const fields: FormField<LoginValues>[] = [
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "m@example.com",
+      inputProps: {
+        readOnly: isInvite,
+        disabled: isInvite,
+      },
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      labelSuffix: (
+        <Link
+          to="/forgot-password"
+          className="text-xs text-[#576CBC]/60 hover:text-[#A5D7E8] transition-colors underline-offset-4 hover:underline"
+        >
+          Forgot password?
+        </Link>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status === "blocked") {
+      toast.error(AppMessages.USER_BLOCKED, {
+        duration: 5000,
+        id: "blocked-toast",
+      });
+      
+      navigate("/login", { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const handleLogin = async (values: LoginValues) => {
     setLoading(true);
@@ -70,7 +96,7 @@ export default function Login() {
         try {
           await acceptInvitation(pendingToken);
           localStorage.removeItem("invite_token");
-          toast.success("Joined workspace successfully!");
+          toast.success(AppMessages.WORKSPACE_JOIN_SUCCESS);
         } catch (inviteErr) {
           console.error("Invitation failed:", inviteErr);
         }
@@ -78,9 +104,9 @@ export default function Login() {
 
       await checkAuth();
       toast.success(response.message);
-      navigate("/home");
-    } catch (error: any) {
-      toast.error(error.message);
+      navigate("/home/dashboard");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -128,7 +154,7 @@ export default function Login() {
             <CustomForm
               fields={fields}
               initialValues={INITIAL_VALUES}
-              schema={LoginUserSchema as any}
+              schema={LoginUserSchema}
               onSubmit={handleLogin}
               submitLabel="Sign In"
               loadingLabel="Signing in..."

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users } from "lucide-react";
+import { LayoutDashboard, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { toast } from "sonner";
 import { Logo } from "@/components/common/Logo";
+import { getErrorMessage } from "@/shared/utils/error";
 
 interface SidebarProps {
     collapsed: boolean;
@@ -23,7 +24,8 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", path: "/super-admin/dashboard" },
-        { icon: Users, label: "Users", path: "/super-admin/workspaces" },
+        { icon: Users, label: "Users", path: "/super-admin/users" },
+        { icon: Building2, label: "Workspaces", path: "/super-admin/workspaces" },
         { icon: CreditCard, label: "Plans", path: "/super-admin/plans" },
     ];
 
@@ -36,8 +38,8 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
                 clearUser();
                 navigate('/login');
             }, 800);
-        } catch (error: any) {
-            toast.error(error.message || "Failed to logout");
+        } catch (error: unknown) {
+            toast.error(getErrorMessage(error) || "Failed to logout");
             setIsLoading(false);
         }
     };

@@ -9,6 +9,7 @@ import { PasswordHash } from "../services/PasswordHash";
 import { UidService } from "../services/UidService";
 import { InvitationController } from "@/presentation/controllers/InvitationController";
 import { AcceptInvitationUseCase } from "@/application/use-cases/Invitation/AcceptInvitationUseCase";
+import { GetInvitationDetailsUseCase } from "@/application/use-cases/Invitation/GetInvitationDetailsUseCase";
 
 const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
@@ -35,11 +36,19 @@ const acceptInvitationUseCase = new AcceptInvitationUseCase(
   invitationRepo,
   membershipRepo,
   userRepo,
+  workspaceRepo,
+  planRepo,
   passwordHasher,
   uidGenerator
+);
+
+const getInvitationDetailsUseCase = new GetInvitationDetailsUseCase(
+  invitationRepo,
+  userRepo
 );
 
 export const invitationController = new InvitationController(
   createInvitationUseCase,
   acceptInvitationUseCase,
+  getInvitationDetailsUseCase
 );

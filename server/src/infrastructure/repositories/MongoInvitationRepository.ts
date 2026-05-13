@@ -2,7 +2,7 @@ import { IInvitationRepository } from "@/application/interfaces/repositories/IIn
 import { Invitation } from "@/domain/entities/Invitation";
 import { InvitationModel, InvitationDocument } from "../database/models/MongoInvitationModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
-import { InvitationStatus } from "shared";
+import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
 
 export class MongoInvitationRepository
   extends MongoBaseRepository<Invitation, InvitationDocument>
@@ -63,5 +63,12 @@ export class MongoInvitationRepository
       { invitationId },
       { status }
     );
+  }
+
+  async countPendingByWorkspace(workspaceId: string): Promise<number> {
+    return InvitationModel.countDocuments({
+      workspaceId,
+      status: InvitationStatus.PENDING,
+    });
   }
 }

@@ -1,9 +1,13 @@
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { VerifyAuthDto } from "@/application/dtos/AuthDto";
-import { AppError, AppMessages, ErrorCode, HttpStatusCode } from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { IRegisterUserUseCase } from "@/application/interfaces/use-cases/User/IRegisterUserUseCase";
 import { IVerifyOtpUseCase } from "@/application/interfaces/use-cases/User/IVerifyOtpUseCase";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
+import { UserAuthResponseDto } from "@/application/dtos/UserDtos";
 
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
   constructor(
@@ -12,7 +16,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     private readonly _registerUserUseCase: IRegisterUserUseCase
   ) {}
 
-  async execute(data: VerifyAuthDto) {
+  async execute(data: VerifyAuthDto) :Promise<UserAuthResponseDto>{
     const stored = await this._otpStore.get(data.email);
 
     if (!stored) {

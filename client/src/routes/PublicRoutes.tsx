@@ -18,7 +18,7 @@ export default function PublicRoutes() {
     if (user && user.membershipCount === 0) {
       return <Navigate to="/onboarding" replace />;
     }
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/home/dashboard" replace />;
   }
   return <Outlet />;
 }

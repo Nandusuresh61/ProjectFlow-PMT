@@ -5,6 +5,7 @@ import { googleAuth } from "@/services/auth/auth.api";
 import { AuthUserState } from "@/store/auth.store";
 import { Loader } from "@/components/ui/Loader";
 import { acceptInvitation } from "@/services/Invitation/invitation.api";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export default function GoogleCallback() {
   const navigate = useNavigate();
@@ -40,13 +41,13 @@ export default function GoogleCallback() {
           await checkAuth();
 
           toast.success("Login successful");
-          navigate("/home");
+          navigate("/home/dashboard");
         } else {
           throw new Error("No user data received");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Google Auth Error:", err);
-        toast.error(err.message || "Google login failed");
+        toast.error(getErrorMessage(err) || "Google login failed");
         navigate("/login");
       } finally {
         setLoading(false);

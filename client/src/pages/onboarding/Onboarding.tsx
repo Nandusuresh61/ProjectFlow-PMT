@@ -6,27 +6,23 @@ import { useNavigate } from "react-router-dom";
 import { AuthUserState } from "@/store/auth.store";
 import { completeOnboarding } from "@/services/onboarding/onboarding.api";
 import { toast } from "sonner";
-import { getPlans } from "@/services/plan/plan.api";
-import type { Plan } from "@/types/plan.types";
 import { Logo } from "@/components/common/Logo";
 import { GridBackground } from "@/components/ui/gridBackground";
-import { BackgroundAtmosphere } from "../workspace/components/BaseComponents";
+import { BackgroundAtmosphere } from "../workspace/components/BackgroundAtmosphere";
 import type {
   OnboardingState,
   WorkspaceValues,
 } from "@/types/onboarding.types";
 
 import { StepWorkspace } from "./StepWorkspace";
-import { StepPlan } from "./StepPlan";
 import { StepTeam } from "./StepTeam";
 
 const steps = [
   { id: 1, name: "Workspace" },
-  { id: 2, name: "Plan" },
-  { id: 3, name: "Team" },
+  { id: 2, name: "Team" },
 ];
 
-const workspaceRegex = /^[a-zA-Z0-9][a-zA-Z0-9 _-]{1,48}[a-zA-Z0-9]$/;
+
 
 const slideVariants = {
   enter: (d: number) => ({ x: d > 0 ? 50 : -50, opacity: 0 }),
@@ -34,17 +30,15 @@ const slideVariants = {
   exit: (d: number) => ({ x: d < 0 ? 50 : -50, opacity: 0 }),
 };
 
-import { WorkspaceRoleEnum } from "shared";
+import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { getErrorMessage } from "@/shared/utils/error";
 
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [plansLoading, setPlansLoading] = useState(true);
   const [finishLoading, setFinishLoading] = useState(false);
   const [formData, setFormData] = useState<OnboardingState>({
     workspaceName: "",
-    planId: "",
     teamMembers: [{ email: "", role: WorkspaceRoleEnum.WORKSPACE_MEMBER }],
   });
 
@@ -53,23 +47,10 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (user && user.membershipCount > 0) {
-      navigate("/home");
+      navigate("/home/dashboard");
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await getPlans();
-        setPlans(response.data);
-      } catch {
-        toast.error("Failed to load plans");
-      } finally {
-        setPlansLoading(false);
-      }
-    };
-    fetchPlans();
-  }, []);
 
   const updateData = (data: Partial<OnboardingState>) =>
     setFormData((prev) => ({ ...prev, ...data }));
@@ -85,25 +66,13 @@ export default function Onboarding() {
   };
 
   const handleWorkspaceSubmit = async (values: WorkspaceValues) => {
-    const name = values.workspaceName.trim();
-    if (!workspaceRegex.test(name)) {
-      toast.error(
-        "Workspace must be 3-50 characters and contain only letters, numbers, spaces, - or _",
-      );
-      return;
-    }
-    updateData({ workspaceName: name });
+    updateData({ workspaceName: values.workspaceName.trim() });
     goNext();
   };
 
   const handleFinish = async () => {
     if (!formData.workspaceName.trim()) {
       toast.error("Workspace name is required");
-      return;
-    }
-
-    if (!formData.planId) {
-      toast.error("Please select a plan");
       return;
     }
 
@@ -118,7 +87,6 @@ export default function Onboarding() {
     try {
       const response = await completeOnboarding({
         workspaceName: formData.workspaceName,
-        planId: formData.planId,
         invites: validInvites.length > 0 ? validInvites : undefined,
       });
 
@@ -131,9 +99,9 @@ export default function Onboarding() {
       await checkAuth();
 
       toast.success("Workspace created successfully 🎉");
-      navigate("/home");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to complete onboarding");
+      navigate("/home/dashboard");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || "Failed to complete onboarding");
     } finally {
       setFinishLoading(false);
     }
@@ -224,16 +192,6 @@ export default function Onboarding() {
                   />
                 )}
                 {currentStep === 2 && (
-                  <StepPlan
-                    data={formData}
-                    plans={plans}
-                    loading={plansLoading}
-                    updateData={updateData}
-                    onNext={goNext}
-                    onBack={goBack}
-                  />
-                )}
-                {currentStep === 3 && (
                   <StepTeam
                     data={formData}
                     updateData={updateData}

@@ -4,14 +4,13 @@ import { IOtpGenerator } from "@/application/interfaces/services/IOtpGenerator";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IOtpStore } from "@/application/interfaces/use-cases/cache/IOtpStore";
 import { IResendOtpUseCase } from "@/application/interfaces/use-cases/User/IResendOtpUseCase";
-import {
-  AppError,
-  AppMessages,
-  EmailType,
-  ErrorCode,
-  HttpStatusCode,
-} from "shared";
+import { AppError } from "@/shared/errors/AppError";
+import { AppMessages } from "@/shared/messages/AppMessages";
+import { EmailType } from "@/shared/enums/EmailEnums";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { logger } from "@/infrastructure/utils/Logger";
+import { EmailTemplates } from "@/infrastructure/utils/EmailTemplates";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
   constructor(
@@ -78,15 +77,12 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
     // Otp to mail
     logger.info(`>>>  OTP <<< [ResendOtp] New OTP for ${email}: ${otp}`);
 
+    const { subject, body } = EmailTemplates.getOtpTemplate(otp);
+
     await this._emailService.sendMail({
       to: email,
-      subject: AppMessages.EMAIL_SUBJECT_RESEND_OTP,
-      body: `
-        <h3>OTP Verification</h3>
-        <p>Your new OTP is:</p>
-        <h2>${otp}</h2>
-        <p>This OTP is valid for 5 minutes.</p>
-      `,
+      subject,
+      body,
       type: EmailType.OTP,
     });
   }

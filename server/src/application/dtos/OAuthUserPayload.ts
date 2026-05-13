@@ -1,4 +1,4 @@
-import { AuthProvider } from "shared";
+import { AuthProvider } from "@/shared/enums/AuthProviders";
 
 
 export interface OAuthUserPayload {
@@ -6,4 +6,5 @@ export interface OAuthUserPayload {
   fullName: string;
   provider: AuthProvider;
   providerId: string;
+  profileImage?: string;
 }
