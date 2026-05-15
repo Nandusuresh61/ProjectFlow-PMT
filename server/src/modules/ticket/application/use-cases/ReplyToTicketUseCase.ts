@@ -1,0 +1,44 @@
+import { IReplyToTicketUseCase, ReplyToTicketDto } from "./IReplyToTicketUseCase";
+import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
+import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessageRepository";
+import { TicketMessage } from "../../domain/entities/TicketMessage";
+import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { TicketStatus } from "../../domain/enums/TicketStatus";
+
+export class ReplyToTicketUseCase implements IReplyToTicketUseCase {
+  constructor(
+    private readonly _ticketRepository: ITicketRepository,
+    private readonly _ticketMessageRepository: ITicketMessageRepository,
+    private readonly _uidGenerator: IUidGenerator
+  ) {}
+
+  async execute(data: ReplyToTicketDto): Promise<void> {
+    const ticket = await this._ticketRepository.findById(data.ticketId);
+    if (!ticket) {
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Ticket not found", HttpStatusCode.NOT_FOUND);
+    }
+
+    if (ticket.status === TicketStatus.CLOSED) {
+        throw new AppError(ErrorCode.VALIDATION_ERROR, "Cannot reply to a closed ticket", HttpStatusCode.BAD_REQUEST);
+    }
+
+    const messageId = this._uidGenerator.createId();
+    const now = new Date();
+
+    const ticketMessage = new TicketMessage(
+      messageId,
+      data.ticketId,
+      data.senderId,
+      data.message,
+      data.attachments || [],
+      now,
+      now
+    );
+
+    await this._ticketMessageRepository.create(ticketMessage);
+    await this._ticketRepository.updateLastReplyAt(data.ticketId, now);
+  }
+}

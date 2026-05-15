@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProfileSettings from '@/pages/profile/Profile';
 import { SecuritySettings } from '../security/SecuritySettings';
 import { BillingSettings } from '../billing/BillingSettings';
+import { SupportTickets } from '../support/SupportTickets';
 import { useWorkspaceStore } from '@/store/workspace.store';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 
@@ -102,6 +103,10 @@ export const SettingsView = () => {
                         ) : activeTab === 'security' ? (
                             <div className="h-full p-4 lg:p-8">
                                 <SecuritySettings />
+                            </div>
+                        ) : activeTab === 'tickets' ? (
+                            <div className="h-full">
+                                <SupportTickets />
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center h-[500px]">

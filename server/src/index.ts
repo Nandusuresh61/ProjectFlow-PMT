@@ -18,6 +18,7 @@ import sprintAnalyticsRoutes from "@/presentation/routes/SprintAnalyticsRoutes";
 import chatRoutes from "@/presentation/routes/ChatRoutes";
 import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
 import workLogRoutes from "@/presentation/routes/WorkLogRoutes";
+import ticketRoutes from "@/modules/ticket/presentation/routes/ticketRoutes";
 import morgan from "morgan";
 
 import http from "http";
@@ -56,6 +57,7 @@ app.use("/api", sprintAnalyticsRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/worklog", workLogRoutes);
+app.use("/api/tickets", ticketRoutes);
 
 app.use(errorMiddleware);
 
