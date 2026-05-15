@@ -4,6 +4,7 @@ import { WorkspaceRepository } from "@/infrastructure/repositories/MongoWorkspac
 import { MongoPlanRepository } from "@/infrastructure/repositories/MongoPlanRepository";
 import { UidService } from "@/infrastructure/services/UidService";
 import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
+import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
 
 import { CreateTicketUseCase } from "../../application/use-cases/CreateTicketUseCase";
 import { ReplyToTicketUseCase } from "../../application/use-cases/ReplyToTicketUseCase";
@@ -20,6 +21,7 @@ const workspaceRepository = new WorkspaceRepository();
 const planRepository = new MongoPlanRepository();
 const uidGenerator = new UidService();
 const membershipRepository = new MembershipRepository();
+const userRepository = new MongoUserRepository();
 
 const createTicketUseCase = new CreateTicketUseCase(
   ticketRepository,
@@ -40,12 +42,13 @@ const getWorkspaceTicketsUseCase = new GetWorkspaceTicketsUseCase(ticketReposito
 const getTicketDetailsUseCase = new GetTicketDetailsUseCase(
   ticketRepository,
   ticketMessageRepository,
-  membershipRepository
+  membershipRepository,
+  userRepository
 );
 
 const updateTicketStatusUseCase = new UpdateTicketStatusUseCase(ticketRepository);
 
-const getAllTicketsUseCase = new GetAllTicketsUseCase(ticketRepository);
+const getAllTicketsUseCase = new GetAllTicketsUseCase(ticketRepository, workspaceRepository);
 
 export const ticketController = new TicketController(
   createTicketUseCase,

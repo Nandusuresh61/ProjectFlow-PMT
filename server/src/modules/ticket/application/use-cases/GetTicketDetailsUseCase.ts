@@ -4,14 +4,15 @@ import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessa
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
-import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
 
 export class GetTicketDetailsUseCase implements IGetTicketDetailsUseCase {
   constructor(
     private readonly _ticketRepository: ITicketRepository,
     private readonly _ticketMessageRepository: ITicketMessageRepository,
-    private readonly _membershipRepository: IMembershipRepository
+    private readonly _membershipRepository: IMembershipRepository,
+    private readonly _userRepository: IUserRepository
   ) {}
 
   async execute(ticketId: string, userId: string, isSuperAdmin: boolean): Promise<TicketDetailsResponse> {
@@ -30,9 +31,19 @@ export class GetTicketDetailsUseCase implements IGetTicketDetailsUseCase {
 
     const messages = await this._ticketMessageRepository.findByTicketId(ticketId);
 
+    // Fetch sender names
+    const senderIds = Array.from(new Set(messages.map(m => m.senderId)));
+    const users = await this._userRepository.findByIds(senderIds);
+    const userMap = new Map(users.map(u => [u.userId, u.fullName]));
+
+    const messagesWithSender = messages.map(msg => ({
+        ...msg,
+        senderName: userMap.get(msg.senderId) || "Unknown User"
+    }));
+
     return {
       ticket,
-      messages,
+      messages: messagesWithSender,
     };
   }
 }

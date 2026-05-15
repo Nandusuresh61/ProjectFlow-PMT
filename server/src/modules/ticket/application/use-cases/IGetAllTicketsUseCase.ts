@@ -8,6 +8,10 @@ export interface GetAllTicketsFilters {
   limit?: number;
 }
 
+export interface TicketWithWorkspace extends Ticket {
+  workspaceName: string;
+}
+
 export interface IGetAllTicketsUseCase {
-  execute(filters: GetAllTicketsFilters): Promise<{ tickets: Ticket[]; total: number }>;
+  execute(filters: GetAllTicketsFilters): Promise<{ tickets: TicketWithWorkspace[]; total: number }>;
 }

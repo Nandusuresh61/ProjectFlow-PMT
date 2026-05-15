@@ -1,9 +1,13 @@
 import { Ticket } from "../../domain/entities/Ticket";
 import { TicketMessage } from "../../domain/entities/TicketMessage";
 
+export interface TicketMessageWithSender extends TicketMessage {
+  senderName: string;
+}
+
 export interface TicketDetailsResponse {
   ticket: Ticket;
-  messages: TicketMessage[];
+  messages: TicketMessageWithSender[];
 }
 
 export interface IGetTicketDetailsUseCase {

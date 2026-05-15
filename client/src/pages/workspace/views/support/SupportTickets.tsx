@@ -307,7 +307,7 @@ function TicketDetailView({ ticketId, onBack }: TicketDetailViewProps) {
               key={msg.messageId}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`flex gap-4 ${isUser ? "flex-row" : "flex-row-reverse"}`}
+              className={`flex gap-4 ${isUser ? "flex-row-reverse" : "flex-row"}`}
             >
               <div className="flex-shrink-0">
                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-all ${
@@ -318,10 +318,10 @@ function TicketDetailView({ ticketId, onBack }: TicketDetailViewProps) {
                   {isUser ? <UserIcon size={20} /> : <ShieldCheck size={20} />}
                 </div>
               </div>
-              <div className={`flex flex-col max-w-[80%] ${isUser ? "items-start" : "items-end"}`}>
+              <div className={`flex flex-col max-w-[80%] ${isUser ? "items-end" : "items-start"}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] font-black uppercase tracking-widest text-[#576CBC]/60">
-                    {isUser ? "You" : "Support Team"}
+                    {isUser ? "You" : (msg.senderName || "Support Team")}
                   </span>
                   <span className="text-[10px] font-bold text-[#576CBC]/40 tracking-wider">
                     {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
@@ -329,8 +329,8 @@ function TicketDetailView({ ticketId, onBack }: TicketDetailViewProps) {
                 </div>
                 <div className={`p-4 rounded-3xl text-sm leading-relaxed ${
                   isUser 
-                    ? "bg-white/[0.03] border border-white/5 text-white/90 rounded-tl-none" 
-                    : "bg-[#A5D7E8]/10 border border-[#A5D7E8]/20 text-white rounded-tr-none shadow-lg"
+                    ? "bg-white/[0.03] border border-white/5 text-white/90 rounded-tr-none" 
+                    : "bg-[#A5D7E8]/10 border border-[#A5D7E8]/20 text-white rounded-tl-none shadow-lg"
                 }`}>
                   {msg.message}
                   

@@ -46,16 +46,9 @@ export class MongoTicketRepository implements ITicketRepository {
       [TicketPriority.LOW]: 3,
     };
 
-    // Note: Mongoose sort doesn't support custom priority order directly easily without aggregation or mapping.
-    // For now, we'll sort by priority field (H, M, L) and then lastReplyAt.
-    // Actually, sorting alphabetically 'HIGH', 'MEDIUM', 'LOW' works well? H, M, L... L comes after H, M.
-    // H < M < L (alphabetical) => HIGH, MEDIUM, LOW.
-    // So sorting by priority ascending will give HIGH, LOW, MEDIUM. Not quite.
-    // I'll use simple sort for now and maybe aggregation later if needed.
-    
     const [docs, total] = await Promise.all([
       TicketModel.find(query)
-        .sort({ priority: 1, lastReplyAt: -1 }) // This is a rough sort, but should be fine for now
+        .sort({ priority: 1, lastReplyAt: -1 })
         .skip(skip)
         .limit(pagination.limit)
         .lean(),

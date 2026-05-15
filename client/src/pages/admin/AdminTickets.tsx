@@ -116,7 +116,7 @@ export default function AdminTickets() {
                     Active {formatDistanceToNow(new Date(ticket.lastReplyAt), { addSuffix: true })}
                   </div>
                   <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
-                    Workspace: <span className="text-zinc-300">{ticket.workspaceId.substring(0, 8)}</span>
+                    Workspace: <span className="text-zinc-300">{ticket.workspaceName || ticket.workspaceId}</span>
                   </div>
                   <div className={`text-[10px] font-black uppercase tracking-widest ${
                     ticket.planType === 'ENTERPRISE' ? 'text-purple-400' : 
@@ -291,7 +291,9 @@ function AdminTicketDetailView({ ticketId, onBack }: { ticketId: string, onBack:
               </div>
               <div className={`flex flex-col max-w-[75%] ${isUser ? "items-start" : "items-end"}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{isUser ? "User" : "Admin (You)"}</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                    {isUser ? (msg.senderName || "User") : "Admin (You)"}
+                  </span>
                   <span className="text-[10px] text-zinc-600 font-medium">{formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}</span>
                 </div>
                 <div className={`p-4 rounded-2xl text-sm ${

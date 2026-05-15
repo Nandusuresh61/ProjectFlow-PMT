@@ -16,6 +16,7 @@ export enum TicketPriority {
 export interface Ticket {
   ticketId: string;
   workspaceId: string;
+  workspaceName?: string;
   createdBy: string;
   title: string;
   planType: string;
@@ -31,6 +32,7 @@ export interface TicketMessage {
   messageId: string;
   ticketId: string;
   senderId: string;
+  senderName?: string;
   message: string;
   attachments: string[];
   createdAt: string;
