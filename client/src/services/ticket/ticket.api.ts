@@ -61,8 +61,10 @@ export const createTicket = async (payload: CreateTicketPayload) => {
   return data;
 };
 
-export const getWorkspaceTickets = async (workspaceId: string) => {
-  const { data } = await API.get(`/tickets/my-workspace?workspaceId=${workspaceId}`);
+export const getWorkspaceTickets = async (workspaceId: string, search?: string, page?: number, limit?: number) => {
+  const { data } = await API.get("/tickets/my-workspace", {
+    params: { workspaceId, search, page, limit }
+  });
   return data;
 };
 
@@ -77,7 +79,7 @@ export const replyToTicket = async (ticketId: string, payload: ReplyToTicketPayl
 };
 
 // Admin APIs
-export const getAllTickets = async (params: { status?: string; priority?: string; page?: number; limit?: number }) => {
+export const getAllTickets = async (params: { status?: string; priority?: string; search?: string; page?: number; limit?: number }) => {
   const { data } = await API.get("/tickets/admin/all", { params });
   return data;
 };

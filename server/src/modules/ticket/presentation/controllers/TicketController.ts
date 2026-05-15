@@ -59,7 +59,7 @@ export class TicketController {
   });
 
   getWorkspaceTickets = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { workspaceId } = req.query;
+    const { workspaceId, search, page, limit } = req.query;
     const { userId, isSuperAdmin } = req.user!;
     
     if (!workspaceId) {
@@ -75,11 +75,16 @@ export class TicketController {
         }
     }
 
-    const tickets = await this._getWorkspaceTicketsUseCase.execute(workspaceId as string);
+    const result = await this._getWorkspaceTicketsUseCase.execute({
+      workspaceId: workspaceId as string,
+      search: search as string,
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+    });
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success(AppMessages.TICKET_RETRIEVED_SUCCESS, tickets));
+      .json(ResponseHandler.success(AppMessages.TICKET_RETRIEVED_SUCCESS, result));
   });
 
   getTicketDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -95,11 +100,12 @@ export class TicketController {
 
   // Admin APIs
   getAllTickets = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { status, priority, page, limit } = req.query;
+    const { status, priority, search, page, limit } = req.query;
 
     const result = await this._getAllTicketsUseCase.execute({
       status: status as TicketStatus,
       priority: priority as string,
+      search: search as string,
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
     });

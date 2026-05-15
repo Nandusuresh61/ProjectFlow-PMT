@@ -1,4 +1,5 @@
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
+import { FilterQuery } from "mongoose";
+import { ITicketRepository, TicketFilters, PaginationParams } from "../../domain/repositories/ITicketRepository";
 import { Ticket } from "../../domain/entities/Ticket";
 import { TicketModel, TicketDocument } from "../models/TicketModel";
 import { TicketStatus } from "../../domain/enums/TicketStatus";
@@ -33,18 +34,17 @@ export class MongoTicketRepository implements ITicketRepository {
     return docs.map((doc) => this.toDomain(doc as TicketDocument));
   }
 
-  async findAll(filters: { status?: TicketStatus; priority?: string }, pagination: { page: number; limit: number }): Promise<{ tickets: Ticket[]; total: number }> {
-    const query: any = {};
+  async findAll(filters: TicketFilters, pagination: PaginationParams): Promise<{ tickets: Ticket[]; total: number }> {
+    const query: FilterQuery<TicketDocument> = {};
+    
     if (filters.status) query.status = filters.status;
     if (filters.priority) query.priority = filters.priority;
+    if (filters.workspaceId) query.workspaceId = filters.workspaceId;
+    if (filters.search) {
+      query.title = { $regex: filters.search, $options: "i" };
+    }
 
     const skip = (pagination.page - 1) * pagination.limit;
-
-    const priorityOrder: Record<string, number> = {
-      [TicketPriority.HIGH]: 1,
-      [TicketPriority.MEDIUM]: 2,
-      [TicketPriority.LOW]: 3,
-    };
 
     const [docs, total] = await Promise.all([
       TicketModel.find(query)
@@ -62,7 +62,7 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   async updateStatus(ticketId: string, status: TicketStatus, resolvedAt?: Date): Promise<void> {
-    const update: any = { status };
+    const update: FilterQuery<TicketDocument> = { status };
     if (resolvedAt) update.resolvedAt = resolvedAt;
     await TicketModel.updateOne({ ticketId }, { $set: update });
   }

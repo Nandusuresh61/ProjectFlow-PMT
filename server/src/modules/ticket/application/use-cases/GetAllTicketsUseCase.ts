@@ -13,7 +13,7 @@ export class GetAllTicketsUseCase implements IGetAllTicketsUseCase {
     const limit = filters.limit || 10;
     
     const { tickets, total } = await this._ticketRepository.findAll(
-      { status: filters.status, priority: filters.priority },
+      { status: filters.status, priority: filters.priority, search: filters.search },
       { page, limit }
     );
 

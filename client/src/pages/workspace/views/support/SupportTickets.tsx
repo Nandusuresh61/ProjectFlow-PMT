@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Plus, Search, MessageSquare, Clock, ChevronRight, Loader2, Paperclip, X, Send, ArrowLeft, User as UserIcon, ShieldCheck } from "lucide-react";
+import { Plus, Search, MessageSquare, Clock, ChevronRight, Loader2, Paperclip, X, Send, ArrowLeft, User as UserIcon, ShieldCheck, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getWorkspaceTickets, getTicketDetails, createTicket, replyToTicket, type Ticket, type TicketMessage, TicketStatus, TicketPriority } from "@/services/ticket/ticket.api";
 import { useWorkspaceStore } from "@/store/workspace.store";
@@ -14,16 +14,35 @@ export function SupportTickets() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTickets, setTotalTickets] = useState(0);
+  const itemsPerPage = 8;
   
   const currentWorkspace = useWorkspaceStore((state) => state.currentWorkspace);
+
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   const fetchTickets = async () => {
     if (!currentWorkspace) return;
     try {
       setIsLoading(true);
-      const response = await getWorkspaceTickets(currentWorkspace.workspaceId);
+      const response = await getWorkspaceTickets(
+        currentWorkspace.workspaceId,
+        debouncedSearch,
+        currentPage,
+        itemsPerPage
+      );
       if (response.success) {
-        setTickets(response.data);
+        setTickets(response.data.tickets);
+        setTotalTickets(response.data.total);
       }
     } catch (error) {
       console.error("Failed to fetch tickets:", error);
@@ -35,11 +54,10 @@ export function SupportTickets() {
 
   useEffect(() => {
     fetchTickets();
-  }, [currentWorkspace]);
+  }, [currentWorkspace, debouncedSearch, currentPage]);
 
-  const filteredTickets = tickets.filter(ticket => 
-    ticket.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const totalPages = Math.ceil(totalTickets / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
   if (selectedTicketId) {
     return (
@@ -82,14 +100,14 @@ export function SupportTickets() {
         />
       </div>
 
-      <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-400px)] pr-2 custom-scrollbar">
+      <div className="space-y-3 overflow-y-auto max-h-[calc(100vh-450px)] pr-2 custom-scrollbar">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-10 h-10 text-[#A5D7E8] animate-spin" />
             <p className="text-[#576CBC]/60 font-bold uppercase tracking-widest text-[10px]">Loading your tickets...</p>
           </div>
-        ) : filteredTickets.length > 0 ? (
-          filteredTickets.map((ticket) => (
+        ) : tickets.length > 0 ? (
+          tickets.map((ticket) => (
             <motion.div
               key={ticket.ticketId}
               initial={{ opacity: 0, y: 10 }}
@@ -131,6 +149,33 @@ export function SupportTickets() {
           </div>
         )}
       </div>
+
+      {totalTickets > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5">
+          <div className="text-xs font-bold text-[#576CBC]/60 uppercase tracking-widest">
+            Showing <span className="text-white">{startIndex + 1}</span> - <span className="text-white">{Math.min(startIndex + itemsPerPage, totalTickets)}</span> of <span className="text-white">{totalTickets}</span> tickets
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-xl bg-white/5 text-[#576CBC] hover:bg-white/10 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-black text-[#A5D7E8]">
+              {currentPage} / {totalPages || 1}
+            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-xl bg-white/5 text-[#576CBC] hover:bg-white/10 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+      )}
 
       <AnimatePresence>
         {showCreateModal && (
@@ -437,8 +482,8 @@ function CreateTicketModal({ onClose, onSuccess }: { onClose: () => void, onSucc
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!currentWorkspace || !title.trim() || !message.trim()) return;
 
     try {
@@ -561,7 +606,7 @@ function CreateTicketModal({ onClose, onSuccess }: { onClose: () => void, onSucc
             Cancel
           </button>
           <button
-            onClick={(e) => handleSubmit(e as any)} 
+            onClick={() => handleSubmit()} 
             disabled={isSubmitting || isUploading || !title.trim() || !message.trim()}
             className="flex-1 py-4 text-sm font-bold bg-[#A5D7E8] text-[#0B2447] rounded-2xl shadow-[0_0_20px_rgba(165,215,232,0.2)] hover:shadow-[0_0_25px_rgba(165,215,232,0.3)] hover:bg-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >

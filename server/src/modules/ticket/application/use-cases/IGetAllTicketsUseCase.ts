@@ -4,6 +4,7 @@ import { TicketStatus } from "../../domain/enums/TicketStatus";
 export interface GetAllTicketsFilters {
   status?: TicketStatus;
   priority?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }

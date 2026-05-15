@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { Search, Filter, MessageSquare, Clock, ChevronRight, Loader2, Paperclip, X, Send, ArrowLeft, User as UserIcon, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Search, Filter, MessageSquare, Clock, ChevronRight, Loader2, Paperclip, X, Send, ArrowLeft, User as UserIcon, ShieldCheck, CheckCircle2, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getAllTickets, getTicketDetails, adminReplyToTicket, updateTicketStatus, type Ticket, type TicketMessage, TicketStatus, TicketPriority } from "@/services/ticket/ticket.api";
 import { toast } from "sonner";
@@ -15,7 +14,18 @@ export default function AdminTickets() {
     status: "",
     priority: "",
     page: 1,
+    search: "",
   });
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(filters.search);
+      setFilters(prev => ({ ...prev, page: 1 }));
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [filters.search]);
 
   const fetchTickets = async () => {
     try {
@@ -23,6 +33,7 @@ export default function AdminTickets() {
       const response = await getAllTickets({
         status: filters.status || undefined,
         priority: filters.priority || undefined,
+        search: debouncedSearch || undefined,
         page: filters.page,
       });
       if (response.success) {
@@ -38,7 +49,7 @@ export default function AdminTickets() {
 
   useEffect(() => {
     fetchTickets();
-  }, [filters]);
+  }, [filters.status, filters.priority, filters.page, debouncedSearch]);
 
   if (selectedTicketId) {
     return (
@@ -66,7 +77,9 @@ export default function AdminTickets() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
             <input 
                 type="text" 
-                placeholder="Search tickets..." 
+                placeholder="Search tickets by title..." 
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50 transition-all"
             />
         </div>
@@ -92,43 +105,72 @@ export default function AdminTickets() {
             <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Loading queue...</p>
           </div>
         ) : tickets.length > 0 ? (
-          tickets.map((ticket, index) => (
-            <motion.div
-              key={ticket.ticketId}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              onClick={() => setSelectedTicketId(ticket.ticketId)}
-              className="group relative flex items-center gap-4 p-5 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-green-500/30 transition-all cursor-pointer"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1.5">
-                  <span className={`w-2 h-2 rounded-full ${
-                    ticket.priority === TicketPriority.HIGH ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" :
-                    ticket.priority === TicketPriority.MEDIUM ? "bg-amber-500" : "bg-blue-500"
-                  }`} />
-                  <h3 className="text-zinc-200 font-bold truncate group-hover:text-green-500 transition-colors">{ticket.title}</h3>
-                  <StatusBadge status={ticket.status} />
+          <>
+            {tickets.map((ticket, index) => (
+              <motion.div
+                key={ticket.ticketId}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => setSelectedTicketId(ticket.ticketId)}
+                className="group relative flex items-center gap-4 p-5 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-green-500/30 transition-all cursor-pointer"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <span className={`w-2 h-2 rounded-full ${
+                      ticket.priority === TicketPriority.HIGH ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" :
+                      ticket.priority === TicketPriority.MEDIUM ? "bg-amber-500" : "bg-blue-500"
+                    }`} />
+                    <h3 className="text-zinc-200 font-bold truncate group-hover:text-green-500 transition-colors">{ticket.title}</h3>
+                    <StatusBadge status={ticket.status} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+                    <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
+                      <Clock size={12} />
+                      Active {formatDistanceToNow(new Date(ticket.lastReplyAt), { addSuffix: true })}
+                    </div>
+                    <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
+                      Workspace: <span className="text-zinc-300">{ticket.workspaceName || ticket.workspaceId}</span>
+                    </div>
+                    <div className={`text-[10px] font-black uppercase tracking-widest ${
+                      ticket.planType === 'ENTERPRISE' ? 'text-purple-400' : 
+                      ticket.planType === 'PRO' ? 'text-amber-400' : 'text-zinc-500'
+                    }`}>
+                      {ticket.planType} PLAN
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-                  <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
-                    <Clock size={12} />
-                    Active {formatDistanceToNow(new Date(ticket.lastReplyAt), { addSuffix: true })}
+                <ChevronRight className="text-zinc-600 group-hover:text-green-500 transition-all" size={20} />
+              </motion.div>
+            ))}
+
+            {total > 0 && (
+              <div className="flex items-center justify-between pt-6 border-t border-zinc-800/50 mt-4">
+                <div className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+                  Showing <span className="text-zinc-300">{(filters.page - 1) * 10 + 1}</span> - <span className="text-zinc-300">{Math.min(filters.page * 10, total)}</span> of <span className="text-zinc-300">{total}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                    disabled={filters.page === 1}
+                    className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <div className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-green-500">
+                    {filters.page} / {Math.ceil(total / 10) || 1}
                   </div>
-                  <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">
-                    Workspace: <span className="text-zinc-300">{ticket.workspaceName || ticket.workspaceId}</span>
-                  </div>
-                  <div className={`text-[10px] font-black uppercase tracking-widest ${
-                    ticket.planType === 'ENTERPRISE' ? 'text-purple-400' : 
-                    ticket.planType === 'PRO' ? 'text-amber-400' : 'text-zinc-500'
-                  }`}>
-                    {ticket.planType} PLAN
-                  </div>
+                  <button
+                    onClick={() => setFilters(prev => ({ ...prev, page: Math.min(Math.ceil(total / 10), prev.page + 1) }))}
+                    disabled={filters.page >= Math.ceil(total / 10)}
+                    className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
                 </div>
               </div>
-              <ChevronRight className="text-zinc-600 group-hover:text-green-500 transition-all" size={20} />
-            </motion.div>
-          ))
+            )}
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 bg-zinc-900/50 border border-dashed border-zinc-800 rounded-3xl">
             <MessageSquare size={48} className="text-zinc-700 mb-4" />
