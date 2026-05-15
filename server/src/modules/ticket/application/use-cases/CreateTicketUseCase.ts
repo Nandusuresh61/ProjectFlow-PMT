@@ -26,12 +26,12 @@ export class CreateTicketUseCase implements ICreateTicketUseCase {
   async execute(data: CreateTicketDto): Promise<void> {
     const workspace = await this._workspaceRepository.findById(data.workspaceId);
     if (!workspace) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Workspace not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.WORKSPACE_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     const plan = await this._planRepository.findById(workspace.planId);
     if (!plan) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Plan not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.PLAN_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     const planType = plan.type as unknown as PlanType;

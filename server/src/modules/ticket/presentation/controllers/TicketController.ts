@@ -11,6 +11,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
 import { TicketStatus } from "../../domain/enums/TicketStatus";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class TicketController {
   constructor(
@@ -37,7 +38,7 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.CREATED)
-      .json(ResponseHandler.success("Ticket created successfully"));
+      .json(ResponseHandler.success(AppMessages.TICKET_CREATED_SUCCESS));
   });
 
   replyToTicket = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -54,7 +55,7 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Reply added successfully"));
+      .json(ResponseHandler.success(AppMessages.TICKET_REPLY_SUCCESS));
   });
 
   getWorkspaceTickets = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -62,14 +63,14 @@ export class TicketController {
     const { userId, isSuperAdmin } = req.user!;
     
     if (!workspaceId) {
-        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error("workspaceId is required"));
+        res.status(HttpStatusCode.BAD_REQUEST).json(ResponseHandler.error(AppMessages.WORKSPACE_ID_REQUIRED));
         return;
     }
 
     if (!isSuperAdmin) {
         const membership = await this._membershipRepository.findByUserAndWorkspace(userId, workspaceId as string);
         if (!membership) {
-            res.status(HttpStatusCode.FORBIDDEN).json(ResponseHandler.error("Unauthorized access to this workspace tickets"));
+            res.status(HttpStatusCode.FORBIDDEN).json(ResponseHandler.error(AppMessages.TICKET_UNAUTHORIZED));
             return;
         }
     }
@@ -78,7 +79,7 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Tickets retrieved successfully", tickets));
+      .json(ResponseHandler.success(AppMessages.TICKET_RETRIEVED_SUCCESS, tickets));
   });
 
   getTicketDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -89,7 +90,7 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Ticket details retrieved successfully", result));
+      .json(ResponseHandler.success(AppMessages.TICKET_DETAILS_RETRIEVED_SUCCESS, result));
   });
 
   // Admin APIs
@@ -105,7 +106,7 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("All tickets retrieved successfully", result));
+      .json(ResponseHandler.success(AppMessages.TICKET_ADMIN_RETRIEVED_SUCCESS, result));
   });
 
   updateTicketStatus = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -116,6 +117,6 @@ export class TicketController {
 
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Ticket status updated successfully"));
+      .json(ResponseHandler.success(AppMessages.TICKET_STATUS_UPDATED));
   });
 }

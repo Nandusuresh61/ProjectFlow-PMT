@@ -6,6 +6,7 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { IUserRepository } from "@/application/interfaces/repositories/IUserRepository";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class GetTicketDetailsUseCase implements IGetTicketDetailsUseCase {
   constructor(
@@ -18,14 +19,14 @@ export class GetTicketDetailsUseCase implements IGetTicketDetailsUseCase {
   async execute(ticketId: string, userId: string, isSuperAdmin: boolean): Promise<TicketDetailsResponse> {
     const ticket = await this._ticketRepository.findById(ticketId);
     if (!ticket) {
-      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, "Ticket not found", HttpStatusCode.NOT_FOUND);
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.TICKET_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     if (!isSuperAdmin) {
         // Check if user belongs to the workspace
         const membership = await this._membershipRepository.findByUserAndWorkspace(userId, ticket.workspaceId);
         if (!membership) {
-             throw new AppError(ErrorCode.AUTH, "Unauthorized access to this ticket", HttpStatusCode.FORBIDDEN);
+             throw new AppError(ErrorCode.AUTH, AppMessages.TICKET_UNAUTHORIZED, HttpStatusCode.FORBIDDEN);
         }
     }
 
