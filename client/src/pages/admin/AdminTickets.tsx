@@ -1,9 +1,9 @@
-import { Search, Filter, MessageSquare, Clock, ChevronRight, Loader2, Paperclip, X, Send, ArrowLeft, User as UserIcon, ShieldCheck, CheckCircle2, ChevronLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, MessageSquare, Clock, ChevronRight, Loader2,Send, ArrowLeft, User as UserIcon, ShieldCheck, CheckCircle2, ChevronLeft } from "lucide-react";
+import { motion } from "framer-motion";
 import { getAllTickets, getTicketDetails, adminReplyToTicket, updateTicketStatus, type Ticket, type TicketMessage, TicketStatus, TicketPriority } from "@/services/ticket/ticket.api";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
-import { uploadToCloudinary } from "@/lib/cloudinary";
+import { useEffect, useRef, useState } from "react";
 
 export default function AdminTickets() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -204,7 +204,6 @@ function AdminTicketDetailView({ ticketId, onBack }: { ticketId: string, onBack:
   const [isLoading, setIsLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<string[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
