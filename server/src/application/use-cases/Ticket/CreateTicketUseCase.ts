@@ -1,10 +1,10 @@
-import { ICreateTicketUseCase, CreateTicketDto } from "./ICreateTicketUseCase";
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
-import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessageRepository";
-import { Ticket } from "../../domain/entities/Ticket";
-import { TicketMessage } from "../../domain/entities/TicketMessage";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
-import { TicketPriority } from "../../domain/enums/TicketPriority";
+import { ICreateTicketUseCase, CreateTicketDto } from "@/application/interfaces/use-cases/Ticket/ICreateTicketUseCase";
+import { ITicketRepository } from "@/application/interfaces/repositories/ITicketRepository";
+import { ITicketMessageRepository } from "@/application/interfaces/repositories/ITicketMessageRepository";
+import { Ticket } from "@/domain/entities/Ticket";
+import { TicketMessage } from "@/domain/entities/TicketMessage";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
+import { TicketPriority } from "@/shared/enums/TicketPriority";
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { PlanType } from "@/shared/enums/PlanType";

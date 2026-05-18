@@ -1,6 +1,6 @@
-import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessageRepository";
-import { TicketMessage } from "../../domain/entities/TicketMessage";
-import { TicketMessageModel, TicketMessageDocument } from "../models/TicketMessageModel";
+import { ITicketMessageRepository } from "@/application/interfaces/repositories/ITicketMessageRepository";
+import { TicketMessage } from "@/domain/entities/TicketMessage";
+import { TicketMessageModel, TicketMessageDocument } from "@/infrastructure/database/models/MongoTicketMessageModel";
 
 export class MongoTicketMessageRepository implements ITicketMessageRepository {
   async create(message: TicketMessage): Promise<TicketMessage> {

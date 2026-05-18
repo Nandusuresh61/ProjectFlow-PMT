@@ -1,5 +1,5 @@
-import { TicketStatus } from "../enums/TicketStatus";
-import { TicketPriority } from "../enums/TicketPriority";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
+import { TicketPriority } from "@/shared/enums/TicketPriority";
 import { PlanType } from "@/shared/enums/PlanType";
 
 export class Ticket {

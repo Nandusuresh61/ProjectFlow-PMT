@@ -1,6 +1,6 @@
-import { IUpdateTicketStatusUseCase } from "./IUpdateTicketStatusUseCase";
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
+import { IUpdateTicketStatusUseCase } from "@/application/interfaces/use-cases/Ticket/IUpdateTicketStatusUseCase";
+import { ITicketRepository } from "@/application/interfaces/repositories/ITicketRepository";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";

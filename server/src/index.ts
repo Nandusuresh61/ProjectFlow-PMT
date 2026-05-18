@@ -18,7 +18,7 @@ import sprintAnalyticsRoutes from "@/presentation/routes/SprintAnalyticsRoutes";
 import chatRoutes from "@/presentation/routes/ChatRoutes";
 import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
 import workLogRoutes from "@/presentation/routes/WorkLogRoutes";
-import ticketRoutes from "@/modules/ticket/presentation/routes/ticketRoutes";
+import ticketRoutes from "@/presentation/routes/TicketRoutes";
 import morgan from "morgan";
 
 import http from "http";

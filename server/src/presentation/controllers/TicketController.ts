@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
-import { ICreateTicketUseCase } from "../../application/use-cases/ICreateTicketUseCase";
-import { IReplyToTicketUseCase } from "../../application/use-cases/IReplyToTicketUseCase";
-import { IGetWorkspaceTicketsUseCase } from "../../application/use-cases/IGetWorkspaceTicketsUseCase";
-import { IGetTicketDetailsUseCase } from "../../application/use-cases/IGetTicketDetailsUseCase";
-import { IUpdateTicketStatusUseCase } from "../../application/use-cases/IUpdateTicketStatusUseCase";
-import { IGetAllTicketsUseCase } from "../../application/use-cases/IGetAllTicketsUseCase";
+import { ICreateTicketUseCase } from "@/application/interfaces/use-cases/Ticket/ICreateTicketUseCase";
+import { IReplyToTicketUseCase } from "@/application/interfaces/use-cases/Ticket/IReplyToTicketUseCase";
+import { IGetWorkspaceTicketsUseCase } from "@/application/interfaces/use-cases/Ticket/IGetWorkspaceTicketsUseCase";
+import { IGetTicketDetailsUseCase } from "@/application/interfaces/use-cases/Ticket/IGetTicketDetailsUseCase";
+import { IUpdateTicketStatusUseCase } from "@/application/interfaces/use-cases/Ticket/IUpdateTicketStatusUseCase";
+import { IGetAllTicketsUseCase } from "@/application/interfaces/use-cases/Ticket/IGetAllTicketsUseCase";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
 import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { AppMessages } from "@/shared/messages/AppMessages";
 

@@ -1,6 +1,6 @@
-import { IGetWorkspaceTicketsUseCase, WorkspaceTicketFilters } from "./IGetWorkspaceTicketsUseCase";
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
-import { Ticket } from "../../domain/entities/Ticket";
+import { IGetWorkspaceTicketsUseCase, WorkspaceTicketFilters } from "@/application/interfaces/use-cases/Ticket/IGetWorkspaceTicketsUseCase";
+import { ITicketRepository } from "@/application/interfaces/repositories/ITicketRepository";
+import { Ticket } from "@/domain/entities/Ticket";
 
 export class GetWorkspaceTicketsUseCase implements IGetWorkspaceTicketsUseCase {
   constructor(private readonly _ticketRepository: ITicketRepository) {}

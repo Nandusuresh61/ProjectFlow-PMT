@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
-import { TicketPriority } from "../../domain/enums/TicketPriority";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
+import { TicketPriority } from "@/shared/enums/TicketPriority";
 import { PlanType } from "@/shared/enums/PlanType";
 
 export interface TicketDocument extends Document {

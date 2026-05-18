@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticatedUser } from "@/presentation/middlewares/AuthMiddleware";
 import { superAdminOnly } from "@/presentation/middlewares/AdminMiddleware";
-import { ticketController } from "../../infrastructure/DI/TicketContainer";
+import { ticketController } from "@/infrastructure/DI/TicketContainer";
 
 const router = Router();
 

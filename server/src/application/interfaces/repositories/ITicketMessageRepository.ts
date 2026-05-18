@@ -1,4 +1,4 @@
-import { TicketMessage } from "../entities/TicketMessage";
+import { TicketMessage } from "@/domain/entities/TicketMessage";
 
 export interface ITicketMessageRepository {
   create(message: TicketMessage): Promise<TicketMessage>;

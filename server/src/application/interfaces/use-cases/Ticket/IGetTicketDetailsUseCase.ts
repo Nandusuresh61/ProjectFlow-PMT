@@ -1,5 +1,5 @@
-import { Ticket } from "../../domain/entities/Ticket";
-import { TicketMessage } from "../../domain/entities/TicketMessage";
+import { Ticket } from "@/domain/entities/Ticket";
+import { TicketMessage } from "@/domain/entities/TicketMessage";
 
 export interface TicketMessageWithSender extends TicketMessage {
   senderName: string;

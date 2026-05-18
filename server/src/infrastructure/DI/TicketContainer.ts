@@ -1,19 +1,19 @@
-import { MongoTicketRepository } from "../repositories/MongoTicketRepository";
-import { MongoTicketMessageRepository } from "../repositories/MongoTicketMessageRepository";
+import { MongoTicketRepository } from "@/infrastructure/repositories/MongoTicketRepository";
+import { MongoTicketMessageRepository } from "@/infrastructure/repositories/MongoTicketMessageRepository";
 import { WorkspaceRepository } from "@/infrastructure/repositories/MongoWorkspaceRepository";
 import { MongoPlanRepository } from "@/infrastructure/repositories/MongoPlanRepository";
 import { UidService } from "@/infrastructure/services/UidService";
 import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
 import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
 
-import { CreateTicketUseCase } from "../../application/use-cases/CreateTicketUseCase";
-import { ReplyToTicketUseCase } from "../../application/use-cases/ReplyToTicketUseCase";
-import { GetWorkspaceTicketsUseCase } from "../../application/use-cases/GetWorkspaceTicketsUseCase";
-import { GetTicketDetailsUseCase } from "../../application/use-cases/GetTicketDetailsUseCase";
-import { UpdateTicketStatusUseCase } from "../../application/use-cases/UpdateTicketStatusUseCase";
-import { GetAllTicketsUseCase } from "../../application/use-cases/GetAllTicketsUseCase";
+import { CreateTicketUseCase } from "@/application/use-cases/Ticket/CreateTicketUseCase";
+import { ReplyToTicketUseCase } from "@/application/use-cases/Ticket/ReplyToTicketUseCase";
+import { GetWorkspaceTicketsUseCase } from "@/application/use-cases/Ticket/GetWorkspaceTicketsUseCase";
+import { GetTicketDetailsUseCase } from "@/application/use-cases/Ticket/GetTicketDetailsUseCase";
+import { UpdateTicketStatusUseCase } from "@/application/use-cases/Ticket/UpdateTicketStatusUseCase";
+import { GetAllTicketsUseCase } from "@/application/use-cases/Ticket/GetAllTicketsUseCase";
 
-import { TicketController } from "../../presentation/controllers/TicketController";
+import { TicketController } from "@/presentation/controllers/TicketController";
 
 const ticketRepository = new MongoTicketRepository();
 const ticketMessageRepository = new MongoTicketMessageRepository();

@@ -1,12 +1,12 @@
-import { IReplyToTicketUseCase, ReplyToTicketDto } from "./IReplyToTicketUseCase";
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
-import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessageRepository";
-import { TicketMessage } from "../../domain/entities/TicketMessage";
+import { IReplyToTicketUseCase, ReplyToTicketDto } from "@/application/interfaces/use-cases/Ticket/IReplyToTicketUseCase";
+import { ITicketRepository } from "@/application/interfaces/repositories/ITicketRepository";
+import { ITicketMessageRepository } from "@/application/interfaces/repositories/ITicketMessageRepository";
+import { TicketMessage } from "@/domain/entities/TicketMessage";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
 
 export class ReplyToTicketUseCase implements IReplyToTicketUseCase {
   constructor(

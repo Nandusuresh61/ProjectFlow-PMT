@@ -1,9 +1,9 @@
-import { FilterQuery } from "mongoose";
-import { ITicketRepository, TicketFilters, PaginationParams } from "../../domain/repositories/ITicketRepository";
-import { Ticket } from "../../domain/entities/Ticket";
-import { TicketModel, TicketDocument } from "../models/TicketModel";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
-import { TicketPriority } from "../../domain/enums/TicketPriority";
+import { QueryFilter } from "mongoose";
+import { ITicketRepository, TicketFilters, PaginationParams } from "@/application/interfaces/repositories/ITicketRepository";
+import { Ticket } from "@/domain/entities/Ticket";
+import { TicketModel, TicketDocument } from "@/infrastructure/database/models/MongoTicketModel";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
+import { TicketPriority } from "@/shared/enums/TicketPriority";
 import { PlanType } from "@/shared/enums/PlanType";
 
 export class MongoTicketRepository implements ITicketRepository {
@@ -35,7 +35,7 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   async findAll(filters: TicketFilters, pagination: PaginationParams): Promise<{ tickets: Ticket[]; total: number }> {
-    const query: FilterQuery<TicketDocument> = {};
+    const query: QueryFilter<TicketDocument> = {};
     
     if (filters.status) query.status = filters.status;
     if (filters.priority) query.priority = filters.priority;
@@ -62,7 +62,7 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   async updateStatus(ticketId: string, status: TicketStatus, resolvedAt?: Date): Promise<void> {
-    const update: FilterQuery<TicketDocument> = { status };
+    const update: any = { status };
     if (resolvedAt) update.resolvedAt = resolvedAt;
     await TicketModel.updateOne({ ticketId }, { $set: update });
   }

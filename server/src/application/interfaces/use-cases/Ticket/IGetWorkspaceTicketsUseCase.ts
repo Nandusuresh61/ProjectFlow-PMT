@@ -1,4 +1,4 @@
-import { Ticket } from "../../domain/entities/Ticket";
+import { Ticket } from "@/domain/entities/Ticket";
 
 export interface WorkspaceTicketFilters {
   workspaceId: string;

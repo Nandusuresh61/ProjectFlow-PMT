@@ -1,5 +1,5 @@
-import { Ticket } from "../../domain/entities/Ticket";
-import { TicketStatus } from "../../domain/enums/TicketStatus";
+import { Ticket } from "@/domain/entities/Ticket";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
 
 export interface GetAllTicketsFilters {
   status?: TicketStatus;

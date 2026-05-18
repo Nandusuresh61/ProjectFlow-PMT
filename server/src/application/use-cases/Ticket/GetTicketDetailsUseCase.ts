@@ -1,6 +1,6 @@
-import { IGetTicketDetailsUseCase, TicketDetailsResponse } from "./IGetTicketDetailsUseCase";
-import { ITicketRepository } from "../../domain/repositories/ITicketRepository";
-import { ITicketMessageRepository } from "../../domain/repositories/ITicketMessageRepository";
+import { IGetTicketDetailsUseCase, TicketDetailsResponse } from "@/application/interfaces/use-cases/Ticket/IGetTicketDetailsUseCase";
+import { ITicketRepository } from "@/application/interfaces/repositories/ITicketRepository";
+import { ITicketMessageRepository } from "@/application/interfaces/repositories/ITicketMessageRepository";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
