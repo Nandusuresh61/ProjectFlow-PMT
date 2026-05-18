@@ -10,7 +10,6 @@ import { ResponseHandler } from "@/shared/response/responseHandler";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
 import { TicketStatus } from "@/shared/enums/TicketStatus";
-import { IMembershipRepository } from "@/application/interfaces/repositories/IMembershipRepository";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class TicketController {
@@ -20,8 +19,7 @@ export class TicketController {
     private readonly _getWorkspaceTicketsUseCase: IGetWorkspaceTicketsUseCase,
     private readonly _getTicketDetailsUseCase: IGetTicketDetailsUseCase,
     private readonly _updateTicketStatusUseCase: IUpdateTicketStatusUseCase,
-    private readonly _getAllTicketsUseCase: IGetAllTicketsUseCase,
-    private readonly _membershipRepository: IMembershipRepository
+    private readonly _getAllTicketsUseCase: IGetAllTicketsUseCase
   ) {}
 
   createTicket = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -67,19 +65,13 @@ export class TicketController {
         return;
     }
 
-    if (!isSuperAdmin) {
-        const membership = await this._membershipRepository.findByUserAndWorkspace(userId, workspaceId as string);
-        if (!membership) {
-            res.status(HttpStatusCode.FORBIDDEN).json(ResponseHandler.error(AppMessages.TICKET_UNAUTHORIZED));
-            return;
-        }
-    }
-
     const result = await this._getWorkspaceTicketsUseCase.execute({
       workspaceId: workspaceId as string,
       search: search as string,
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
+      userId,
+      isSuperAdmin,
     });
 
     res

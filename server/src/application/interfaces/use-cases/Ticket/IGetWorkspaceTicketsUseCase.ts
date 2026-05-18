@@ -5,6 +5,8 @@ export interface WorkspaceTicketFilters {
   search?: string;
   page?: number;
   limit?: number;
+  userId: string;
+  isSuperAdmin: boolean;
 }
 
 export interface IGetWorkspaceTicketsUseCase {

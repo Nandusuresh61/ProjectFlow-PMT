@@ -37,7 +37,7 @@ const replyToTicketUseCase = new ReplyToTicketUseCase(
   uidGenerator
 );
 
-const getWorkspaceTicketsUseCase = new GetWorkspaceTicketsUseCase(ticketRepository);
+const getWorkspaceTicketsUseCase = new GetWorkspaceTicketsUseCase(ticketRepository, membershipRepository);
 
 const getTicketDetailsUseCase = new GetTicketDetailsUseCase(
   ticketRepository,
@@ -56,6 +56,5 @@ export const ticketController = new TicketController(
   getWorkspaceTicketsUseCase,
   getTicketDetailsUseCase,
   updateTicketStatusUseCase,
-  getAllTicketsUseCase,
-  membershipRepository
+  getAllTicketsUseCase
 );
