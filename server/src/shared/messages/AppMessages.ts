@@ -178,4 +178,12 @@ export const AppMessages = {
   SPRINT_HISTORY_NOT_FOUND: "Sprint not found",
   SPRINT_HISTORY_ONLY_COMPLETED: "Historical details are only available for completed sprints",
   SPRINT_HISTORY_RETRIEVED_SUCCESS: "Sprint history details retrieved successfully",
+  TICKET_CREATED_SUCCESS: "Support ticket created successfully",
+  TICKET_REPLY_SUCCESS: "Reply added successfully",
+  TICKET_NOT_FOUND: "Support ticket not found",
+  TICKET_RETRIEVED_SUCCESS: "Support tickets retrieved successfully",
+  TICKET_DETAILS_RETRIEVED_SUCCESS: "Support ticket details retrieved successfully",
+  TICKET_STATUS_UPDATED: "Support ticket status updated successfully",
+  TICKET_UNAUTHORIZED: "Unauthorized access to this support ticket",
+  TICKET_ADMIN_RETRIEVED_SUCCESS: "All support tickets retrieved successfully",
 };
