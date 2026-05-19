@@ -11,6 +11,7 @@ import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
   constructor(
@@ -18,7 +19,8 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     private readonly _sprintRepo: ISprintRepository,
     private readonly _projectRepo: IProjectRepository,
     private readonly _membershipRepo: IMembershipRepository,
-    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) { }
 
   async execute(userId: string, data: AssignIssueToSprintDto): Promise<Issue> {
@@ -171,6 +173,21 @@ export class AssignIssueToSprintUseCase implements IAssignIssueToSprintUseCase {
     if (oldSprintId && oldSprintId !== sprintId) {
       await this._allocationCalculatorService.calculateAndSaveAllocation(oldSprintId);
     }
+
+    await this._eventTracker.trackEvent({
+      workspaceId: updatedIssue.workspaceId,
+      actorId: userId,
+      eventType: "ISSUE_MOVED",
+      entityType: "ISSUE",
+      entityId: updatedIssue.issueId,
+      projectId: updatedIssue.projectId,
+      metadata: {
+        issueKey: updatedIssue.issueKey,
+        title: updatedIssue.title,
+        toSprintId: sprintId,
+        fromSprintId: oldSprintId,
+      },
+    });
 
     return updatedIssue;
   }

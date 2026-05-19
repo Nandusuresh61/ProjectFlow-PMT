@@ -15,6 +15,8 @@ export class GetIssueCommentsUseCase implements IGetIssueCommentsUseCase {
       content: comment.content,
       createdAt: comment.createdAt.toISOString(),
       updatedAt: comment.updatedAt.toISOString(),
+      mentions: comment.mentions || [],
+      attachments: comment.attachments || [],
     }));
   }
 }

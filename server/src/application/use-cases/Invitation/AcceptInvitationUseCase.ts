@@ -13,6 +13,7 @@ import crypto from "crypto";
 import { Membership } from "@/domain/entities/Membership";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
   constructor(
@@ -22,7 +23,8 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
     private readonly _workspaceRepo: IWorkspaceRepository,
     private readonly _planRepo: IPlanRepository,
     private readonly _passwordHasher: IPasswordHasher,
-    private readonly _uidGenerator: IUidGenerator
+    private readonly _uidGenerator: IUidGenerator,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) { }
 
   async execute(
@@ -124,6 +126,19 @@ export class AcceptInvitationUseCase implements IAcceptInvitationUseCase {
     );
 
     await this._userRepo.updateCurrentWorkspace(user.userId, invitation.workspaceId);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: invitation.workspaceId,
+      actorId: userId,
+      eventType: "MEMBER_JOINED",
+      entityType: "USER",
+      entityId: userId,
+      metadata: {
+        role: invitation.role,
+        email: invitation.email,
+        workspaceName: workspace.name,
+      },
+    });
 
     return { workspaceId: invitation.workspaceId };
   }

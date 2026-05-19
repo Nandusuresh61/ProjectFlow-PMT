@@ -11,7 +11,7 @@ import {
     ClipboardList,
     Kanban,
     Zap,
-    BarChart2,
+    Activity,
     FolderKanban,
     Plus,
 } from 'lucide-react';
@@ -172,6 +172,14 @@ const WorkspaceNav = ({
                 isActive={activeTab === 'dashboard'}
                 isCollapsed={isCollapsed}
                 onClick={() => onTabChange('dashboard')}
+            />
+            <NavItem
+                id="activity"
+                icon={Activity}
+                label="Activity"
+                isActive={activeTab === 'activity'}
+                isCollapsed={isCollapsed}
+                onClick={() => onTabChange('activity')}
             />
         </NavSection>
 

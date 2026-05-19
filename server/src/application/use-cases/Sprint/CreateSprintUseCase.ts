@@ -10,6 +10,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppError } from "@/shared/errors/AppError";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class CreateSprintUseCase implements ICreateSprintUseCase {
   constructor(
@@ -17,6 +18,7 @@ export class CreateSprintUseCase implements ICreateSprintUseCase {
     private readonly _uidGenerator: IUidGenerator,
     private readonly _sprintRepository: ISprintRepository,
     private readonly _membershipRepository: IMembershipRepository,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) { }
   async execute(userId: string, data: CreateSprintDto): Promise<Sprint> {
     const { projectId, name, goal } = data;
@@ -66,6 +68,18 @@ export class CreateSprintUseCase implements ICreateSprintUseCase {
     );
 
     await this._sprintRepository.create(sprint);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: project.workspaceId,
+      actorId: userId,
+      eventType: "SPRINT_CREATED",
+      entityType: "SPRINT",
+      entityId: sprintId,
+      projectId: project.projectId,
+      metadata: {
+        sprintName: sprint.name,
+      },
+    });
 
     return sprint;
   }
