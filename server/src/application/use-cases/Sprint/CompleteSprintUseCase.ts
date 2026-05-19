@@ -18,6 +18,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
 import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 
 export class CompleteSprintUseCase implements ICompleteSprintUseCase {
@@ -32,6 +33,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
     private readonly _metricsCalculator: ISprintMetricsCalculatorService,
     private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
     private readonly _allocationCalculatorService: ISprintAllocationCalculatorService,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) { }
 
 
@@ -294,6 +296,20 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
       await this._burndownSnapshotService.captureSnapshot(moveToSprintId);
       await this._allocationCalculatorService.calculateAndSaveAllocation(moveToSprintId);
     }
+
+    await this._eventTracker.trackEvent({
+      workspaceId: project.workspaceId,
+      actorId: userId,
+      eventType: "SPRINT_COMPLETED",
+      entityType: "SPRINT",
+      entityId: sprintId,
+      projectId: project.projectId,
+      metadata: {
+        sprintName: sprint.name,
+        completedPoints: metrics.completedStoryPoints,
+        committedPoints: metrics.committedStoryPoints,
+      }
+    });
 
     return updatedSprint;
 

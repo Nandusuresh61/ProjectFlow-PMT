@@ -8,12 +8,14 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class AddCommentUseCase implements IAddCommentUseCase {
   constructor(
     private readonly _commentRepository: ICommentRepository,
     private readonly _issueRepository: IIssueRepository,
-    private readonly _uidService: UidService
+    private readonly _uidService: UidService,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
   async execute(userId: string, issueId: string, content: string, mentions?: string[], attachments?: string[]): Promise<CommentResponseDto> {
@@ -41,6 +43,22 @@ export class AddCommentUseCase implements IAddCommentUseCase {
     );
 
     const created = await this._commentRepository.create(comment);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: issue.workspaceId,
+      actorId: userId,
+      eventType: "ISSUE_COMMENT_ADDED",
+      entityType: "ISSUE",
+      entityId: issue.issueId,
+      projectId: issue.projectId,
+      parentEntityId: issue.sprintId,
+      parentEntityType: issue.sprintId ? "SPRINT" : null,
+      metadata: {
+        issueKey: issue.issueKey,
+        title: issue.title,
+        commentId: created.commentId,
+      }
+    });
 
     return {
       commentId: created.commentId,

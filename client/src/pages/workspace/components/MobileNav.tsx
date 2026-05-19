@@ -9,6 +9,7 @@ import {
     Kanban,
     Zap,
     Users,
+    Activity,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { SidebarMode } from '../types/sidebar.types';
@@ -25,6 +26,7 @@ const WORKSPACE_NAV_ITEMS: MobileNavItem[] = [
     { id: 'projects', icon: Briefcase, label: 'Projects' },
     { id: 'chat', icon: MessageSquare, label: 'Inbox' },
     { id: 'meetings', icon: Video, label: 'Meetings' },
+    { id: 'activity', icon: Activity, label: 'Activity' },
     { id: 'settings', icon: Settings, label: 'Settings' },
 ];
 

@@ -11,6 +11,7 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class CreateProjectUseCase implements ICreateProjectUseCase {
   constructor(
@@ -18,7 +19,8 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
     private readonly _membershipRepo: IMembershipRepository,
     private readonly _planRepo: IPlanRepository,
     private readonly _projectRepo: IProjectRepository,
-    private readonly _uidGenerator: IUidGenerator
+    private readonly _uidGenerator: IUidGenerator,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
   async execute(userId: string, data: CreateProjectDto): Promise<Project> {
@@ -150,6 +152,21 @@ export class CreateProjectUseCase implements ICreateProjectUseCase {
       now
     );
 
-    return this._projectRepo.create(project);
+    const createdProject = await this._projectRepo.create(project);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: data.workspaceId,
+      actorId: userId,
+      eventType: "PROJECT_CREATED",
+      entityType: "PROJECT",
+      entityId: createdProject.projectId,
+      projectId: createdProject.projectId,
+      metadata: {
+        projectName: createdProject.name,
+        projectKey: createdProject.projectKey,
+      },
+    });
+
+    return createdProject;
   }
 }

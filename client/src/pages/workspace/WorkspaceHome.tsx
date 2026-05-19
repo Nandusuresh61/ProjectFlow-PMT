@@ -16,6 +16,7 @@ import { TeamView } from './views/team/TeamView';
 import { SettingsView } from './views/settings/SettingsView';
 import { ChatView } from './views/chat/ChatView';
 import { MeetingsView } from './views/meetings/MeetingsView';
+import { ActivityView } from './views/activity/ActivityView';
 import { InviteModal } from './components/workspace/InviteModal';
 import { CreateWorkspaceModal } from './components/workspace/CreateWorkspaceModal';
 import { CreateProjectModal } from './views/project/components/project/CreateProjectModal';
@@ -30,7 +31,7 @@ import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { AppMessages } from '@/shared/messages/AppMessages';
 import { Briefcase } from 'lucide-react';
 
-const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
+const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'activity', 'settings'] as const;
 const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'project-team'] as const;
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
@@ -82,6 +83,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
         case 'team': return <TeamView openInvite={openInvite} canManage={canManage} />;
         case 'chat': return <ChatView />;
         case 'meetings': return <MeetingsView />;
+        case 'activity': return <ActivityView />;
         case 'settings': return <SettingsView />;
         default: return <DashboardView openInvite={openInvite} canManage={canManage} />;
     }

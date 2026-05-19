@@ -12,6 +12,8 @@ import { MongoIssueRepository } from "@/infrastructure/repositories/MongoIssueRe
 import { WorkspaceRepository } from "@/infrastructure/repositories/MongoWorkspaceRepository";
 import { UidService } from "@/infrastructure/services/UidService";
 
+import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
+
 const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
 const planRepo = new MongoPlanRepository();
@@ -25,7 +27,8 @@ const createProjectUseCase = new CreateProjectUseCase(
   membershipRepo,
   planRepo,
   projectRepo,
-  uidGenerator
+  uidGenerator,
+  workspaceEventTrackingService
 );
 const getWorkspaceProjectsUseCase = new GetWorkspaceProjectsUseCase(
   workspaceRepo,
@@ -36,7 +39,8 @@ const updateProjectUseCase = new UpdateProjectUseCase(
   projectRepo,
   workspaceRepo,
   membershipRepo,
-  planRepo
+  planRepo,
+  workspaceEventTrackingService
 );
 const getProjectMembersUseCase = new GetProjectMembersUseCase(
   projectRepo,

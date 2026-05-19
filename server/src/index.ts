@@ -19,17 +19,20 @@ import chatRoutes from "@/presentation/routes/ChatRoutes";
 import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
 import workLogRoutes from "@/presentation/routes/WorkLogRoutes";
 import ticketRoutes from "@/presentation/routes/TicketRoutes";
+import activityRoutes from "@/presentation/routes/ActivityRoutes";
 import morgan from "morgan";
 
 import http from "http";
 import { SocketServer } from "./infrastructure/services/SocketServer";
 import { ChatSocketHandler } from "./presentation/sockets/ChatSocketHandler";
+import { ActivitySocketHandler } from "./presentation/sockets/ActivitySocketHandler";
 
 const app = express();
 const server = http.createServer(app);
 
 const socketServer = SocketServer.init(server);
 socketServer.registerHandler(ChatSocketHandler);
+socketServer.registerHandler(ActivitySocketHandler);
 
 app.use(morgan("dev"));
 connectDB();
@@ -58,6 +61,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/worklog", workLogRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/activity", activityRoutes);
 
 app.use(errorMiddleware);
 

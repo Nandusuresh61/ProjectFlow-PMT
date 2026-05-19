@@ -186,4 +186,6 @@ export const AppMessages = {
   TICKET_STATUS_UPDATED: "Support ticket status updated successfully",
   TICKET_UNAUTHORIZED: "Unauthorized access to this support ticket",
   TICKET_ADMIN_RETRIEVED_SUCCESS: "All support tickets retrieved successfully",
+  ACTIVITY_FEED_RETRIEVED: "Activity feed retrieved successfully",
+  ENTITY_TIMELINE_RETRIEVED: "Entity timeline retrieved successfully",
 };

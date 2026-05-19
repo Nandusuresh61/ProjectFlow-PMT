@@ -10,13 +10,15 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class UpdateProjectUseCase implements IUpdateProjectUseCase {
   constructor(
     private readonly _projectRepo: IProjectRepository,
     private readonly _workspaceRepo: IWorkspaceRepository,
     private readonly _membershipRepo: IMembershipRepository,
-    private readonly _planRepo: IPlanRepository
+    private readonly _planRepo: IPlanRepository,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
   async execute(
@@ -152,6 +154,21 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
     project.memberIds = memberIds;
     project.updatedAt = new Date();
 
-    return this._projectRepo.update(project);
+    const updatedProject = await this._projectRepo.update(project);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: project.workspaceId,
+      actorId: userId,
+      eventType: "PROJECT_UPDATED",
+      entityType: "PROJECT",
+      entityId: updatedProject.projectId,
+      projectId: updatedProject.projectId,
+      metadata: {
+        projectName: updatedProject.name,
+        projectKey: updatedProject.projectKey,
+      },
+    });
+
+    return updatedProject;
   }
 }
