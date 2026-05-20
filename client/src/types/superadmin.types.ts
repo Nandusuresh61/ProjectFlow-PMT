@@ -78,3 +78,52 @@ export interface PaginatedWorkspaces {
   limit: number;
   pages: number;
 }
+
+export interface DashboardStats {
+  totalWorkspaces: number;
+  totalWorkspacesChange: number;
+  totalUsers: number;
+  totalUsersChange: number;
+  activeSubscriptions: number;
+  activeSubscriptionsChange: number;
+  pendingTickets: number;
+  revenueThisMonth: number;
+  revenueThisMonthChange: number;
+  newWorkspacesThisMonth: number;
+  newWorkspacesThisMonthChange: number;
+}
+
+export interface RevenueOverview {
+  monthlyRevenue: number;
+  yearlyRevenue: number;
+  activePaidOrganizations: number;
+  monthlyHistory: { month: string; revenue: number }[];
+}
+
+export interface WorkspaceGrowth {
+  newlyCreated: number;
+  trial: number;
+  upgraded: number;
+  growthHistory: { month: string; count: number }[];
+}
+
+export interface RecentWorkspace {
+  workspaceId: string;
+  name: string;
+  ownerName: string;
+  ownerEmail: string;
+  planName: string;
+  membersCount: number;
+  createdAt: string;
+  status: "active" | "suspended" | "trial";
+}
+
+export interface PendingTicket {
+  ticketId: string;
+  title: string;
+  workspaceName: string;
+  priority: "LOW" | "MEDIUM" | "HIGH";
+  status: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+  createdAt: string;
+}
+

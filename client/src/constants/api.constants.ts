@@ -74,6 +74,11 @@ export const API_ROUTES = {
     GET_WORKSPACES: "/super-admin/workspaces",
     WORKSPACE_DETAILS: (workspaceId: string) => `/super-admin/workspace/${workspaceId}`,
     TOGGLE_SUSPEND: (workspaceId: string) => `/super-admin/workspace/${workspaceId}/toggle-suspend`,
+    DASHBOARD_STATS: "/super-admin/dashboard/stats",
+    DASHBOARD_REVENUE: "/super-admin/dashboard/revenue",
+    DASHBOARD_GROWTH: "/super-admin/dashboard/workspace-growth",
+    DASHBOARD_RECENT_WORKSPACES: "/super-admin/dashboard/recent-workspaces",
+    DASHBOARD_PENDING_TICKETS: "/super-admin/dashboard/pending-tickets",
   },
   WORKLOG: {
     ISSUE: (issueId: string) => `/worklog/issue/${issueId}`,
