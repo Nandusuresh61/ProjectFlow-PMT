@@ -2,56 +2,16 @@ import { WorkspaceModel } from "@/infrastructure/database/models/MongoWorkspaceM
 import { UserModel } from "@/infrastructure/database/models/MongoUserModel";
 import { MongoSubscriptionModel } from "@/infrastructure/database/models/MongoSubscriptionModel";
 import { TicketModel } from "@/infrastructure/database/models/MongoTicketModel";
+import { IGetSuperAdminDashboardUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetSuperAdminDashboardUseCase";
+import {
+  DashboardStatsDto,
+  RevenueOverviewDto,
+  WorkspaceGrowthDto,
+  RecentWorkspaceDto,
+  PendingTicketDto
+} from "@/application/dtos/SuperAdminDashboardDto";
 
-export interface DashboardStatsDto {
-  totalWorkspaces: number;
-  totalWorkspacesChange: number;
-  totalUsers: number;
-  totalUsersChange: number;
-  activeSubscriptions: number;
-  activeSubscriptionsChange: number;
-  pendingTickets: number;
-  revenueThisMonth: number;
-  revenueThisMonthChange: number;
-  newWorkspacesThisMonth: number;
-  newWorkspacesThisMonthChange: number;
-}
-
-export interface RevenueOverviewDto {
-  monthlyRevenue: number;
-  yearlyRevenue: number;
-  activePaidOrganizations: number;
-  monthlyHistory: { month: string; revenue: number }[];
-}
-
-export interface WorkspaceGrowthDto {
-  newlyCreated: number;
-  trial: number;
-  upgraded: number;
-  growthHistory: { month: string; count: number }[];
-}
-
-export interface RecentWorkspaceDto {
-  workspaceId: string;
-  name: string;
-  ownerName: string;
-  ownerEmail: string;
-  planName: string;
-  membersCount: number;
-  createdAt: Date;
-  status: "active" | "suspended" | "trial";
-}
-
-export interface PendingTicketDto {
-  ticketId: string;
-  title: string;
-  workspaceName: string;
-  priority: string;
-  status: string;
-  createdAt: Date;
-}
-
-export class GetSuperAdminDashboardUseCase {
+export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUseCase {
   async getStats(): Promise<DashboardStatsDto> {
     const startOfCurrentMonth = new Date();
     startOfCurrentMonth.setDate(1);

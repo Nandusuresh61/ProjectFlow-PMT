@@ -1,33 +1,34 @@
 import { Request, Response } from "express";
-import { GetSuperAdminDashboardUseCase } from "@/application/use-cases/Admin/GetSuperAdminDashboardUseCase";
+import { IGetSuperAdminDashboardUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetSuperAdminDashboardUseCase";
 import { asyncHandler } from "../utils/AsyncHandler";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ResponseHandler } from "@/shared/response/responseHandler";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class SuperAdminDashboardController {
   constructor(
-    private readonly _getSuperAdminDashboardUseCase: GetSuperAdminDashboardUseCase
+    private readonly _getSuperAdminDashboardUseCase: IGetSuperAdminDashboardUseCase
   ) {}
 
   getStats = asyncHandler(async (req: Request, res: Response) => {
     const stats = await this._getSuperAdminDashboardUseCase.getStats();
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Dashboard statistics retrieved successfully", stats));
+      .json(ResponseHandler.success(AppMessages.DASHBOARD_STATS_RETRIEVED, stats));
   });
 
   getRevenueOverview = asyncHandler(async (req: Request, res: Response) => {
     const revenue = await this._getSuperAdminDashboardUseCase.getRevenueOverview();
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Revenue overview retrieved successfully", revenue));
+      .json(ResponseHandler.success(AppMessages.DASHBOARD_REVENUE_RETRIEVED, revenue));
   });
 
   getWorkspaceGrowth = asyncHandler(async (req: Request, res: Response) => {
     const growth = await this._getSuperAdminDashboardUseCase.getWorkspaceGrowth();
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Workspace growth retrieved successfully", growth));
+      .json(ResponseHandler.success(AppMessages.DASHBOARD_GROWTH_RETRIEVED, growth));
   });
 
   getRecentWorkspaces = asyncHandler(async (req: Request, res: Response) => {
@@ -37,7 +38,7 @@ export class SuperAdminDashboardController {
     const result = await this._getSuperAdminDashboardUseCase.getRecentWorkspaces(page, limit);
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Recent workspaces retrieved successfully", result));
+      .json(ResponseHandler.success(AppMessages.DASHBOARD_WORKSPACES_RETRIEVED, result));
   });
 
   getPendingTickets = asyncHandler(async (req: Request, res: Response) => {
@@ -47,6 +48,6 @@ export class SuperAdminDashboardController {
     const result = await this._getSuperAdminDashboardUseCase.getPendingTickets(page, limit);
     res
       .status(HttpStatusCode.OK)
-      .json(ResponseHandler.success("Pending tickets retrieved successfully", result));
+      .json(ResponseHandler.success(AppMessages.DASHBOARD_TICKETS_RETRIEVED, result));
   });
 }
