@@ -188,4 +188,10 @@ export const AppMessages = {
   TICKET_ADMIN_RETRIEVED_SUCCESS: "All support tickets retrieved successfully",
   ACTIVITY_FEED_RETRIEVED: "Activity feed retrieved successfully",
   ENTITY_TIMELINE_RETRIEVED: "Entity timeline retrieved successfully",
+
+  DASHBOARD_STATS_RETRIEVED: "Dashboard statistics retrieved successfully",
+  DASHBOARD_REVENUE_RETRIEVED: "Revenue overview retrieved successfully",
+  DASHBOARD_GROWTH_RETRIEVED: "Workspace growth retrieved successfully",
+  DASHBOARD_WORKSPACES_RETRIEVED: "Recent workspaces retrieved successfully",
+  DASHBOARD_TICKETS_RETRIEVED: "Pending tickets retrieved successfully",
 };

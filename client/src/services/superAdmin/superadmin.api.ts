@@ -4,7 +4,12 @@ import type {
   PaginatedUsers, 
   UserDetails, 
   PaginatedWorkspaces, 
-  WorkspaceDetails 
+  WorkspaceDetails,
+  DashboardStats,
+  RevenueOverview,
+  WorkspaceGrowth,
+  RecentWorkspace,
+  PendingTicket
 } from "@/types/superadmin.types";
 import { API } from "../api";
 import { API_ROUTES } from "@/constants/api.constants";
@@ -51,3 +56,39 @@ export const toggleSuspendWorkspace = async (
   const { data } = await API.patch(API_ROUTES.SUPER_ADMIN.TOGGLE_SUSPEND(workspaceId));
   return data;
 };
+
+export const getDashboardStats = async (): Promise<ApiResponse<DashboardStats>> => {
+  const { data } = await API.get(API_ROUTES.SUPER_ADMIN.DASHBOARD_STATS);
+  return data;
+};
+
+export const getRevenueOverview = async (): Promise<ApiResponse<RevenueOverview>> => {
+  const { data } = await API.get(API_ROUTES.SUPER_ADMIN.DASHBOARD_REVENUE);
+  return data;
+};
+
+export const getWorkspaceGrowth = async (): Promise<ApiResponse<WorkspaceGrowth>> => {
+  const { data } = await API.get(API_ROUTES.SUPER_ADMIN.DASHBOARD_GROWTH);
+  return data;
+};
+
+export const getRecentWorkspaces = async (
+  page: number = 1,
+  limit: number = 5
+): Promise<ApiResponse<{ workspaces: RecentWorkspace[]; total: number }>> => {
+  const { data } = await API.get(API_ROUTES.SUPER_ADMIN.DASHBOARD_RECENT_WORKSPACES, {
+    params: { page, limit },
+  });
+  return data;
+};
+
+export const getPendingTickets = async (
+  page: number = 1,
+  limit: number = 5
+): Promise<ApiResponse<{ tickets: PendingTicket[]; total: number }>> => {
+  const { data } = await API.get(API_ROUTES.SUPER_ADMIN.DASHBOARD_PENDING_TICKETS, {
+    params: { page, limit },
+  });
+  return data;
+};
+
