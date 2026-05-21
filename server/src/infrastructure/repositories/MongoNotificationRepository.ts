@@ -62,4 +62,13 @@ export class MongoNotificationRepository implements INotificationRepository {
     );
     return result.modifiedCount > 0;
   }
+
+  async clearHistory(receiverId: string, workspaceId?: string): Promise<boolean> {
+    const query: any = { receiverId };
+    if (workspaceId) {
+      query.workspaceId = workspaceId;
+    }
+    const result = await MongoNotificationModel.deleteMany(query);
+    return result.acknowledged;
+  }
 }

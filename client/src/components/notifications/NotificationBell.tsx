@@ -36,7 +36,7 @@ const formatTimeAgo = (dateString: string) => {
 
 export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { notifications, unreadCount, isLoading, markAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, clearHistory } = useNotifications();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,11 +88,24 @@ export const NotificationBell = () => {
             className="absolute right-0 mt-3 w-80 md:w-96 rounded-2xl bg-[#0a1120]/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden z-50 flex flex-col"
           >
             <div className="flex items-center justify-between p-4 border-b border-white/5 bg-white/[0.02]">
-              <h3 className="text-sm font-semibold text-white">Notifications</h3>
-              {unreadCount > 0 && (
-                <span className="text-[11px] font-medium text-blue-400 bg-blue-500/10 px-2 py-1 rounded-full">
-                  {unreadCount} new
-                </span>
+              <div className="flex items-center gap-3">
+                <h3 className="text-sm font-semibold text-white">Notifications</h3>
+                {unreadCount > 0 && (
+                  <span className="text-[11px] font-medium text-blue-400 bg-blue-500/10 px-2 py-1 rounded-full">
+                    {unreadCount} new
+                  </span>
+                )}
+              </div>
+              {notifications.length > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearHistory();
+                  }}
+                  className="text-[11px] text-white/40 hover:text-red-400 transition-colors uppercase tracking-wider font-medium"
+                >
+                  Clear All
+                </button>
               )}
             </div>
 

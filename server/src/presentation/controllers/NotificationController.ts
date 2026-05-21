@@ -3,6 +3,7 @@ import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
 import { IGetUserNotificationsUseCase } from "@/application/interfaces/use-cases/Notification/IGetUserNotificationsUseCase";
 import { IMarkNotificationAsReadUseCase } from "@/application/interfaces/use-cases/Notification/IMarkNotificationAsReadUseCase";
 import { IGetUnreadNotificationCountUseCase } from "@/application/interfaces/use-cases/Notification/IGetUnreadNotificationCountUseCase";
+import { IClearNotificationHistoryUseCase } from "@/application/interfaces/use-cases/Notification/IClearNotificationHistoryUseCase";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
@@ -14,7 +15,8 @@ export class NotificationController {
   constructor(
     private readonly getUserNotificationsUseCase: IGetUserNotificationsUseCase,
     private readonly getUnreadNotificationCountUseCase: IGetUnreadNotificationCountUseCase,
-    private readonly markNotificationAsReadUseCase: IMarkNotificationAsReadUseCase
+    private readonly markNotificationAsReadUseCase: IMarkNotificationAsReadUseCase,
+    private readonly clearNotificationHistoryUseCase: IClearNotificationHistoryUseCase
   ) {}
   async getUserNotifications(req: AuthRequest, res: Response, next: NextFunction) {
     try {
@@ -62,6 +64,22 @@ export class NotificationController {
       res.status(HttpStatusCode.OK).json({ success, data: { notificationId: id, isRead: true } });
     } catch (error) {
       logger.error("Error marking notification as read", error);
+      next(error);
+    }
+  }
+
+  async clearHistory(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
+      }
+
+      const workspaceId = req.query.workspaceId as string | undefined;
+      const success = await this.clearNotificationHistoryUseCase.execute(userId, workspaceId);
+      res.status(HttpStatusCode.OK).json({ success });
+    } catch (error) {
+      logger.error("Error clearing notification history", error);
       next(error);
     }
   }

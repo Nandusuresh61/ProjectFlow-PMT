@@ -76,11 +76,22 @@ export const useNotifications = () => {
     }
   };
 
+  const clearHistory = async () => {
+    try {
+      await notificationService.clearHistory(currentWorkspace?.workspaceId);
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Failed to clear notification history', error);
+    }
+  };
+
   return {
     notifications,
     unreadCount,
     isLoading,
     markAsRead,
+    clearHistory,
     refresh: fetchNotifications
   };
 };

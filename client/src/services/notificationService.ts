@@ -19,5 +19,12 @@ export const notificationService = {
   markAsRead: async (notificationId: string) => {
     const response = await API.patch<{ success: boolean; data: { notificationId: string; isRead: boolean } }>(`/notifications/${notificationId}/read`);
     return response.data.data;
+  },
+
+  clearHistory: async (workspaceId?: string) => {
+    let url = '/notifications/history';
+    if (workspaceId) url += `?workspaceId=${workspaceId}`;
+    const response = await API.delete<{ success: boolean }>(url);
+    return response.data.success;
   }
 };
