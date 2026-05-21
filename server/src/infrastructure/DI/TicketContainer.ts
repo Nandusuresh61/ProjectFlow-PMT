@@ -5,6 +5,7 @@ import { MongoPlanRepository } from "@/infrastructure/repositories/MongoPlanRepo
 import { UidService } from "@/infrastructure/services/UidService";
 import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
 import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
+import { workspaceEventTrackingService } from "@/infrastructure/DI/WorkspaceEventContainer";
 
 import { CreateTicketUseCase } from "@/application/use-cases/Ticket/CreateTicketUseCase";
 import { ReplyToTicketUseCase } from "@/application/use-cases/Ticket/ReplyToTicketUseCase";
@@ -34,7 +35,8 @@ const createTicketUseCase = new CreateTicketUseCase(
 const replyToTicketUseCase = new ReplyToTicketUseCase(
   ticketRepository,
   ticketMessageRepository,
-  uidGenerator
+  uidGenerator,
+  workspaceEventTrackingService
 );
 
 const getWorkspaceTicketsUseCase = new GetWorkspaceTicketsUseCase(ticketRepository, membershipRepository);

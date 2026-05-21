@@ -7,12 +7,14 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { TicketStatus } from "@/shared/enums/TicketStatus";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export class ReplyToTicketUseCase implements IReplyToTicketUseCase {
   constructor(
     private readonly _ticketRepository: ITicketRepository,
     private readonly _ticketMessageRepository: ITicketMessageRepository,
-    private readonly _uidGenerator: IUidGenerator
+    private readonly _uidGenerator: IUidGenerator,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
   async execute(data: ReplyToTicketDto): Promise<void> {
@@ -40,5 +42,18 @@ export class ReplyToTicketUseCase implements IReplyToTicketUseCase {
 
     await this._ticketMessageRepository.create(ticketMessage);
     await this._ticketRepository.updateLastReplyAt(data.ticketId, now);
+
+    await this._eventTracker.trackEvent({
+      workspaceId: ticket.workspaceId,
+      actorId: data.senderId,
+      eventType: "TICKET_REPLIED",
+      entityType: "TICKET",
+      entityId: ticket.ticketId,
+      metadata: {
+        ticketId: ticket.ticketId,
+        creatorId: ticket.createdBy,
+        messageId,
+      },
+    });
   }
 }

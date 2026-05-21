@@ -126,6 +126,24 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
       },
     });
 
+    if (createdIssue.assigneeId) {
+      await this._eventTracker.trackEvent({
+        workspaceId: createdIssue.workspaceId,
+        actorId: userId,
+        eventType: "ISSUE_ASSIGNED",
+        entityType: "ISSUE",
+        entityId: createdIssue.issueId,
+        projectId: createdIssue.projectId,
+        parentEntityId: createdIssue.sprintId,
+        parentEntityType: createdIssue.sprintId ? "SPRINT" : null,
+        metadata: {
+          issueKey: createdIssue.issueKey,
+          title: createdIssue.title,
+          assigneeId: createdIssue.assigneeId,
+        },
+      });
+    }
+
     return createdIssue;
   }
 }

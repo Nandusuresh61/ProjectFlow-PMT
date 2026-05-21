@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { MessageSquare, Search, Send, Hash, Users, Smile, Paperclip, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { MessageSquare, Search, Send, Hash, Users, Smile, Paperclip, Loader2 } from 'lucide-react';
 import { useSocket } from '@/app/Providers/SocketProvider';
 import { useWorkspaceStore } from '@/store/workspace.store';
 import { getChatMessages, getChatConversations, type Message, type Conversation } from '@/services/chat/chat.api';
 import { AuthUserState } from '@/store/auth.store';
-import { format, formatDistanceToNow, isToday } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import { toast } from 'sonner';
 
@@ -34,7 +34,7 @@ export const ChatView = () => {
     const [isUploading, setIsUploading] = useState(false);
     
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Debounce search term
@@ -62,7 +62,7 @@ export const ChatView = () => {
             try {
                 const response = await getChatConversations(currentWorkspace.workspaceId);
                 if (response.success && response.data) {
-                    const uiConvs: UIConversation[] = response.data.map((c, index) => ({
+                    const uiConvs: UIConversation[] = response.data.map((c) => ({
                         ...c,
                         initials: c.name.substring(0, 2).toUpperCase(),
                         color: c.type === 'workspace' ? '#576CBC' : '#7C9AC7',
