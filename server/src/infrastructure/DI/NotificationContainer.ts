@@ -4,6 +4,7 @@ import { GetUserNotificationsUseCase } from "@/application/use-cases/Notificatio
 import { MarkNotificationAsReadUseCase } from "@/application/use-cases/Notification/MarkNotificationAsReadUseCase";
 import { GetUnreadNotificationCountUseCase } from "@/application/use-cases/Notification/GetUnreadNotificationCountUseCase";
 import { NotificationService } from "@/application/services/NotificationService";
+import { NotificationController } from "@/presentation/controllers/NotificationController";
 
 export const notificationRepo = new MongoNotificationRepository();
 export const createNotificationUseCase = new CreateNotificationUseCase(notificationRepo);
@@ -12,3 +13,9 @@ export const markNotificationAsReadUseCase = new MarkNotificationAsReadUseCase(n
 export const getUnreadNotificationCountUseCase = new GetUnreadNotificationCountUseCase(notificationRepo);
 
 export const notificationService = new NotificationService(createNotificationUseCase);
+
+export const notificationController = new NotificationController(
+  getUserNotificationsUseCase,
+  getUnreadNotificationCountUseCase,
+  markNotificationAsReadUseCase
+);

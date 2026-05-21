@@ -1,7 +1,8 @@
 import { Notification } from "@/domain/entities/Notification";
 import { INotificationRepository } from "@/domain/repositories/INotificationRepository";
+import { IGetUserNotificationsUseCase } from "@/application/interfaces/use-cases/Notification/IGetUserNotificationsUseCase";
 
-export class GetUserNotificationsUseCase {
+export class GetUserNotificationsUseCase implements IGetUserNotificationsUseCase {
   constructor(private readonly notificationRepo: INotificationRepository) {}
 
   async execute(receiverId: string, page: number = 1, limit: number = 20, workspaceId?: string): Promise<{ notifications: Notification[]; totalUnread: number }> {

@@ -1,6 +1,8 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
-import { getUserNotificationsUseCase, markNotificationAsReadUseCase, getUnreadNotificationCountUseCase } from "@/infrastructure/DI/NotificationContainer";
+import { IGetUserNotificationsUseCase } from "@/application/interfaces/use-cases/Notification/IGetUserNotificationsUseCase";
+import { IMarkNotificationAsReadUseCase } from "@/application/interfaces/use-cases/Notification/IMarkNotificationAsReadUseCase";
+import { IGetUnreadNotificationCountUseCase } from "@/application/interfaces/use-cases/Notification/IGetUnreadNotificationCountUseCase";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
@@ -9,6 +11,11 @@ import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class NotificationController {
+  constructor(
+    private readonly getUserNotificationsUseCase: IGetUserNotificationsUseCase,
+    private readonly getUnreadNotificationCountUseCase: IGetUnreadNotificationCountUseCase,
+    private readonly markNotificationAsReadUseCase: IMarkNotificationAsReadUseCase
+  ) {}
   async getUserNotifications(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.userId;
@@ -19,7 +26,7 @@ export class NotificationController {
       const limit = parseInt(req.query.limit as string) || 20;
       const workspaceId = req.query.workspaceId as string | undefined;
 
-      const result = await getUserNotificationsUseCase.execute(userId, page, limit, workspaceId);
+      const result = await this.getUserNotificationsUseCase.execute(userId, page, limit, workspaceId);
       res.status(HttpStatusCode.OK).json({ success: true, data: result });
     } catch (error) {
       logger.error("Error getting user notifications", error);
@@ -35,7 +42,7 @@ export class NotificationController {
       }
 
       const workspaceId = req.query.workspaceId as string | undefined;
-      const count = await getUnreadNotificationCountUseCase.execute(userId, workspaceId);
+      const count = await this.getUnreadNotificationCountUseCase.execute(userId, workspaceId);
       res.status(HttpStatusCode.OK).json({ success: true, data: { count } });
     } catch (error) {
       logger.error("Error getting unread notification count", error);
@@ -51,7 +58,7 @@ export class NotificationController {
         throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
       }
 
-      const success = await markNotificationAsReadUseCase.execute(id, userId);
+      const success = await this.markNotificationAsReadUseCase.execute(id, userId);
       res.status(HttpStatusCode.OK).json({ success, data: { notificationId: id, isRead: true } });
     } catch (error) {
       logger.error("Error marking notification as read", error);
@@ -59,5 +66,3 @@ export class NotificationController {
     }
   }
 }
-
-export const notificationController = new NotificationController();
