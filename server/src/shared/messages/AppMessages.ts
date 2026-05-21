@@ -189,6 +189,11 @@ export const AppMessages = {
   ACTIVITY_FEED_RETRIEVED: "Activity feed retrieved successfully",
   ENTITY_TIMELINE_RETRIEVED: "Entity timeline retrieved successfully",
 
+  MEETING_CREATED_SUCCESS: "Meeting created successfully",
+  MEETING_RETRIEVED_SUCCESS: "Meeting retrieved successfully",
+  MEETINGS_RETRIEVED_SUCCESS: "Meetings retrieved successfully",
+  MEETING_ENDED_SUCCESS: "Meeting ended successfully",
+
   DASHBOARD_STATS_RETRIEVED: "Dashboard statistics retrieved successfully",
   DASHBOARD_REVENUE_RETRIEVED: "Revenue overview retrieved successfully",
   DASHBOARD_GROWTH_RETRIEVED: "Workspace growth retrieved successfully",

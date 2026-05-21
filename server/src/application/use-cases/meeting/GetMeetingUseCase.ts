@@ -1,7 +1,8 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
+import { IGetMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IGetMeetingUseCase";
 
-export class GetMeetingUseCase {
+export class GetMeetingUseCase implements IGetMeetingUseCase {
   constructor(private readonly meetingRepo: IMeetingRepository) {}
 
   async execute(meetingId: string, userId: string): Promise<MeetingResponseDTO> {

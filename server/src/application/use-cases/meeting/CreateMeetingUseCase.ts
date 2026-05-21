@@ -2,8 +2,9 @@ import { IMeetingRepository } from "@/application/interfaces/repositories/IMeeti
 import { CreateMeetingDTO, MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
 import { WorkspaceEventTrackingService } from "@/application/services/WorkspaceEventTrackingService";
+import { ICreateMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/ICreateMeetingUseCase";
 
-export class CreateMeetingUseCase {
+export class CreateMeetingUseCase implements ICreateMeetingUseCase {
   constructor(
     private readonly meetingRepo: IMeetingRepository,
     private readonly eventTrackingService: WorkspaceEventTrackingService,

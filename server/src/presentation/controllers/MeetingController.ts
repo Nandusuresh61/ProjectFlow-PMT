@@ -3,17 +3,18 @@ import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ResponseHandler } from "@/shared/response/responseHandler";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
-import { CreateMeetingUseCase } from "@/application/use-cases/meeting/CreateMeetingUseCase";
-import { GetMeetingUseCase } from "@/application/use-cases/meeting/GetMeetingUseCase";
-import { GetWorkspaceMeetingsUseCase } from "@/application/use-cases/meeting/GetWorkspaceMeetingsUseCase";
-import { EndMeetingUseCase } from "@/application/use-cases/meeting/EndMeetingUseCase";
+import { ICreateMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/ICreateMeetingUseCase";
+import { IGetMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IGetMeetingUseCase";
+import { IGetWorkspaceMeetingsUseCase } from "@/application/interfaces/use-cases/Meeting/IGetWorkspaceMeetingsUseCase";
+import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class MeetingController {
   constructor(
-    private readonly createMeetingUseCase: CreateMeetingUseCase,
-    private readonly getMeetingUseCase: GetMeetingUseCase,
-    private readonly getWorkspaceMeetingsUseCase: GetWorkspaceMeetingsUseCase,
-    private readonly endMeetingUseCase: EndMeetingUseCase
+    private readonly createMeetingUseCase: ICreateMeetingUseCase,
+    private readonly getMeetingUseCase: IGetMeetingUseCase,
+    private readonly getWorkspaceMeetingsUseCase: IGetWorkspaceMeetingsUseCase,
+    private readonly endMeetingUseCase: IEndMeetingUseCase
   ) {}
 
   createMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -29,7 +30,7 @@ export class MeetingController {
       duration
     });
 
-    res.status(HttpStatusCode.CREATED).json(ResponseHandler.success("Meeting created successfully", meeting));
+    res.status(HttpStatusCode.CREATED).json(ResponseHandler.success(AppMessages.MEETING_CREATED_SUCCESS, meeting));
   });
 
   getMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -38,7 +39,7 @@ export class MeetingController {
 
     const meeting = await this.getMeetingUseCase.execute(meetingId, userId);
 
-    res.status(HttpStatusCode.OK).json(ResponseHandler.success("Meeting retrieved successfully", meeting));
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_RETRIEVED_SUCCESS, meeting));
   });
 
   getWorkspaceMeetings = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -47,7 +48,7 @@ export class MeetingController {
 
     const meetings = await this.getWorkspaceMeetingsUseCase.execute(workspaceId, userId);
 
-    res.status(HttpStatusCode.OK).json(ResponseHandler.success("Meetings retrieved successfully", meetings));
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETINGS_RETRIEVED_SUCCESS, meetings));
   });
 
   endMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -56,6 +57,6 @@ export class MeetingController {
 
     const meeting = await this.endMeetingUseCase.execute(meetingId, userId);
 
-    res.status(HttpStatusCode.OK).json(ResponseHandler.success("Meeting ended successfully", meeting));
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_ENDED_SUCCESS, meeting));
   });
 }

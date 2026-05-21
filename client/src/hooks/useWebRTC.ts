@@ -23,10 +23,7 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
     isCameraOn,
   } = useMeetingStore();
 
-  // We need the socket instance
-  // Note: Adjust how socket is retrieved based on actual implementation.
-  // Using a mock approach where useSocket provides the current socket.
-  const { socket } = useSocket() as { socket: Socket | null }; 
+  const { socket } = useSocket() as { socket: Socket | null };
 
   const peersRef = useRef<Record<string, RTCPeerConnection>>({});
 
@@ -71,7 +68,7 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
 
     const createPeerConnection = (targetSocketId: string, userId: string, fullName?: string) => {
       const pc = new RTCPeerConnection(ICE_SERVERS);
-      
+
       peersRef.current[targetSocketId] = pc;
       addParticipant(targetSocketId, userId, fullName);
 

@@ -1,8 +1,9 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
 import { WorkspaceEventTrackingService } from "@/application/services/WorkspaceEventTrackingService";
+import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
 
-export class EndMeetingUseCase {
+export class EndMeetingUseCase implements IEndMeetingUseCase {
   constructor(
     private readonly meetingRepo: IMeetingRepository,
     private readonly eventTrackingService: WorkspaceEventTrackingService
