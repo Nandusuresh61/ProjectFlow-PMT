@@ -9,17 +9,14 @@ import {
   TrendingDown,
   MessageSquare,
   Calendar,
-  Ban,
   CheckCircle2,
   Clock,
   ChevronLeft,
   ChevronRight,
-  Eye,
   AlertTriangle,
   Mail,
   User,
-  Activity,
-  ArrowRight
+  Activity
 } from "lucide-react";
 import {
   AreaChart,
@@ -407,7 +404,7 @@ export default function AdminDashboard() {
                           }}
                           labelStyle={{ color: "#a1a1aa", fontSize: "12px", fontWeight: "bold" }}
                           itemStyle={{ color: "#10b981", fontSize: "13px" }}
-                          formatter={(v) => [`₹${v.toLocaleString()}`, "Revenue"]}
+                          formatter={(v: any) => [`₹${v?.toLocaleString() || 0}`, "Revenue"]}
                         />
                         <Area
                           type="monotone"
@@ -495,7 +492,7 @@ export default function AdminDashboard() {
                           formatter={(v) => [v, "New Workspaces"]}
                         />
                         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                          {(growth?.growthHistory || []).map((entry, idx) => (
+                          {(growth?.growthHistory || []).map((_entry: any, idx: number) => (
                             <Cell key={`cell-${idx}`} fill={idx === 5 ? "#10b981" : "#3b82f6"} />
                           ))}
                         </Bar>

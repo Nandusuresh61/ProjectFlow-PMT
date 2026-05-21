@@ -345,7 +345,7 @@ function TicketDetailView({ ticketId, onBack }: TicketDetailViewProps) {
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar max-h-[500px]"
       >
-        {messages.map((msg, idx) => {
+        {messages.map((msg, _idx) => {
           const isUser = msg.senderId === ticket.createdBy;
           return (
             <motion.div

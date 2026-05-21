@@ -57,6 +57,8 @@ export class AddCommentUseCase implements IAddCommentUseCase {
         issueKey: issue.issueKey,
         title: issue.title,
         commentId: created.commentId,
+        assigneeId: issue.assigneeId,
+        mentions: created.mentions,
       }
     });
 

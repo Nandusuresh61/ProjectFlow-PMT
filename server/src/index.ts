@@ -26,6 +26,8 @@ import http from "http";
 import { SocketServer } from "./infrastructure/services/SocketServer";
 import { ChatSocketHandler } from "./presentation/sockets/ChatSocketHandler";
 import { ActivitySocketHandler } from "./presentation/sockets/ActivitySocketHandler";
+import { NotificationSocketHandler } from "./presentation/sockets/NotificationSocketHandler";
+import notificationRoutes from "@/presentation/routes/NotificationRoutes";
 
 const app = express();
 const server = http.createServer(app);
@@ -33,6 +35,7 @@ const server = http.createServer(app);
 const socketServer = SocketServer.init(server);
 socketServer.registerHandler(ChatSocketHandler);
 socketServer.registerHandler(ActivitySocketHandler);
+socketServer.registerHandler(NotificationSocketHandler);
 
 app.use(morgan("dev"));
 connectDB();
@@ -62,6 +65,7 @@ app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/worklog", workLogRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/activity", activityRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use(errorMiddleware);
 

@@ -2,9 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Check, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Loader } from "@/components/ui/Loader";
-import type { StepPlanProps } from "@/types/onboarding.types";
-
-
+interface StepPlanProps {
+    data: any;
+    plans: any[];
+    loading: boolean;
+    updateData: (data: any) => void;
+    onNext: () => void;
+    onBack: () => void;
+}
 
 export function StepPlan({
     data,
@@ -30,8 +35,8 @@ export function StepPlan({
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {plans
-                        ?.filter((plan) => plan.isActive)
-                        .map((plan) => (
+                        ?.filter((plan: any) => plan.isActive)
+                        .map((plan: any) => (
                             <div
                                 key={plan.planId}
                                 onClick={() => updateData({ planId: plan.planId })}
@@ -57,7 +62,7 @@ export function StepPlan({
                                     {plan.description}
                                 </p>
                                 <div className="space-y-2">
-                                    {plan.features.map((feature, idx) => (
+                                    {plan.features.map((feature: string, idx: number) => (
                                         <div
                                             key={idx}
                                             className="flex items-center gap-2 text-sm text-[#576CBC]/80 font-medium"
