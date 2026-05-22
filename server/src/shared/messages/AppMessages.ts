@@ -189,6 +189,15 @@ export const AppMessages = {
   ACTIVITY_FEED_RETRIEVED: "Activity feed retrieved successfully",
   ENTITY_TIMELINE_RETRIEVED: "Entity timeline retrieved successfully",
 
+  MEETING_CREATED_SUCCESS: "Meeting created successfully",
+  MEETING_RETRIEVED_SUCCESS: "Meeting retrieved successfully",
+  MEETINGS_RETRIEVED_SUCCESS: "Meetings retrieved successfully",
+  MEETING_ENDED_SUCCESS: "Meeting ended successfully",
+  MEETING_NOT_FOUND: "Meeting not found",
+  MEETING_UNAUTHORIZED: "You are not authorized to join this meeting",
+  MEETING_HOST_ONLY: "Only the host can end the meeting",
+  MEETING_END_FAILED: "Failed to end meeting",
+
   DASHBOARD_STATS_RETRIEVED: "Dashboard statistics retrieved successfully",
   DASHBOARD_REVENUE_RETRIEVED: "Revenue overview retrieved successfully",
   DASHBOARD_GROWTH_RETRIEVED: "Workspace growth retrieved successfully",

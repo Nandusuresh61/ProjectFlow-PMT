@@ -11,6 +11,7 @@ import { SocketServer } from "@/infrastructure/services/SocketServer";
 import mongoose from "mongoose";
 import { notificationService } from "@/infrastructure/DI/NotificationContainer";
 import { NotificationType } from "@/domain/entities/Notification";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 export interface TrackEventParams {
   workspaceId: string;
@@ -25,7 +26,7 @@ export interface TrackEventParams {
   projectId?: string | null;
 }
 
-export class WorkspaceEventTrackingService {
+export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingService {
   constructor(private readonly eventRepository: IWorkspaceEventRepository) {}
 
   async trackEvent(params: TrackEventParams): Promise<void> {
