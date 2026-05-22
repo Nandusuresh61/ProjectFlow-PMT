@@ -11,17 +11,17 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class MeetingController {
   constructor(
-    private readonly createMeetingUseCase: ICreateMeetingUseCase,
-    private readonly getMeetingUseCase: IGetMeetingUseCase,
-    private readonly getWorkspaceMeetingsUseCase: IGetWorkspaceMeetingsUseCase,
-    private readonly endMeetingUseCase: IEndMeetingUseCase
+    private readonly _createMeetingUseCase: ICreateMeetingUseCase,
+    private readonly _getMeetingUseCase: IGetMeetingUseCase,
+    private readonly _getWorkspaceMeetingsUseCase: IGetWorkspaceMeetingsUseCase,
+    private readonly _endMeetingUseCase: IEndMeetingUseCase
   ) {}
 
   createMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { workspaceId, title, participants, scheduledAt, duration } = req.body;
     const userId = req.user!.userId;
 
-    const meeting = await this.createMeetingUseCase.execute({
+    const meeting = await this._createMeetingUseCase.execute({
       workspaceId,
       hostId: userId,
       title,
@@ -37,7 +37,7 @@ export class MeetingController {
     const { meetingId } = req.params;
     const userId = req.user!.userId;
 
-    const meeting = await this.getMeetingUseCase.execute(meetingId, userId);
+    const meeting = await this._getMeetingUseCase.execute(meetingId, userId);
 
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_RETRIEVED_SUCCESS, meeting));
   });
@@ -46,7 +46,7 @@ export class MeetingController {
     const { workspaceId } = req.params;
     const userId = req.user!.userId;
 
-    const meetings = await this.getWorkspaceMeetingsUseCase.execute(workspaceId, userId);
+    const meetings = await this._getWorkspaceMeetingsUseCase.execute(workspaceId, userId);
 
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETINGS_RETRIEVED_SUCCESS, meetings));
   });
@@ -55,7 +55,7 @@ export class MeetingController {
     const { meetingId } = req.params;
     const userId = req.user!.userId;
 
-    const meeting = await this.endMeetingUseCase.execute(meetingId, userId);
+    const meeting = await this._endMeetingUseCase.execute(meetingId, userId);
 
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_ENDED_SUCCESS, meeting));
   });
