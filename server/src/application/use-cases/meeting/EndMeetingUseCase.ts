@@ -2,6 +2,10 @@ import { IMeetingRepository } from "@/application/interfaces/repositories/IMeeti
 import { MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
 import { WorkspaceEventTrackingService } from "@/application/services/WorkspaceEventTrackingService";
 import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
+import { AppError } from "@/shared/errors/AppError";
+import { ErrorCode } from "@/shared/enums/ErrorCode";
+import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
+import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class EndMeetingUseCase implements IEndMeetingUseCase {
   constructor(
@@ -12,11 +16,11 @@ export class EndMeetingUseCase implements IEndMeetingUseCase {
   async execute(meetingId: string, userId: string): Promise<MeetingResponseDTO> {
     const meeting = await this.meetingRepo.findById(meetingId);
     if (!meeting) {
-      throw new Error("Meeting not found");
+      throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.MEETING_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     if (meeting.hostId !== userId) {
-      throw new Error("Only the host can end the meeting");
+      throw new AppError(ErrorCode.AUTH, AppMessages.MEETING_HOST_ONLY, HttpStatusCode.FORBIDDEN);
     }
 
     const updated = await this.meetingRepo.update(meetingId, {
@@ -25,7 +29,7 @@ export class EndMeetingUseCase implements IEndMeetingUseCase {
     });
 
     if (!updated) {
-      throw new Error("Failed to end meeting");
+      throw new AppError(ErrorCode.INTERNAL_ERROR, AppMessages.MEETING_END_FAILED, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
     // Track activity
