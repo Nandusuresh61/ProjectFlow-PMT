@@ -1,13 +1,13 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { CreateMeetingDTO, MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
-import { WorkspaceEventTrackingService } from "@/application/services/WorkspaceEventTrackingService";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 import { ICreateMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/ICreateMeetingUseCase";
 
 export class CreateMeetingUseCase implements ICreateMeetingUseCase {
   constructor(
     private readonly meetingRepo: IMeetingRepository,
-    private readonly eventTrackingService: WorkspaceEventTrackingService,
+    private readonly eventTrackingService: IWorkspaceEventTrackingService,
     private readonly uidGenerator: IUidGenerator
   ) {}
 

@@ -1,6 +1,6 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
-import { WorkspaceEventTrackingService } from "@/application/services/WorkspaceEventTrackingService";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
@@ -10,7 +10,7 @@ import { AppMessages } from "@/shared/messages/AppMessages";
 export class EndMeetingUseCase implements IEndMeetingUseCase {
   constructor(
     private readonly meetingRepo: IMeetingRepository,
-    private readonly eventTrackingService: WorkspaceEventTrackingService
+    private readonly eventTrackingService: IWorkspaceEventTrackingService
   ) {}
 
   async execute(meetingId: string, userId: string): Promise<MeetingResponseDTO> {
