@@ -203,4 +203,9 @@ export const AppMessages = {
   DASHBOARD_GROWTH_RETRIEVED: "Workspace growth retrieved successfully",
   DASHBOARD_WORKSPACES_RETRIEVED: "Recent workspaces retrieved successfully",
   DASHBOARD_TICKETS_RETRIEVED: "Pending tickets retrieved successfully",
+
+  NOTIFICATION_FETCH_ERROR: "Error getting user notifications",
+  NOTIFICATION_UNREAD_COUNT_ERROR: "Error getting unread notification count",
+  NOTIFICATION_MARK_READ_ERROR: "Error marking notification as read",
+  NOTIFICATION_CLEAR_HISTORY_ERROR: "Error clearing notification history",
 };

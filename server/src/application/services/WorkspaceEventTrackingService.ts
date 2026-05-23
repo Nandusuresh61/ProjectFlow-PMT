@@ -19,7 +19,7 @@ export interface TrackEventParams {
   eventType: WorkspaceEventType;
   entityType: WorkspaceEventEntityType;
   entityId: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   visibility?: WorkspaceEventVisibility;
   parentEntityType?: WorkspaceEventEntityType | null;
   parentEntityId?: string | null;
@@ -37,7 +37,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
       try {
         const user = await mongoose.model("User").findOne({ userId: params.actorId }).select("fullName").exec();
         if (user) {
-          actorName = (user as any).fullName;
+          actorName = (user as { fullName: string }).fullName;
         }
       } catch (userError) {
         console.error("[WorkspaceEventTrackingService] Failed to resolve actor name:", userError);
@@ -67,7 +67,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
 
         if (params.eventType === "ISSUE_ASSIGNED" && params.metadata?.assigneeId && params.metadata?.assigneeId !== params.actorId) {
           notificationsToSend.push({
-            receiverId: params.metadata.assigneeId,
+            receiverId: params.metadata.assigneeId as string,
             type: NotificationType.ISSUE_ASSIGNED,
             title: "Issue Assigned",
             message: `You were assigned to issue ${params.metadata.issueKey || 'Unknown'}`
@@ -76,7 +76,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
           const user = await mongoose.model("User").findOne({ email: params.metadata.email }).select("userId").exec();
           if (user) {
             notificationsToSend.push({
-              receiverId: (user as any).userId,
+              receiverId: (user as { userId: string }).userId,
               type: NotificationType.WORKSPACE_INVITE,
               title: "Workspace Invitation",
               message: `You have been invited to a new workspace`
@@ -86,7 +86,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
           // If the issue has an assignee and they are not the commenter
           if (params.metadata?.assigneeId && params.metadata.assigneeId !== params.actorId) {
             notificationsToSend.push({
-              receiverId: params.metadata.assigneeId,
+              receiverId: params.metadata.assigneeId as string,
               type: NotificationType.ISSUE_COMMENT,
               title: "New Comment",
               message: `New comment on issue ${params.metadata.issueKey || 'Unknown'}`
@@ -98,7 +98,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
             for (const mentionUserId of params.metadata.mentions) {
               if (mentionUserId !== params.actorId && mentionUserId !== params.metadata?.assigneeId) {
                 notificationsToSend.push({
-                  receiverId: mentionUserId,
+                  receiverId: mentionUserId as string,
                   type: NotificationType.MENTION,
                   title: "You were mentioned",
                   message: `You were mentioned in a comment on issue ${params.metadata.issueKey || 'Unknown'}`
@@ -108,7 +108,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
           }
         } else if (params.eventType === "TICKET_REPLIED" && params.metadata?.creatorId && params.metadata.creatorId !== params.actorId) {
           notificationsToSend.push({
-            receiverId: params.metadata.creatorId,
+            receiverId: params.metadata.creatorId as string,
             type: NotificationType.TICKET_REPLY,
             title: "Ticket Reply",
             message: `New reply on your ticket`

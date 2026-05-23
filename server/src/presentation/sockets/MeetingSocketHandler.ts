@@ -27,7 +27,7 @@ export const MeetingSocketHandler = (io: Server, socket: AuthenticatedSocket) =>
     });
   });
 
-  socket.on("webrtc-offer", (data: { targetSocketId: string, meetingId: string, offer: any }) => {
+  socket.on("webrtc-offer", (data: { targetSocketId: string, meetingId: string, offer: unknown }) => {
     socket.to(data.targetSocketId).emit("receive-offer", {
       senderSocketId: socket.id,
       userId: socket.user?.userId,
@@ -36,7 +36,7 @@ export const MeetingSocketHandler = (io: Server, socket: AuthenticatedSocket) =>
     });
   });
 
-  socket.on("webrtc-answer", (data: { targetSocketId: string, meetingId: string, answer: any }) => {
+  socket.on("webrtc-answer", (data: { targetSocketId: string, meetingId: string, answer: unknown }) => {
     socket.to(data.targetSocketId).emit("receive-answer", {
       senderSocketId: socket.id,
       userId: socket.user?.userId,
@@ -45,7 +45,7 @@ export const MeetingSocketHandler = (io: Server, socket: AuthenticatedSocket) =>
     });
   });
 
-  socket.on("ice-candidate", (data: { targetSocketId: string, meetingId: string, candidate: any }) => {
+  socket.on("ice-candidate", (data: { targetSocketId: string, meetingId: string, candidate: unknown }) => {
     socket.to(data.targetSocketId).emit("receive-ice-candidate", {
       senderSocketId: socket.id,
       userId: socket.user?.userId,

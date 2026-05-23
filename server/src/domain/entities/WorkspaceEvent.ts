@@ -45,7 +45,7 @@ export class WorkspaceEvent {
     public readonly eventType: WorkspaceEventType,
     public readonly entityType: WorkspaceEventEntityType,
     public readonly entityId: string,
-    public readonly metadata: Record<string, any>,
+    public readonly metadata: Record<string, unknown>,
     public readonly visibility: WorkspaceEventVisibility = "PUBLIC",
     public readonly parentEntityType: WorkspaceEventEntityType | null = null,
     public readonly parentEntityId: string | null = null,

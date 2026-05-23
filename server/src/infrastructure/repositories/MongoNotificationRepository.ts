@@ -1,9 +1,9 @@
 import { Notification } from "@/domain/entities/Notification";
 import { INotificationRepository } from "@/domain/repositories/INotificationRepository";
-import { MongoNotificationModel } from "../database/models/MongoNotificationModel";
+import { MongoNotificationModel, INotificationDocument } from "../database/models/MongoNotificationModel";
 
 export class MongoNotificationRepository implements INotificationRepository {
-  private mapToDomain(doc: any): Notification {
+  private mapToDomain(doc: INotificationDocument): Notification {
     return new Notification(
       doc.notificationId,
       doc.receiverId,
@@ -35,7 +35,7 @@ export class MongoNotificationRepository implements INotificationRepository {
   }
 
   async findByReceiverId(receiverId: string, skip: number, limit: number, workspaceId?: string): Promise<Notification[]> {
-    const query: any = { receiverId };
+    const query: Record<string, unknown> = { receiverId };
     if (workspaceId) {
       query.workspaceId = workspaceId;
     }
@@ -48,7 +48,7 @@ export class MongoNotificationRepository implements INotificationRepository {
   }
 
   async countUnreadByReceiverId(receiverId: string, workspaceId?: string): Promise<number> {
-    const query: any = { receiverId, isRead: false };
+    const query: Record<string, unknown> = { receiverId, isRead: false };
     if (workspaceId) {
       query.workspaceId = workspaceId;
     }
@@ -64,7 +64,7 @@ export class MongoNotificationRepository implements INotificationRepository {
   }
 
   async clearHistory(receiverId: string, workspaceId?: string): Promise<boolean> {
-    const query: any = { receiverId };
+    const query: Record<string, unknown> = { receiverId };
     if (workspaceId) {
       query.workspaceId = workspaceId;
     }

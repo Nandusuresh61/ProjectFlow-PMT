@@ -12,10 +12,16 @@ interface ScheduleMeetingModalProps {
   onCreated: () => void;
 }
 
+interface Member {
+  userId: string;
+  fullName: string;
+  email: string;
+}
+
 export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOpen, onClose, onCreated }) => {
   const { currentWorkspace } = useWorkspaceStore();
   const { user } = AuthUserState();
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
   const [title, setTitle] = useState('');
@@ -83,8 +89,9 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({ isOp
       toast.success('Meeting scheduled successfully');
       onCreated();
       onClose();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to schedule meeting');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || 'Failed to schedule meeting');
     } finally {
       setIsCreating(false);
     }

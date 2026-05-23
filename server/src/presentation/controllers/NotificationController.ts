@@ -22,7 +22,7 @@ export class NotificationController {
     try {
       const userId = req.user?.userId;
       if (!userId) {
-        throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
+        throw new AppError(ErrorCode.AUTH, AppMessages.UNAUTHORIZED_ACCESS, HttpStatusCode.UNAUTHORIZED);
       }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 20;
@@ -31,7 +31,7 @@ export class NotificationController {
       const result = await this.getUserNotificationsUseCase.execute(userId, page, limit, workspaceId);
       res.status(HttpStatusCode.OK).json({ success: true, data: result });
     } catch (error) {
-      logger.error("Error getting user notifications", error);
+      logger.error(AppMessages.NOTIFICATION_FETCH_ERROR, error);
       next(error);
     }
   }
@@ -40,14 +40,14 @@ export class NotificationController {
     try {
       const userId = req.user?.userId;
       if (!userId) {
-        throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
+        throw new AppError(ErrorCode.AUTH, AppMessages.UNAUTHORIZED_ACCESS, HttpStatusCode.UNAUTHORIZED);
       }
 
       const workspaceId = req.query.workspaceId as string | undefined;
       const count = await this.getUnreadNotificationCountUseCase.execute(userId, workspaceId);
       res.status(HttpStatusCode.OK).json({ success: true, data: { count } });
     } catch (error) {
-      logger.error("Error getting unread notification count", error);
+      logger.error(AppMessages.NOTIFICATION_UNREAD_COUNT_ERROR, error);
       next(error);
     }
   }
@@ -57,13 +57,13 @@ export class NotificationController {
       const userId = req.user?.userId;
       const { id } = req.params;
       if (!userId) {
-        throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
+        throw new AppError(ErrorCode.AUTH, AppMessages.UNAUTHORIZED_ACCESS, HttpStatusCode.UNAUTHORIZED);
       }
 
       const success = await this.markNotificationAsReadUseCase.execute(id, userId);
       res.status(HttpStatusCode.OK).json({ success, data: { notificationId: id, isRead: true } });
     } catch (error) {
-      logger.error("Error marking notification as read", error);
+      logger.error(AppMessages.NOTIFICATION_MARK_READ_ERROR, error);
       next(error);
     }
   }
@@ -72,14 +72,14 @@ export class NotificationController {
     try {
       const userId = req.user?.userId;
       if (!userId) {
-        throw new AppError(ErrorCode.AUTH, "Unauthorized", HttpStatusCode.UNAUTHORIZED);
+        throw new AppError(ErrorCode.AUTH, AppMessages.UNAUTHORIZED_ACCESS, HttpStatusCode.UNAUTHORIZED);
       }
 
       const workspaceId = req.query.workspaceId as string | undefined;
       const success = await this.clearNotificationHistoryUseCase.execute(userId, workspaceId);
       res.status(HttpStatusCode.OK).json({ success });
     } catch (error) {
-      logger.error("Error clearing notification history", error);
+      logger.error(AppMessages.NOTIFICATION_CLEAR_HISTORY_ERROR, error);
       next(error);
     }
   }
