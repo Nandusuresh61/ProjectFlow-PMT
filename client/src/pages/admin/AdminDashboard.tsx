@@ -404,7 +404,7 @@ export default function AdminDashboard() {
                           }}
                           labelStyle={{ color: "#a1a1aa", fontSize: "12px", fontWeight: "bold" }}
                           itemStyle={{ color: "#10b981", fontSize: "13px" }}
-                          formatter={(v: any) => [`₹${v?.toLocaleString() || 0}`, "Revenue"]}
+                          formatter={(v: number | string | readonly (string | number)[] | undefined) => [`₹${Number(Array.isArray(v) ? v[0] : v || 0).toLocaleString()}`, "Revenue"]}
                         />
                         <Area
                           type="monotone"
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                           formatter={(v) => [v, "New Workspaces"]}
                         />
                         <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                          {(growth?.growthHistory || []).map((_entry: any, idx: number) => (
+                          {(growth?.growthHistory || []).map((_entry: unknown, idx: number) => (
                             <Cell key={`cell-${idx}`} fill={idx === 5 ? "#10b981" : "#3b82f6"} />
                           ))}
                         </Bar>

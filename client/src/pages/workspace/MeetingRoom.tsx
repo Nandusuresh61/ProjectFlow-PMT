@@ -39,8 +39,9 @@ export const MeetingRoom: React.FC = () => {
         if (data.status === "ENDED") {
           setError("This meeting has already ended.");
         }
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Failed to load meeting");
+      } catch (err: unknown) {
+        const error = err as { response?: { data?: { message?: string } } };
+        setError(error.response?.data?.message || "Failed to load meeting");
       } finally {
         setLoading(false);
       }

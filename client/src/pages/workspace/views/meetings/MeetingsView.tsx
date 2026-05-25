@@ -6,6 +6,7 @@ import { getWorkspaceMeetings } from '@/services/meetingService';
 import { toast } from 'sonner';
 import { ScheduleMeetingModal } from './ScheduleMeetingModal';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
+import type { Meeting } from '@/types/meeting.types';
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
     PENDING: { label: 'Upcoming', color: 'text-[#A5D7E8]', bg: 'bg-[#A5D7E8]/10' },
@@ -18,7 +19,7 @@ export const MeetingsView = () => {
     const { currentWorkspace, currentWorkspaceRole } = useWorkspaceStore();
 
 
-    const [meetings, setMeetings] = useState<any[]>([]);
+    const [meetings, setMeetings] = useState<Meeting[]>([]);
     const [loading, setLoading] = useState(true);
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
 

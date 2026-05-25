@@ -45,9 +45,18 @@ const VideoTile: React.FC<VideoTileProps> = ({ stream, isLocal, name, isMicOn, i
   );
 };
 
+interface Participant {
+  socketId: string;
+  stream: MediaStream | null;
+  fullName?: string;
+  userId?: string;
+  isMicOn?: boolean;
+  isCameraOn?: boolean;
+}
+
 interface VideoGridProps {
   localStream: MediaStream | null;
-  participants: any[]; // using array for mapping
+  participants: Participant[]; // using array for mapping
   localMicOn: boolean;
   localCameraOn: boolean;
   userName?: string;

@@ -1,5 +1,10 @@
 import { IWorkspaceEventRepository } from "@/application/interfaces/repositories/IWorkspaceEventRepository";
-import { WorkspaceEvent } from "@/domain/entities/WorkspaceEvent";
+import {
+  WorkspaceEvent,
+  WorkspaceEventType,
+  WorkspaceEventEntityType,
+  WorkspaceEventVisibility,
+} from "@/domain/entities/WorkspaceEvent";
 import { WorkspaceEventModel, WorkspaceEventDocument } from "@/infrastructure/database/models/MongoWorkspaceEventModel";
 import { UserModel } from "@/infrastructure/database/models/MongoUserModel";
 
@@ -9,12 +14,12 @@ export class MongoWorkspaceEventRepository implements IWorkspaceEventRepository 
       doc.eventId,
       doc.workspaceId,
       doc.actorId,
-      doc.eventType as any,
-      doc.entityType as any,
+      doc.eventType as WorkspaceEventType,
+      doc.entityType as WorkspaceEventEntityType,
       doc.entityId,
       doc.metadata,
-      doc.visibility as any,
-      doc.parentEntityType as any,
+      doc.visibility as WorkspaceEventVisibility,
+      doc.parentEntityType as WorkspaceEventEntityType | null,
       doc.parentEntityId,
       doc.projectId,
       doc.createdAt,

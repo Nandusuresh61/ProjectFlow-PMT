@@ -7,7 +7,7 @@ export interface WorkspaceEventDocument extends Document {
   eventType: string;
   entityType: string;
   entityId: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   visibility: string;
   parentEntityType: string | null;
   parentEntityId: string | null;

@@ -1,7 +1,6 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { Meeting } from "@/domain/entities/Meeting";
 import { MeetingModel, MeetingDocument } from "@/infrastructure/database/models/MongoMeetingModel";
-
 export class MongoMeetingRepository implements IMeetingRepository {
   private mapToEntity(doc: MeetingDocument): Meeting {
     return new Meeting(
@@ -10,7 +9,7 @@ export class MongoMeetingRepository implements IMeetingRepository {
       doc.hostId,
       doc.title,
       doc.participants,
-      doc.status as any,
+      doc.status as "PENDING" | "ACTIVE" | "ENDED",
       doc.scheduledAt,
       doc.duration,
       doc.startedAt,

@@ -2,11 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Check, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Loader } from "@/components/ui/Loader";
+interface PlanItem {
+    planId: string;
+    isActive: boolean;
+    type: string;
+    priceMonthly: number;
+    description: string;
+    features: string[];
+}
+
 interface StepPlanProps {
-    data: any;
-    plans: any[];
+    data: { planId?: string };
+    plans: PlanItem[];
     loading: boolean;
-    updateData: (data: any) => void;
+    updateData: (data: Partial<{ planId: string }>) => void;
     onNext: () => void;
     onBack: () => void;
 }
@@ -35,8 +44,8 @@ export function StepPlan({
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {plans
-                        ?.filter((plan: any) => plan.isActive)
-                        .map((plan: any) => (
+                        ?.filter((plan) => plan.isActive)
+                        .map((plan) => (
                             <div
                                 key={plan.planId}
                                 onClick={() => updateData({ planId: plan.planId })}

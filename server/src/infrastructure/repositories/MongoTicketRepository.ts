@@ -62,7 +62,7 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   async updateStatus(ticketId: string, status: TicketStatus, resolvedAt?: Date): Promise<void> {
-    const update: any = { status };
+    const update: Record<string, unknown> = { status };
     if (resolvedAt) update.resolvedAt = resolvedAt;
     await TicketModel.updateOne({ ticketId }, { $set: update });
   }

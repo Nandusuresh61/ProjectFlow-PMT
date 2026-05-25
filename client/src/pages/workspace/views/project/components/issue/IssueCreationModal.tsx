@@ -140,8 +140,7 @@ export function IssueCreationModal({
     const [pendingFiles, setPendingFiles] = useState<{ id: string; file: File }[]>([]);
 
     const handleChange = useCallback((field: string, value: unknown) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        dispatch({ type: "SET_VALUE", field: field as "title", value: value as any }); 
+        dispatch({ type: "SET_VALUE", field, value: value as FormValues[keyof FormValues] }); 
     }, []);
 
     const handleBlur = useCallback((field: string) => {

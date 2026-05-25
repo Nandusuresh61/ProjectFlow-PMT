@@ -44,7 +44,7 @@ export interface WorkspaceEvent {
   eventType: WorkspaceEventType;
   entityType: WorkspaceEventEntityType;
   entityId: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   visibility: "PUBLIC" | "PRIVATE" | "INTERNAL";
   parentEntityType: WorkspaceEventEntityType | null;
   parentEntityId: string | null;

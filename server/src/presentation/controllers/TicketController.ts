@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ICreateTicketUseCase } from "@/application/interfaces/use-cases/Ticket/ICreateTicketUseCase";
 import { IReplyToTicketUseCase } from "@/application/interfaces/use-cases/Ticket/IReplyToTicketUseCase";
