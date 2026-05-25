@@ -2,9 +2,23 @@ import { Button } from "@/components/ui/button";
 import { Check, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Loader } from "@/components/ui/Loader";
-import type { StepPlanProps } from "@/types/onboarding.types";
+interface PlanItem {
+    planId: string;
+    isActive: boolean;
+    type: string;
+    priceMonthly: number;
+    description: string;
+    features: string[];
+}
 
-
+interface StepPlanProps {
+    data: { planId?: string };
+    plans: PlanItem[];
+    loading: boolean;
+    updateData: (data: Partial<{ planId: string }>) => void;
+    onNext: () => void;
+    onBack: () => void;
+}
 
 export function StepPlan({
     data,
@@ -57,7 +71,7 @@ export function StepPlan({
                                     {plan.description}
                                 </p>
                                 <div className="space-y-2">
-                                    {plan.features.map((feature, idx) => (
+                                    {plan.features.map((feature: string, idx: number) => (
                                         <div
                                             key={idx}
                                             className="flex items-center gap-2 text-sm text-[#576CBC]/80 font-medium"

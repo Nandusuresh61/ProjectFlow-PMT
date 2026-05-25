@@ -11,7 +11,7 @@ import {
     ClipboardList,
     Kanban,
     Zap,
-    BarChart2,
+    Activity,
     FolderKanban,
     Plus,
 } from 'lucide-react';
@@ -112,6 +112,7 @@ export const Sidebar = ({
                             onSelectProject={onSelectProject}
                             onCreateProject={onCreateProject}
                             canCreateProject={canCreateProject}
+                            role={role}
                         />
                     ) : (
                         <ProjectNav
@@ -143,6 +144,7 @@ interface WorkspaceNavProps {
     onSelectProject: (project: Project) => void;
     onCreateProject?: () => void;
     canCreateProject?: boolean;
+    role: WorkspaceRoleEnum | null;
 }
 
 const WorkspaceNav = ({
@@ -155,100 +157,114 @@ const WorkspaceNav = ({
     onSelectProject,
     onCreateProject,
     canCreateProject,
-}: WorkspaceNavProps) => (
-    <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
-        transition={{ duration: 0.2 }}
-        className="space-y-0.5 pt-1"
-    >
-        {/* Monitor */}
-        <NavSection label="Monitor" isCollapsed={isCollapsed}>
+    role,
+}: WorkspaceNavProps) => {
+    const canAccessActivity = role === WorkspaceRoleEnum.WORKSPACE_OWNER || role === WorkspaceRoleEnum.WORKSPACE_ADMIN;
+    return (
+        <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-0.5 pt-1"
+        >
+            {/* Monitor */}
+            <NavSection label="Monitor" isCollapsed={isCollapsed}>
+                <NavItem
+                    id="dashboard"
+                    icon={LayoutDashboard}
+                    label="Dashboard"
+                    isActive={activeTab === 'dashboard'}
+                    isCollapsed={isCollapsed}
+                    onClick={() => onTabChange('dashboard')}
+                />
+                {canAccessActivity && (
+                    <NavItem
+                        id="activity"
+                        icon={Activity}
+                        label="Activity"
+                        isActive={activeTab === 'activity'}
+                        isCollapsed={isCollapsed}
+                        onClick={() => onTabChange('activity')}
+                    />
+                )}
+            </NavSection>
+
+            {/* Work */}
+            <NavSection label="Work" isCollapsed={isCollapsed}>
+                <ExpandableNavItem
+                    icon={Briefcase}
+                    label="Projects"
+                    isExpanded={isProjectsExpanded}
+                    isCollapsed={isCollapsed}
+                    onToggle={onToggleProjects}
+                >
+                    <CollapsibleProjectList isOpen={isProjectsExpanded}>
+                        {projects.map(project => (
+                            <ProjectChip
+                                key={project.id}
+                                name={project.name}
+                                color={project.color}
+                                keyCode={project.key}
+                                onClick={() => onSelectProject(project)}
+                            />
+                        ))}
+                        {canCreateProject && (
+                            <button
+                                onClick={onCreateProject}
+                                className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all group text-left text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#A5D7E8]/10 mt-1"
+                            >
+                                <Plus size={14} className="opacity-70 group-hover:opacity-100 flex-shrink-0" />
+                                <span className="text-[13px] font-medium truncate flex-1">Create project</span>
+                            </button>
+                        )}
+                    </CollapsibleProjectList>
+                </ExpandableNavItem>
+
+                <NavItem
+                    id="team"
+                    icon={Users}
+                    label="Team"
+                    isActive={activeTab === 'team'}
+                    isCollapsed={isCollapsed}
+                    onClick={() => onTabChange('team')}
+                />
+            </NavSection>
+
+            {/* Communicate */}
+            <NavSection label="Communicate" isCollapsed={isCollapsed}>
+                <NavItem
+                    id="chat"
+                    icon={MessageSquare}
+                    label="Inbox"
+                    isActive={activeTab === 'chat'}
+                    isCollapsed={isCollapsed}
+                    onClick={() => onTabChange('chat')}
+                />
+                <NavItem
+                    id="meetings"
+                    icon={Video}
+                    label="Meetings"
+                    isActive={activeTab === 'meetings'}
+                    isCollapsed={isCollapsed}
+                    onClick={() => onTabChange('meetings')}
+                />
+            </NavSection>
+
+            <SidebarDivider />
+
+            {/* Config */}
             <NavItem
-                id="dashboard"
-                icon={LayoutDashboard}
-                label="Dashboard"
-                isActive={activeTab === 'dashboard'}
+                id="settings"
+                icon={Settings}
+                label="Settings"
+                isActive={activeTab === 'settings'}
                 isCollapsed={isCollapsed}
-                onClick={() => onTabChange('dashboard')}
+                onClick={() => onTabChange('settings')}
             />
-        </NavSection>
-
-        {/* Work */}
-        <NavSection label="Work" isCollapsed={isCollapsed}>
-            <ExpandableNavItem
-                icon={Briefcase}
-                label="Projects"
-                isExpanded={isProjectsExpanded}
-                isCollapsed={isCollapsed}
-                onToggle={onToggleProjects}
-            >
-                <CollapsibleProjectList isOpen={isProjectsExpanded}>
-                    {projects.map(project => (
-                        <ProjectChip
-                            key={project.id}
-                            name={project.name}
-                            color={project.color}
-                            keyCode={project.key}
-                            onClick={() => onSelectProject(project)}
-                        />
-                    ))}
-                    {canCreateProject && (
-                        <button
-                            onClick={onCreateProject}
-                            className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all group text-left text-[#576CBC]/60 hover:text-[#A5D7E8] hover:bg-[#A5D7E8]/10 mt-1"
-                        >
-                            <Plus size={14} className="opacity-70 group-hover:opacity-100 flex-shrink-0" />
-                            <span className="text-[13px] font-medium truncate flex-1">Create project</span>
-                        </button>
-                    )}
-                </CollapsibleProjectList>
-            </ExpandableNavItem>
-
-            <NavItem
-                id="team"
-                icon={Users}
-                label="Team"
-                isActive={activeTab === 'team'}
-                isCollapsed={isCollapsed}
-                onClick={() => onTabChange('team')}
-            />
-        </NavSection>
-
-        {/* Communicate */}
-        <NavSection label="Communicate" isCollapsed={isCollapsed}>
-            <NavItem
-                id="chat"
-                icon={MessageSquare}
-                label="Inbox"
-                isActive={activeTab === 'chat'}
-                isCollapsed={isCollapsed}
-                onClick={() => onTabChange('chat')}
-            />
-            <NavItem
-                id="meetings"
-                icon={Video}
-                label="Meetings"
-                isActive={activeTab === 'meetings'}
-                isCollapsed={isCollapsed}
-                onClick={() => onTabChange('meetings')}
-            />
-        </NavSection>
-
-        <SidebarDivider />
-
-        {/* Config */}
-        <NavItem
-            id="settings"
-            icon={Settings}
-            label="Settings"
-            isActive={activeTab === 'settings'}
-            isCollapsed={isCollapsed}
-            onClick={() => onTabChange('settings')}
-        />
-    </motion.div>
-);
+        </motion.div>
+    );
+};
 
 // ─── ProjectNav ───────────────────────────────────────────────────────────────
 

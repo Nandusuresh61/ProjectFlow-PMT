@@ -7,6 +7,7 @@ import { MongoInvitationRepository } from "../repositories/MongoInvitationReposi
 import { EmailService } from "../services/EmailService";
 import { PasswordHash } from "../services/PasswordHash";
 import { UidService } from "../services/UidService";
+import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
 import { InvitationController } from "@/presentation/controllers/InvitationController";
 import { AcceptInvitationUseCase } from "@/application/use-cases/Invitation/AcceptInvitationUseCase";
 import { GetInvitationDetailsUseCase } from "@/application/use-cases/Invitation/GetInvitationDetailsUseCase";
@@ -30,6 +31,7 @@ export const createInvitationUseCase = new CreateInvitationUseCase(
   emailService,
   passwordHasher,
   uidGenerator,
+  workspaceEventTrackingService
 );
 
 const acceptInvitationUseCase = new AcceptInvitationUseCase(
@@ -39,7 +41,8 @@ const acceptInvitationUseCase = new AcceptInvitationUseCase(
   workspaceRepo,
   planRepo,
   passwordHasher,
-  uidGenerator
+  uidGenerator,
+  workspaceEventTrackingService
 );
 
 const getInvitationDetailsUseCase = new GetInvitationDetailsUseCase(

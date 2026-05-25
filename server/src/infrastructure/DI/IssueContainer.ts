@@ -7,6 +7,7 @@ import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
 import { MembershipRepository } from "../repositories/MongoMembershipRepository";
 import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
 import { UidService } from "../services/UidService";
+import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
 
 // Comments
 import { MongoCommentRepository } from "../repositories/MongoCommentRepository";
@@ -30,7 +31,8 @@ const createissueUseCase = new CreateIssueUseCase(
   issueRepository,
   uidGenerator,
   workspaceRepository,
-  membershipRepository
+  membershipRepository,
+  workspaceEventTrackingService
 );
 
 const getIssuesByProjectUseCase = new GetIssuesByProjectUseCase(
@@ -47,14 +49,16 @@ const updateIssueUseCase = new UpdateIssueUseCase(
   membershipRepository,
   workLogRepository,
   sprintBurndownSnapshotService,
-  sprintAllocationCalculatorService
+  sprintAllocationCalculatorService,
+  workspaceEventTrackingService
 );
 
 
 const addCommentUseCase = new AddCommentUseCase(
   commentRepository,
   issueRepository,
-  uidGenerator
+  uidGenerator,
+  workspaceEventTrackingService
 );
 
 const getIssueCommentsUseCase = new GetIssueCommentsUseCase(

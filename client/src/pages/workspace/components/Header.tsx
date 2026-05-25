@@ -1,6 +1,7 @@
 import { ChevronRight, LogOut, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import type { User } from '@/types/auth.types';
 import type { SidebarMode, Project } from '../types/sidebar.types';
 
@@ -63,6 +64,7 @@ export const Header = ({
 
         {/* Right actions */}
         <div className="flex items-center gap-3 pl-4">
+            <NotificationBell />
             <div className="text-right hidden sm:block">
                 <p className="text-[11px] font-semibold text-white/80 leading-none">
                     {user?.fullName || 'User'}

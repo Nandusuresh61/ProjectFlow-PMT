@@ -16,6 +16,7 @@ import { TeamView } from './views/team/TeamView';
 import { SettingsView } from './views/settings/SettingsView';
 import { ChatView } from './views/chat/ChatView';
 import { MeetingsView } from './views/meetings/MeetingsView';
+import { ActivityView } from './views/activity/ActivityView';
 import { InviteModal } from './components/workspace/InviteModal';
 import { CreateWorkspaceModal } from './components/workspace/CreateWorkspaceModal';
 import { CreateProjectModal } from './views/project/components/project/CreateProjectModal';
@@ -30,7 +31,7 @@ import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import { AppMessages } from '@/shared/messages/AppMessages';
 import { Briefcase } from 'lucide-react';
 
-const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'settings'] as const;
+const WORKSPACE_TABS = ['dashboard', 'team', 'chat', 'meetings', 'activity', 'settings'] as const;
 const PROJECT_TABS = ['overview', 'backlogs', 'board', 'sprint', 'project-team'] as const;
 
 const PROJECT_COLORS = ['#A5D7E8', '#7C9AC7', '#576CBC', '#9DB2BF', '#64B6AC', '#D0E7FF'];
@@ -49,6 +50,23 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
     // Role-based view restriction logic
     const isMemberOrViewer = role === WorkspaceRoleEnum.WORKSPACE_MEMBER || role === WorkspaceRoleEnum.WORKSPACE_VIEWER;
     const restrictedTabs = ['backlogs', 'sprint'];
+
+    // Block direct URL access to activity for members/viewers
+    if (mode === 'workspace' && activeTab === 'activity' && isMemberOrViewer) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 bg-white/[0.01] border border-dashed border-white/10 rounded-3xl p-8 text-center">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.03] flex items-center justify-center">
+                    <Briefcase className="text-white/20" size={24} />
+                </div>
+                <div>
+                    <h3 className="text-white font-bold text-lg">Access Restricted</h3>
+                    <p className="text-white/40 text-sm max-w-xs mt-1">
+                        You don't have the required permissions to view the Activity feed. Please contact your workspace administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     if (mode === 'project' && selectedProject) {
         if (isMemberOrViewer && restrictedTabs.includes(activeTab)) {
@@ -82,6 +100,7 @@ const ContentRouter = ({ mode, activeTab, selectedProject, openInvite, openEditP
         case 'team': return <TeamView openInvite={openInvite} canManage={canManage} />;
         case 'chat': return <ChatView />;
         case 'meetings': return <MeetingsView />;
+        case 'activity': return <ActivityView />;
         case 'settings': return <SettingsView />;
         default: return <DashboardView openInvite={openInvite} canManage={canManage} />;
     }

@@ -8,6 +8,7 @@ import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWor
 import { IEmailService } from "@/application/interfaces/services/IEmailService";
 import { IPasswordHasher } from "@/application/interfaces/services/IPasswordHasher";
 import { IUidGenerator } from "@/application/interfaces/services/IUidGenerator";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 import { ICreateInvitationUseCase } from "@/application/interfaces/use-cases/Invitation/ICreateInvitationUseCase";
 import { Invitation } from "@/domain/entities/Invitation";
 import { AppError } from "@/shared/errors/AppError";
@@ -31,6 +32,7 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
     private readonly _emailService: IEmailService,
     private readonly _passwordHasher: IPasswordHasher,
     private readonly _uidGenerator: IUidGenerator,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) { }
 
   async execute(dto: CreateInvitationDto): Promise<void> {
@@ -182,6 +184,18 @@ export class CreateInvitationUseCase implements ICreateInvitationUseCase {
       subject,
       body,
       type: EmailType.INVITE_USER,
+    });
+
+    await this._eventTracker.trackEvent({
+      workspaceId: workspaceId,
+      actorId: inviterId,
+      eventType: "MEMBER_INVITED",
+      entityType: "USER",
+      entityId: invitation.invitationId, // We use invitationId since user might not exist yet
+      metadata: {
+        email: email,
+        role: role,
+      }
     });
   }
 }

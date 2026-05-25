@@ -6,6 +6,7 @@ const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const Users = lazy(() => import("@/pages/admin/WorkspaceUsers"));
 const Workspaces = lazy(() => import("@/pages/admin/Workspaces"));
 const Plans = lazy(() => import("@/pages/admin/Plans"));
+const AdminTickets = lazy(() => import("@/pages/admin/AdminTickets"));
 
 
 export default function AdminRoutes() {
@@ -18,6 +19,7 @@ export default function AdminRoutes() {
           <Route path="users" element={<Users />} />
           <Route path="workspaces" element={<Workspaces />} />
           <Route path="plans" element={<Plans />} />
+          <Route path="tickets" element={<AdminTickets />} />
         </Route>
       </Route>
     </Routes>

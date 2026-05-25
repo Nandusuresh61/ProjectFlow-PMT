@@ -15,6 +15,7 @@ const Home = lazy(() => import("@/pages/Home"));
 const LandingPage = lazy(() => import("@/pages/landing/LandingPage"));
 const Onboarding = lazy(() => import("@/pages/onboarding/Onboarding"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
+const MeetingRoom = lazy(() => import("@/pages/workspace/MeetingRoom").then(module => ({ default: module.MeetingRoom })));
 
 export default function UserRoutes() {
   return (
@@ -35,6 +36,7 @@ export default function UserRoutes() {
       <Route element={<ProtectedRoutes />}>
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/home/*" element={<Home />} />
+        <Route path="/meetings/:meetingId" element={<MeetingRoom />} />
       </Route>
 
       {/* Catch-all 404 for User Routes */}

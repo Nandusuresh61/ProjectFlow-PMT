@@ -15,6 +15,7 @@ import { sizeToPointsMap } from "@/shared/story/sizeToPointsMap";
 import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkLogRepository";
 import { ISprintBurndownSnapshotService } from "@/application/interfaces/services/ISprintBurndownSnapshotService";
 import { ISprintAllocationCalculatorService } from "@/application/interfaces/services/ISprintAllocationCalculatorService";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 
 
 export class UpdateIssueUseCase implements IUpdateIssueUseCase {
@@ -25,7 +26,8 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
     private readonly _membershipRepository: IMembershipRepository,
     private readonly _workLogRepository: IWorkLogRepository,
     private readonly _burndownSnapshotService: ISprintBurndownSnapshotService,
-    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService
+    private readonly _allocationCalculatorService: ISprintAllocationCalculatorService,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
 
@@ -176,6 +178,62 @@ export class UpdateIssueUseCase implements IUpdateIssueUseCase {
         await this._burndownSnapshotService.captureSnapshot(issue.sprintId);
         await this._allocationCalculatorService.calculateAndSaveAllocation(issue.sprintId);
       }
+    }
+
+    if (data.status !== undefined && data.status !== issue.status) {
+      await this._eventTracker.trackEvent({
+        workspaceId: updatedIssue.workspaceId,
+        actorId: userId,
+        eventType: "ISSUE_STATUS_CHANGED",
+        entityType: "ISSUE",
+        entityId: updatedIssue.issueId,
+        projectId: updatedIssue.projectId,
+        parentEntityId: updatedIssue.sprintId,
+        parentEntityType: updatedIssue.sprintId ? "SPRINT" : null,
+        metadata: {
+          issueKey: updatedIssue.issueKey,
+          title: updatedIssue.title,
+          fromStatus: issue.status,
+          toStatus: updatedIssue.status,
+        }
+      });
+    }
+
+    if (data.sprintId !== undefined && data.sprintId !== issue.sprintId) {
+      await this._eventTracker.trackEvent({
+        workspaceId: updatedIssue.workspaceId,
+        actorId: userId,
+        eventType: "ISSUE_MOVED",
+        entityType: "ISSUE",
+        entityId: updatedIssue.issueId,
+        projectId: updatedIssue.projectId,
+        parentEntityId: updatedIssue.sprintId,
+        parentEntityType: updatedIssue.sprintId ? "SPRINT" : null,
+        metadata: {
+          issueKey: updatedIssue.issueKey,
+          title: updatedIssue.title,
+          fromSprintId: issue.sprintId,
+          toSprintId: updatedIssue.sprintId,
+        }
+      });
+    }
+
+    if (data.assigneeId !== undefined && data.assigneeId !== issue.assigneeId) {
+      await this._eventTracker.trackEvent({
+        workspaceId: updatedIssue.workspaceId,
+        actorId: userId,
+        eventType: updatedIssue.assigneeId ? "ISSUE_ASSIGNED" : "ISSUE_UNASSIGNED",
+        entityType: "ISSUE",
+        entityId: updatedIssue.issueId,
+        projectId: updatedIssue.projectId,
+        parentEntityId: updatedIssue.sprintId,
+        parentEntityType: updatedIssue.sprintId ? "SPRINT" : null,
+        metadata: {
+          issueKey: updatedIssue.issueKey,
+          title: updatedIssue.title,
+          assigneeId: updatedIssue.assigneeId,
+        }
+      });
     }
 
     return updatedIssue;

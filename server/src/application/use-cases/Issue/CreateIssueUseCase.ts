@@ -11,6 +11,7 @@ import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
+import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
 import { ICreateIssueUseCase } from "@/application/interfaces/use-cases/Issue/ICreateIssueUseCase";
 
 export class CreateIssueUseCase implements ICreateIssueUseCase {
@@ -19,7 +20,8 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
     private readonly _issueRepo: IIssueRepository,
     private readonly _uidGenerator: IUidGenerator,
     private readonly _workspaceRepo: IWorkspaceRepository,
-    private readonly _membershipRepo: IMembershipRepository
+    private readonly _membershipRepo: IMembershipRepository,
+    private readonly _eventTracker: IWorkspaceEventTrackingService
   ) {}
 
   async execute(userId: string, data: CreateIssueDto): Promise<Issue> {
@@ -106,6 +108,40 @@ export class CreateIssueUseCase implements ICreateIssueUseCase {
         parentStory.taskIds.push(createdIssue.issueId);
         await this._issueRepo.update(parentStory.issueId, { taskIds: parentStory.taskIds });
       }
+    }
+
+    await this._eventTracker.trackEvent({
+      workspaceId: createdIssue.workspaceId,
+      actorId: userId,
+      eventType: "ISSUE_CREATED",
+      entityType: "ISSUE",
+      entityId: createdIssue.issueId,
+      projectId: createdIssue.projectId,
+      parentEntityId: createdIssue.sprintId,
+      parentEntityType: createdIssue.sprintId ? "SPRINT" : null,
+      metadata: {
+        issueKey: createdIssue.issueKey,
+        title: createdIssue.title,
+        type: createdIssue.type,
+      },
+    });
+
+    if (createdIssue.assigneeId) {
+      await this._eventTracker.trackEvent({
+        workspaceId: createdIssue.workspaceId,
+        actorId: userId,
+        eventType: "ISSUE_ASSIGNED",
+        entityType: "ISSUE",
+        entityId: createdIssue.issueId,
+        projectId: createdIssue.projectId,
+        parentEntityId: createdIssue.sprintId,
+        parentEntityType: createdIssue.sprintId ? "SPRINT" : null,
+        metadata: {
+          issueKey: createdIssue.issueKey,
+          title: createdIssue.title,
+          assigneeId: createdIssue.assigneeId,
+        },
+      });
     }
 
     return createdIssue;

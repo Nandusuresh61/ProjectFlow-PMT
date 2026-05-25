@@ -23,6 +23,7 @@ import { SprintBurndownSnapshotService } from "@/application/services/SprintBurn
 import { MongoSprintMemberAllocationRepository } from "../repositories/MongoSprintMemberAllocationRepository";
 import { SprintAllocationCalculatorService } from "@/application/services/SprintAllocationCalculatorService";
 import { MongoUserRepository } from "../repositories/MongoUserRepository";
+import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
 
 
 const sprintRepository = new SprintRepository();
@@ -59,6 +60,7 @@ const createSprintUseCase = new CreateSprintUseCase(
   uidGenarator,
   sprintRepository,
   membershipRepository,
+  workspaceEventTrackingService
 );
 
 const getSprintsByProjectUseCase = new GetSprintsByProjectUseCase(
@@ -72,7 +74,8 @@ const assignIssueToSprintUseCase = new AssignIssueToSprintUseCase(
   sprintRepository,
   projectRepository,
   membershipRepository,
-  sprintAllocationCalculatorService
+  sprintAllocationCalculatorService,
+  workspaceEventTrackingService
 );
 
 const startSprintUseCase = new StartSprintUseCase(
@@ -81,7 +84,8 @@ const startSprintUseCase = new StartSprintUseCase(
   projectRepository,
   membershipRepository,
   sprintBurndownSnapshotService,
-  sprintAllocationCalculatorService
+  sprintAllocationCalculatorService,
+  workspaceEventTrackingService
 );
 
 const getActiveSprintUseCase = new GetActiveSprintUseCase(
@@ -101,7 +105,8 @@ const completeSprintUseCase = new CompleteSprintUseCase(
   uidGenarator,
   sprintMetricsCalculatorService,
   sprintBurndownSnapshotService,
-  sprintAllocationCalculatorService
+  sprintAllocationCalculatorService,
+  workspaceEventTrackingService
 );
 
 const updateSprintUseCase = new UpdateSprintUseCase(

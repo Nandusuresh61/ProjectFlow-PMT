@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users, Building2 } from "lucide-react";
+import { LayoutDashboard, CreditCard, LogOut, ChevronsLeft, ChevronsRight, Settings, X, Users, Building2, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/services/auth/auth.api";
@@ -27,6 +27,7 @@ export default function AdminSidebar({ collapsed, setCollapsed, isMobileOpen, se
         { icon: Users, label: "Users", path: "/super-admin/users" },
         { icon: Building2, label: "Workspaces", path: "/super-admin/workspaces" },
         { icon: CreditCard, label: "Plans", path: "/super-admin/plans" },
+        { icon: MessageSquare, label: "Tickets", path: "/super-admin/tickets" },
     ];
 
     const handleLogout = async () => {

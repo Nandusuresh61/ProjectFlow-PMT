@@ -382,7 +382,7 @@ export default function Plans() {
                   <Switch
                     checked={plan.isActive}
                     onCheckedChange={() => togglePlanStatusHandler(plan.planId)}
-                    className="data-[state=checked]:bg-green-600"
+                    className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-zinc-800 border border-zinc-700/60 transition-colors"
                   />
                   <span
                     className={cn(

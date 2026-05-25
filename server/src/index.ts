@@ -18,17 +18,27 @@ import sprintAnalyticsRoutes from "@/presentation/routes/SprintAnalyticsRoutes";
 import chatRoutes from "@/presentation/routes/ChatRoutes";
 import subscriptionRoutes from "@/presentation/routes/SubscriptionRoutes";
 import workLogRoutes from "@/presentation/routes/WorkLogRoutes";
+import ticketRoutes from "@/presentation/routes/TicketRoutes";
+import activityRoutes from "@/presentation/routes/ActivityRoutes";
 import morgan from "morgan";
 
 import http from "http";
 import { SocketServer } from "./infrastructure/services/SocketServer";
 import { ChatSocketHandler } from "./presentation/sockets/ChatSocketHandler";
+import { ActivitySocketHandler } from "./presentation/sockets/ActivitySocketHandler";
+import { NotificationSocketHandler } from "./presentation/sockets/NotificationSocketHandler";
+import notificationRoutes from "@/presentation/routes/NotificationRoutes";
+import { MeetingSocketHandler } from "./presentation/sockets/MeetingSocketHandler";
+import meetingRoutes from "@/presentation/routes/MeetingRoutes";
 
 const app = express();
 const server = http.createServer(app);
 
 const socketServer = SocketServer.init(server);
 socketServer.registerHandler(ChatSocketHandler);
+socketServer.registerHandler(ActivitySocketHandler);
+socketServer.registerHandler(NotificationSocketHandler);
+socketServer.registerHandler(MeetingSocketHandler);
 
 app.use(morgan("dev"));
 connectDB();
@@ -56,6 +66,10 @@ app.use("/api", sprintAnalyticsRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/worklog", workLogRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/activity", activityRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/meetings", meetingRoutes);
 
 app.use(errorMiddleware);
 

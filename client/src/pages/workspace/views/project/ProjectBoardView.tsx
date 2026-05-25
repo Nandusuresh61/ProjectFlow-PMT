@@ -7,6 +7,7 @@ import type { Project } from '../../types/sidebar.types';
 import { getActiveSprint, type ActiveSprintData, getProjectSprints } from '@/services/sprint/sprint.api';
 import { updateIssue, getProjectIssues } from '@/services/issue/issue.api';
 import { getMembers } from '@/services/workspace/team.api';
+import { AuthUserState } from '@/store/auth.store';
 import { IssueDetailModal } from './components/issue/IssueDetailModal';
 import { CompleteSprintModal } from './components/CompleteSprintModal';
 
@@ -108,6 +109,7 @@ const BoardCard = ({ card, onClick, onParentClick }: { card: BoardCardData; onCl
 );
 
 export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) => {
+    const user = AuthUserState(state => state.user);
     const [loading, setLoading] = useState(true);
     const [activeSprintData, setActiveSprintData] = useState<ActiveSprintData | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
@@ -261,7 +263,8 @@ export const ProjectBoardView = ({ project, canManage }: ProjectBoardViewProps) 
         }
     };
 
-    const issues = activeSprintData?.issues || [];
+    const allIssues = activeSprintData?.issues || [];
+    const issues = canManage ? allIssues : allIssues.filter(i => i.assigneeId === user?.userId);
     const sprintLevelIssues = issues.filter(i => i.type === 'STORY' || i.type === 'BUG');
     const incompleteIssues = sprintLevelIssues.filter(i => i.status !== 'DONE');
     const completedIssues = sprintLevelIssues.filter(i => i.status === 'DONE');

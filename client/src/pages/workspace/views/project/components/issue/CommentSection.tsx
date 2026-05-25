@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, User as UserIcon, Loader2, Smile, Paperclip, X, Image as ImageIcon } from "lucide-react";
+import { Send, User as UserIcon, Loader2, Smile, Paperclip, X } from "lucide-react";
 import { getIssueComments, addComment, type CommentData } from "@/services/issue/issue.api";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -109,7 +109,7 @@ export function CommentSection({ issueId, membersMap }: CommentSectionProps) {
     textareaRef.current?.focus();
   };
 
-  const handleMentionSelect = (userId: string, fullName: string) => {
+  const handleMentionSelect = (_userId: string, fullName: string) => {
     const lastAtPos = newComment.lastIndexOf("@");
     const newValue = newComment.substring(0, lastAtPos) + `@${fullName} ` + newComment.substring(newComment.indexOf(" ", lastAtPos) !== -1 ? newComment.indexOf(" ", lastAtPos) : newComment.length);
     setNewComment(newValue);
