@@ -55,7 +55,7 @@ export class NotificationController {
   async markAsRead(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.userId;
-      const { id } = req.params;
+      const id = req.params.id as string;
       if (!userId) {
         throw new AppError(ErrorCode.AUTH, AppMessages.UNAUTHORIZED_ACCESS, HttpStatusCode.UNAUTHORIZED);
       }

@@ -3,6 +3,8 @@ import { UserModel } from "@/infrastructure/database/models/MongoUserModel";
 import { MongoSubscriptionModel } from "@/infrastructure/database/models/MongoSubscriptionModel";
 import { TicketModel } from "@/infrastructure/database/models/MongoTicketModel";
 import { IGetSuperAdminDashboardUseCase } from "@/application/interfaces/use-cases/SuperAdmin/IGetSuperAdminDashboardUseCase";
+import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
+import { TicketStatus } from "@/shared/enums/TicketStatus";
 import {
   DashboardStatsDto,
   RevenueOverviewDto,
@@ -26,8 +28,8 @@ export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUse
     // Queries for current state
     const totalWorkspaces = await WorkspaceModel.countDocuments();
     const totalUsers = await UserModel.countDocuments();
-    const activeSubscriptions = await MongoSubscriptionModel.countDocuments({ status: "active" });
-    const pendingTickets = await TicketModel.countDocuments({ status: { $in: ["OPEN", "IN_PROGRESS"] } });
+    const activeSubscriptions = await MongoSubscriptionModel.countDocuments({ status: SubscriptionStatus.ACTIVE });
+    const pendingTickets = await TicketModel.countDocuments({ status: { $in: [TicketStatus.OPEN, TicketStatus.IN_PROGRESS] } });
 
     // Current Month Revenue
     const revenueThisMonthResult = await MongoSubscriptionModel.aggregate([
@@ -44,7 +46,7 @@ export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUse
     const usersLastMonth = await UserModel.countDocuments({ createdAt: { $lt: startOfCurrentMonth } });
     
     const activeSubscriptionsLastMonth = await MongoSubscriptionModel.countDocuments({ 
-      status: "active",
+      status: SubscriptionStatus.ACTIVE,
       createdAt: { $lt: startOfCurrentMonth } 
     });
 
@@ -104,7 +106,7 @@ export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUse
     const monthlyRevenue = monthlyRevenueResult[0]?.total || 0;
 
     // Active Paid Organizations
-    const activePaidOrgs = await MongoSubscriptionModel.distinct("workspaceId", { status: "active" });
+    const activePaidOrgs = await MongoSubscriptionModel.distinct("workspaceId", { status: SubscriptionStatus.ACTIVE });
     const activePaidOrganizations = activePaidOrgs.length;
 
     // Last 12 Months history
@@ -164,7 +166,7 @@ export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUse
     
     // We assume Free plans have no active subscriptions or the planId is 'FREE'
     const trial = await WorkspaceModel.countDocuments({ planId: "FREE" });
-    const upgraded = await MongoSubscriptionModel.distinct("workspaceId", { status: "active" }).then(ids => ids.length);
+    const upgraded = await MongoSubscriptionModel.distinct("workspaceId", { status: SubscriptionStatus.ACTIVE }).then(ids => ids.length);
 
     // Last 6 months growth history
     const sixMonthsAgo = new Date();
@@ -291,7 +293,7 @@ export class GetSuperAdminDashboardUseCase implements IGetSuperAdminDashboardUse
   async getPendingTickets(page: number = 1, limit: number = 5): Promise<{ tickets: PendingTicketDto[]; total: number }> {
     const skip = (page - 1) * limit;
 
-    const query = { status: { $in: ["OPEN", "IN_PROGRESS"] } };
+    const query = { status: { $in: [TicketStatus.OPEN, TicketStatus.IN_PROGRESS] } };
     const total = await TicketModel.countDocuments(query);
 
     const ticketsRaw = await TicketModel.aggregate([

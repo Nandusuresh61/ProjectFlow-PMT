@@ -19,7 +19,7 @@ export class SprintAnalyticsController {
 
   getSprintAnalytics = asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
 
     if (!userId) {
       throw new AppError(
@@ -38,7 +38,7 @@ export class SprintAnalyticsController {
 
   getProjectVelocity = asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
 
     if (!userId) {
       throw new AppError(
@@ -57,7 +57,7 @@ export class SprintAnalyticsController {
 
   getSprintPerformanceSummary = asyncHandler(async (req: AuthRequest, res: Response) => {
     const userId = req.user?.userId;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
 
     if (!userId) {
       throw new AppError(

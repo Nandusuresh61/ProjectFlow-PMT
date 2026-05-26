@@ -15,7 +15,7 @@ export class SubscriptionController {
   ) {}
 
   getSubscription = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const result = await this._getDetailsUseCase.execute(workspaceId);
 
     res
@@ -24,7 +24,7 @@ export class SubscriptionController {
   });
 
   upgrade = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const { planId } = req.body;
 
     const result = await this._upgradeUseCase.execute({ workspaceId, planId });
@@ -35,7 +35,7 @@ export class SubscriptionController {
   });
 
   verifyPayment = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const { razorpayOrderId, razorpayPaymentId, razorpaySignature, planId } = req.body;
 
     const result = await this._verifyUseCase.execute({

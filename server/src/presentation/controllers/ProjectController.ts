@@ -24,7 +24,7 @@ export class ProjectController {
 
   getProjectMembers = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
 
     const result = await this._getProjectMembersUseCase.execute(
       tokenPayload.userId,
@@ -53,7 +53,7 @@ export class ProjectController {
   getWorkspaceProjects = asyncHandler(
     async (req: AuthRequest, res: Response) => {
       const tokenPayload = req.user!;
-      const { workspaceId } = req.params;
+      const workspaceId = req.params.workspaceId as string;
 
       const result = await this._getWorkspaceProjectsUseCase.execute(
         tokenPayload.userId,
@@ -68,7 +68,7 @@ export class ProjectController {
 
   updateProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
     const validatedData = UpdateProjectSchema.parse(req.body) as UpdateProjectDto;
 
     const result = await this._updateProjectUseCase.execute(
@@ -84,7 +84,7 @@ export class ProjectController {
 
   getProjectOverview = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
 
     const result = await this._getProjectOverviewUseCase.execute(
       tokenPayload.userId,

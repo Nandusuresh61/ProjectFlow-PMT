@@ -41,7 +41,7 @@ export class TicketController {
 
   replyToTicket = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { userId } = req.user!;
-    const { ticketId } = req.params;
+    const ticketId = req.params.ticketId as string;
     const { message, attachments } = req.body;
 
     await this._replyToTicketUseCase.execute({
@@ -81,7 +81,7 @@ export class TicketController {
 
   getTicketDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
     const { userId, isSuperAdmin } = req.user!;
-    const { ticketId } = req.params;
+    const ticketId = req.params.ticketId as string;
 
     const result = await this._getTicketDetailsUseCase.execute(ticketId, userId, isSuperAdmin);
 
@@ -108,7 +108,7 @@ export class TicketController {
   });
 
   updateTicketStatus = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { ticketId } = req.params;
+    const ticketId = req.params.ticketId as string;
     const { status } = req.body;
 
     await this._updateTicketStatusUseCase.execute(ticketId, status as TicketStatus);

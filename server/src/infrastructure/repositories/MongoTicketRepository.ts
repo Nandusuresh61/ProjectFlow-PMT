@@ -38,7 +38,7 @@ export class MongoTicketRepository implements ITicketRepository {
     const query: QueryFilter<TicketDocument> = {};
     
     if (filters.status) query.status = filters.status;
-    if (filters.priority) query.priority = filters.priority;
+    if (filters.priority) query.priority = filters.priority as TicketPriority;
     if (filters.workspaceId) query.workspaceId = filters.workspaceId;
     if (filters.search) {
       query.title = { $regex: filters.search, $options: "i" };

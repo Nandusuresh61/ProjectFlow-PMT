@@ -2,6 +2,7 @@ import { ISubscriptionRepository } from "@/application/interfaces/repositories/I
 import { Subscription } from "@/domain/entities/Subscription";
 import { MongoSubscriptionModel, SubscriptionDoc } from "../database/models/MongoSubscriptionModel";
 import { MongoBaseRepository } from "./MongoBaseRepository";
+import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
 
 export class MongoSubscriptionRepository
   extends MongoBaseRepository<Subscription, SubscriptionDoc>
@@ -81,7 +82,7 @@ export class MongoSubscriptionRepository
   async findExpired(date: Date): Promise<Subscription[]> {
     return this.find({
       endDate: { $lt: date },
-      status: "active",
+      status: SubscriptionStatus.ACTIVE,
     });
   }
 }

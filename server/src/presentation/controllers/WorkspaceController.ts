@@ -27,7 +27,7 @@ export class WorkspaceController {
   ) {}
 
   getMembers = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const search = req.query.search as string || "";
 
     const members = await this._getMembersUseCase.execute(workspaceId, search);
@@ -47,7 +47,7 @@ export class WorkspaceController {
 
   switchWorkspace = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tokenPayload = req.user!;
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
 
     const result = await this._switchWorkspaceUseCase.execute(tokenPayload.userId, workspaceId);
 
@@ -82,7 +82,7 @@ export class WorkspaceController {
   });
 
   getDashboardData = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const { userId } = req.user!;
 
     // Determine role

@@ -12,7 +12,7 @@ export class ChatController {
 
   async getMessages(req: Request, res: Response, next: NextFunction) {
     try {
-      const { roomId } = req.params;
+      const roomId = req.params.roomId as string;
       const { limit, skip } = req.query;
       
       const messages = await this._getChatMessagesUseCase.execute(
@@ -32,7 +32,7 @@ export class ChatController {
 
   async getConversations(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const { workspaceId } = req.params;
+      const workspaceId = req.params.workspaceId as string;
       const userId = req.user?.userId;
 
       if (!userId) {

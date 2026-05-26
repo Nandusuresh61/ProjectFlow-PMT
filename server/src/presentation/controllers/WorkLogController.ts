@@ -18,7 +18,7 @@ export class WorkLogController {
 
   addWorkLog = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
-    const { issueId } = req.params;
+    const issueId = req.params.issueId as string;
     const workLog = await this._addWorkLogUseCase.execute(userId, issueId, req.body);
     res.status(HttpStatusCode.CREATED).json({
       success: true,
@@ -29,7 +29,7 @@ export class WorkLogController {
 
   updateWorkLog = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
-    const { workLogId } = req.params;
+    const workLogId = req.params.workLogId as string;
     const workLog = await this._updateWorkLogUseCase.execute(userId, workLogId, req.body);
     res.status(HttpStatusCode.OK).json({
       success: true,
@@ -40,7 +40,7 @@ export class WorkLogController {
 
   deleteWorkLog = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
-    const { workLogId } = req.params;
+    const workLogId = req.params.workLogId as string;
     await this._deleteWorkLogUseCase.execute(userId, workLogId);
     res.status(HttpStatusCode.OK).json({
       success: true,
@@ -49,7 +49,7 @@ export class WorkLogController {
   };
 
   getIssueWorkLogs = async (req: Request, res: Response) => {
-    const { issueId } = req.params;
+    const issueId = req.params.issueId as string;
     const workLogs = await this._getIssueWorkLogsUseCase.execute(issueId);
     res.status(HttpStatusCode.OK).json({
       success: true,

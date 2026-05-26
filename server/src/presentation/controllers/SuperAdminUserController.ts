@@ -40,7 +40,7 @@ export class SuperAdminUserController {
   );
 
   getUserDetails = asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const userId = req.params.userId as string;
     const result = await this._getUserDetailsUseCase.execute(userId);
 
     if (!result) {
@@ -59,7 +59,7 @@ export class SuperAdminUserController {
   });
 
   toggleUserBlock = asyncHandler(async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const userId = req.params.userId as string;
     await this._toggleUserBlockUseCase.execute(userId);
 
     res

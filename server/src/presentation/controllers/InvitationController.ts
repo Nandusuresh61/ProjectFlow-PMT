@@ -21,7 +21,7 @@ export class InvitationController {
     async (req: AuthRequest, res: Response): Promise<void> => {
       const validatedData = CreateInvitationSchema.parse(req.body);
 
-      const workspaceId = req.params.workspaceId;
+      const workspaceId = req.params.workspaceId as string;
       const inviterId = req.user?.userId;
 
       await Promise.all(
@@ -58,7 +58,7 @@ export class InvitationController {
 
   getInvitationDetails = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      const { token } = req.params;
+      const token = req.params.token as string;
       const details = await this._getInvitationDetailsUseCase.execute(token);
 
       res.status(HttpStatusCode.OK).json(

@@ -64,7 +64,7 @@ export class SprintController {
   });
 
   getSprintsByProject = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -123,9 +123,7 @@ export class SprintController {
 
     const validatedData = StartSprintSchema.parse(req.body) as StartSprintDto;
 
-    if (req.params.sprintId) {
-      validatedData.sprintId = req.params.sprintId;
-    }
+      validatedData.sprintId = req.params.sprintId as string;
 
     const result = await this._startSprintUseCase.execute(
       userId,
@@ -138,7 +136,7 @@ export class SprintController {
   });
 
   getActiveSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -162,7 +160,7 @@ export class SprintController {
   });
 
   completeSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -193,7 +191,7 @@ export class SprintController {
   });
 
   updateSprint = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -217,7 +215,7 @@ export class SprintController {
   });
   
   getBurndown = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -238,7 +236,7 @@ export class SprintController {
   });
 
   getSprintAllocation = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
     const userId = req.user?.userId;
 
     if (!userId) {
@@ -259,7 +257,7 @@ export class SprintController {
   });
 
   getSprintHistoryDetails = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { sprintId } = req.params;
+    const sprintId = req.params.sprintId as string;
     const userId = req.user?.userId;
 
     if (!userId) {

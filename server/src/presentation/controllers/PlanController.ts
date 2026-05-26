@@ -38,7 +38,7 @@ export class PlanController {
   });
 
   togglePlanStatus = asyncHandler(async (req: Request, res: Response) => {
-    const { planId } = req.params;
+    const planId = req.params.planId as string;
 
     const result = await this._togglePlanStatusUseCase.execute(planId);
 

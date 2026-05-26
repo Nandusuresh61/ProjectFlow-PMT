@@ -54,7 +54,7 @@ export class IssueController {
 
   getIssuesByProject = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
-    const { projectId } = req.params;
+    const projectId = req.params.projectId as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const search = req.query.search as string || "";
@@ -86,7 +86,7 @@ export class IssueController {
 
   updateIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
-    const { issueId } = req.params;
+    const issueId = req.params.issueId as string;
 
     if (!issueId) {
       throw new AppError(
@@ -119,7 +119,7 @@ export class IssueController {
 
   addComment = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
-    const { issueId } = req.params;
+    const issueId = req.params.issueId as string;
 
     if (!issueId) {
       throw new AppError(
@@ -145,7 +145,7 @@ export class IssueController {
   });
 
   getCommentsByIssue = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { issueId } = req.params;
+    const issueId = req.params.issueId as string;
 
     if (!issueId) {
       throw new AppError(

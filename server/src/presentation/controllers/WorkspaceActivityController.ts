@@ -15,7 +15,7 @@ export class WorkspaceActivityController {
 
   getWorkspaceFeed = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
 
@@ -29,7 +29,7 @@ export class WorkspaceActivityController {
 
   getEntityTimeline = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = req.user!;
-    const { entityId } = req.params;
+    const entityId = req.params.entityId as string;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
     const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
 

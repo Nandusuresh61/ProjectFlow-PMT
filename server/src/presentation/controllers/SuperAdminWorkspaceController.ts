@@ -37,7 +37,7 @@ export class SuperAdminWorkspaceController {
   });
 
   getWorkspaceDetails = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const result = await this._getWorkspaceDetailsUseCase.execute(workspaceId);
 
     if (!result) {
@@ -54,7 +54,7 @@ export class SuperAdminWorkspaceController {
   });
 
   toggleWorkspaceSuspension = asyncHandler(async (req: Request, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     await this._toggleWorkspaceSuspensionUseCase.execute(workspaceId);
 
     res

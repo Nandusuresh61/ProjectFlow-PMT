@@ -34,7 +34,7 @@ export class MeetingController {
   });
 
   getMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { meetingId } = req.params;
+    const meetingId = req.params.meetingId as string;
     const userId = req.user!.userId;
 
     const meeting = await this._getMeetingUseCase.execute(meetingId, userId);
@@ -43,7 +43,7 @@ export class MeetingController {
   });
 
   getWorkspaceMeetings = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { workspaceId } = req.params;
+    const workspaceId = req.params.workspaceId as string;
     const userId = req.user!.userId;
 
     const meetings = await this._getWorkspaceMeetingsUseCase.execute(workspaceId, userId);
@@ -52,7 +52,7 @@ export class MeetingController {
   });
 
   endMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
-    const { meetingId } = req.params;
+    const meetingId = req.params.meetingId as string;
     const userId = req.user!.userId;
 
     const meeting = await this._endMeetingUseCase.execute(meetingId, userId);
