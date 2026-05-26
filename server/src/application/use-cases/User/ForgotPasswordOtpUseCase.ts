@@ -33,8 +33,6 @@ export class ForgotPasswordOtpUseCase implements IForgotPasswordOtpUseCase {
 
     const otp = this._otpGenerator.generateOtp();
 
-    console.log(`OTP for forgot password: ${otp}`);
-
     const otpHash = await this._passwordHash.createHashPassword(otp);
 
     await this._resetPasswordOtpStore.save(

@@ -31,7 +31,7 @@ Follow these steps to get the project up and running in your local development e
 
 Ensure you have the following installed:
 - **Node.js** (v18.x or higher)
-- **pnpm** (v10.x or higher)
+- **npm** (v7.x or higher)
 - **MongoDB** (Local or Atlas)
 - **Redis** (Local or Upstash)
 
@@ -45,7 +45,7 @@ Ensure you have the following installed:
 
 2. **Install dependencies**:
    ```bash
-   pnpm install
+   npm install
    ```
 
 ### ⚙️ Environment Setup
@@ -80,11 +80,11 @@ From the root directory, you can run both the client and server concurrently:
 
 ```bash
 # Run both frontend and backend
-pnpm dev
+npm run dev
 
 # Or run them individually
-pnpm dev:client  # Frontend only
-pnpm dev:server  # Backend only
+npm run dev:client  # Frontend only
+npm run dev:server  # Backend only
 ```
 
 ---
@@ -150,7 +150,7 @@ The project follows a **Monorepo** structure with a **Clean Architecture** appro
 
 | Component | Status | Description |
 | :--- | :---: | :--- |
-| **Core API** | ✅ | Express backend with pnpm workspace. |
+| **Core API** | ✅ | Express backend with npm workspace. |
 | **Auth System** | ✅ | OTP-based registration and secure login. |
 | **Workspace** | 🚧 | Multi-tenant workspace management. |
 | **Profile** | ✅ | User profiles with Cloudinary image support. |
