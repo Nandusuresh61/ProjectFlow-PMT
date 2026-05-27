@@ -75,7 +75,7 @@ export class MongoIssueRepository implements IIssueRepository {
     const updated = await IssueModel.findOneAndUpdate(
       { issueId },
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!updated) return null;

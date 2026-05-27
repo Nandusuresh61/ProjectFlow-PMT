@@ -24,7 +24,7 @@ export class MongoSprintDailyMetricRepository implements ISprintDailyMetricRepos
     const updated = await SprintDailyMetricModel.findOneAndUpdate(
       { metricId },
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!updated) return null;
@@ -55,7 +55,7 @@ export class MongoSprintDailyMetricRepository implements ISprintDailyMetricRepos
           createdAt: new Date()
         }
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: "after" }
     ).lean();
 
     return this.toDomain(updated as SprintDailyMetricDocument);

@@ -67,7 +67,7 @@ export class MongoProjectRepository
     const project = await ProjectModel.findOneAndUpdate(
       { projectId },
       { $inc: { issueSequence: 1 } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!project) {

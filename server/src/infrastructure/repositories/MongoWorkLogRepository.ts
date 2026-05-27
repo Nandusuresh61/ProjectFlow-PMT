@@ -29,7 +29,7 @@ export class MongoWorkLogRepository implements IWorkLogRepository {
     const updated = await WorkLogModel.findOneAndUpdate(
       { workLogId },
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
     if (!updated) return null;
     return this.toDomain(updated as WorkLogDocument);

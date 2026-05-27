@@ -39,7 +39,7 @@ export class MongoMeetingRepository implements IMeetingRepository {
     const updated = await MeetingModel.findOneAndUpdate(
       { meetingId },
       { $set: data },
-      { new: true }
+      { returnDocument: "after" }
     );
     if (!updated) return null;
     return this.mapToEntity(updated);

@@ -26,7 +26,7 @@ export abstract class MongoBaseRepository<TEntity, TDoc extends Document> {
   }
 
   async updateOne(filter: QueryFilter<TDoc>, update: UpdateQuery<TDoc>): Promise<TEntity | null> {
-    const updated = await this.model.findOneAndUpdate(filter, update, { new: true }).exec();
+    const updated = await this.model.findOneAndUpdate(filter, update, { returnDocument: "after" }).exec();
     return updated ? this.mapToEntity(updated) : null;
   }
 

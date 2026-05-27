@@ -31,7 +31,7 @@ export class MongoCommentRepository implements ICommentRepository {
     const updated = await CommentModel.findOneAndUpdate(
       { commentId },
       { $set: { content } },
-      { new: true }
+      { returnDocument: "after" }
     ).lean();
 
     if (!updated) return null;

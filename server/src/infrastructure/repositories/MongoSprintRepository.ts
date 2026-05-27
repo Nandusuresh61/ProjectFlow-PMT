@@ -38,7 +38,7 @@ export class SprintRepository implements ISprintRepository {
     const updated = await SprintModel.findOneAndUpdate(
       { sprintId },
       { $set: data },
-      { new: true },
+      { returnDocument: "after" },
     ).lean();
 
     if (!updated) return null;
