@@ -19,3 +19,11 @@ export interface MeetingResponseDTO {
   startedAt: Date | null;
   endedAt: Date | null;
 }
+
+export interface EditMeetingDTO {
+  meetingId: string;
+  title: string;
+  participants: string[];
+  scheduledAt: Date;
+  duration: number;
+}

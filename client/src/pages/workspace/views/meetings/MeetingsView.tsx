@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Video, Plus, Calendar, Clock, Loader2 } from 'lucide-react';
+import { Video, Plus, Calendar, Clock, Loader2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkspaceStore } from '@/store/workspace.store';
 import { getWorkspaceMeetings } from '@/services/meetingService';
 import { toast } from 'sonner';
 import { ScheduleMeetingModal } from './ScheduleMeetingModal';
+import { EditMeetingModal } from './EditMeetingModal';
+import { AuthUserState } from '@/store/auth.store';
 import { WorkspaceRoleEnum } from '@/shared/enums/WorkspaceRolesEnum';
 import type { Meeting } from '@/types/meeting.types';
 
@@ -17,11 +19,14 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
 export const MeetingsView = () => {
     const navigate = useNavigate();
     const { currentWorkspace, currentWorkspaceRole } = useWorkspaceStore();
+    const { user } = AuthUserState();
 
 
     const [meetings, setMeetings] = useState<Meeting[]>([]);
     const [loading, setLoading] = useState(true);
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedMeetingToEdit, setSelectedMeetingToEdit] = useState<Meeting | null>(null);
 
     const canCreateMeeting = currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_ADMIN || currentWorkspaceRole === WorkspaceRoleEnum.WORKSPACE_OWNER;
 
@@ -123,13 +128,34 @@ export const MeetingsView = () => {
                                     {meeting.participants.length} Participant{meeting.participants.length !== 1 ? 's' : ''}
                                 </div>
 
-                                {(meeting.status === 'PENDING' || meeting.status === 'ACTIVE') && (
+                                {meeting.status === 'ENDED' ? (
                                     <button
-                                        onClick={() => navigate(`/meetings/${meeting.meetingId}`)}
-                                        className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white transition-all shadow-sm flex-shrink-0"
+                                        disabled
+                                        className="px-4 py-2 rounded-lg bg-gray-800 text-white/20 text-sm font-semibold cursor-not-allowed flex-shrink-0"
                                     >
-                                        Join
+                                        Ended
                                     </button>
+                                ) : (
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        {meeting.hostId === user?.userId && (
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedMeetingToEdit(meeting);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="p-2 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/60 hover:text-white transition-all shadow-sm"
+                                                title="Edit Meeting"
+                                            >
+                                                <Pencil size={15} />
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => navigate(`/meetings/${meeting.meetingId}`)}
+                                            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white transition-all shadow-sm"
+                                        >
+                                            Join
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         );
@@ -141,6 +167,18 @@ export const MeetingsView = () => {
                 isOpen={isScheduleModalOpen}
                 onClose={() => setIsScheduleModalOpen(false)}
                 onCreated={() => {
+                    fetchMeetings();
+                }}
+            />
+
+            <EditMeetingModal
+                isOpen={isEditModalOpen}
+                meeting={selectedMeetingToEdit}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedMeetingToEdit(null);
+                }}
+                onUpdated={() => {
                     fetchMeetings();
                 }}
             />

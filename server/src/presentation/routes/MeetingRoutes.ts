@@ -32,4 +32,11 @@ router.post(
   meetingController.endMeeting
 );
 
+router.put(
+  "/:meetingId",
+  authenticatedUser,
+  workspaceRoleMiddleware.requireRoles([WorkspaceRoleEnum.WORKSPACE_ADMIN, WorkspaceRoleEnum.WORKSPACE_OWNER]),
+  meetingController.editMeeting
+);
+
 export default router;

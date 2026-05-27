@@ -1,44 +1,41 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
-import { MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
+import { EditMeetingDTO, MeetingResponseDTO } from "@/application/dtos/MeetingDTOs";
 import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
-import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
+import { IEditMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEditMeetingUseCase";
 import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { AppMessages } from "@/shared/messages/AppMessages";
-import { SocketServer } from "@/infrastructure/services/SocketServer";
 
-export class EndMeetingUseCase implements IEndMeetingUseCase {
+export class EditMeetingUseCase implements IEditMeetingUseCase {
   constructor(
     private readonly meetingRepo: IMeetingRepository,
     private readonly eventTrackingService: IWorkspaceEventTrackingService
   ) {}
 
-  async execute(meetingId: string, userId: string): Promise<MeetingResponseDTO> {
-    const meeting = await this.meetingRepo.findById(meetingId);
+  async execute(dto: EditMeetingDTO, userId: string): Promise<MeetingResponseDTO> {
+    const meeting = await this.meetingRepo.findById(dto.meetingId);
     if (!meeting) {
       throw new AppError(ErrorCode.RESOURCE_NOT_FOUND, AppMessages.MEETING_NOT_FOUND, HttpStatusCode.NOT_FOUND);
     }
 
     if (meeting.hostId !== userId) {
-      throw new AppError(ErrorCode.AUTH, AppMessages.MEETING_HOST_ONLY, HttpStatusCode.FORBIDDEN);
+      throw new AppError(ErrorCode.AUTH, AppMessages.MEETING_HOST_ONLY_EDIT, HttpStatusCode.FORBIDDEN);
     }
 
-    const updated = await this.meetingRepo.update(meetingId, {
-      status: "ENDED",
-      endedAt: new Date()
+    // Add host back to participants if not present
+    const participantsSet = new Set(dto.participants);
+    participantsSet.add(meeting.hostId);
+
+    const updated = await this.meetingRepo.update(dto.meetingId, {
+      title: dto.title,
+      participants: Array.from(participantsSet),
+      scheduledAt: dto.scheduledAt,
+      duration: dto.duration
     });
 
     if (!updated) {
-      throw new AppError(ErrorCode.INTERNAL_ERROR, AppMessages.MEETING_END_FAILED, HttpStatusCode.INTERNAL_SERVER_ERROR);
-    }
-
-    // Notify all participants in the meeting room that the meeting has ended
-    try {
-      const io = SocketServer.getInstance().getIO();
-      io.to(`meeting:${meetingId}`).emit("meeting-ended", { meetingId });
-    } catch (socketErr) {
-      // Ignore if socket server is not initialized yet (e.g. in tests)
+      throw new AppError(ErrorCode.INTERNAL_ERROR, AppMessages.MEETING_UPDATE_FAILED, HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 
     // Track activity
@@ -49,7 +46,7 @@ export class EndMeetingUseCase implements IEndMeetingUseCase {
       entityType: "WORKSPACE",
       entityId: updated.workspaceId,
       metadata: {
-        action: "MEETING_ENDED",
+        action: "MEETING_UPDATED",
         meetingId: updated.meetingId,
         title: updated.title
       }

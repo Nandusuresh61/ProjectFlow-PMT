@@ -197,6 +197,9 @@ export const AppMessages = {
   MEETING_UNAUTHORIZED: "You are not authorized to join this meeting",
   MEETING_HOST_ONLY: "Only the host can end the meeting",
   MEETING_END_FAILED: "Failed to end meeting",
+  MEETING_HOST_ONLY_EDIT: "Only the host can edit the meeting",
+  MEETING_UPDATED_SUCCESS: "Meeting updated successfully",
+  MEETING_UPDATE_FAILED: "Failed to update meeting",
 
   DASHBOARD_STATS_RETRIEVED: "Dashboard statistics retrieved successfully",
   DASHBOARD_REVENUE_RETRIEVED: "Revenue overview retrieved successfully",

@@ -11,7 +11,11 @@ const ICE_SERVERS = {
   ],
 };
 
-export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
+export const useWebRTC = (
+  meetingId: string,
+  shouldConnect: boolean = true,
+  onMeetingEnded?: () => void
+) => {
   const {
     localStream,
     setLocalStream,
@@ -170,6 +174,12 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
       });
     });
 
+    socket.on("meeting-ended", () => {
+      if (onMeetingEnded) {
+        onMeetingEnded();
+      }
+    });
+
     return () => {
       socket.off("user-joined");
       socket.off("receive-offer");
@@ -177,9 +187,9 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
       socket.off("receive-ice-candidate");
       socket.off("user-left");
       socket.off("participant-updated");
+      socket.off("meeting-ended");
     };
-  }, [socket, isInitialized, localStream, meetingId]); // eslint-disable-line
-
+  }, [socket, isInitialized, localStream, meetingId, onMeetingEnded]);
   // Sync mic/camera changes with others
   useEffect(() => {
     if (socket) {

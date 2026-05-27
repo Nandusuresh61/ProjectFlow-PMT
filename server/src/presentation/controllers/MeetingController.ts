@@ -7,6 +7,7 @@ import { ICreateMeetingUseCase } from "@/application/interfaces/use-cases/Meetin
 import { IGetMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IGetMeetingUseCase";
 import { IGetWorkspaceMeetingsUseCase } from "@/application/interfaces/use-cases/Meeting/IGetWorkspaceMeetingsUseCase";
 import { IEndMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEndMeetingUseCase";
+import { IEditMeetingUseCase } from "@/application/interfaces/use-cases/Meeting/IEditMeetingUseCase";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class MeetingController {
@@ -14,7 +15,8 @@ export class MeetingController {
     private readonly _createMeetingUseCase: ICreateMeetingUseCase,
     private readonly _getMeetingUseCase: IGetMeetingUseCase,
     private readonly _getWorkspaceMeetingsUseCase: IGetWorkspaceMeetingsUseCase,
-    private readonly _endMeetingUseCase: IEndMeetingUseCase
+    private readonly _endMeetingUseCase: IEndMeetingUseCase,
+    private readonly _editMeetingUseCase: IEditMeetingUseCase
   ) {}
 
   createMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -58,5 +60,21 @@ export class MeetingController {
     const meeting = await this._endMeetingUseCase.execute(meetingId, userId);
 
     res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_ENDED_SUCCESS, meeting));
+  });
+
+  editMeeting = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const meetingId = req.params.meetingId as string;
+    const userId = req.user!.userId;
+    const { title, participants, scheduledAt, duration } = req.body;
+
+    const meeting = await this._editMeetingUseCase.execute({
+      meetingId,
+      title,
+      participants,
+      scheduledAt,
+      duration
+    }, userId);
+
+    res.status(HttpStatusCode.OK).json(ResponseHandler.success(AppMessages.MEETING_UPDATED_SUCCESS, meeting));
   });
 }

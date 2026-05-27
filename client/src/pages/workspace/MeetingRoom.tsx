@@ -28,7 +28,9 @@ export const MeetingRoom: React.FC = () => {
   } = useMeetingStore();
 
   // Initialize WebRTC and Socket
-  useWebRTC(meetingId || "", !!meeting && !error);
+  useWebRTC(meetingId || "", !!meeting && !error, () => {
+    setError("This meeting has been ended by the host.");
+  });
 
   useEffect(() => {
     const fetchMeeting = async () => {

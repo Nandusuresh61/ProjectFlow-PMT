@@ -18,3 +18,10 @@ export interface CreateMeetingPayload {
   scheduledAt: Date;
   duration: number;
 }
+
+export interface EditMeetingPayload {
+  title: string;
+  participants: string[];
+  scheduledAt: Date;
+  duration: number;
+}

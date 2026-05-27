@@ -3,6 +3,7 @@ import { CreateMeetingUseCase } from "@/application/use-cases/meeting/CreateMeet
 import { GetMeetingUseCase } from "@/application/use-cases/meeting/GetMeetingUseCase";
 import { EndMeetingUseCase } from "@/application/use-cases/meeting/EndMeetingUseCase";
 import { GetWorkspaceMeetingsUseCase } from "@/application/use-cases/meeting/GetWorkspaceMeetingsUseCase";
+import { EditMeetingUseCase } from "@/application/use-cases/meeting/EditMeetingUseCase";
 import { workspaceEventTrackingService } from "@/infrastructure/DI/WorkspaceEventContainer";
 import { MeetingController } from "@/presentation/controllers/MeetingController";
 import { UidService } from "@/infrastructure/services/UidService";
@@ -14,10 +15,12 @@ export const createMeetingUseCase = new CreateMeetingUseCase(meetingRepo, worksp
 export const getMeetingUseCase = new GetMeetingUseCase(meetingRepo);
 export const getWorkspaceMeetingsUseCase = new GetWorkspaceMeetingsUseCase(meetingRepo);
 export const endMeetingUseCase = new EndMeetingUseCase(meetingRepo, workspaceEventTrackingService);
+export const editMeetingUseCase = new EditMeetingUseCase(meetingRepo, workspaceEventTrackingService);
 
 export const meetingController = new MeetingController(
   createMeetingUseCase,
   getMeetingUseCase,
   getWorkspaceMeetingsUseCase,
-  endMeetingUseCase
+  endMeetingUseCase,
+  editMeetingUseCase
 );
