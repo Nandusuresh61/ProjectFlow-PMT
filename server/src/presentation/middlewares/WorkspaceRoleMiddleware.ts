@@ -7,6 +7,7 @@ import { IMembershipRepository } from "@/application/interfaces/repositories/IMe
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { WorkspaceRoleEnum } from "@/shared/enums/WorkspaceRolesEnum";
 import { AuthRequest } from "./AuthMiddleware";
+import { MeetingModel } from "../../infrastructure/database/models/MongoMeetingModel";
 
 export class WorkspaceRoleMiddleware {
   constructor(
@@ -18,7 +19,14 @@ export class WorkspaceRoleMiddleware {
     return async (req: AuthRequest, res: Response, next: NextFunction) => {
       try {
         const userId = req.user?.userId;
-        const workspaceId = req.params?.workspaceId || req.body?.workspaceId || req.query?.workspaceId;
+        let workspaceId = req.params?.workspaceId || req.body?.workspaceId || req.query?.workspaceId;
+
+        if (!workspaceId && req.params?.meetingId) {
+          const meeting = await MeetingModel.findOne({ meetingId: req.params.meetingId });
+          if (meeting) {
+            workspaceId = meeting.workspaceId;
+          }
+        }
 
         if (!workspaceId) {
           throw new AppError(
