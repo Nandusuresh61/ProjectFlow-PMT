@@ -46,7 +46,7 @@ connectRedis();
 
 app.use(
   cors({
-    origin: config.FRONTEND_BASE_URL,
+    origin: config.ALLOWED_ORIGINS,
     credentials: true,
   }),
 );

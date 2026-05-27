@@ -16,7 +16,7 @@ export class SocketServer {
   private constructor(server: HttpServer) {
     this.io = new Server(server, {
       cors: {
-        origin: config.FRONTEND_BASE_URL,
+        origin: config.ALLOWED_ORIGINS,
         credentials: true,
       },
     });

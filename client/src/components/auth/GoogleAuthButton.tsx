@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/button";
 
-const GOOGLE_AUTH_URL =
-    "https://accounts.google.com/o/oauth2/v2/auth?" +
-    new URLSearchParams({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        redirect_uri: "http://localhost:5173/auth/google/callback",
-        response_type: "code",
-        scope: "email profile",
-        prompt: "consent",
-    }).toString();
-
 export const GoogleAuthButton = () => {
     const handleGoogleLogin = () => {
-        window.location.href = GOOGLE_AUTH_URL;
+        const googleAuthUrl =
+            "https://accounts.google.com/o/oauth2/v2/auth?" +
+            new URLSearchParams({
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+                redirect_uri: `${window.location.origin}/auth/google/callback`,
+                response_type: "code",
+                scope: "email profile",
+                prompt: "consent",
+            }).toString();
+
+        window.location.href = googleAuthUrl;
     };
 
     return (

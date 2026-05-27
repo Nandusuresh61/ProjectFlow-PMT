@@ -38,8 +38,26 @@ if (!parsedEnv.success) {
 
 const env = parsedEnv.data;
 
+const allowedOrigins = [env.VITE_FRONTEND_BASE_URL];
+if (env.VITE_FRONTEND_BASE_URL.startsWith("https://")) {
+  const domain = env.VITE_FRONTEND_BASE_URL.replace("https://", "");
+  if (domain.startsWith("www.")) {
+    allowedOrigins.push(`https://${domain.replace("www.", "")}`);
+  } else {
+    allowedOrigins.push(`https://www.${domain}`);
+  }
+} else if (env.VITE_FRONTEND_BASE_URL.startsWith("http://")) {
+  const domain = env.VITE_FRONTEND_BASE_URL.replace("http://", "");
+  if (domain.startsWith("www.")) {
+    allowedOrigins.push(`http://${domain.replace("www.", "")}`);
+  } else {
+    allowedOrigins.push(`http://www.${domain}`);
+  }
+}
+
 export const config = {
   FRONTEND_BASE_URL: env.VITE_FRONTEND_BASE_URL,
+  ALLOWED_ORIGINS: allowedOrigins,
   dbUrl: env.MONGO_URI,
 
   ACCESS_TOKEN_SECRET: env.ACCESS_TOKEN_SECRET,
