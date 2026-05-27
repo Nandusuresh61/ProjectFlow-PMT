@@ -27,6 +27,19 @@ export const MeetingSocketHandler = (io: Server, socket: AuthenticatedSocket) =>
     });
   });
 
+  socket.on("disconnecting", () => {
+    for (const room of socket.rooms) {
+      if (room.startsWith("meeting:")) {
+        const meetingId = room.replace("meeting:", "");
+        socket.to(room).emit("user-left", {
+          userId: socket.user?.userId,
+          socketId: socket.id
+        });
+        logger.info(`User ${socket.user?.userId} abruptly left meeting room ${meetingId} due to disconnect`);
+      }
+    }
+  });
+
   socket.on("webrtc-offer", (data: { targetSocketId: string, meetingId: string, offer: unknown }) => {
     socket.to(data.targetSocketId).emit("receive-offer", {
       senderSocketId: socket.id,

@@ -13,10 +13,10 @@ const VideoTile: React.FC<VideoTileProps> = ({ stream, isLocal, name, isMicOn, i
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && stream) {
+    if (videoRef.current && stream && isCameraOn !== false) {
       videoRef.current.srcObject = stream;
     }
-  }, [stream]);
+  }, [stream, isCameraOn]);
 
   return (
     <div className="relative bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center h-48 md:h-64 lg:h-80 w-full shadow-lg border border-gray-700 transition-all duration-300">

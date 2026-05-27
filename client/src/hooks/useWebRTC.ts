@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMeetingStore } from "@/store/useMeetingStore";
 import { useSocket } from "@/app/Providers/SocketProvider";
 import { Socket } from "socket.io-client";
@@ -21,50 +21,78 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
     updateParticipantState,
     isMicOn,
     isCameraOn,
+    reset,
   } = useMeetingStore();
 
   const { socket } = useSocket() as { socket: Socket | null };
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const peersRef = useRef<Record<string, RTCPeerConnection>>({});
 
   useEffect(() => {
     if (!socket || !shouldConnect) return;
 
+    let activeStream: MediaStream | null = null;
+
     const initWebRTC = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        });
-        setLocalStream(stream);
+        let stream: MediaStream | null = null;
+        try {
+          // Attempt 1: Get both video and audio
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+        } catch (videoErr) {
+          console.warn("Error accessing video + audio, trying audio-only...", videoErr);
+          try {
+            // Attempt 2: Fallback to audio-only if video device is locked/fails
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: false,
+              audio: true,
+            });
+          } catch (audioErr) {
+            console.error("Error accessing audio-only as well:", audioErr);
+            // Fallback: Continue without local stream
+          }
+        }
 
-        // Join room via socket
+        if (stream) {
+          activeStream = stream;
+          setLocalStream(stream);
+        }
+      } catch (err) {
+        console.error("Error in WebRTC initialization flow:", err);
+      } finally {
+        // Always join the meeting room socket so we can see/hear others
         socket.emit("join-meeting", meetingId);
 
         // Notify initial states
         socket.emit("toggle-mic", { meetingId, isMicOn });
         socket.emit("toggle-camera", { meetingId, isCameraOn });
 
-      } catch (err) {
-        console.error("Error accessing media devices", err);
+        setIsInitialized(true);
       }
     };
 
     initWebRTC();
 
     return () => {
-      // Cleanup
-      localStream?.getTracks().forEach((track) => track.stop());
-      setLocalStream(null);
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+      reset();
       if (socket) {
         socket.emit("leave-meeting", meetingId);
       }
       Object.values(peersRef.current).forEach((pc) => pc.close());
+      peersRef.current = {};
+      setIsInitialized(false);
     };
-  }, [meetingId, shouldConnect]); // eslint-disable-line
+  }, [meetingId, shouldConnect, socket]); // eslint-disable-line
 
   useEffect(() => {
-    if (!socket || !localStream) return;
+    if (!socket || !isInitialized) return;
 
     const createPeerConnection = (targetSocketId: string, userId: string, fullName?: string) => {
       const pc = new RTCPeerConnection(ICE_SERVERS);
@@ -72,10 +100,12 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
       peersRef.current[targetSocketId] = pc;
       addParticipant(targetSocketId, userId, fullName);
 
-      // Add local tracks to PC
-      localStream.getTracks().forEach((track) => {
-        pc.addTrack(track, localStream);
-      });
+      // Add local tracks to PC if localStream is available
+      if (localStream) {
+        localStream.getTracks().forEach((track) => {
+          pc.addTrack(track, localStream);
+        });
+      }
 
       pc.onicecandidate = (event) => {
         if (event.candidate) {
@@ -148,7 +178,7 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
       socket.off("user-left");
       socket.off("participant-updated");
     };
-  }, [socket, localStream, meetingId]); // eslint-disable-line
+  }, [socket, isInitialized, localStream, meetingId]); // eslint-disable-line
 
   // Sync mic/camera changes with others
   useEffect(() => {
@@ -162,5 +192,4 @@ export const useWebRTC = (meetingId: string, shouldConnect: boolean = true) => {
       socket.emit("toggle-camera", { meetingId, isCameraOn });
     }
   }, [isCameraOn, meetingId, socket]);
-
 };
