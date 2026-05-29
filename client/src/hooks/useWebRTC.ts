@@ -93,7 +93,7 @@ export const useWebRTC = (
       peersRef.current = {};
       setIsInitialized(false);
     };
-  }, [meetingId, shouldConnect, socket]); // eslint-disable-line
+  }, [meetingId, shouldConnect, socket]);
 
   useEffect(() => {
     if (!socket || !isInitialized) return;
