@@ -49,6 +49,15 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       );
 
       await this._userRepo.createUser(user);
+    } else {
+      if (user.authProvider !== AuthProvider.GOOGLE) {
+        user.authProvider = AuthProvider.GOOGLE;
+        user.providerId = payload.providerId;
+        if (payload.profileImage && !user.profileImage) {
+          user.profileImage = payload.profileImage;
+        }
+        await this._userRepo.update(user);
+      }
     }
 
     if (user.isBlocked) {
