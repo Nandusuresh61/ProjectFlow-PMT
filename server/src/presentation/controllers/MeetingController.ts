@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthRequest } from "@/presentation/middlewares/AuthMiddleware";
 import { asyncHandler } from "@/presentation/utils/AsyncHandler";
 import { ResponseHandler } from "@/shared/response/responseHandler";

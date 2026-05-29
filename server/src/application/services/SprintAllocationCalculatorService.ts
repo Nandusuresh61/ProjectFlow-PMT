@@ -92,12 +92,7 @@ export class SprintAllocationCalculatorService implements ISprintAllocationCalcu
     }
 
     
-    const currentAllocations = await this._allocationRepo.findBySprintId(sprintId);
-    for (const allocation of currentAllocations) {
-      if (!allocationMap.has(allocation.userId)) {
-      
-      }
-    }
+
   }
 
   async getSprintAllocation(sprintId: string): Promise<SprintMemberAllocation[]> {

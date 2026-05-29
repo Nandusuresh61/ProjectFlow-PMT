@@ -3,6 +3,7 @@ import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { ZodError } from "zod";
 import { Request, Response, NextFunction } from "express";
 import { AppMessages } from "@/shared/messages/AppMessages";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export const errorMiddleware = (
   err: unknown,
@@ -25,7 +26,7 @@ export const errorMiddleware = (
       message: err.message,
     });
   }
-  console.error("Unhandled Error:", err);
+  logger.error("Unhandled Error:", err);
 
   return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
     success: false,

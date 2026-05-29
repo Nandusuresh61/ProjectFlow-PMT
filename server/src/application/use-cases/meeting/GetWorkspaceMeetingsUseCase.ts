@@ -5,7 +5,7 @@ import { IGetWorkspaceMeetingsUseCase } from "@/application/interfaces/use-cases
 export class GetWorkspaceMeetingsUseCase implements IGetWorkspaceMeetingsUseCase {
   constructor(private readonly meetingRepo: IMeetingRepository) { }
 
-  async execute(workspaceId: string, userId: string): Promise<MeetingResponseDTO[]> {
+  async execute(workspaceId: string, _userId: string): Promise<MeetingResponseDTO[]> {
     return await this.meetingRepo.findByWorkspace(workspaceId);
   }
 }

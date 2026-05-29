@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import { notificationService } from "@/infrastructure/DI/NotificationContainer";
 import { NotificationType } from "@/domain/entities/Notification";
 import { IWorkspaceEventTrackingService } from "@/application/interfaces/services/IWorkspaceEventTrackingService";
+import { logger } from "@/infrastructure/utils/Logger";
 
 export interface TrackEventParams {
   workspaceId: string;
@@ -40,7 +41,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
           actorName = (user as { fullName: string }).fullName;
         }
       } catch (userError) {
-        console.error("[WorkspaceEventTrackingService] Failed to resolve actor name:", userError);
+        logger.error("[WorkspaceEventTrackingService] Failed to resolve actor name:", userError);
       }
 
       const event = new WorkspaceEvent(
@@ -126,7 +127,7 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
           });
         }
       } catch (notifErr) {
-        console.error("[WorkspaceEventTrackingService] Failed to send notification:", notifErr);
+        logger.error("[WorkspaceEventTrackingService] Failed to send notification:", notifErr);
       }
 
       // Emit real-time event to connected clients in the workspace room
@@ -134,12 +135,12 @@ export class WorkspaceEventTrackingService implements IWorkspaceEventTrackingSer
         const io = SocketServer.getInstance().getIO();
         io.to(`workspace_activity_${params.workspaceId}`).emit("new_activity", event);
       } catch (socketError) {
-        console.error("[WorkspaceEventTrackingService] Failed to emit socket event:", socketError);
+        logger.error("[WorkspaceEventTrackingService] Failed to emit socket event:", socketError);
       }
     } catch (error) {
       // We shouldn't throw errors from the tracking service to prevent
       // blocking the main business operation if tracking fails
-      console.error("[WorkspaceEventTrackingService] Failed to track event:", error);
+      logger.error("[WorkspaceEventTrackingService] Failed to track event:", error);
     }
   }
 }

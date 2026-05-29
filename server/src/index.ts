@@ -73,6 +73,8 @@ app.use("/api/meetings", meetingRoutes);
 
 app.use(errorMiddleware);
 
+import { logger } from "@/infrastructure/utils/Logger";
+
 const port = config.PORT || 3000;
 server.listen(port, () =>
-  console.log(`Server is running on http://localhost:${config.PORT}`));
+  logger.info(`Server is running on http://localhost:${config.PORT}`));

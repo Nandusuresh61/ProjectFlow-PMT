@@ -37,7 +37,7 @@ export class EndMeetingUseCase implements IEndMeetingUseCase {
     try {
       const io = SocketServer.getInstance().getIO();
       io.to(`meeting:${meetingId}`).emit("meeting-ended", { meetingId });
-    } catch (socketErr) {
+    } catch {
       // Ignore if socket server is not initialized yet (e.g. in tests)
     }
 

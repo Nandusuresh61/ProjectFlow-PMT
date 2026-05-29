@@ -8,7 +8,6 @@ import { AppError } from "@/shared/errors/AppError";
 import { ErrorCode } from "@/shared/enums/ErrorCode";
 import { HttpStatusCode } from "@/shared/enums/HttpStatusCodes";
 import { logger } from "@/infrastructure/utils/Logger";
-import { ResponseHandler } from "@/shared/response/responseHandler";
 import { AppMessages } from "@/shared/messages/AppMessages";
 
 export class NotificationController {

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import path from "path";
 import dotenv from "dotenv";
 import { envSchema } from "./shared/schema/EnvSchema/env.schema";

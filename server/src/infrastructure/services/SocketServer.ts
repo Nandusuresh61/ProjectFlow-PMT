@@ -54,7 +54,7 @@ export class SocketServer {
         const decoded = jwt.verify(token, config.ACCESS_TOKEN_SECRET) as ITokenPayload;
         socket.user = decoded;
         next();
-      } catch (_err) {
+      } catch {
         next(new Error("Authentication error: Invalid token"));
       }
     });
