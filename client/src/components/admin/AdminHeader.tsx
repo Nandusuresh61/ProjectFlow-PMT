@@ -1,5 +1,5 @@
 import { AuthUserState } from "@/store/auth.store";
-import { Bell, Search, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminHeaderProps {
@@ -24,21 +24,7 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
             </div>
 
             <div className="flex items-center gap-4">
-                <div className="relative hidden md:block">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-500" />
-                    <input
-                        type="text"
-                        placeholder="Search anything..."
-                        className="h-9 w-64 rounded-md border border-zinc-700 bg-zinc-950 pl-9 pr-4 text-sm text-zinc-300 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 placeholder:text-zinc-600"
-                    />
-                </div>
-
-                <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white hover:bg-zinc-800">
-                    <Bell size={20} />
-                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border border-zinc-900"></span>
-                </Button>
-
-                <div className="flex items-center gap-3 pl-4 border-l border-zinc-800">
+                <div className="flex items-center gap-3">
                     <div className="text-right hidden sm:block">
                         <p className="text-sm font-medium text-white">{user?.fullName || "Super Admin"}</p>
                         <p className="text-xs text-zinc-500">Administrator</p>
