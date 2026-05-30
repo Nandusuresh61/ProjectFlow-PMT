@@ -123,8 +123,6 @@ export class SprintController {
 
     const validatedData = StartSprintSchema.parse(req.body) as StartSprintDto;
 
-      validatedData.sprintId = req.params.sprintId as string;
-
     const result = await this._startSprintUseCase.execute(
       userId,
       validatedData,
