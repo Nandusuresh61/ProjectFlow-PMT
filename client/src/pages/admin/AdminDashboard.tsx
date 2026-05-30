@@ -170,9 +170,18 @@ export default function AdminDashboard() {
             ? "Workspace unsuspended successfully"
             : "Workspace suspended successfully"
         );
+        
+        // Update local UI state directly to avoid refetching all workspaces and dashboard charts
+        const newStatus = workspace.status === "suspended" ? "active" : "suspended";
+        setWorkspaces((prev) =>
+          prev.map((w) =>
+            w.workspaceId === workspace.workspaceId
+              ? { ...w, status: newStatus }
+              : w
+          )
+        );
+
         setSelectedWorkspace(null);
-        fetchWorkspaces(workspacePage);
-        fetchDashboardData();
       } else {
         toast.error("Failed to update workspace status.");
       }
