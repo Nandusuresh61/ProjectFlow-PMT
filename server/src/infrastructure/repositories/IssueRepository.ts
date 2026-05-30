@@ -4,7 +4,7 @@ import { IssueModel, IssueDocument } from "../database/models/MongoIssueModel";
 import { QueryFilter } from "mongoose";
 
 
-export class MongoIssueRepository implements IIssueRepository {
+export class IssueRepository implements IIssueRepository {
 
   async create(issue: Issue): Promise<Issue> {
     const created = await IssueModel.create({

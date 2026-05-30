@@ -2,7 +2,7 @@ import { GetWorkspaceActivityFeedUseCase } from "@/application/use-cases/Activit
 import { GetEntityTimelineUseCase } from "@/application/use-cases/Activity/GetEntityTimelineUseCase";
 import { WorkspaceActivityController } from "@/presentation/controllers/WorkspaceActivityController";
 import { workspaceEventRepository } from "./WorkspaceEventContainer";
-import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
+import { MembershipRepository } from "@/infrastructure/repositories/MembershipRepository";
 
 const membershipRepository = new MembershipRepository();
 

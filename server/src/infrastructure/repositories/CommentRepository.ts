@@ -2,7 +2,7 @@ import { ICommentRepository } from "@/application/interfaces/repositories/IComme
 import { Comment } from "@/domain/entities/Comment";
 import { CommentModel, CommentDocument } from "../database/models/MongoCommentModel";
 
-export class MongoCommentRepository implements ICommentRepository {
+export class CommentRepository implements ICommentRepository {
   async create(comment: Comment): Promise<Comment> {
     const created = await CommentModel.create({
       commentId: comment.commentId,

@@ -1,5 +1,5 @@
-import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
-import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
+import { WorkLogRepository } from "../repositories/WorkLogRepository";
+import { IssueRepository } from "../repositories/IssueRepository";
 import { UidService } from "../services/UidService";
 import { sprintBurndownSnapshotService, sprintAllocationCalculatorService } from "./SprintContainer";
 
@@ -9,8 +9,8 @@ import { DeleteWorkLogUseCase } from "@/application/use-cases/WorkLog/DeleteWork
 import { GetIssueWorkLogsUseCase } from "@/application/use-cases/WorkLog/GetIssueWorkLogsUseCase";
 import { WorkLogController } from "@/presentation/controllers/WorkLogController";
 
-const workLogRepository = new MongoWorkLogRepository();
-const issueRepository = new MongoIssueRepository();
+const workLogRepository = new WorkLogRepository();
+const issueRepository = new IssueRepository();
 const uidService = new UidService();
 
 const addWorkLogUseCase = new AddWorkLogUseCase(

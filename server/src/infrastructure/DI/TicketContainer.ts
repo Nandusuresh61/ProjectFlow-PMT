@@ -1,10 +1,10 @@
-import { MongoTicketRepository } from "@/infrastructure/repositories/MongoTicketRepository";
-import { MongoTicketMessageRepository } from "@/infrastructure/repositories/MongoTicketMessageRepository";
-import { WorkspaceRepository } from "@/infrastructure/repositories/MongoWorkspaceRepository";
-import { MongoPlanRepository } from "@/infrastructure/repositories/MongoPlanRepository";
+import { TicketRepository } from "@/infrastructure/repositories/TicketRepository";
+import { TicketMessageRepository } from "@/infrastructure/repositories/TicketMessageRepository";
+import { WorkspaceRepository } from "@/infrastructure/repositories/WorkspaceRepository";
+import { PlanRepository } from "@/infrastructure/repositories/PlanRepository";
 import { UidService } from "@/infrastructure/services/UidService";
-import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
-import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
+import { MembershipRepository } from "@/infrastructure/repositories/MembershipRepository";
+import { UserRepository } from "@/infrastructure/repositories/UserRepository";
 import { workspaceEventTrackingService } from "@/infrastructure/DI/WorkspaceEventContainer";
 
 import { CreateTicketUseCase } from "@/application/use-cases/Ticket/CreateTicketUseCase";
@@ -16,13 +16,13 @@ import { GetAllTicketsUseCase } from "@/application/use-cases/Ticket/GetAllTicke
 
 import { TicketController } from "@/presentation/controllers/TicketController";
 
-const ticketRepository = new MongoTicketRepository();
-const ticketMessageRepository = new MongoTicketMessageRepository();
+const ticketRepository = new TicketRepository();
+const ticketMessageRepository = new TicketMessageRepository();
 const workspaceRepository = new WorkspaceRepository();
-const planRepository = new MongoPlanRepository();
+const planRepository = new PlanRepository();
 const uidGenerator = new UidService();
 const membershipRepository = new MembershipRepository();
-const userRepository = new MongoUserRepository();
+const userRepository = new UserRepository();
 
 const createTicketUseCase = new CreateTicketUseCase(
   ticketRepository,

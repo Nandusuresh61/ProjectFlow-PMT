@@ -2,7 +2,7 @@ import { Notification } from "@/domain/entities/Notification";
 import { INotificationRepository } from "@/domain/repositories/INotificationRepository";
 import { MongoNotificationModel, INotificationDocument } from "../database/models/MongoNotificationModel";
 
-export class MongoNotificationRepository implements INotificationRepository {
+export class NotificationRepository implements INotificationRepository {
   private mapToDomain(doc: INotificationDocument): Notification {
     return new Notification(
       doc.notificationId,

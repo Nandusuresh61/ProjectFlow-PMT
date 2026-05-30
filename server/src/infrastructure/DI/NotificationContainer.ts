@@ -1,4 +1,4 @@
-import { MongoNotificationRepository } from "@/infrastructure/repositories/MongoNotificationRepository";
+import { NotificationRepository } from "@/infrastructure/repositories/NotificationRepository";
 import { CreateNotificationUseCase } from "@/application/use-cases/Notification/CreateNotificationUseCase";
 import { GetUserNotificationsUseCase } from "@/application/use-cases/Notification/GetUserNotificationsUseCase";
 import { MarkNotificationAsReadUseCase } from "@/application/use-cases/Notification/MarkNotificationAsReadUseCase";
@@ -7,7 +7,7 @@ import { ClearNotificationHistoryUseCase } from "@/application/use-cases/Notific
 import { NotificationService } from "@/application/services/NotificationService";
 import { NotificationController } from "@/presentation/controllers/NotificationController";
 
-export const notificationRepo = new MongoNotificationRepository();
+export const notificationRepo = new NotificationRepository();
 export const createNotificationUseCase = new CreateNotificationUseCase(notificationRepo);
 export const getUserNotificationsUseCase = new GetUserNotificationsUseCase(notificationRepo);
 export const markNotificationAsReadUseCase = new MarkNotificationAsReadUseCase(notificationRepo);

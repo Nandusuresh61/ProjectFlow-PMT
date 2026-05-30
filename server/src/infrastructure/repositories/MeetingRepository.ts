@@ -1,7 +1,7 @@
 import { IMeetingRepository } from "@/application/interfaces/repositories/IMeetingRepository";
 import { Meeting } from "@/domain/entities/Meeting";
 import { MeetingModel, MeetingDocument } from "@/infrastructure/database/models/MongoMeetingModel";
-export class MongoMeetingRepository implements IMeetingRepository {
+export class MeetingRepository implements IMeetingRepository {
   private mapToEntity(doc: MeetingDocument): Meeting {
     return new Meeting(
       doc.meetingId,

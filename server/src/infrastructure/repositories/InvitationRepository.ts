@@ -1,11 +1,11 @@
 import { IInvitationRepository } from "@/application/interfaces/repositories/IInvitationRepository";
 import { Invitation } from "@/domain/entities/Invitation";
 import { InvitationModel, InvitationDocument } from "../database/models/MongoInvitationModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 import { InvitationStatus } from "@/shared/enums/InvitationStatusEnum";
 
-export class MongoInvitationRepository
-  extends MongoBaseRepository<Invitation, InvitationDocument>
+export class InvitationRepository
+  extends BaseRepository<Invitation, InvitationDocument>
   implements IInvitationRepository
 {
   constructor() {

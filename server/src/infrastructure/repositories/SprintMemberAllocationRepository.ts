@@ -1,10 +1,10 @@
 import { ISprintMemberAllocationRepository } from "@/application/interfaces/repositories/ISprintMemberAllocationRepository";
 import { SprintMemberAllocation, CapacityStatus } from "@/domain/entities/SprintMemberAllocation";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 import { SprintMemberAllocationDocument, SprintMemberAllocationModel } from "../database/models/MongoSprintMemberAllocationModel";
 
-export class MongoSprintMemberAllocationRepository
-  extends MongoBaseRepository<SprintMemberAllocation, SprintMemberAllocationDocument>
+export class SprintMemberAllocationRepository
+  extends BaseRepository<SprintMemberAllocation, SprintMemberAllocationDocument>
   implements ISprintMemberAllocationRepository
 {
   constructor() {

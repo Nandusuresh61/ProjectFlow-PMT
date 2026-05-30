@@ -1,9 +1,9 @@
 import { IPlanRepository } from "@/application/interfaces/repositories/IPlanRepository";
 import { Plan } from "@/domain/entities/Plan";
 import { PlanModel, PlanDocument } from "../database/models/MongoPlanModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 
-export class MongoPlanRepository extends MongoBaseRepository<Plan, PlanDocument> implements IPlanRepository {
+export class PlanRepository extends BaseRepository<Plan, PlanDocument> implements IPlanRepository {
   constructor() {
     super(PlanModel);
   }

@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import { AuthenticatedSocket } from "@/infrastructure/services/SocketServer";
 import { logger } from "@/infrastructure/utils/Logger";
-import { MembershipRepository } from "@/infrastructure/repositories/MongoMembershipRepository";
+import { MembershipRepository } from "@/infrastructure/repositories/MembershipRepository";
 
 const membershipRepo = new MembershipRepository();
 

@@ -5,22 +5,22 @@ import { CreateWorkspaceUseCase } from "@/application/use-cases/workspace/Create
 import { CheckWorkspaceNameUseCase } from "@/application/use-cases/workspace/CheckWorkspaceNameUseCase";
 import { GetWorkspaceDashboardDataUseCase } from "@/application/use-cases/workspace/GetWorkspaceDashboardDataUseCase";
 import { WorkspaceController } from "@/presentation/controllers/WorkspaceController";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { MongoUserRepository } from "../repositories/MongoUserRepository";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
-import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
-import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
-import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
+import { UserRepository } from "../repositories/UserRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
+import { PlanRepository } from "../repositories/PlanRepository";
+import { ProjectRepository } from "../repositories/ProjectRepository";
+import { IssueRepository } from "../repositories/IssueRepository";
 import { UidService } from "../services/UidService";
 import { subscriptionRepo } from "./SubscriptionContainer";
 
 
 const membershipRepo = new MembershipRepository();
-const userRepo = new MongoUserRepository();
+const userRepo = new UserRepository();
 const workspaceRepo = new WorkspaceRepository();
-const planRepo = new MongoPlanRepository();
-const projectRepo = new MongoProjectRepository();
-const issueRepo = new MongoIssueRepository();
+const planRepo = new PlanRepository();
+const projectRepo = new ProjectRepository();
+const issueRepo = new IssueRepository();
 const uidGenerator = new UidService();
 
 const getWorkspaceMembersUseCase = new GetWorkspaceMembersUseCase(

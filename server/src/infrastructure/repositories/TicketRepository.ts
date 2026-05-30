@@ -6,7 +6,7 @@ import { TicketStatus } from "@/shared/enums/TicketStatus";
 import { TicketPriority } from "@/shared/enums/TicketPriority";
 import { PlanType } from "@/shared/enums/PlanType";
 
-export class MongoTicketRepository implements ITicketRepository {
+export class TicketRepository implements ITicketRepository {
   async create(ticket: Ticket): Promise<Ticket> {
     const created = await TicketModel.create({
       ticketId: ticket.ticketId,

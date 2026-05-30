@@ -1,4 +1,4 @@
-import { MongoMeetingRepository } from "@/infrastructure/repositories/MongoMeetingRepository";
+import { MeetingRepository } from "@/infrastructure/repositories/MeetingRepository";
 import { CreateMeetingUseCase } from "@/application/use-cases/meeting/CreateMeetingUseCase";
 import { GetMeetingUseCase } from "@/application/use-cases/meeting/GetMeetingUseCase";
 import { EndMeetingUseCase } from "@/application/use-cases/meeting/EndMeetingUseCase";
@@ -8,7 +8,7 @@ import { workspaceEventTrackingService } from "@/infrastructure/DI/WorkspaceEven
 import { MeetingController } from "@/presentation/controllers/MeetingController";
 import { UidService } from "@/infrastructure/services/UidService";
 
-const meetingRepo = new MongoMeetingRepository();
+const meetingRepo = new MeetingRepository();
 const uidGenerator = new UidService();
 
 export const createMeetingUseCase = new CreateMeetingUseCase(meetingRepo, workspaceEventTrackingService, uidGenerator);

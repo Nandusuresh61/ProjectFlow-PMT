@@ -4,10 +4,10 @@ import {
   ProjectDocument,
   ProjectModel,
 } from "@/infrastructure/database/models/MongoProjectModel";
-import { MongoBaseRepository } from "@/infrastructure/repositories/MongoBaseRepository";
+import { BaseRepository } from "@/infrastructure/repositories/BaseRepository";
 
-export class MongoProjectRepository
-  extends MongoBaseRepository<Project, ProjectDocument>
+export class ProjectRepository
+  extends BaseRepository<Project, ProjectDocument>
   implements IProjectRepository
 {
   constructor() {

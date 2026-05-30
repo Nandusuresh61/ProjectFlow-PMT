@@ -1,10 +1,10 @@
 import { Message } from "@/domain/entities/Message";
 import { IMessageRepository } from "@/application/interfaces/repositories/IMessageRepository";
 import { MessageDoc, MessageModel } from "../database/models/MongoMessageModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 
-export class MongoMessageRepository
-  extends MongoBaseRepository<Message, MessageDoc>
+export class MessageRepository
+  extends BaseRepository<Message, MessageDoc>
   implements IMessageRepository
 {
   constructor() {

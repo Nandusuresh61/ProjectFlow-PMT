@@ -1,6 +1,6 @@
 import { RegisterUserUseCase } from "@/application/use-cases/User/RegisterUserUseCase";
 import { PasswordHash } from "@/infrastructure/services/PasswordHash";
-import { MongoUserRepository } from "@/infrastructure/repositories/MongoUserRepository";
+import { UserRepository } from "@/infrastructure/repositories/UserRepository";
 import { TokenService } from "@/infrastructure/services/TokenService";
 import { UidService } from "@/infrastructure/services/UidService";
 import { AuthController } from "@/presentation/controllers/AuthController";
@@ -17,7 +17,7 @@ import { RedisResetPasswordOtpStore } from "../cache/RedisResetPasswordOtpStore"
 import { ResetPasswordUseCase } from "@/application/use-cases/User/ResetPasswordUseCase";
 import { GoogleOAuthService } from "../services/GoogleOAuthService";
 import { GoogleAuthUseCase } from "@/application/use-cases/User/GoogleAuthUseCase";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
 import { GetMeUseCase } from "@/application/use-cases/User/GetMeUseCase";
 import { AuthCookieService } from "../services/AuthCookieService";
 
@@ -25,7 +25,7 @@ import { AuthCookieService } from "../services/AuthCookieService";
  * Infrastructure layer use case
  */
 
-const userRepository = new MongoUserRepository();
+const userRepository = new UserRepository();
 const passwordHasher = new PasswordHash();
 const tokenService = new TokenService();
 const uidService = new UidService();

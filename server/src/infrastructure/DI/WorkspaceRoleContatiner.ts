@@ -1,7 +1,7 @@
 
 import { WorkspaceRoleMiddleware } from "@/presentation/middlewares/WorkspaceRoleMiddleware";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
 
 const membershipRepo = new MembershipRepository;
 const workspaceRepo = new WorkspaceRepository();

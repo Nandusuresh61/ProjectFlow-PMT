@@ -4,10 +4,10 @@ import {
   MembershipModel,
   MembershipDocument,
 } from "../database/models/MongoMembershipModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 
 export class MembershipRepository
-  extends MongoBaseRepository<Membership, MembershipDocument>
+  extends BaseRepository<Membership, MembershipDocument>
   implements IMembershipRepository {
   constructor() {
     super(MembershipModel);

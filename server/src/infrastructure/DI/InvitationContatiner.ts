@@ -1,9 +1,9 @@
 import { CreateInvitationUseCase } from "@/application/use-cases/Invitation/CreateInvitationUseCase";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
-import { MongoUserRepository } from "../repositories/MongoUserRepository";
-import { MongoInvitationRepository } from "../repositories/MongoInvitationRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
+import { PlanRepository } from "../repositories/PlanRepository";
+import { UserRepository } from "../repositories/UserRepository";
+import { InvitationRepository } from "../repositories/InvitationRepository";
 import { EmailService } from "../services/EmailService";
 import { PasswordHash } from "../services/PasswordHash";
 import { UidService } from "../services/UidService";
@@ -14,9 +14,9 @@ import { GetInvitationDetailsUseCase } from "@/application/use-cases/Invitation/
 
 const workspaceRepo = new WorkspaceRepository();
 const membershipRepo = new MembershipRepository();
-const planRepo = new MongoPlanRepository();
-const userRepo = new MongoUserRepository();
-const invitationRepo = new MongoInvitationRepository();
+const planRepo = new PlanRepository();
+const userRepo = new UserRepository();
+const invitationRepo = new InvitationRepository();
 
 const emailService = new EmailService();
 const passwordHasher = new PasswordHash();

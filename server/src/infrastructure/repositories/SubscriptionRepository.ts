@@ -1,11 +1,11 @@
 import { ISubscriptionRepository } from "@/application/interfaces/repositories/ISubscriptionRepository";
 import { Subscription } from "@/domain/entities/Subscription";
 import { MongoSubscriptionModel, SubscriptionDoc } from "../database/models/MongoSubscriptionModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 import { SubscriptionStatus } from "@/shared/enums/SubscriptionStatus";
 
-export class MongoSubscriptionRepository
-  extends MongoBaseRepository<Subscription, SubscriptionDoc>
+export class SubscriptionRepository
+  extends BaseRepository<Subscription, SubscriptionDoc>
   implements ISubscriptionRepository
 {
   constructor() {

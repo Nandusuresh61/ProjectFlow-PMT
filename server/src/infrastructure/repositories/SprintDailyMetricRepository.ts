@@ -2,7 +2,7 @@ import { ISprintDailyMetricRepository } from "@/application/interfaces/repositor
 import { SprintDailyMetric } from "@/domain/entities/SprintDailyMetric";
 import { SprintDailyMetricModel, SprintDailyMetricDocument } from "../database/models/MongoSprintDailyMetricModel";
 
-export class MongoSprintDailyMetricRepository implements ISprintDailyMetricRepository {
+export class SprintDailyMetricRepository implements ISprintDailyMetricRepository {
   async create(metric: SprintDailyMetric): Promise<SprintDailyMetric> {
     const created = await SprintDailyMetricModel.create({
       metricId: metric.metricId,

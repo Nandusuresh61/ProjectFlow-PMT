@@ -2,7 +2,7 @@ import { ITicketMessageRepository } from "@/application/interfaces/repositories/
 import { TicketMessage } from "@/domain/entities/TicketMessage";
 import { TicketMessageModel, TicketMessageDocument } from "@/infrastructure/database/models/MongoTicketMessageModel";
 
-export class MongoTicketMessageRepository implements ITicketMessageRepository {
+export class TicketMessageRepository implements ITicketMessageRepository {
   async create(message: TicketMessage): Promise<TicketMessage> {
     const created = await TicketMessageModel.create({
       messageId: message.messageId,

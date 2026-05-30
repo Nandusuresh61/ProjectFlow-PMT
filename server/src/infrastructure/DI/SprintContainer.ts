@@ -10,33 +10,33 @@ import { GetSprintAllocationUseCase } from "@/application/use-cases/Sprint/GetSp
 import { GetSprintHistoryDetailsUseCase } from "@/application/use-cases/Sprint/GetSprintHistoryDetailsUseCase";
 
 import { SprintController } from "@/presentation/controllers/SprintController";
-import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
-import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
+import { ProjectRepository } from "../repositories/ProjectRepository";
+import { IssueRepository } from "../repositories/IssueRepository";
 import { UidService } from "../services/UidService";
-import { SprintRepository } from "../repositories/MongoSprintRepository";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { MongoSprintAnalyticsRepository } from "../repositories/MongoSprintAnalyticsRepository";
-import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
+import { SprintRepository } from "../repositories/SprintRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
+import { SprintAnalyticsRepository } from "../repositories/SprintAnalyticsRepository";
+import { WorkLogRepository } from "../repositories/WorkLogRepository";
 import { SprintMetricsCalculatorService } from "@/application/services/SprintMetricsCalculatorService";
-import { MongoSprintDailyMetricRepository } from "../repositories/MongoSprintDailyMetricRepository";
+import { SprintDailyMetricRepository } from "../repositories/SprintDailyMetricRepository";
 import { SprintBurndownSnapshotService } from "@/application/services/SprintBurndownSnapshotService";
-import { MongoSprintMemberAllocationRepository } from "../repositories/MongoSprintMemberAllocationRepository";
+import { SprintMemberAllocationRepository } from "../repositories/SprintMemberAllocationRepository";
 import { SprintAllocationCalculatorService } from "@/application/services/SprintAllocationCalculatorService";
-import { MongoUserRepository } from "../repositories/MongoUserRepository";
+import { UserRepository } from "../repositories/UserRepository";
 import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
 
 
 const sprintRepository = new SprintRepository();
-const projectRepository = new MongoProjectRepository();
-const issueRepository = new MongoIssueRepository();
+const projectRepository = new ProjectRepository();
+const issueRepository = new IssueRepository();
 const membershipRepository = new MembershipRepository();
 const uidGenarator = new UidService();
-const sprintAnalyticsRepository = new MongoSprintAnalyticsRepository();
-const workLogRepository = new MongoWorkLogRepository();
+const sprintAnalyticsRepository = new SprintAnalyticsRepository();
+const workLogRepository = new WorkLogRepository();
 const sprintMetricsCalculatorService = new SprintMetricsCalculatorService();
-const sprintDailyMetricRepository = new MongoSprintDailyMetricRepository();
-const sprintMemberAllocationRepository = new MongoSprintMemberAllocationRepository();
-const userRepository = new MongoUserRepository();
+const sprintDailyMetricRepository = new SprintDailyMetricRepository();
+const sprintMemberAllocationRepository = new SprintMemberAllocationRepository();
+const userRepository = new UserRepository();
 
 export const sprintBurndownSnapshotService = new SprintBurndownSnapshotService(
   sprintRepository,

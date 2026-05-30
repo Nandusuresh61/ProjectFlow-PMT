@@ -2,7 +2,7 @@ import { GetAllWorkspacesUseCase } from "@/application/use-cases/Admin/GetAllWor
 import { GetWorkspaceDetailsUseCase } from "@/application/use-cases/Admin/GetWorkspaceDetailsUseCase";
 import { ToggleWorkspaceSuspensionUseCase } from "@/application/use-cases/Admin/ToggleWorkspaceSuspensionUseCase";
 import { SuperAdminWorkspaceController } from "@/presentation/controllers/SuperAdminWorkspaceController";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
 
 const workspaceRepo = new WorkspaceRepository();
 

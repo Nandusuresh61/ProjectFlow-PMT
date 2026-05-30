@@ -1,8 +1,8 @@
-import { MongoSubscriptionRepository } from "../repositories/MongoSubscriptionRepository";
-import { MongoPlanRepository } from "../repositories/MongoPlanRepository";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
-import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
+import { SubscriptionRepository } from "../repositories/SubscriptionRepository";
+import { PlanRepository } from "../repositories/PlanRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
+import { ProjectRepository } from "../repositories/ProjectRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
 import { RazorpayService } from "../services/RazorpayService";
 import { UidService } from "../services/UidService";
 import { CreateSubscriptionUseCase } from "@/application/use-cases/Subscription/CreateSubscriptionUseCase";
@@ -11,10 +11,10 @@ import { VerifyPaymentUseCase } from "@/application/use-cases/Subscription/Verif
 import { GetSubscriptionDetailsUseCase } from "@/application/use-cases/Subscription/GetSubscriptionDetailsUseCase";
 import { SubscriptionController } from "@/presentation/controllers/SubscriptionController";
 
-export const subscriptionRepo = new MongoSubscriptionRepository();
-const planRepo = new MongoPlanRepository();
+export const subscriptionRepo = new SubscriptionRepository();
+const planRepo = new PlanRepository();
 const workspaceRepo = new WorkspaceRepository();
-const projectRepo = new MongoProjectRepository();
+const projectRepo = new ProjectRepository();
 const membershipRepo = new MembershipRepository();
 const paymentService = new RazorpayService();
 const uidGenerator = new UidService();

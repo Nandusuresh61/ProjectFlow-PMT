@@ -8,7 +8,7 @@ import {
 import { WorkspaceEventModel, WorkspaceEventDocument } from "@/infrastructure/database/models/MongoWorkspaceEventModel";
 import { UserModel } from "@/infrastructure/database/models/MongoUserModel";
 
-export class MongoWorkspaceEventRepository implements IWorkspaceEventRepository {
+export class WorkspaceEventRepository implements IWorkspaceEventRepository {
   private mapToDomain(doc: WorkspaceEventDocument, actorName?: string): WorkspaceEvent {
     return new WorkspaceEvent(
       doc.eventId,

@@ -2,9 +2,9 @@ import { GetAllUsersWithWorkspaceUseCase } from "@/application/use-cases/Admin/G
 import { GetUserDetailsUseCase } from "@/application/use-cases/Admin/GetUserDetailsUseCase";
 import { ToggleUserBlockUseCase } from "@/application/use-cases/Admin/ToggleUserBlockUseCase";
 import { SuperAdminUserController } from "@/presentation/controllers/SuperAdminUserController";
-import { MongoUserRepository } from "../repositories/MongoUserRepository";
+import { UserRepository } from "../repositories/UserRepository";
 
-const userRepo = new MongoUserRepository();
+const userRepo = new UserRepository();
 const getAllUsersWithWorkspace = new GetAllUsersWithWorkspaceUseCase(
   userRepo,
 );

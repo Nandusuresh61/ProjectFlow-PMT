@@ -1,10 +1,10 @@
 import { IWorkspaceRepository } from "@/application/interfaces/repositories/IWorkspaceRepository";
 import { Workspace } from "@/domain/entities/Workspace";
 import { WorkspaceModel, WorkspaceDocument } from "../database/models/MongoWorkspaceModel";
-import { MongoBaseRepository } from "./MongoBaseRepository";
+import { BaseRepository } from "./BaseRepository";
 import { WorkspaceQueryOptions, PaginatedWorkspacesResult, WorkspaceDetailsDto } from "@/application/dtos/WorkspaceDtos";
 
-export class WorkspaceRepository extends MongoBaseRepository<Workspace, WorkspaceDocument> implements IWorkspaceRepository {
+export class WorkspaceRepository extends BaseRepository<Workspace, WorkspaceDocument> implements IWorkspaceRepository {
   constructor() {
     super(WorkspaceModel);
   }

@@ -2,7 +2,7 @@ import { IWorkLogRepository } from "@/application/interfaces/repositories/IWorkL
 import { WorkLog } from "@/domain/entities/WorkLog";
 import { WorkLogModel, WorkLogDocument } from "../database/models/MongoWorkLogModel";
 
-export class MongoWorkLogRepository implements IWorkLogRepository {
+export class WorkLogRepository implements IWorkLogRepository {
   async create(workLog: WorkLog): Promise<WorkLog> {
     const created = await WorkLogModel.create({
       workLogId: workLog.workLogId,

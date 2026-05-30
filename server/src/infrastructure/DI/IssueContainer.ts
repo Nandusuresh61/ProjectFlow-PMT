@@ -2,28 +2,28 @@ import { CreateIssueUseCase } from "@/application/use-cases/Issue/CreateIssueUse
 import { IssueController } from "@/presentation/controllers/IssueController";
 import { GetIssuesByProjectUseCase } from "@/application/use-cases/Issue/GetIssuesByProjectUseCase";
 import { UpdateIssueUseCase } from "@/application/use-cases/Issue/UpdateIssueUseCase";
-import { MongoIssueRepository } from "../repositories/MongoIssueRepository";
-import { MongoProjectRepository } from "../repositories/MongoProjectRepository";
-import { MembershipRepository } from "../repositories/MongoMembershipRepository";
-import { WorkspaceRepository } from "../repositories/MongoWorkspaceRepository";
+import { IssueRepository } from "../repositories/IssueRepository";
+import { ProjectRepository } from "../repositories/ProjectRepository";
+import { MembershipRepository } from "../repositories/MembershipRepository";
+import { WorkspaceRepository } from "../repositories/WorkspaceRepository";
 import { UidService } from "../services/UidService";
 import { workspaceEventTrackingService } from "./WorkspaceEventContainer";
 
 // Comments
-import { MongoCommentRepository } from "../repositories/MongoCommentRepository";
+import { CommentRepository } from "../repositories/CommentRepository";
 import { AddCommentUseCase } from "@/application/use-cases/Issue/AddCommentUseCase";
 import { GetIssueCommentsUseCase } from "@/application/use-cases/Issue/GetIssueCommentsUseCase";
 
-import { MongoWorkLogRepository } from "../repositories/MongoWorkLogRepository";
+import { WorkLogRepository } from "../repositories/WorkLogRepository";
 import { sprintBurndownSnapshotService, sprintAllocationCalculatorService } from "./SprintContainer";
 
 
-const projectRepository = new MongoProjectRepository();
-const issueRepository = new MongoIssueRepository();
+const projectRepository = new ProjectRepository();
+const issueRepository = new IssueRepository();
 const membershipRepository = new MembershipRepository();
 const workspaceRepository = new WorkspaceRepository();
-const commentRepository = new MongoCommentRepository();
-const workLogRepository = new MongoWorkLogRepository();
+const commentRepository = new CommentRepository();
+const workLogRepository = new WorkLogRepository();
 const uidGenerator = new UidService();
 
 const createissueUseCase = new CreateIssueUseCase(

@@ -6,7 +6,7 @@ import {
 } from "@/infrastructure/database/models/MongoSprintAnalyticsModel";
 import { PipelineStage } from "mongoose";
 
-export class MongoSprintAnalyticsRepository implements ISprintAnalyticsRepository {
+export class SprintAnalyticsRepository implements ISprintAnalyticsRepository {
   async create(analytics: SprintAnalytics): Promise<SprintAnalytics> {
     const created = await SprintAnalyticsModel.create({
       analyticsId: analytics.analyticsId,

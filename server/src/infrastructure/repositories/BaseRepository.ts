@@ -1,6 +1,6 @@
 import { Model, Document, QueryFilter, UpdateQuery } from "mongoose";
 
-export abstract class MongoBaseRepository<TEntity, TDoc extends Document> {
+export abstract class BaseRepository<TEntity, TDoc extends Document> {
   constructor(protected readonly model: Model<TDoc>) { }
 
   protected abstract mapToEntity(doc: TDoc): TEntity;
